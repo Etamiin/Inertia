@@ -20,6 +20,12 @@ namespace Inertia
             }
         }
 
+        private static uint managedIdGiver = 1;
+        internal static uint GiveId()
+        {
+            return managedIdGiver++;
+        }
+
         public static int BufferLength = 4096;
 
         private Dictionary<Type, Message> _messages = new Dictionary<Type, Message>();

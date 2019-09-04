@@ -10,13 +10,13 @@ namespace Inertia
 {
     public class UserTransmissionControl : TransmissionControl.User
     {
-        internal UserTransmissionControl(ServerBase Server, Socket Socket) : base(Server, Socket)
+        internal UserTransmissionControl(ServerBase Server, Socket Socket, uint userId) : base(Server, Socket, userId)
         {
         }
     }
     public class DatagramUser : UserDatagram.User
     {
-        internal DatagramUser(ServerBase Server, IPEndPoint EndPoint) : base(Server, EndPoint)
+        internal DatagramUser(ServerBase Server, IPEndPoint EndPoint, uint userId) : base(Server, EndPoint, userId)
         {
         }
     }

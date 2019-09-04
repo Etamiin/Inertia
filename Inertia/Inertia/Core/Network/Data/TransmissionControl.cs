@@ -161,7 +161,7 @@ namespace Inertia
                 try
                 {
                     var socket = ((Socket)iar.AsyncState).EndAccept(iar);
-                    var user = new UserTransmissionControl(server, socket);
+                    var user = new UserTransmissionControl(server, socket, NetworkModule.GiveId());
 
                     OnClientJoin(user);
                 }
@@ -179,14 +179,17 @@ namespace Inertia
         {
             public readonly ServerBase Server;
             public readonly Socket Socket;
+            public readonly uint userId;
+
             internal readonly Reader Reader;
 
             private readonly byte[] buffer;
 
-            internal User(ServerBase Server, Socket Socket)
+            internal User(ServerBase Server, Socket Socket, uint userId)
             {
                 this.Server = Server;
                 this.Socket = Socket;
+                this.userId = userId;
 
                 buffer = new byte[NetworkModule.BufferLength];
                 Reader = new Reader();

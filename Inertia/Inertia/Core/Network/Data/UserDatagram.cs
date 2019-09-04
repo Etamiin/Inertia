@@ -140,7 +140,7 @@ namespace Inertia
 
                     if (!users.ContainsKey(endPoint))
                     {
-                        user = new DatagramUser(server, endPoint);
+                        user = new DatagramUser(server, endPoint, NetworkModule.GiveId());
                         users.Add(endPoint, user);
 
                         OnClientJoin(user);
@@ -164,12 +164,16 @@ namespace Inertia
         {
             public readonly ServerBase Server;
             public readonly IPEndPoint EndPoint;
+            public readonly uint userId;
+
             internal readonly Reader Reader;
 
-            internal User(ServerBase Server, IPEndPoint EndPoint)
+            internal User(ServerBase Server, IPEndPoint EndPoint, uint userId)
             {
                 this.Server = Server;
                 this.EndPoint = EndPoint;
+                this.userId = userId;
+
                 Reader = new Reader();
             }
 
