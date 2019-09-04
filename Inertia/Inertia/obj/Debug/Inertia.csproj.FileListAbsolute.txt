@@ -1,0 +1,5 @@
+C:\Users\abdel\source\repos\Inertia\Inertia\bin\Debug\Inertia.dll
+C:\Users\abdel\source\repos\Inertia\Inertia\bin\Debug\Inertia.pdb
+C:\Users\abdel\source\repos\Inertia\Inertia\obj\Debug\Inertia.csproj.CoreCompileInputs.cache
+C:\Users\abdel\source\repos\Inertia\Inertia\obj\Debug\Inertia.dll
+C:\Users\abdel\source\repos\Inertia\Inertia\obj\Debug\Inertia.pdb
