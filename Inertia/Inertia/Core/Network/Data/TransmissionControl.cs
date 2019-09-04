@@ -20,6 +20,8 @@ namespace Inertia
             private Socket socket;
             private readonly byte[] buffer;
 
+            private DisconnectReason lastDisconnectionReason = DisconnectReason.None;
+
             internal Client(ClientBase client)
             {
                 buffer = new byte[NetworkModule.BufferLength];
@@ -37,6 +39,8 @@ namespace Inertia
 
                     socket.Connect(new IPEndPoint(IPAddress.Parse(ip), port));
                     socket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, new AsyncCallback(Receive), socket);
+
+                    lastDisconnectionReason = DisconnectReason.None;
                 }
                 catch (Exception e)
                 {
@@ -49,6 +53,9 @@ namespace Inertia
             }
             public void Disconnect(DisconnectReason reason)
             {
+                if (lastDisconnectionReason != DisconnectReason.None)
+                    return;
+
                 try
                 {
                     if (socket != null && socket.Connected)
@@ -62,6 +69,8 @@ namespace Inertia
 
                 if (reason != DisconnectReason.ChangeConnection)
                     OnDisconnected(reason);
+
+                lastDisconnectionReason = reason;
             }
 
             private void Receive(IAsyncResult iar)

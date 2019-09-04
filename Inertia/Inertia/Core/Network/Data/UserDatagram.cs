@@ -18,6 +18,7 @@ namespace Inertia
             public readonly ClientBase client;
 
             private UdpClient socket;
+            private DisconnectReason lastDisconnectionReason = DisconnectReason.None;
 
             internal Client(ClientBase client)
             {
@@ -36,6 +37,8 @@ namespace Inertia
                     socket.BeginReceive(new AsyncCallback(Receive), socket);
 
                     OnConnected();
+
+                    lastDisconnectionReason = DisconnectReason.None;
                 }
                 catch (Exception e)
                 {
@@ -45,6 +48,9 @@ namespace Inertia
             }
             public void Disconnect(DisconnectReason reason)
             {
+                if (lastDisconnectionReason != DisconnectReason.None)
+                    return;
+
                 try
                 {
                     if (socket != null)
@@ -56,6 +62,8 @@ namespace Inertia
 
                 if (reason != DisconnectReason.ChangeConnection)
                     OnDisconnected(reason);
+
+                lastDisconnectionReason = reason;
             }
 
             private void Receive(IAsyncResult iar)

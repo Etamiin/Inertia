@@ -8,6 +8,7 @@ namespace Inertia
 {
     public enum DisconnectReason
     {
+        None,
         Manual,
         ConnectionLost,
         CantConnect,
