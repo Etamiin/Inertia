@@ -10,13 +10,13 @@ namespace Inertia
     {
         public abstract uint Id { get; }
 
-        public virtual void OnReceivedFromClient(ClientBase client, Reader reader)
+        public virtual void ClientReceivedHandler(ClientBase client, Reader reader)
         {
         }
-        public virtual void OnReceivedFromServer(UserDatagram.User user, Reader reader)
+        public virtual void ServerReceivedHandler(UserDatagram.User user, Reader reader)
         {
         }
-        public virtual void OnReceivedFromServer(TransmissionControl.User user, Reader reader)
+        public virtual void ServerReceivedHandler(TransmissionControl.User user, Reader reader)
         {
         }
 

@@ -31,9 +31,9 @@ namespace Inertia
                         break;
 
                     if (packet.Tcp != null)
-                        message.OnReceivedFromServer(packet.Tcp, contentReader);
+                        message.ServerReceivedHandler(packet.Tcp, contentReader);
                     else
-                        message.OnReceivedFromServer(packet.Udp, contentReader);
+                        message.ServerReceivedHandler(packet.Udp, contentReader);
 
                     if (packet.Reader.LengthAvailable == 0)
                         packet.Reader.Clear();

@@ -31,7 +31,7 @@ namespace Inertia
                     if (!Message.Read(Reader, out Reader contentReader, out Message message))
                         break;
 
-                    message.OnReceivedFromClient(this, contentReader);
+                    message.ClientReceivedHandler(this, contentReader);
                     if (Reader.LengthAvailable == 0)
                         Reader.Clear();
                 }
