@@ -1,9 +1,6 @@
-#Inertia
+Get the project with git command:
+```
+git clone https://github.com/Etamiin/Inertia.git
+```
 
-▪ Networking implementation (Server/Client)
-
-▪ Files and data storages implementation
-
-▪ Scripting implementation
-
-▪ Command system implementation
+Access to the wiki: https://github.com/Etamiin/Inertia/wiki/Welcome
