@@ -51,7 +51,7 @@ namespace Inertia
                 if (socket.Connected)
                     OnConnected();
             }
-            public void Disconnect(DisconnectReason reason)
+            public void Disconnect(DisconnectReason reason = DisconnectReason.Manual)
             {
                 if (lastDisconnectionReason != DisconnectReason.None)
                     return;
@@ -232,7 +232,7 @@ namespace Inertia
                 }
             }
 
-            public void Disconnect(DisconnectReason reason)
+            public void Disconnect(DisconnectReason reason = DisconnectReason.Manual)
             {
                 try
                 {

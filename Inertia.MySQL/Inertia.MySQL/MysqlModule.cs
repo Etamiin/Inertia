@@ -7,59 +7,39 @@ using System.Threading.Tasks;
 
 namespace Inertia.MySQL
 {
-    public class MysqlModule
+    public class MySqlModule
     {
-        public static class Config
-        {
-            public static string Host { get; private set; }
-            public static string User { get; private set; }
-            public static string Pass { get; private set; }
-            public static string Database { get; private set; }
-
-            public static string ConnStr
-            {
-                get
-                {
-                    return "server=" + Host + ";uid=" + User + ";pwd=" + Pass + ";database=" + Database;
-                }
-            }
-
-            public static void Set(string User, string Database, string Pass = "", string Host = "127.0.0.1")
-            {
-                Config.User = User;
-                Config.Database = Database;
-                Config.Pass = Pass;
-                Config.Host = Host;
-            }
-        }
-
-        private static MysqlModule instance;
-        public static MysqlModule Module
+        private static MySqlModule instance;
+        public static MySqlModule Module
         {
             get
             {
                 if (instance == null)
-                    instance = new MysqlModule();
+                    instance = new MySqlModule();
                 return instance;
             }
         }
 
-        internal MysqlModule()
-        {
+        public MySqlCredentials Credentials;
 
+        internal MySqlModule()
+        {
         }
 
         public MySqlConnection CreateConnection()
         {
+            if (Credentials == null)
+                throw new NullCredentialsException();
+
             MySqlConnection conn = null;
 
             try
             {
-                conn = new MySqlConnection(Config.ConnStr);
+                conn = new MySqlConnection(Credentials.ToString());
                 conn.Open();
             }
             catch (MySqlException ex) {
-                InDebug.Error(ex);
+                Logger.Error(ex);
                 conn = null;
             }
 
@@ -67,8 +47,7 @@ namespace Inertia.MySQL
         }
         public MySqlCommand CreateCommand()
         {
-            var cmd = new MySqlCommand
-            {
+            var cmd = new MySqlCommand {
                 Connection = CreateConnection()
             };
 

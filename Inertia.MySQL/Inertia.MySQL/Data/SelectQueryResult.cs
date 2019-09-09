@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Inertia.MySQL
 {
-    public class QueryResultSelector : IDisposable
+    public class SelectQueryResult : IDisposable
     {
         public int RowCount
         {
@@ -17,22 +17,22 @@ namespace Inertia.MySQL
             }
         }
 
-        public QueryResultRow CurrentRow { get; private set; }
+        public SelectQueryRow CurrentRow { get; private set; }
 
-        private QueryResultRow[] rows;
+        private SelectQueryRow[] rows;
         private int currentPosition;
 
-        public QueryResultSelector(MySqlDataReader reader)
+        public SelectQueryResult(MySqlDataReader reader)
         {
-            var rowList = new List<QueryResultRow>();
+            var rowList = new List<SelectQueryRow>();
 
             while (reader.Read())
             {
-                var row = new QueryResultRow();
+                var row = new SelectQueryRow();
 
                 for (var i = 0; i < reader.FieldCount; i++) {
-                    var name = reader.GetName(i);
-                    row.AddField(name, reader.GetValue(i));
+                    var field = reader.GetName(i);
+                    row[field] = reader.GetValue(i);
                 }
                 rowList.Add(row);
             }
@@ -41,7 +41,7 @@ namespace Inertia.MySQL
             NextRow();
         }
 
-        public QueryResultRow NextRow()
+        public SelectQueryRow NextRow()
         {
             if (currentPosition >= rows.Length) {
                 CurrentRow = null;
@@ -50,6 +50,13 @@ namespace Inertia.MySQL
 
             CurrentRow = rows[currentPosition++];
             return CurrentRow;
+        }
+        public SelectQueryRow GetRow(int index)
+        {
+            if (index < 0 || index >= RowCount)
+                throw new ArgumentOutOfRangeException("index", "SelectQueryRow index was out of range, choose an index in the range 0 to RowCount");
+
+            return rows[index];
         }
 
         public void Dispose()

@@ -47,15 +47,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Data\QueryResultRow.cs" />
-    <Compile Include="Data\QueryResultSelector.cs" />
-    <Compile Include="Elements\BasicQuery.cs" />
-    <Compile Include="Elements\DeleteQuery.cs" />
-    <Compile Include="Elements\InsertQuery.cs" />
-    <Compile Include="Elements\SelectQuery.cs" />
-    <Compile Include="Elements\UpdateQuery.cs" />
-    <Compile Include="MysqlModule.cs" />
+    <Compile Include="Data\MySqlCredentials.cs" />
+    <Compile Include="Data\SelectQueryRow.cs" />
+    <Compile Include="Data\SelectQueryResult.cs" />
+    <Compile Include="Elements\MySqlTable.cs" />
+    <Compile Include="Enums\QueryConditionType.cs" />
+    <Compile Include="Exceptions\DeleteQuerySecureException.cs" />
+    <Compile Include="Exceptions\QueryAddRangeInvalidCountException.cs" />
+    <Compile Include="Exceptions\InsertQueryNoValueException.cs" />
+    <Compile Include="Exceptions\NullCredentialsException.cs" />
+    <Compile Include="Exceptions\QueryBrokenException.cs" />
+    <Compile Include="Exceptions\UpdateQueryNoSetterException.cs" />
+    <Compile Include="MySqlModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Query.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

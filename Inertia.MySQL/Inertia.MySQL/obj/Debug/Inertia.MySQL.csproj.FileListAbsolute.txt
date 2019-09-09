@@ -9,3 +9,14 @@ C:\Users\abdel\source\repos\Inertia.MySQL\Inertia.MySQL\obj\Debug\Inertia.MySQL.
 C:\Users\abdel\source\repos\Inertia.MySQL\Inertia.MySQL\obj\Debug\Inertia.MySQL.pdb
 C:\Users\abdel\source\repos\Inertia.MySQL\Inertia.MySQL\bin\Debug\Inertia.MySQL.dll.config
 C:\Users\abdel\source\repos\Inertia.MySQL\Inertia.MySQL\obj\Debug\Inertia.MySQL.csprojAssemblyReference.cache
+C:\Users\abdel\Desktop\Inertia git\Inertia\Inertia.MySQL\Inertia.MySQL\obj\Debug\Inertia.MySQL.csproj.CoreCompileInputs.cache
+C:\Users\abdel\Desktop\Inertia git\Inertia\Inertia.MySQL\Inertia.MySQL\obj\Debug\Inertia.MySQL.dll
+C:\Users\abdel\Desktop\Inertia git\Inertia\Inertia.MySQL\Inertia.MySQL\obj\Debug\Inertia.MySQL.pdb
+C:\Users\abdel\Desktop\Inertia git\Inertia\Inertia.MySQL\Inertia.MySQL\bin\Debug\Inertia.MySQL.dll.config
+C:\Users\abdel\Desktop\Inertia git\Inertia\Inertia.MySQL\Inertia.MySQL\bin\Debug\Inertia.MySQL.dll
+C:\Users\abdel\Desktop\Inertia git\Inertia\Inertia.MySQL\Inertia.MySQL\bin\Debug\Inertia.MySQL.pdb
+C:\Users\abdel\Desktop\Inertia git\Inertia\Inertia.MySQL\Inertia.MySQL\bin\Debug\Inertia.dll
+C:\Users\abdel\Desktop\Inertia git\Inertia\Inertia.MySQL\Inertia.MySQL\bin\Debug\MySql.Data.dll
+C:\Users\abdel\Desktop\Inertia git\Inertia\Inertia.MySQL\Inertia.MySQL\bin\Debug\Inertia.pdb
+C:\Users\abdel\Desktop\Inertia git\Inertia\Inertia.MySQL\Inertia.MySQL\obj\Debug\Inertia.MySQL.csproj.CopyComplete
+C:\Users\abdel\Desktop\Inertia git\Inertia\Inertia.MySQL\Inertia.MySQL\obj\Debug\Inertia.MySQL.csprojAssemblyReference.cache

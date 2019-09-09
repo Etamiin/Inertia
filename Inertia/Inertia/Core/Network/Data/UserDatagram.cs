@@ -46,7 +46,7 @@ namespace Inertia
                     Disconnect(DisconnectReason.CantConnect);
                 }
             }
-            public void Disconnect(DisconnectReason reason)
+            public void Disconnect(DisconnectReason reason = DisconnectReason.Manual)
             {
                 if (lastDisconnectionReason != DisconnectReason.None)
                     return;

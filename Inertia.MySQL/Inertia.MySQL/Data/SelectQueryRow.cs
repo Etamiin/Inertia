@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Inertia.MySQL
 {
-    public class QueryResultRow : IDisposable
+    public class SelectQueryRow : IDisposable
     {
         public int FieldCount
         {
@@ -18,19 +18,29 @@ namespace Inertia.MySQL
 
         private Dictionary<string, object> fields;
 
-        public QueryResultRow()
+        public SelectQueryRow()
         {
             fields = new Dictionary<string, object>();
         }
 
-        internal void AddField(string name, object value)
+        public object this[string field]
         {
-            fields.Add(name, value);
+            set {
+                if (!fields.ContainsKey(field))
+                    fields.Add(field, value);
+                else
+                    fields[field] = value;
+            }
+            get {
+                if (!fields.ContainsKey(field))
+                    return null;
+                return fields[field];
+            }
         }
 
-        public T Get<T>(string name)
+        public T Select<T>(string field)
         {
-            fields.TryGetValue(name, out object value);
+            fields.TryGetValue(field, out object value);
             return (T)value;
         }
 
