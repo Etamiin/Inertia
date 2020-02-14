@@ -1,0 +1,13 @@
+C:\Users\abdel\Desktop\InertiaLib\InertiaLib.ORM\bin\Debug\Inertia.ORM.dll
+C:\Users\abdel\Desktop\InertiaLib\InertiaLib.ORM\bin\Debug\Inertia.ORM.pdb
+C:\Users\abdel\Desktop\InertiaLib\InertiaLib.ORM\bin\Debug\MySql.Data.dll
+C:\Users\abdel\Desktop\InertiaLib\InertiaLib.ORM\obj\Debug\Inertia.ORM.csproj.CopyComplete
+C:\Users\abdel\Desktop\InertiaLib\InertiaLib.ORM\obj\Debug\Inertia.ORM.dll
+C:\Users\abdel\Desktop\InertiaLib\InertiaLib.ORM\obj\Debug\Inertia.ORM.pdb
+C:\Users\abdel\Desktop\InertiaLib\Inertia.ORM\bin\Debug\Inertia.ORM.dll
+C:\Users\abdel\Desktop\InertiaLib\Inertia.ORM\bin\Debug\Inertia.ORM.pdb
+C:\Users\abdel\Desktop\InertiaLib\Inertia.ORM\bin\Debug\MySql.Data.dll
+C:\Users\abdel\Desktop\InertiaLib\Inertia.ORM\obj\Debug\Inertia.ORM.csproj.CopyComplete
+C:\Users\abdel\Desktop\InertiaLib\Inertia.ORM\obj\Debug\Inertia.ORM.dll
+C:\Users\abdel\Desktop\InertiaLib\Inertia.ORM\obj\Debug\Inertia.ORM.pdb
+C:\Users\abdel\Desktop\InertiaLib\Inertia.ORM\obj\Debug\Inertia.ORM.csprojAssemblyReference.cache

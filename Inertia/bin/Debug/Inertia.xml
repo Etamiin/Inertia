@@ -1,0 +1,110 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Inertia</name>
+    </assembly>
+    <members>
+        <member name="T:Inertia.FlexDictionary`1">
+            <summary>
+            Dictionary that can store objects of different types.
+            </summary>
+            <typeparam name="TKey">The type of object used for dictionary keys</typeparam>
+        </member>
+        <member name="P:Inertia.FlexDictionary`1.Count">
+            <summary>
+            Returns the number of objects that are stored in the dictionnary.
+            </summary>
+        </member>
+        <member name="M:Inertia.FlexDictionary`1.#ctor">
+            <summary>
+            Create a new instance of a <see cref="T:Inertia.FlexDictionary`1"/> class
+            </summary>
+        </member>
+        <member name="P:Inertia.FlexDictionary`1.Item(`0)">
+            <summary>
+            Retrieves the object stored in the dictionary with to the provided key
+            </summary>
+            <param name="key">The key associated to the target object</param>
+            <returns>The object associated to the specified <paramref name="key"/> or null</returns>
+        </member>
+        <member name="M:Inertia.FlexDictionary`1.GetKeys">
+            <summary>
+            Retrieves all the keys from the dictionnary
+            </summary>
+            <returns>An array of <typeparamref name="TKey"/> stored in the dictionnary</returns>
+        </member>
+        <member name="M:Inertia.FlexDictionary`1.Add``1(`0,``0)">
+            <summary>
+            Add a new object associated to the specified key to the dictionnary
+            </summary>
+            <typeparam name="TData">Type of the object that will be added</typeparam>
+            <param name="identifier">The key associated</param>
+            <param name="data">The object to add</param>
+            <returns>The current <see cref="T:Inertia.FlexDictionary`1"/> instance</returns>
+        </member>
+        <member name="M:Inertia.FlexDictionary`1.Remove(`0)">
+            <summary>
+            Remove the object from the dictionnary associated to the specified key
+            </summary>
+            <param name="identifier">The key to remove</param>
+            <returns>The current <see cref="T:Inertia.FlexDictionary`1"/> instance</returns>
+        </member>
+        <member name="M:Inertia.FlexDictionary`1.Replace``1(`0,``0)">
+            <summary>
+            Replace a stored object (nothing happend if the specified key don't exist)
+            </summary>
+            <typeparam name="TData">The type of the object to add</typeparam>
+            <param name="identifier">The key that already exist</param>
+            <param name="value">The new object</param>
+            <returns>The current <see cref="T:Inertia.FlexDictionary`1"/> instance</returns>
+        </member>
+        <member name="M:Inertia.FlexDictionary`1.TryGetValue``1(`0,``0@)">
+            <summary>
+            Try to retrieve a stored object with the specified key
+            </summary>
+            <typeparam name="TData">The type of the object to get</typeparam>
+            <param name="identifier">The key associated</param>
+            <param name="value">The variable that will store the object</param>
+            <returns>Return true if the object was found and referenced to <paramref name="value"/> or false if not</returns>
+            <remarks>If the object wasn't found, the result will be the default value of <typeparamref name="TData"/></remarks>
+        </member>
+        <member name="M:Inertia.FlexDictionary`1.GetValue``1(`0)">
+            <summary>
+            Retrieve a stored object and return it
+            </summary>
+            <typeparam name="TData">The type of the target object</typeparam>
+            <param name="identifier">The key associated to the target object</param>
+            <returns>The target object that is stored</returns>
+            <exception cref="T:System.NullReferenceException">Thrown if the specified key don't exist</exception>
+        </member>
+        <member name="M:Inertia.FlexDictionary`1.GetValues(`0[])">
+            <summary>
+            Retrieve a list of object without type and return them
+            </summary>
+            <param name="identifiers">An array of key associated to the target objects</param>
+            <returns>An array of objects that are stored</returns>
+            <remarks>If a key don't exist in the dictionnary, the object in the returned array will be null</remarks>
+        </member>
+        <member name="M:Inertia.FlexDictionary`1.GetValues``1(`0[])">
+            <summary>
+            Retrieve a list of object with type and return them
+            </summary>
+            <typeparam name="TData">The target type for the objects</typeparam>
+            <param name="identifiers">An array of key associated to the target objects</param>
+            <returns>An array of objects of type <typeparamref name="TData"/></returns>
+            <remarks>If an object wasn't found, the result will be the default value of <typeparamref name="TData"/></remarks>
+        </member>
+        <member name="M:Inertia.FlexDictionary`1.Exist(`0)">
+            <summary>
+            Check if a key exist in the dictionnary
+            </summary>
+            <param name="identifier">The target key to find</param>
+            <returns>Return true if the specified key exist in the dictionnary, or false if not</returns>
+        </member>
+        <member name="M:Inertia.FlexDictionary`1.Dispose">
+            <summary>
+            Dispose all the resources used by the <see cref="T:Inertia.FlexDictionary`1"/> instance
+            </summary>
+        </member>
+    </members>
+</doc>

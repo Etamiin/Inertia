@@ -1,0 +1,6 @@
+C:\Users\abdel\Desktop\InertiaLib\InertiaLib.ORM\bin\Debug\InertiaLib.ORM.dll
+C:\Users\abdel\Desktop\InertiaLib\InertiaLib.ORM\bin\Debug\InertiaLib.ORM.pdb
+C:\Users\abdel\Desktop\InertiaLib\InertiaLib.ORM\bin\Debug\MySql.Data.dll
+C:\Users\abdel\Desktop\InertiaLib\InertiaLib.ORM\obj\Debug\InertiaLib.ORM.csproj.CopyComplete
+C:\Users\abdel\Desktop\InertiaLib\InertiaLib.ORM\obj\Debug\InertiaLib.ORM.dll
+C:\Users\abdel\Desktop\InertiaLib\InertiaLib.ORM\obj\Debug\InertiaLib.ORM.pdb
