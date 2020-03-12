@@ -27,11 +27,11 @@ namespace Inertia.Internal
 
         #endregion
 
-        public override void Start()
+        protected override void Start()
         {
             Clock = Clock.Create();
         }
-        public override void Update()
+        protected override void Update()
         {
             if (Action == null)
                 return;

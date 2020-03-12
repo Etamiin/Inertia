@@ -153,7 +153,7 @@ namespace Inertia
         public InertiaWriter SetSerializableObject(ISerializableObject serializableObj)
         {
             var objWriter = new InertiaWriter();
-            serializableObj.Serialize(ref objWriter);
+            serializableObj.Serialize(objWriter);
 
             return SetBytes(objWriter.ExportAndDispose());
         }

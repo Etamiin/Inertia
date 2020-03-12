@@ -94,6 +94,8 @@ namespace Inertia.Storage
                 try
                 {
                     var path = Path.Combine(dirPath, GetFinalName(dirPath, method));
+                    if (!Directory.Exists(dirPath))
+                        Directory.CreateDirectory(dirPath);
 
                     File.WriteAllBytes(path, GetFinalSerialization(Serialize(async)));
 
@@ -180,35 +182,36 @@ namespace Inertia.Storage
             var final = new InertiaWriter()
                 .SetBool(!string.IsNullOrEmpty(Password));
 
-            if (!string.IsNullOrEmpty(Password))
-                final.SetBytes(InertiaIO.EncryptWithString(serializedData, Password));
-            else
-                final.SetBytes(serializedData);
+            var core = !string.IsNullOrEmpty(Password) ? InertiaIO.EncryptWithString(serializedData, Password) : serializedData;
+            var compressable = InertiaIO.Compress(core, out core);
+
+            final
+                .SetBool(compressable)
+                .SetBytes(core);
 
             return final.ExportAndDispose();
         }
         private byte[] FirstDeserialization(byte[] data)
         {
             var first = new InertiaReader(data);
-            byte[] result;
+            var hasPassword = first.GetBool();
+            var compressed = first.GetBool();
+            var core = compressed ? InertiaIO.Decompress(first.GetBytes()) : first.GetBytes();
 
-            if (first.GetBool())
+            if (hasPassword)
             {
                 try
                 {
-                    result = InertiaIO.DecryptWithString(first.GetBytes(), Password);
+                    core = InertiaIO.DecryptWithString(core, Password);
                 }
                 catch
                 {
-                    result = null;
                     OnLoadFailed(new InvalidPasswordException());
                 }
             }
-            else
-                result = first.GetBytes();
 
             first.Dispose();
-            return result;
+            return core;
         }
 
         private protected void WaitTasks(bool forceLock = false)

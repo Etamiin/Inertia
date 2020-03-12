@@ -22,7 +22,7 @@ namespace Inertia.Scripting
 
         #region Private variables
 
-        private Dictionary<int, Scriptable> Scripts;
+        private List<Scriptable> Scripts;
 
         #endregion
 
@@ -30,7 +30,7 @@ namespace Inertia.Scripting
 
         public ScriptCollection()
         {
-            Scripts = new Dictionary<int, Scriptable>();
+            Scripts = new List<Scriptable>();
         }
 
         #endregion
@@ -42,7 +42,7 @@ namespace Inertia.Scripting
             var script = (Scriptable)obj;
 
             script.SetParameters(this);
-            Scripts.Add(script.Id, script);
+            Scripts.Add(script);
 
             return (T)obj;
         }
@@ -53,8 +53,8 @@ namespace Inertia.Scripting
             {
                 foreach (var v in Scripts)
                 {
-                    if (v.Value is T)
-                        return (T)v.Value;
+                    if (v is T)
+                        return (T)v;
                 }
             }
 
@@ -67,8 +67,8 @@ namespace Inertia.Scripting
             {
                 foreach (var v in Scripts)
                 {
-                    if (v.Value is T)
-                        scripts.Add((T)v.Value);
+                    if (v is T)
+                        scripts.Add((T)v);
                 }
             }
 
@@ -86,16 +86,16 @@ namespace Inertia.Scripting
             foreach (var script in scripts)
                 script.Destroy();
         }
-        internal void Remove(int scriptId)
+        internal void Remove(Scriptable script)
         {
-            Scripts.Remove(scriptId);
+            Scripts.Remove(script);
         }
 
         public void Dispose()
         {
             Scriptable[] allScripts = null;
             lock (Scripts)
-                allScripts = Scripts.Values.ToArray();
+                allScripts = Scripts.ToArray();
 
             foreach (var script in allScripts)
                 script.Dispose();

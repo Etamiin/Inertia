@@ -17,6 +17,7 @@ namespace Inertia
         #region Public variables
 
         public bool IsDisposed { get; private set; }
+        public int Count { get; private set; }
 
         #endregion
 
@@ -37,9 +38,11 @@ namespace Inertia
             {
                 action();
                 QueueHandler -= handler;
+                Count--;
             }
 
             QueueHandler += handler;
+            Count++;
         }
         public void EnqueueRange(params InertiaAction[] actions)
         {

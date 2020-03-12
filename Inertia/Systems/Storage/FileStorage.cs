@@ -187,6 +187,7 @@ namespace Inertia.Storage
                 directoryPath = directoryPath.Replace("/", @"\");
 
             var files = InertiaIO.GetFilesPathFromDirectory(directoryPath, true);
+
             var progression = new StorageAsyncProgression(files.Length);
             var result = new List<FileMemoryData>();
 

@@ -149,8 +149,8 @@ namespace Inertia.ORM
 
         internal void AddTable(Table table)
         {
-            if (GetTable(table.Name) == null)
-                Tables.Add(table.Name, table);
+            if (GetTable(table.TableName) == null)
+                Tables.Add(table.TableName, table);
         }
     }
 }

@@ -49,7 +49,6 @@ namespace Inertia.Internal
                 return;
 
             UpdateHandler?.Invoke();
-            ScriptingManager.ContainerExecuted(this);
         }
         public void Dispose()
         {

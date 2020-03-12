@@ -34,7 +34,7 @@ namespace Inertia.ORM
             }
             catch (Exception e)
             {
-                LoggerORM.Error(e);
+                InertiaLoggerORM.Error(e);
             }
         }
         internal UpdateQuery(Table table, ConditionQuery conditionQuery, int limit) : this (table, limit)
@@ -48,7 +48,7 @@ namespace Inertia.ORM
             }
             catch (Exception e)
             {
-                LoggerORM.Error(e);
+                InertiaLoggerORM.Error(e);
             }
         }
 
@@ -83,7 +83,7 @@ namespace Inertia.ORM
                 throw new ArgumentNullException();
 
 
-            var query = "UPDATE `" + Table.Name + "` SET ";
+            var query = "UPDATE `" + Table.TableName + "` SET ";
             foreach (var setter in Values)
                 query += setter;
 
@@ -96,7 +96,7 @@ namespace Inertia.ORM
             }
             catch (Exception ex)
             {
-                LoggerORM.Error(ex);
+                InertiaLoggerORM.Error(ex);
                 return 0;
             }
         }

@@ -12,7 +12,14 @@ namespace Inertia.Web
     {
         #region GetInstance
 
-        public readonly static WebManager Current = new WebManager();
+        public static WebManager GetInstance()
+        {
+            if (Instance == null)
+                Instance = new WebManager();
+
+            return Instance;
+        }
+        private static WebManager Instance;
 
         #endregion
 
@@ -59,7 +66,7 @@ namespace Inertia.Web
                 }
                 catch (Exception ex)
                 {
-                    Current.HandleError("Downloading data failed: " + ex.ToString());
+                    GetInstance().HandleError("Downloading data failed: " + ex.ToString());
                     return null;
                 }
             }

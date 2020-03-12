@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Inertia.Internal;
 
@@ -17,10 +18,10 @@ namespace Inertia
         private readonly static Random ioRand = new Random();
 
         #endregion
-        
+
         public static string[] GetFilesPathFromDirectory(string path, bool inheritance)
         {
-            StringConventionNormalizer.NormalizeFolderPath(ref path);
+            path = StringConventionNormalizer.GetNormalizedFolderPath(path);
 
             if (!Directory.Exists(path))
                 return new string[] { };
@@ -33,6 +34,7 @@ namespace Inertia
             if (inheritance)
             {
                 var directories = Directory.GetDirectories(path);
+
                 foreach (var dir in directories)
                 {
                     var dirOut = GetFilesPathFromDirectory(dir, inheritance);
@@ -45,7 +47,7 @@ namespace Inertia
         }
         public static void OpenInExplorer(string path)
         {
-            StringConventionNormalizer.NormalizeFolderPath(ref path);
+            path = StringConventionNormalizer.GetNormalizedFolderPath(path);
 
             if (Directory.Exists(path))
                 Process.Start("explorer.exe", path);

@@ -70,6 +70,8 @@ namespace Inertia.ORM
 
         public void ExecuteOnSelection(OrmRowExecutionHandler executor)
         {
+            Position = -1;
+
             SelectionRow row;
             while ((row = GetNextRow()) != null)
                 executor(row);

@@ -18,14 +18,14 @@ namespace Inertia.Internal
         public override void Execute(ArgumentsCollection collection)
         {
             if (collection.NextArgument(out string name)) {
-                var command = CommandManager.Current.GetCommand(name);
+                var command = CommandManager.GetInstance().GetCommand(name);
                 if (command == null)
                     return;
 
-                Logger.Log("Help for command({0}): {1}", name, command.GetHelp());
+                InertiaLogger.Log("Help for command({0}): {1}", name, command.GetHelp());
             }
             else
-                Logger.Log(GetHelp());
+                InertiaLogger.Log(GetHelp());
         }
 
         public override string GetHelp()

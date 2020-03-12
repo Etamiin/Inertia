@@ -12,7 +12,14 @@ namespace Inertia.Scripting
     {
         #region GetInstance
 
-        public readonly static ScriptingManager Current = new ScriptingManager();
+        public static ScriptingManager GetInstance()
+        {
+            if (Instance == null)
+                Instance = new ScriptingManager();
+
+            return Instance;
+        }
+        private static ScriptingManager Instance;
 
         #endregion
 
@@ -31,7 +38,14 @@ namespace Inertia.Scripting
 
         #region Public variables
 
-        public static ScriptCollection DefaultCollection = new ScriptCollection();
+        public static ScriptCollection GetDefaultCollection()
+        {
+            if (CollectionInstance == null)
+                CollectionInstance = new ScriptCollection();
+
+            return CollectionInstance;
+        }
+        private static ScriptCollection CollectionInstance;
 
         #endregion
 
@@ -40,7 +54,6 @@ namespace Inertia.Scripting
         private readonly DependentThread ThreadContext;
         private Updater CurrentUpdater;
         private readonly List<Updater> Updaters;
-        private int ExecutedContainerCount;
         private int ScriptCount;
 
         private readonly Random Randomizer;
@@ -65,7 +78,7 @@ namespace Inertia.Scripting
 
         public static void ExecuteIn(float seconds, InertiaAction action)
         {
-            var script = DefaultCollection.Add<ExecuteInScript>();
+            var script = GetDefaultCollection().Add<ExecuteInScript>();
 
             script.Time = Math.Abs(seconds);
             script.Action = action;
@@ -73,24 +86,24 @@ namespace Inertia.Scripting
 
         internal static void GenerateScriptEvents(Scriptable script)
         {
-            var currentUpdateContainer = Current.CurrentUpdater;
+            var currentUpdateContainer = GetInstance().CurrentUpdater;
             if (currentUpdateContainer == null || currentUpdateContainer.IsDisposed || currentUpdateContainer.Count >= InertiaConfiguration.MaxUpdaterScriptCount) {
                 currentUpdateContainer = new Updater();
-                Current.Updaters.Add(currentUpdateContainer);
-                Current.CurrentUpdater = currentUpdateContainer;
+                GetInstance().Updaters.Add(currentUpdateContainer);
+                GetInstance().CurrentUpdater = currentUpdateContainer;
             }
 
-            Current.StartHandler += script.InternalStart;
+            GetInstance().StartHandler += script.InternalStart;
 
             script.Updater = currentUpdateContainer;
             currentUpdateContainer.AddHandler(script.InternalUpdate);
         }
         internal static void ScriptStarted(Scriptable script)
         {
-            Current.StartHandler -= script.InternalStart;
-            Current.ScriptCount++;
+            GetInstance().StartHandler -= script.InternalStart;
+            GetInstance().ScriptCount++;
 
-            if (Current.ScriptCount >= InertiaConfiguration.CriticalScriptCount)
+            if (GetInstance().ScriptCount >= InertiaConfiguration.CriticalScriptCount)
                 throw new CriticalScriptManagement();
         }
         internal static void DeleteScript(Scriptable script)
@@ -98,46 +111,43 @@ namespace Inertia.Scripting
             if (script.DestroyRequested)
                 return;
 
-            Current.DestroyHandler += script.DestroyCheck;
+            GetInstance().DestroyHandler += script.DestroyCheck;
             script.DestroyRequested = true;
         }
         internal static void OnScriptDeleted(Scriptable script)
         {
-            Current.DestroyHandler -= script.DestroyCheck;
+            GetInstance().DestroyHandler -= script.DestroyCheck;
             script.Updater.RemoveHandler(script.InternalUpdate);
 
-            Current.ScriptCount--;
+            GetInstance().ScriptCount--;
         }
     
-        internal static void ContainerExecuted(Updater updater)
-        {
-            Current.ExecutedContainerCount++;
-        }
         internal static void RemoveContainer(Updater updater)
         {
-            Current.Updaters.Remove(updater);
+            GetInstance().Updaters.Remove(updater);
         }
     
         private void ExecuteLogic(Thread dependency)
         {
-            var currentMsUpdate = 0;
-            var targetMsUpdate = (int)(1f / InertiaConfiguration.MaxScriptExecutionPerSecond * 1000);
+            var targetMsUpdate = (int)Math.Round(1f / InertiaConfiguration.MaxScriptExecutionPerSecond * 1000);
             var clock = Clock.Create();
 
             while (dependency.IsAlive)
             {
-                currentMsUpdate = (int)clock.GetElapsedMillisecondsAndReset();
+                var currentMsUpdate = (int)clock.GetElapsedMilliseconds();
+
                 if (currentMsUpdate < targetMsUpdate)
                 {
                     Thread.Sleep(targetMsUpdate - currentMsUpdate);
-                    currentMsUpdate = (int)clock.GetElapsedMillisecondsAndReset();
+                    currentMsUpdate = (int)clock.GetElapsedMilliseconds();
                 }
+                
                 DeltaTime = currentMsUpdate / 1000f;
+                clock.Reset();
 
                 lock (StartHandler)
                     StartHandler();
 
-                ExecutedContainerCount = 0;
                 Updater[] updaters = null;
 
                 try
@@ -150,10 +160,8 @@ namespace Inertia.Scripting
                     continue;
                 }
 
-                foreach (var updater in updaters)
-                    Task.Factory.StartNew(updater.Execute);
-
-                while (ExecutedContainerCount < updaters.Length) { Thread.Sleep(1); }
+                for (var i = 0; i < updaters.Length; i++)
+                    updaters[i].Execute();
 
                 lock (DestroyHandler)
                     DestroyHandler();

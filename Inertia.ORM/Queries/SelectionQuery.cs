@@ -34,7 +34,7 @@ namespace Inertia.ORM
             }
             catch (Exception e)
             {
-                LoggerORM.Error(e);
+                InertiaLoggerORM.Error(e);
             }
         }
         internal SelectionQuery(Table table, ConditionQuery conditionQuery, int limit) : this(table, limit)
@@ -48,7 +48,7 @@ namespace Inertia.ORM
             }
             catch (Exception e)
             {
-                LoggerORM.Error(e);
+                InertiaLoggerORM.Error(e);
             }
         }
 
@@ -86,7 +86,7 @@ namespace Inertia.ORM
             else
                 query += "*";
 
-            query += " FROM `" + Table.Name + "`";
+            query += " FROM `" + Table.TableName + "`";
 
             ConditionQuery.JoinQuery(ref query);
 
@@ -99,7 +99,7 @@ namespace Inertia.ORM
             }
             catch (Exception ex)
             {
-                LoggerORM.Error(ex);
+                InertiaLoggerORM.Error(ex);
                 return null;
             }
         }

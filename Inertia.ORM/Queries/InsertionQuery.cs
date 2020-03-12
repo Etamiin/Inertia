@@ -35,7 +35,7 @@ namespace Inertia.ORM
             }
             catch (Exception e)
             {
-                LoggerORM.Error(e);
+                InertiaLoggerORM.Error(e);
             }
         }
         
@@ -72,7 +72,7 @@ namespace Inertia.ORM
             if (Values.Count == 0)
                 return this;
 
-            var query = "INSERT INTO `" + Table.Name + "`";
+            var query = "INSERT INTO `" + Table.TableName + "`";
             var fields = "(";
             var values = "(";
             var keys = Values.Keys.ToArray();
@@ -102,7 +102,7 @@ namespace Inertia.ORM
             }
             catch (Exception ex)
             {
-                LoggerORM.Error(ex);
+                InertiaLoggerORM.Error(ex);
             }
 
             return this;

@@ -10,7 +10,14 @@ namespace Inertia.Commands
     {
         #region GetInstance
 
-        public readonly static CommandManager Current = new CommandManager();
+        public static CommandManager GetInstance()
+        {
+            if (Instance == null)
+                Instance = new CommandManager();
+
+            return Instance;
+        }
+        private static CommandManager Instance;
 
         #endregion
 
@@ -76,7 +83,7 @@ namespace Inertia.Commands
         }
         public static bool ExecuteCommand(string name, params string[] arguments)
         {
-            var command = Current.GetCommand(name);
+            var command = GetInstance().GetCommand(name);
             if (command == null)
                 return false;
 

@@ -12,7 +12,6 @@ namespace Inertia.Scripting
     {
         #region Internal variables
 
-        internal int Id;
         internal bool DestroyRequested = false;
         internal ScriptCollection Collection;
         internal Updater Updater;
@@ -44,7 +43,6 @@ namespace Inertia.Scripting
             ScriptingManager.GenerateScriptEvents(this);
 
             Collection = collection;
-            Id = ScriptingManager.Current.GenerateScriptId();
             UpdateMethod = GetType().GetMethod("Update");
             OnDestroyedMethod = GetType().GetMethod("OnDestroyed");
 
@@ -56,10 +54,7 @@ namespace Inertia.Scripting
             if (IsAwaked)
                 return;
 
-            var method = GetType().GetMethod("Awake");
-            if (method != null)
-                try { method.Invoke(this, new object[] { }); } catch (Exception e) { Logger.Error(e); };
-
+            Awake();
             IsAwaked = true;
         }
         internal void InternalStart()
@@ -67,10 +62,7 @@ namespace Inertia.Scripting
             if (!IsAwaked || IsStarted)
                 return;
 
-            var method = GetType().GetMethod("Start");
-            if (method != null)
-                try { method.Invoke(this, new object[] { }); } catch (Exception e) { Logger.Error(e); };
-
+            Start();
             ScriptingManager.ScriptStarted(this);
             IsStarted = true;
         }
@@ -79,15 +71,14 @@ namespace Inertia.Scripting
             if (IsDestroyed)
                 return;
 
-            if (IsStarted)
-                try { UpdateMethod?.Invoke(this, new object[] { }); } catch (Exception e) { Logger.Error(e); };
+            Update();
             FirstUpdateExecuted = true;
         }
 
-        public virtual void Awake() { }
-        public virtual void Start() { }
-        public virtual void Update() { }
-        public virtual void OnDestroyed() { }
+        protected virtual void Awake() { }
+        protected virtual void Start() { }
+        protected virtual void Update() { }
+        protected virtual void OnDestroyed() { }
 
         public void Destroy()
         {
@@ -106,9 +97,9 @@ namespace Inertia.Scripting
                 return;
 
             ScriptingManager.OnScriptDeleted(this);
-            try { OnDestroyedMethod?.Invoke(this, new object[] { }); } catch (Exception e) { Logger.Error(e); };
+            try { OnDestroyedMethod?.Invoke(this, new object[] { }); } catch (Exception e) { InertiaLogger.Error(e); };
 
-            Collection.Remove(Id);
+            Collection.Remove(this);
             Collection = null;
             IsDestroyed = true;
         }

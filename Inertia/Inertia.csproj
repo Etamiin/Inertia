@@ -23,6 +23,7 @@
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DocumentationFile>bin\Debug\Inertia.xml</DocumentationFile>
+    <RegisterForComInterop>false</RegisterForComInterop>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -107,7 +108,7 @@
     <Compile Include="Systems\Scripting\ScriptingManager.cs" />
     <Compile Include="Systems\Scripting\Scripts\ExecuteInScript.cs" />
     <Compile Include="Core\InertiaConfiguration.cs" />
-    <Compile Include="Core\Tools\Logger.cs" />
+    <Compile Include="Core\Tools\InertiaLogger.cs" />
     <Compile Include="Systems\Storage\Data\StorageAsyncProgression.cs" />
     <Compile Include="Systems\Web\Download\FtpDownloader.cs" />
     <Compile Include="Systems\Web\Download\WebDownloader.cs" />

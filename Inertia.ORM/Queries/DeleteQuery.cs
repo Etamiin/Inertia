@@ -32,7 +32,7 @@ namespace Inertia.ORM
             }
             catch (Exception e)
             {
-                LoggerORM.Error(e);
+                InertiaLoggerORM.Error(e);
             }
         }
         internal DeleteQuery(Table table, ConditionQuery conditionQuery, int limit) : this(table, limit)
@@ -45,7 +45,7 @@ namespace Inertia.ORM
             }
             catch (Exception e)
             {
-                LoggerORM.Error(e);
+                InertiaLoggerORM.Error(e);
             }
         }
 
@@ -59,7 +59,7 @@ namespace Inertia.ORM
 
         public int Delete()
         {
-            var query = "DELETE FROM `" + Table.Name + "`";
+            var query = "DELETE FROM `" + Table.TableName + "`";
             ConditionQuery.JoinQuery(ref query);
 
             try
@@ -69,7 +69,7 @@ namespace Inertia.ORM
             }
             catch (Exception ex)
             {
-                LoggerORM.Error(ex);
+                InertiaLoggerORM.Error(ex);
                 return 0;
             }
         }

@@ -58,7 +58,7 @@ namespace Inertia.ORM
         #region Public variables
 
         public Database Database { get; internal set; }
-        public abstract string Name { get; }
+        public abstract string TableName { get; }
         public abstract string DatabaseName { get; }
 
         #endregion
@@ -72,7 +72,7 @@ namespace Inertia.ORM
             {
                 var command = Database.CreateCommand();
 
-                var query = "CREATE TABLE IF NOT EXISTS `" + Name + "` (";
+                var query = "CREATE TABLE IF NOT EXISTS `" + TableName + "` (";
                 var fieldsContent = string.Empty;
                 var primaryColumns = "primary key(";
 
@@ -131,7 +131,7 @@ namespace Inertia.ORM
             }
             catch (Exception e)
             {
-                LoggerORM.Error("Creating table {0} on database {1} failed: {2}", Name, Database.Name, e);
+                InertiaLoggerORM.Error("Creating table {0} on database {1} failed: {2}", TableName, Database.Name, e);
             }
         }
 
@@ -227,7 +227,7 @@ namespace Inertia.ORM
         public long GetCount(ConditionQuery conditionQuery)
         {
             var command = conditionQuery.Command;
-            var query = "SELECT COUNT(*) FROM `" + Name + "`";
+            var query = "SELECT COUNT(*) FROM `" + TableName + "`";
 
             conditionQuery.JoinQuery(ref query);
 
@@ -243,7 +243,7 @@ namespace Inertia.ORM
             }
             catch (Exception e)
             {
-                LoggerORM.Error(e);
+                InertiaLoggerORM.Error(e);
                 return 0;
             }
         }

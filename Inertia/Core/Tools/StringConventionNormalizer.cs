@@ -41,17 +41,20 @@ namespace Inertia.Internal
                 uri += "/";
         }
 
-        public static void NormalizeFolderPath(ref string folderPath)
+        public static string GetNormalizedFolderPath(string folderPath)
         {
-            if (!File.Exists(folderPath) || !File.GetAttributes(folderPath).HasFlag(FileAttributes.Directory))
+            var normalized = folderPath;
+
+            if (!File.Exists(normalized) || !File.GetAttributes(normalized).HasFlag(FileAttributes.Directory))
             {
-                var info = new FileInfo(folderPath);
-                if (!string.IsNullOrEmpty(info.Extension))
-                    folderPath = info.Directory.FullName;
+                var info = new DirectoryInfo(normalized);
+                normalized = info.FullName;
             }
 
-            if (!folderPath.EndsWith(@"\"))
-                folderPath += @"\";
+            if (!normalized.EndsWith(@"\"))
+                normalized += @"\";
+
+            return normalized;
         }
     }
 }

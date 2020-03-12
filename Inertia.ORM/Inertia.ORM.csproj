@@ -60,7 +60,7 @@
     <Compile Include="Queries\InsertionQuery.cs" />
     <Compile Include="Queries\SelectionQuery.cs" />
     <Compile Include="Queries\UpdateQuery.cs" />
-    <Compile Include="Tools\LoggerORM.cs" />
+    <Compile Include="Tools\InertiaLoggerORM.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

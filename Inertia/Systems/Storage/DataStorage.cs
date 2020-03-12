@@ -162,7 +162,7 @@ namespace Inertia.Storage
                     .SetBool(false)
                     .SetString(value.GetType().Name);
 
-                ((ISerializableObject)value).Serialize(ref writer);
+                ((ISerializableObject)value).Serialize(writer);
             }
 
             try

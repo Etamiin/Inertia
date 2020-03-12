@@ -44,7 +44,7 @@ namespace Inertia.Web
         internal WebFileData(string host, string uri, string folderDestinationPath)
         {
             StringConventionNormalizer.NormalizeUri(ref host, ref uri);
-            StringConventionNormalizer.NormalizeFolderPath(ref folderDestinationPath);
+            folderDestinationPath = StringConventionNormalizer.GetNormalizedFolderPath(folderDestinationPath);
 
             var charIndex = uri.LastIndexOf('/');
 

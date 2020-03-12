@@ -9,6 +9,6 @@ namespace Inertia
     public interface ISerializableObject
     {
         void Deserialize(InertiaReader reader);
-        void Serialize(ref InertiaWriter writer);
+        void Serialize(InertiaWriter writer);
     }
 }
