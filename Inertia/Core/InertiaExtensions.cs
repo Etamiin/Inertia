@@ -1,16 +1,61 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Inertia.Internal;
 
 namespace Inertia
 {
+    /// <summary>
+    /// Contains all the framework extension
+    /// </summary>
     public static class InertiaExtensions
     {
+        #region General Extensions
+
+        /// <summary>
+        /// Shuffle the list
+        /// </summary>
+        /// <typeparam name="T">Type of element</typeparam>
+        /// <param name="collection">List to shuffle</param>
+        public static void Shuffle<T>(this IList<T> collection)
+        {
+            var idStart = 0;
+            T valueSave;
+
+            while (idStart < collection.Count - 1)
+            {
+                int idRand = InertiaIO.m_rand.Next(idStart, collection.Count);
+                valueSave = collection[idStart];
+                collection[idStart++] = collection[idRand];
+                collection[idRand] = valueSave;
+            }
+        }
+
+        /// <summary>
+        /// Get the SHA256 key representation of the specified string 
+        /// </summary>
+        /// <param name="text">Target string</param>
+        /// <returns></returns>
+        public static string GetSHA256(this string text)
+        {
+            return text.GetSHA256(Encoding.UTF8);
+        }
+        /// <summary>
+        /// Get the SHA256 key representation of the specified string
+        /// </summary>
+        /// <param name="text">Target string</param>
+        /// <param name="encoding">Target <see cref="Encoding"/> algorithm to use</param>
+        /// <returns></returns>
+        public static string GetSHA256(this string text, Encoding encoding)
+        {
+            var data = encoding.GetBytes(text);
+            return InertiaIO.GetSHA256(data);
+        }
+
+        #endregion
+
         #region Storage Extensions
-        
+
         internal static TypeCode ToTypeCode(this Type type)
         {
             if (type == typeof(bool))
@@ -19,7 +64,7 @@ namespace Inertia
                 return TypeCode.Char;
             else if (type == typeof(sbyte))
                 return TypeCode.SByte;
-            else if (type == typeof(byte))
+            else if (type == typeof(byte) || type == typeof(byte[]))
                 return TypeCode.Byte;
             else if (type == typeof(short))
                 return TypeCode.Int16;
@@ -43,81 +88,6 @@ namespace Inertia
                 return TypeCode.String;
             else
                 return TypeCode.Object;
-        }
-        internal static ArrayTypeCode ToArrayTypeCode(this Type type)
-        {
-            if (!type.IsArray)
-                return ArrayTypeCode.InvalidType;
-
-            if (type == typeof(bool[]))
-                return ArrayTypeCode.BooleanArray;
-            else if (type == typeof(char[]))
-                return ArrayTypeCode.CharArray;
-            else if (type == typeof(sbyte[]))
-                return ArrayTypeCode.SByteArray;
-            else if (type == typeof(byte[]))
-                return ArrayTypeCode.ByteArray;
-            else if (type == typeof(short[]))
-                return ArrayTypeCode.Int16Array;
-            else if (type == typeof(ushort[]))
-                return ArrayTypeCode.UInt16Array;
-            else if (type == typeof(int[]))
-                return ArrayTypeCode.Int32Array;
-            else if (type == typeof(uint[]))
-                return ArrayTypeCode.UInt32Array;
-            else if (type == typeof(long[]))
-                return ArrayTypeCode.Int64Array;
-            else if (type == typeof(ulong[]))
-                return ArrayTypeCode.UInt64Array;
-            else if (type == typeof(float[]))
-                return ArrayTypeCode.SingleArray;
-            else if (type == typeof(double[]))
-                return ArrayTypeCode.DoubleArray;
-            else if (type == typeof(decimal[]))
-                return ArrayTypeCode.DecimalArray;
-            else if (type == typeof(string[]))
-                return ArrayTypeCode.StringArray;
-            else if (type == typeof(object[]))
-                return ArrayTypeCode.ObjectArray;
-            else
-            {
-                var eType = type.GetElementType();
-                if (eType.IsArray)
-                    return eType.ToArrayTypeCode();
-                else
-                {
-                    var instance = GetStorageInterfaceInstanceFromType(eType);
-                    if (instance == null)
-                        return ArrayTypeCode.InvalidType;
-                    else
-                        return ArrayTypeCode.SerializableArray;
-                }
-            }
-        }
-        internal static ISerializableObject GetStorageInterfaceInstanceFromTypeName(string typeName)
-        {
-            var Assemblys = AppDomain.CurrentDomain.GetAssemblies();
-            foreach (var assembly in Assemblys)
-            {
-                var types = assembly.GetTypes();
-                foreach (var type in types)
-                {
-                    if (type.Name == typeName && type.GetInterface(nameof(ISerializableObject)) != null)
-                        return GetStorageInterfaceInstanceFromType(type);
-                }
-            }
-
-            return null;
-        }
-        internal static ISerializableObject GetStorageInterfaceInstanceFromType(Type type)
-        {
-            if (type.GetInterface(nameof(ISerializableObject)) != null)
-            {
-                var ctor = type.GetConstructors()[0];
-                return (ISerializableObject)ctor.Invoke(new object[ctor.GetParameters().Length]);
-            }
-
-            return null;
         }
         internal static Type ToType(this TypeCode code)
         {
@@ -153,7 +123,52 @@ namespace Inertia
 
             return typeof(object);
         }
-        
+
+        #endregion
+
+        #region Compression extensions
+
+        /// <summary>
+        /// Compress the specified byte array and return the compressed one
+        /// </summary>
+        /// <param name="data">Target byte array to compress</param>
+        /// <param name="compressed">Return true if the returned data is lower in length than the non-compressed data</param>
+        /// <returns>Compressed byte array</returns>
+        public static byte[] Compress(this byte[] data, out bool compressed)
+        {
+            return InertiaIO.Compress(data, out compressed);
+        }
+        /// <summary>
+        /// Decompress the specified byte array and return the decompressed one
+        /// </summary>
+        /// <param name="compressedData">Target byte array to decompress</param>
+        /// <returns>Decompressed byte array</returns>
+        public static byte[] Decompress(this byte[] compressedData)
+        {
+            return InertiaIO.Decompress(compressedData);
+        }
+
+        /// <summary>
+        /// Encrypt the target byte array with the specified string key
+        /// </summary>
+        /// <param name="data">Target byte array to encrypt</param>
+        /// <param name="key">Target string key for encryption</param>
+        /// <returns>Encrypted byte array</returns>
+        public static byte[] EncryptWithString(this byte[] data, string key)
+        {
+            return InertiaIO.EncryptWithString(data, key);
+        }
+        /// <summary>
+        /// Encrypt the target byte array with the specified string key
+        /// </summary>
+        /// <param name="encryptedData">Target byte array to encrypt</param>
+        /// <param name="key">Target string key for encryption</param>
+        /// <returns>Decrypted byte array</returns>
+        public static byte[] DecryptWithString(this byte[] encryptedData, string key)
+        {
+            return InertiaIO.DecryptWithString(encryptedData, key);
+        }
+
         #endregion
     }
 }

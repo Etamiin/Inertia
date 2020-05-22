@@ -4,66 +4,104 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Inertia;
-using Inertia.Storage;
-using Inertia.Web;
 using Inertia.Network;
+using Inertia.Storage;
 
 #region General Events
 
-public delegate void InertiaAction();
-public delegate void InertiaAction<T>(T value);
-public delegate void LoggerHandler(string log);
-
-#endregion
-
-#region Web Events
-
-public delegate void DownloadStartedHandler(WebFileData webFile);
-public delegate void DownloadProgressHandler(WebFileData webFile);
-public delegate void DownloadCompletedHandler(WebFileData webFile);
-public delegate void DownloadFailedHandler(WebFileData webFile, Exception error);
-
-public delegate void UploadFileStartedHandler(WebUploadFileData file);
-public delegate void UploadFileProgressHandler(WebUploadFileData file);
-public delegate void UploadFileCompletedHandler(WebUploadFileData file);
-public delegate void UploadFileFailedHandler(WebUploadFileData file, Exception exception);
+/// <summary>
+/// Execute code
+/// </summary>
+public delegate void SimpleAction();
+/// <summary>
+/// Execute code with <typeparamref name="T"/> parameter
+/// </summary>
+public delegate void SimpleAction<T>(T value);
+/// <summary>
+/// Execute code with multiples types parameters
+/// </summary>
+public delegate void SimpleAction<T1, T2>(T1 value1, T2 value2);
+/// <summary>
+/// Execute code with multiples types parameters
+/// </summary>
+public delegate void SimpleAction<T1, T2, T3>(T1 value1, T2 value2, T3 value3);
+/// <summary>
+/// Execute code with multiples types parameters
+/// </summary>
+public delegate void SimpleAction<T1, T2, T3, T4>(T1 value1, T2 value2, T3 value3, T4 value4);
+/// <summary>
+/// Execute code with multiples types parameters
+/// </summary>
+public delegate void SimpleAction<T1, T2, T3, T4, T5>(T1 value1, T2 value2, T3 value3, T4 value4, T5 value5);
+/// <summary>
+/// Execute code with a <typeparamref name="R"/> returned object
+/// </summary>
+public delegate R SimpleReturnAction<R>();
+/// <summary>
+/// Execute code with a <typeparamref name="R"/> returned object and one <typeparamref name="T1"/> parameter
+/// </summary>
+public delegate R SimpleReturnAction<T1, R>(T1 value1);
+/// <summary>
+/// Execute code with a <typeparamref name="R"/> returned object and multiples types parameters
+/// </summary>
+public delegate R SimpleReturnAction<T1, T2, R>(T1 value1, T2 value2);
+/// <summary>
+/// Execute code with a <typeparamref name="R"/> returned object and multiples types parameters
+/// </summary>
+public delegate R SimpleReturnAction<T1, T2, T3, R>(T1 value1, T2 value2, T3 value3);
+/// <summary>
+/// Execute code with a <typeparamref name="R"/> returned object and multiples types parameters
+/// </summary>
+public delegate R SimpleReturnAction<T1, T2, T3, T4, R>(T1 value1, T2 value2, T3 value3, T4 value4);
+/// <summary>
+/// Execute code with a <typeparamref name="R"/> returned object and multiples types parameters
+/// </summary>
+public delegate R SimpleReturnAction<T1, T2, T3, T4, T5, R>(T1 value1, T2 value2, T3 value3, T4 value4, T5 value5);
 
 #endregion
 
 #region Storage Events
 
-public delegate void DataStorageCompletedHandler<T>(DataStorage<T> storage);
-public delegate void DataStorageProgressHandler<T>(DataStorage<T> storage, StorageAsyncProgression progression);
-public delegate void DataStorageProgressFailedHandler<T>(DataStorage<T> storage, Exception e);
-
-public delegate void FileStorageCompletedHandler(FileStorage storage);
-public delegate void FileStorageProgressHandler(FileStorage storage, StorageAsyncProgression progression);
-public delegate void FileStorageProgressFailedHandler(FileStorage storage, Exception e);
-public delegate void FileStorageAddFileCompletedHandler(FileMemoryData file);
-public delegate void FileStorageAddFileFailedHandler(FileMemoryData file, Exception e);
-public delegate void FileStorageAddDirectoryCompletedHandler(FileStorage storage, FileMemoryData[] files);
-public delegate void FileStorageAddDirectoryProgressHandler(FileStorage storage, FileMemoryData file, StorageAsyncProgression progression);
-public delegate void FileStorageExtractFailedHandler(FileStorage storage, FileMemoryData file, Exception e);
-public delegate void FileStorageExtractProgressHandler(FileStorage storage, FileMemoryData file, StorageAsyncProgression progression);
-public delegate void FileStorageExtractFileCompletedHandler(FileStorage storage, FileMemoryData file);
+/// <summary>
+/// Storage event failing handler
+/// </summary>
+/// <param name="ex"></param>
+public delegate void StorageUpdateFailedHandler(Exception ex);
+/// <summary>
+/// Storage progression handler
+/// </summary>
+/// <param name="progress"></param>
+public delegate void StorageProgressHandler(StorageProgressionEventArgs progress);
 
 #endregion
 
 #region Network Events
 
-public delegate void ServerStartHandler(Server server);
-public delegate void ServerStopHandler(Server server, NetworkDisconnectReason reason);
-
-public delegate void TcpServerAddClientHandler(TcpNetworkUser user);
-public delegate void TcpServerRemoveClientHandler(TcpNetworkUser user, NetworkDisconnectReason reason);
-public delegate void UdpServerAddClientHandler(UdpNetworkUser user);
-public delegate void UdpServerRemoveClientHandler(UdpNetworkUser user, NetworkDisconnectReason reason);
-
-public delegate void TcpClientConnectedHandler(TcpNetworkClient client);
-public delegate void TcpClientDisconnectedHandler(TcpNetworkClient client, NetworkDisconnectReason reason);
-public delegate void UdpClientConnectedHandler(UdpNetworkClient client);
-public delegate void UdpClientDisconnectedHandler(UdpNetworkClient client, NetworkDisconnectReason reason);
-
-public delegate void NetworkMessageSenderHandler(byte[] data);
+/// <summary>
+/// Network disconnecting handler
+/// </summary>
+/// <param name="reason"></param>
+public delegate void NetworkDisconnectHandler(NetworkDisconnectReason reason);
+/// <summary>
+/// Network transmission control protocol created handler
+/// </summary>
+/// <param name="connection"></param>
+public delegate void NetworkTcpClientConnectionCreatedHandler(NetTcpConnection connection);
+/// <summary>
+/// Network transmission control protocol disconnected handler
+/// </summary>
+/// <param name="connection"></param>
+/// <param name="reason"></param>
+public delegate void NetworkTcpClientConnectionDisconnectedHandler(NetTcpConnection connection, NetworkDisconnectReason reason);
+/// <summary>
+/// Network group sender handler
+/// </summary>
+/// <param name="packet"></param>
+public delegate void NetworkGroupSenderHandler(NetPacket packet);
+/// <summary>
+/// Network user datagram added handler
+/// </summary>
+/// <param name="connection"></param>
+public delegate void NetworkUdpConnectionAddedHandler(NetUdpConnection connection);
 
 #endregion

@@ -4,20 +4,29 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Inertia.Scripting;
 
 namespace Inertia
 {
+    /// <summary>
+    /// Queue actions and execute them automatically
+    /// </summary>
     public class AutoQueue : IDisposable
     {
         #region Public variables
 
+        /// <summary>
+        /// Return true if <see cref="Dispose"/> was called
+        /// </summary>
         public bool IsDisposed { get; private set; }
+        /// <summary>
+        /// Return the number of actions currently queued
+        /// </summary>
         public int Count
         {
             get
             {
-                return 0;
+                lock (m_queue)
+                    return m_queue.Count;
             }
         }
 
@@ -25,69 +34,70 @@ namespace Inertia
 
         #region Private variables
 
-        private List<InertiaAction> Actions;
-        private readonly QueueMod Mod;
-        private readonly Clock Clock;
+        private List<SimpleAction> m_queue;
+        private Clock m_clock;
 
         #endregion
 
         #region Constructors
 
-        public AutoQueue(QueueMod mod)
+        /// <summary>
+        /// Create a new instance
+        /// </summary>
+        public AutoQueue()
         {
-            Actions = new List<InertiaAction>();
-            Mod = mod;
-            Clock = Clock.Create();
+            m_queue = new List<SimpleAction>();;
+            m_clock = new Clock();
 
-            DependentThread.CreateDependentTask(Execute);
+            DependentThread.ExecuteTaskWhileDependencyIsAlive(Execute, additionalConditions: () => !IsDisposed);
         }
 
         #endregion
 
-        public void Enqueue(InertiaAction handler)
+        /// <summary>
+        /// Enqueue the specified actions at the end of the queue
+        /// </summary>
+        /// <param name="handlers">Actions to enqueue</param>
+        public void Enqueue(params SimpleAction[] handlers)
         {
             if (IsDisposed)
                 throw new ObjectDisposedException(nameof(AutoQueue));
 
-            lock (Actions)
-                Actions.Add(handler);
-        }
-        public void EnqueueRange(params InertiaAction[] handlers)
-        {
-            foreach (var handler in handlers)
-                Enqueue(handler);
-        }
-        
-        private void Execute(Thread dependency)
-        {
-            while (dependency.IsAlive && !IsDisposed)
+            lock (m_queue)
             {
-                if (Count == 0)
-                {
-                    if (Mod == QueueMod.AutoDispose && Clock.GetElapsedMilliseconds() >= InertiaConfiguration.AutoQueueDisposeTime)
-                    {
-                        Dispose();
-                        break;
-                    }
-                }
-
-                lock (Actions)
-                {
-                    foreach (var action in Actions)
-                        action();
-
-                    Actions.Clear();
-                }
-
-                Clock.Reset();
-                Thread.Sleep(InertiaConfiguration.AutoQueueSleepTime);
+                foreach (var handler in handlers)
+                    m_queue.Add(handler);
             }
         }
         
+        /// <summary>
+        /// Dispose the current instance
+        /// </summary>
         public void Dispose()
         {
             IsDisposed = true;
-            Clock.Dispose();
+            m_queue.Clear();
+            m_clock.Dispose();
+            m_queue = null;
+            m_clock = null;
+        }
+
+        private void Execute()
+        {
+            if (Count == 0)
+                Thread.Sleep(10);
+
+            lock (m_queue)
+            {
+                foreach (var action in m_queue)
+                    action();
+
+                m_queue.Clear();
+            }
+
+            m_clock.Reset();
+            Thread.Sleep(1);
+
         }
     }
 }

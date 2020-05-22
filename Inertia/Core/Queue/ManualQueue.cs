@@ -6,63 +6,86 @@ using System.Threading.Tasks;
 
 namespace Inertia
 {
+    /// <summary>
+    /// Queue actions and execute them manually
+    /// </summary>
     public class ManualQueue : IDisposable
     {
         #region Events
 
-        private event InertiaAction QueueHandler = () => { };
+        private event SimpleAction QueueExecutor = () => { };
 
         #endregion
 
         #region Public variables
 
+        /// <summary>
+        /// Return true if <see cref="Dispose"/> was called
+        /// </summary>
         public bool IsDisposed { get; private set; }
+        /// <summary>
+        /// Return the number of actions currently queued
+        /// </summary>
         public int Count { get; private set; }
 
         #endregion
 
         #region Constructors 
 
+        /// <summary>
+        /// Create a new instance
+        /// </summary>
         public ManualQueue()
         {
         }
 
         #endregion
 
-        public void Enqueue(InertiaAction action)
+        /// <summary>
+        /// Enqueue the specified actions at the end of the queue
+        /// </summary>
+        /// <param name="actions">Actions to enqueue</param>
+        /// <returns>Return the current instance</returns>
+        public ManualQueue Enqueue(params SimpleAction[] actions)
         {
             if (IsDisposed)
                 throw new ObjectDisposedException(nameof(ManualQueue));
 
-            void handler()
+            foreach (var action in actions)
             {
-                action();
-                QueueHandler -= handler;
-                Count--;
+                void handler()
+                {
+                    action();
+                    QueueExecutor -= handler;
+                    Count--;
+                }
+
+                QueueExecutor += handler;
+                Count++;
             }
 
-            QueueHandler += handler;
-            Count++;
+            return this;
         }
-        public void EnqueueRange(params InertiaAction[] actions)
-        {
-            foreach (var action in actions)
-                Enqueue(action);
-        }
-        
+
+        /// <summary>
+        /// Execute all the actions queued and remove them from the queue
+        /// </summary>
         public void Execute()
         {
             if (IsDisposed)
                 throw new ObjectDisposedException(nameof(ManualQueue));
 
-            lock (QueueHandler)
-                QueueHandler();
+            lock (QueueExecutor)
+                QueueExecutor();
         }
         
+        /// <summary>
+        /// Dispose the current instance
+        /// </summary>
         public void Dispose()
         {
             IsDisposed = true;
-            QueueHandler = null;
+            QueueExecutor = null;
         }
     }
 }

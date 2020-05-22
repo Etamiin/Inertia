@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Inertia.ORM
+namespace Inertia.Internal
 {
     internal class FieldType
     {
@@ -20,21 +20,22 @@ namespace Inertia.ORM
         {
             FieldTypes = new Dictionary<Type, FieldType>
             {
-                { typeof(byte), new FieldType("tinyint", true) },
-                { typeof(ushort), new FieldType("smallint", true) },
-                { typeof(uint), new FieldType("int", true) },
-                { typeof(ulong), new FieldType("bigint", true) },
-                { typeof(sbyte), new FieldType("tinyint", false) },
-                { typeof(short), new FieldType("smallint", false) },
-                { typeof(int), new FieldType("int", false) },
-                { typeof(long), new FieldType("bigint", false) },
-                { typeof(float), new FieldType("float", false) },
-                { typeof(double), new FieldType("double", false) },
-                { typeof(decimal), new FieldType("decimal", false) },
-                { typeof(char), new FieldType("char", false) },
-                { typeof(DateTime), new FieldType("datetime", false) },
-                { typeof(byte[]), new FieldType("blob", false) },
-                { typeof(object), new FieldType("text", false) }
+                { typeof(byte), new FieldType("tinyint", true, TypeCode.Byte) },
+                { typeof(ushort), new FieldType("smallint", true, TypeCode.UInt16) },
+                { typeof(uint), new FieldType("int", true, TypeCode.UInt32) },
+                { typeof(ulong), new FieldType("bigint", true, TypeCode.UInt64) },
+                { typeof(sbyte), new FieldType("tinyint", false, TypeCode.SByte) },
+                { typeof(short), new FieldType("smallint", false, TypeCode.Int16) },
+                { typeof(int), new FieldType("int", false, TypeCode.Int32) },
+                { typeof(long), new FieldType("bigint", false, TypeCode.Int64) },
+                { typeof(float), new FieldType("float", false, TypeCode.Single) },
+                { typeof(double), new FieldType("double", false, TypeCode.Double) },
+                { typeof(decimal), new FieldType("decimal", false, TypeCode.Decimal) },
+                { typeof(char), new FieldType("char", false, TypeCode.Char) },
+                { typeof(DateTime), new FieldType("datetime", false, TypeCode.DateTime) },
+                { typeof(byte[]), new FieldType("blob", false, TypeCode.Byte) },
+                { typeof(string), new FieldType("text", false, TypeCode.String) },
+                { typeof(object), new FieldType("object", false, TypeCode.Object) }
             };
         }
 
@@ -53,6 +54,7 @@ namespace Inertia.ORM
 
         #region Public variables
 
+        public readonly TypeCode Code;
         public readonly string SqlType;
         public readonly bool Unsigned;
 
@@ -60,8 +62,9 @@ namespace Inertia.ORM
 
         #region Constructors
 
-        public FieldType(string type, bool unsigned)
+        public FieldType(string type, bool unsigned, TypeCode code)
         {
+            Code = code;
             SqlType = type;
             Unsigned = unsigned;
         }

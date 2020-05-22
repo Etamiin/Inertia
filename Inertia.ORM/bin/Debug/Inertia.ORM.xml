@@ -1,0 +1,416 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Inertia.ORM</name>
+    </assembly>
+    <members>
+        <member name="T:Inertia.ORM.AutoCreateTables">
+            <summary>
+            Represent the state that will automatically create all tables in a <see cref="T:Inertia.ORM.Database"/>
+            </summary>
+        </member>
+        <member name="M:Inertia.ORM.AutoCreateTables.#ctor">
+            <summary>
+            Instantiate a new instance of the class <see cref="T:Inertia.ORM.AutoCreateTables"/>
+            </summary>
+        </member>
+        <member name="T:Inertia.ORM.DatabaseAttach">
+            <summary>
+            Represents the link between a table and a database
+            </summary>
+        </member>
+        <member name="F:Inertia.ORM.DatabaseAttach.Database">
+            <summary>
+            Database name attached to
+            </summary>
+        </member>
+        <member name="M:Inertia.ORM.DatabaseAttach.#ctor(System.String)">
+            <summary>
+            Instantiate a new instance of the class <see cref="T:Inertia.ORM.DatabaseAttach"/>
+            </summary>
+            <param name="database">Database name to attach</param>
+        </member>
+        <member name="T:Inertia.ORM.IgnoreField">
+            <summary>
+            Define for a field that is ignored by the ORM system
+            </summary>
+        </member>
+        <member name="M:Inertia.ORM.IgnoreField.#ctor">
+            <summary>
+            Instantiate a new instance of the class <see cref="T:Inertia.ORM.IgnoreField"/>
+            </summary>
+        </member>
+        <member name="T:Inertia.ORM.IgnoreTableCreation">
+            <summary>
+            Define for a table that its creation is to be ignored
+            </summary>
+        </member>
+        <member name="M:Inertia.ORM.IgnoreTableCreation.#ctor">
+            <summary>
+            Instantiate a new instance of the class <see cref="T:Inertia.ORM.IgnoreTableCreation"/>
+            </summary>
+        </member>
+        <member name="T:Inertia.ORM.PrimaryKey">
+            <summary>
+            Represent a primarykey field in a table
+            </summary>
+        </member>
+        <member name="F:Inertia.ORM.PrimaryKey.AutoIncrement">
+            <summary>
+            The field is set as auto increment if true
+            </summary>
+        </member>
+        <member name="M:Inertia.ORM.PrimaryKey.#ctor(System.Boolean)">
+            <summary>
+            Instantiate a new instance of the class <see cref="T:Inertia.ORM.PrimaryKey"/>
+            </summary>
+            <param name="autoIncrement">Set the auto increment state of the primary key field</param>
+        </member>
+        <member name="T:Inertia.ORM.VarChar">
+            <summary>
+            Represent a varchar field in a table
+            </summary>
+        </member>
+        <member name="F:Inertia.ORM.VarChar.Length">
+            <summary>
+            Max length of the varchar field
+            </summary>
+        </member>
+        <member name="M:Inertia.ORM.VarChar.#ctor(System.Int32)">
+            <summary>
+            Instantiate a new instance of the class <see cref="T:Inertia.ORM.VarChar"/>
+            </summary>
+            <param name="length"></param>
+        </member>
+        <member name="T:Inertia.ORM.Database">
+            <summary>
+            Represent the database class
+            </summary>
+        </member>
+        <member name="M:Inertia.ORM.Database.CreateAllTables">
+            <summary>
+            Create all tables for each <see cref="T:Inertia.ORM.Database"/> class
+            </summary>
+        </member>
+        <member name="M:Inertia.ORM.Database.GetDatabase(System.String)">
+            <summary>
+            Get a <see cref="T:Inertia.ORM.Database"/> class instance based on the name
+            </summary>
+            <param name="name">Name of the <see cref="T:Inertia.ORM.Database"/></param>
+            <returns>Finded instance or null</returns>
+        </member>
+        <member name="M:Inertia.ORM.Database.GetDatabase``1">
+            <summary>
+            Get a <see cref="T:Inertia.ORM.Database"/> class instance based on the <see cref="T:System.Type"/>
+            </summary>
+            <typeparam name="T"><see cref="T:System.Type"/> of the target <see cref="T:Inertia.ORM.Database"/></typeparam>
+            <returns><typeparamref name="T"/> instance or null</returns>
+        </member>
+        <member name="M:Inertia.ORM.Database.Use``1(SimpleAction{``0})">
+            <summary>
+            Get the specified <typeparamref name="T"/> instance and execute <paramref name="usage"/> action
+            </summary>
+            <typeparam name="T"><see cref="T:System.Type"/> of <see cref="T:Inertia.ORM.Database"/> to get</typeparam>
+            <param name="usage">Action to execute</param>
+        </member>
+        <member name="P:Inertia.ORM.Database.Name">
+            <summary>
+            Get the name of the database
+            </summary>
+        </member>
+        <member name="P:Inertia.ORM.Database.Host">
+            <summary>
+            Get the host ip of the database
+            </summary>
+        </member>
+        <member name="P:Inertia.ORM.Database.User">
+            <summary>
+            Get the username to use for the connection
+            </summary>
+        </member>
+        <member name="P:Inertia.ORM.Database.Password">
+            <summary>
+            Get the password to use for the connection
+            </summary>
+        </member>
+        <member name="M:Inertia.ORM.Database.#ctor">
+            <summary>
+            Instantiate a new instance of the class <see cref="T:Inertia.ORM.Database"/>
+            </summary>
+        </member>
+        <member name="M:Inertia.ORM.Database.CreateTables">
+            <summary>
+            Create all tables of the current <see cref="T:Inertia.ORM.Database"/>
+            </summary>
+        </member>
+        <member name="M:Inertia.ORM.Database.CreateTable``1">
+            <summary>
+            Create specified <typeparamref name="T"/> table of the current <see cref="T:Inertia.ORM.Database"/>
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="M:Inertia.ORM.Database.DropTable``1">
+            <summary>
+            Delete specified <typeparamref name="T"/> table of the current <see cref="T:Inertia.ORM.Database"/>
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="M:Inertia.ORM.Database.DeleteAll``1">
+            <summary>
+            Delete all rows in the specified <typeparamref name="T"/> table
+            </summary>
+            <typeparam name="T"><see cref="T:System.Type"/> of the table</typeparam>
+        </member>
+        <member name="M:Inertia.ORM.Database.Delete``1(Inertia.ORM.ConditionBuilder)">
+            <summary>
+            Delete all rows based on the specified <see cref="T:Inertia.ORM.ConditionBuilder"/> in specified <typeparamref name="T"/> table
+            </summary>
+            <param name="condition"><see cref="T:Inertia.ORM.ConditionBuilder"/> condition of the deletion</param>
+            <typeparam name="T"><see cref="T:System.Type"/> of the table</typeparam>
+        </member>
+        <member name="M:Inertia.ORM.Database.Select``1(Inertia.ORM.ConditionBuilder,System.String[])">
+            <summary>
+            Select all values based on the specified <see cref="T:Inertia.ORM.ConditionBuilder"/> in the specified <typeparamref name="T"/> table
+            </summary>
+            <param name="condition"><see cref="T:Inertia.ORM.ConditionBuilder"/> for the selection</param>
+            <param name="columns">Columns to select</param>
+            <typeparam name="T"><see cref="T:System.Type"/> of the table</typeparam>
+            <returns><typeparamref name="T"/> array</returns>
+        </member>
+        <member name="M:Inertia.ORM.Database.SelectAll``1(System.String[])">
+            <summary>
+            Select specified columns of each rows in the specified <typeparamref name="T"/> table
+            </summary>
+            <param name="columns">Columns to select</param>
+            <typeparam name="T"><see cref="T:System.Type"/> of the table</typeparam>
+            <returns><typeparamref name="T"/> array</returns>
+        </member>
+        <member name="M:Inertia.ORM.Database.Count``1(Inertia.ORM.ConditionBuilder,System.String)">
+            <summary>
+            Get the number of rows based on the specified <see cref="T:Inertia.ORM.ConditionBuilder"/> in the specified <typeparamref name="T"/> table
+            </summary>
+            <param name="condition"><see cref="T:Inertia.ORM.ConditionBuilder" /> to use</param>
+            <param name="columnName">Column name to focus on (or all in not specified)</param>
+            <typeparam name="T"><see cref="T:System.Type"/> of the table</typeparam>
+            <returns>The number of rows</returns>
+        </member>
+        <member name="M:Inertia.ORM.Database.Exist``1(Inertia.ORM.ConditionBuilder)">
+            <summary>
+            Return true if a value based on the specified <see cref="T:Inertia.ORM.ConditionBuilder"/> in the <typeparamref name="T"/> table exist
+            </summary>
+            <param name="condition"><see cref="T:Inertia.ORM.ConditionBuilder"/> to use</param>
+            <typeparam name="T"><see cref="T:System.Type"/> of the table</typeparam>
+            <returns>True if exist</returns>
+        </member>
+        <member name="T:Inertia.ORM.Table">
+            <summary>
+            Represent the table class
+            </summary>
+        </member>
+        <member name="P:Inertia.ORM.Table.Name">
+            <summary>
+            Get the name of the table
+            </summary>
+        </member>
+        <member name="P:Inertia.ORM.Table.Database">
+            <summary>
+            Get the <see cref="P:Inertia.ORM.Table.Database"/> attached
+            </summary>
+        </member>
+        <member name="M:Inertia.ORM.Table.#ctor">
+            <summary>
+            Instantiate a new instance of the class <see cref="T:Inertia.ORM.Table"/>
+            </summary>
+        </member>
+        <member name="M:Inertia.ORM.Table.Insert">
+            <summary>
+            Insert the current instance values in the database
+            </summary>
+        </member>
+        <member name="M:Inertia.ORM.Table.UpdateAll">
+            <summary>
+            Update all rows in the database by the current instance values
+            </summary>
+        </member>
+        <member name="M:Inertia.ORM.Table.Update(Inertia.ORM.ConditionBuilder)">
+            <summary>
+            Update rows based on the specified <see cref="T:Inertia.ORM.ConditionBuilder"/> by the current instance values
+            </summary>
+            <param name="condition"></param>
+        </member>
+        <member name="M:Inertia.ORM.Table.Select(System.String[])">
+            <summary>
+            Set the current instance values by the selected row based on the specified values
+            </summary>
+            <param name="columns">Columns to select</param>
+        </member>
+        <member name="M:Inertia.ORM.Table.Delete(System.Int32)">
+            <summary>
+            Delete rows based on the current instance values
+            </summary>
+            <param name="limit">Number of rows to delete</param>
+        </member>
+        <member name="M:Inertia.ORM.Table.Count(System.String)">
+            <summary>
+            Get the number of rows that have the same values as the current instance
+            </summary>
+            <param name="columnName">Column to focus (or all if not specified)</param>
+            <returns>Number of rows</returns>
+        </member>
+        <member name="M:Inertia.ORM.Table.Exist">
+            <summary>
+            Return true if the current instance values exist in the table
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:Inertia.ORM.ConditionBuilder">
+            <summary>
+            Represent the condition query builder
+            </summary>
+        </member>
+        <member name="M:Inertia.ORM.ConditionBuilder.#ctor(Inertia.ORM.Database)">
+            <summary>
+            Instantiate a new instance of the class <see cref="T:Inertia.ORM.ConditionBuilder"/>
+            </summary>
+            <param name="db"><see cref="T:Inertia.ORM.Database"/> attached to the <see cref="T:Inertia.ORM.ConditionBuilder"/></param>
+        </member>
+        <member name="M:Inertia.ORM.ConditionBuilder.#ctor(Inertia.ORM.Table)">
+            <summary>
+            Instantiate a new instance of the class <see cref="T:Inertia.ORM.ConditionBuilder"/>
+            </summary>
+            <param name="table"><see cref="T:Inertia.ORM.Table"/> attached to the <see cref="T:Inertia.ORM.ConditionBuilder"/></param>
+        </member>
+        <member name="M:Inertia.ORM.ConditionBuilder.Clear">
+            <summary>
+            Clear the current instance
+            </summary>
+        </member>
+        <member name="M:Inertia.ORM.ConditionBuilder.OpenBrackets(Inertia.ORM.ConditionType)">
+            <summary>
+            Open brackets in the condition query
+            </summary>
+            <param name="type">Additional <see cref="T:Inertia.ORM.ConditionType"/> if allowed</param>
+            <returns>The current instance</returns>
+        </member>
+        <member name="M:Inertia.ORM.ConditionBuilder.CloseBrackets">
+            <summary>
+            Close brackets in the condition query
+            </summary>
+            <returns>The current instance</returns>
+        </member>
+        <member name="M:Inertia.ORM.ConditionBuilder.AddCondition(System.String,System.Object,Inertia.ORM.ConditionOperator,Inertia.ORM.ConditionType)">
+            <summary>
+            Add condition to the query
+            </summary>
+            <param name="fieldName">Field name</param>
+            <param name="value">Value of the condition</param>
+            <param name="conditionOperator"><see cref="T:Inertia.ORM.ConditionOperator"/> for the condition</param>
+            <param name="type">Additional <see cref="T:Inertia.ORM.ConditionType"/> to add if allowed</param>
+            <returns>The current instance</returns>
+        </member>
+        <member name="M:Inertia.ORM.ConditionBuilder.SetLimit(System.Int32)">
+            <summary>
+            Set the "LIMIT" state of the query
+            </summary>
+            <param name="limit"></param>
+            <returns>The current instance</returns>
+        </member>
+        <member name="M:Inertia.ORM.ConditionBuilder.Dispose">
+            <summary>
+            Dispose the current instance
+            </summary>
+        </member>
+        <member name="T:Inertia.ORM.ConditionOperator">
+            <summary>
+            Conditonal operators
+            </summary>
+        </member>
+        <member name="F:Inertia.ORM.ConditionOperator.Equal">
+            <summary>
+            "=" operator
+            </summary>
+        </member>
+        <member name="F:Inertia.ORM.ConditionOperator.Greater">
+            <summary>
+            ">" operator
+            </summary>
+        </member>
+        <member name="F:Inertia.ORM.ConditionOperator.Less">
+            <summary>
+            <![CDATA["<"]]> operator
+            </summary>
+        </member>
+        <member name="F:Inertia.ORM.ConditionOperator.GreaterOrEqual">
+            <summary>
+            ">=" operator
+            </summary>
+        </member>
+        <member name="F:Inertia.ORM.ConditionOperator.LessOrEqual">
+            <summary>
+            <![CDATA["<="]]> operator operator
+            </summary>
+        </member>
+        <member name="F:Inertia.ORM.ConditionOperator.Different">
+            <summary>
+            <![CDATA["<>"]]> operator operator
+            </summary>
+        </member>
+        <member name="F:Inertia.ORM.ConditionOperator.In">
+            <summary>
+            "IN" operator
+            </summary>
+        </member>
+        <member name="T:Inertia.ORM.ConditionType">
+            <summary>
+            Conditional type (AND, OR)
+            </summary>
+        </member>
+        <member name="F:Inertia.ORM.ConditionType.And">
+            <summary>
+            "AND" condition
+            </summary>
+        </member>
+        <member name="F:Inertia.ORM.ConditionType.Or">
+            <summary>
+            "OR condition"
+            </summary>
+        </member>
+        <member name="T:Inertia.ORM.InvalidDatabaseAttachException">
+            <summary>
+            Throw when a <see cref="T:Inertia.ORM.DatabaseAttach"/> attribute has a not existing Database
+            </summary>
+        </member>
+        <member name="P:Inertia.ORM.InvalidDatabaseAttachException.Message">
+            <summary>
+            Message of the exception
+            </summary>
+        </member>
+        <member name="F:Inertia.ORM.InvalidDatabaseAttachException.DatabaseName">
+            <summary>
+            Database name to attach
+            </summary>
+        </member>
+        <member name="M:Inertia.ORM.InvalidDatabaseAttachException.#ctor(System.String)">
+            <summary>
+            Instantiate a new instance of the class <see cref="T:Inertia.ORM.InvalidDatabaseAttachException"/>
+            </summary>
+            <param name="databaseName">Name of the database to attach</param>
+        </member>
+        <member name="T:Inertia.ORM.NoFieldsException">
+            <summary>
+            Throw when a <see cref="T:Inertia.ORM.Table"/> class don't have any fields
+            </summary>
+        </member>
+        <member name="P:Inertia.ORM.NoFieldsException.Message">
+            <summary>
+            Message of the exception
+            </summary>
+        </member>
+        <member name="M:Inertia.ORM.NoFieldsException.#ctor(Inertia.ORM.Table)">
+            <summary>
+            Instantiante a new instance of the class <see cref="T:Inertia.ORM.NoFieldsException"/>
+            </summary>
+            <param name="table"></param>
+        </member>
+    </members>
+</doc>

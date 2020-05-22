@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // l'ensemble d'attributs suivant. Changez les valeurs de ces attributs pour modifier les informations
 // associées à un assembly.
 [assembly: AssemblyTitle("Inertia.ORM")]
-[assembly: AssemblyDescription("C# Library for MySql")]
+[assembly: AssemblyDescription("C# ORM for MySql")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Abdel Bourahla")]
+[assembly: AssemblyCompany("Etamiin (A.Bourahla)")]
 [assembly: AssemblyProduct("Inertia.ORM")]
-[assembly: AssemblyCopyright("Copyright ©  2019 Abdel Bourahla")]
+[assembly: AssemblyCopyright("Copyright © 2020 Abdel Bourahla")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -33,4 +33,4 @@ using System.Runtime.InteropServices;
 // en utilisant '*', comme indiqué ci-dessous :
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("2020.1.0.0")]
+[assembly: AssemblyFileVersion("2020.1.5.15")]

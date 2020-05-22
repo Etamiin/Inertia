@@ -4,55 +4,33 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Inertia.Commands
+namespace Inertia
 {
-    public class CommandManager
+    /// <summary>
+    /// Represent the class that will manage the command reception and execution
+    /// </summary>
+    public static class CommandHooker
     {
-        #region GetInstance
-
-        public static CommandManager GetInstance()
-        {
-            if (Instance == null)
-                Instance = new CommandManager();
-
-            return Instance;
-        }
-        private static CommandManager Instance;
-
-        #endregion
-
         #region Private variables
 
-        private readonly Dictionary<string, InertiaCommand> Commands;
-
-        #endregion
-
-        #region Constructors
-
-        internal CommandManager()
+        private static Dictionary<string, TextCommand> m_commands;
+        private static bool Initializated
         {
-            Commands = new Dictionary<string, InertiaCommand>();
-            LoadCommands();
+            get
+            {
+                return m_commands != null;
+            }
         }
 
         #endregion
 
-        public InertiaCommand[] GetCommands()
+        private static void Initialize()
         {
-            var cmds = new InertiaCommand[0];
-            lock (Commands)
-                cmds = Commands.Values.ToArray();
+            if (Initializated)
+                return;
 
-            return cmds;
-        }
-        public InertiaCommand GetCommand(string commandName)
-        {
-            Commands.TryGetValue(commandName, out InertiaCommand command);
-            return command;
-        }
+            m_commands = new Dictionary<string, TextCommand>();
 
-        private void LoadCommands()
-        {
             var Assemblys = AppDomain.CurrentDomain.GetAssemblies();
             foreach (var assembly in Assemblys)
             {
@@ -61,33 +39,75 @@ namespace Inertia.Commands
                 {
                     if (type.IsClass)
                     {
-                        if (type.IsSubclassOf(typeof(InertiaCommand)) && !type.IsAbstract)
+                        if (type.IsSubclassOf(typeof(TextCommand)) && !type.IsAbstract)
                         {
-                            var inertiaCommand = (InertiaCommand)type.GetConstructor(Type.EmptyTypes).Invoke(new object[] { });
-                            if (Commands.ContainsKey(inertiaCommand.Name))
+                            var inertiaCommand = (TextCommand)type.GetConstructor(Type.EmptyTypes).Invoke(new object[] { });
+                            if (m_commands.ContainsKey(inertiaCommand.Name))
                                 continue;
-                            Commands.Add(inertiaCommand.Name, inertiaCommand);
+                            m_commands.Add(inertiaCommand.Name, inertiaCommand);
                         }
                     }
                 }
             }
         }
 
-        public static bool ExecuteCommandLine(string commandLine)
+        /// <summary>
+        /// Return all existing <see cref="TextCommand"/> instancied
+        /// </summary>
+        /// <returns>An array of <see cref="TextCommand"/> representing the existing <see cref="TextCommand"/></returns>
+        public static TextCommand[] GetAllCommands()
+        {
+            if (!Initializated)
+                Initialize();
+
+            var cmds = new TextCommand[0];
+            lock (m_commands)
+                cmds = m_commands.Values.ToArray();
+
+            return cmds;
+        }
+        /// <summary>
+        /// Return the <see cref="TextCommand"/> associated to the specified name 
+        /// </summary>
+        /// <param name="commandName">The name of the command</param>
+        /// <returns>The <see cref="TextCommand"/> associated or null if none</returns>
+        public static TextCommand GetCommandByName(string commandName)
+        {
+            if (!Initializated)
+                Initialize();
+
+            m_commands.TryGetValue(commandName, out TextCommand command);
+            return command;
+        }
+
+        /// <summary>
+        /// Parse a string command line to a <see cref="TextCommand"/> and execute it with facultative data
+        /// </summary>
+        /// <param name="commandLine">The string line to parse</param>
+        /// <param name="dataCollection">Facultative data objects</param>
+        /// <returns>Return true if the command was executed</returns>
+        public static bool ExecuteTextCommand(string commandLine, params object[] dataCollection)
         {
             var args = commandLine.Split(' ');
             var others = new string[args.Length - 1];
             Array.Copy(args, 1, others, 0, others.Length);
 
-            return ExecuteCommand(args[0], others);
+            return ExecuteCommandByName(args[0], dataCollection, others);
         }
-        public static bool ExecuteCommand(string name, params string[] arguments)
+        /// <summary>
+        /// Get the associated <see cref="TextCommand"/> based on the name and execute it with the specified arguments
+        /// </summary>
+        /// <param name="commandName">The command anme</param>
+        /// <param name="dataCollection">Facultative data objects</param>
+        /// <param name="arguments">Facultative string arguments</param>
+        /// <returns></returns>
+        public static bool ExecuteCommandByName(string commandName, object[] dataCollection = null, params string[] arguments)
         {
-            var command = GetInstance().GetCommand(name);
+            var command = GetCommandByName(commandName);
             if (command == null)
                 return false;
 
-            command.Execute(new ArgumentsCollection(arguments));
+            command.Execute(new TextCommandArgs(arguments, dataCollection));
             return true;
         }
     }

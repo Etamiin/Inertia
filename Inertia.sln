@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inertia", "Inertia\Inertia.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inertia.ORM", "Inertia.ORM\Inertia.ORM.csproj", "{46D66FDA-33C9-4BBC-8D2C-9B13B3E7CF48}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inertia.Forms", "Inertia.Forms\Inertia.Forms.csproj", "{2F7C1BFC-F1D0-46E1-8FAA-B10D1869F381}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inertia.Web", "Inertia.Web\Inertia.Web.csproj", "{65413496-C725-4F82-92B1-15D51F4EC04D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{46D66FDA-33C9-4BBC-8D2C-9B13B3E7CF48}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{46D66FDA-33C9-4BBC-8D2C-9B13B3E7CF48}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{46D66FDA-33C9-4BBC-8D2C-9B13B3E7CF48}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F7C1BFC-F1D0-46E1-8FAA-B10D1869F381}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F7C1BFC-F1D0-46E1-8FAA-B10D1869F381}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F7C1BFC-F1D0-46E1-8FAA-B10D1869F381}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F7C1BFC-F1D0-46E1-8FAA-B10D1869F381}.Release|Any CPU.Build.0 = Release|Any CPU
+		{65413496-C725-4F82-92B1-15D51F4EC04D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{65413496-C725-4F82-92B1-15D51F4EC04D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{65413496-C725-4F82-92B1-15D51F4EC04D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{65413496-C725-4F82-92B1-15D51F4EC04D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

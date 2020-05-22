@@ -4,18 +4,27 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Inertia.Storage
+namespace Inertia
 {
+    /// <summary>
+    /// Exception thrown when a file storage use a bad password
+    /// </summary>
     public class InvalidPasswordException : Exception
     {
         #region Public variables
 
+        /// <summary>
+        /// Get the message of the current exception
+        /// </summary>
         public override string Message => GetMessage();
 
         #endregion
 
         #region Constructors
 
+        /// <summary>
+        /// Initialize a new instance of the class <see cref="InvalidPasswordException"/>
+        /// </summary>
         public InvalidPasswordException()
         {
         }
@@ -24,8 +33,7 @@ namespace Inertia.Storage
 
         private string GetMessage()
         {
-            return
-                "Can't open target storage file: password not match";
+            return "The specified password isn't valid.";
         }
     }
 }

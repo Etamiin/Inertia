@@ -2,29 +2,29 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Inertia.Storage;
 
 namespace Inertia
 {
     /// <summary>
-    /// Dictionary that can store objects of different types.
+    /// Represents a collection of keys associated with values that can be of any type
     /// </summary>
     /// <typeparam name="TKey">The type of object used for dictionary keys</typeparam>
+    [Serializable]
     public class FlexDictionary<TKey> : IDisposable
     {
         #region Public variables
 
         /// <summary>
-        /// Returns the number of objects that are stored in the dictionnary.
+        /// Returns the number of values that are stored in the dictionnary.
         /// </summary>
-        public int Count => Memory.Count;
+        public int Count => m_memory.Count;
 
         #endregion
 
         #region Private variables
 
-        private Dictionary<TKey, FlexDictionaryValue<object>> Memory;
+        private Dictionary<TKey, FlexDictionaryValue<object>> m_memory;
 
         #endregion
 
@@ -35,7 +35,7 @@ namespace Inertia
         /// </summary>
         public FlexDictionary()
         {
-            Memory = new Dictionary<TKey, FlexDictionaryValue<object>>();
+            m_memory = new Dictionary<TKey, FlexDictionaryValue<object>>();
         }
 
         #endregion
@@ -59,8 +59,8 @@ namespace Inertia
         /// <returns>An array of <typeparamref name="TKey"/> stored in the dictionnary</returns>
         public TKey[] GetKeys()
         {
-            lock (Memory)
-                return Memory.Keys.ToArray();
+            lock (m_memory)
+                return m_memory.Keys.ToArray();
         }
 
         /// <summary>
@@ -75,8 +75,8 @@ namespace Inertia
             if (identifier == null)
                 throw new NullReferenceException();
 
-            if (!Memory.ContainsKey(identifier))
-                Memory.Add(identifier, new FlexDictionaryValue<TData>(identifier, data));
+            if (!m_memory.ContainsKey(identifier))
+                m_memory.Add(identifier, new FlexDictionaryValue<TData>(identifier, data));
 
             return this;
         }
@@ -87,10 +87,10 @@ namespace Inertia
         /// <returns>The current <see cref="FlexDictionary{TKey}"/> instance</returns>
         public FlexDictionary<TKey> Remove(TKey identifier)
         {
-            if (Memory.ContainsKey(identifier))
+            if (m_memory.ContainsKey(identifier))
             {
                 GetDataExtension<object>(identifier).Dispose();
-                Memory.Remove(identifier);
+                m_memory.Remove(identifier);
             }
 
             return this;
@@ -104,8 +104,8 @@ namespace Inertia
         /// <returns>The current <see cref="FlexDictionary{TKey}"/> instance</returns>
         public FlexDictionary<TKey> Replace<TData>(TKey identifier, TData value)
         {
-            if (Memory.ContainsKey(identifier))
-                Memory[identifier] = new FlexDictionaryValue<TData>(identifier, value);
+            if (m_memory.ContainsKey(identifier))
+                m_memory[identifier] = new FlexDictionaryValue<TData>(identifier, value);
 
             return this;
         }
@@ -120,7 +120,7 @@ namespace Inertia
         /// <remarks>If the object wasn't found, the result will be the default value of <typeparamref name="TData"/></remarks>
         public bool TryGetValue<TData>(TKey identifier, out TData value)
         {
-            if (IsOfType<TData>(identifier))
+            if (Exist(identifier))
             {
                 value = (TData)this[identifier];
                 return true;
@@ -139,10 +139,10 @@ namespace Inertia
         /// <exception cref="NullReferenceException">Thrown if the specified key don't exist</exception>
         public TData GetValue<TData>(TKey identifier)
         {
-            if (IsOfType<TData>(identifier))
+            if (Exist(identifier))
                 return (TData)this[identifier];
 
-            throw new NullReferenceException("Identifier " + nameof(TKey) + " arn't attached to any data");
+            return default;
         }
         /// <summary>
         /// Retrieve a list of object without type and return them
@@ -181,57 +181,81 @@ namespace Inertia
         /// <returns>Return true if the specified key exist in the dictionnary, or false if not</returns>
         public bool Exist(TKey identifier)
         {
-            return Memory.ContainsKey(identifier);
+            return m_memory.ContainsKey(identifier);
         }
-        internal bool IsOfType<TData>(TKey identifier)
+
+        /// <summary>
+        /// Clear the data stored in the current instance
+        /// </summary>
+        public void Clear()
         {
-            var exist = Exist(identifier);
-            if (exist)
-            {
-                var value = this[identifier];
-
-                if (value is ISerializableObject && typeof(TData) == typeof(ISerializableObject))
-                    return true;
-                else if (value.GetType().IsArray && value.GetType() != typeof(TData)) {
-                    var array = (Array)value;
-                    var elementType = value.GetType().GetElementType();
-                    var targetElementType = typeof(TData).GetElementType();
-
-                    if (elementType.IsInterface && elementType.Name == nameof(ISerializableObject) && elementType.IsAssignableFrom(targetElementType))
-                    {
-                        try
-                        {
-                            var newArray = Array.CreateInstance(targetElementType, array.Length);
-                            for (var i = 0; i < array.Length; i++)
-                                newArray.SetValue(array.GetValue(i), i);
-
-                            Replace(identifier, newArray);
-                            value = newArray;
-                        }
-                        catch
-                        {
-                        }
-                    }
-                }
-
-                return value.GetType() == typeof(TData);
-            }
-
-            return exist;
+            m_memory.Clear();
         }
-
-        internal FlexDictionaryValue<T> GetDataExtension<T>(TKey identifier)
-        {
-            return Memory.ContainsKey(identifier) ? Memory[identifier] : null;
-        }
-
+        
         /// <summary>
         /// Dispose all the resources used by the <see cref="FlexDictionary{TKey}"/> instance
         /// </summary>
         public void Dispose()
         {
-            Memory.Clear();
-            Memory = null;
+            m_memory.Clear();
+            m_memory = null;
+        }
+
+        internal virtual byte[] Serialize(SimpleAction<StorageProgressionEventArgs> progressCallback)
+        {
+            var serializer = new SimpleWriter();
+            var keys = GetKeys();
+            var progression = new StorageProgressionEventArgs(keys.Length);
+
+            serializer.SetInt(keys.Length);
+
+            foreach (var key in keys)
+            {
+                var value = GetDataExtension<object>(key);
+                if (value == null)
+                    continue;
+
+                var typeCode = value.GetDataTypeCode();
+
+                serializer
+                    .SetValue(key)
+                    .SetByte((byte)typeCode);
+
+                if (typeCode == TypeCode.Byte)
+                    serializer.SetBool(value.isByteArray);
+
+                serializer.SetValue(value.Data);
+                progressCallback(progression.Progress());
+            }
+
+            return serializer.ToArrayAndDispose().Compress(out _);
+        }
+        internal virtual void Deserialize(byte[] data, SimpleAction<StorageProgressionEventArgs> progressCallback)
+        {
+            var deserializer = new SimpleReader(data.Decompress());
+            var length = deserializer.GetInt();
+            var progression = new StorageProgressionEventArgs(length);
+
+            for (var i = 0; i < length; i++)
+            {
+                var key = (TKey)deserializer.GetValue(typeof(TKey));
+                var typeCode = (TypeCode)deserializer.GetByte();
+                object value;
+                if (typeCode == TypeCode.Byte && deserializer.GetBool())
+                    value = deserializer.GetBytes();
+                else
+                    value = deserializer.GetValue(typeCode.ToType());
+
+                Add(key, value);
+                progressCallback(progression.Progress());
+            }
+
+            deserializer.Dispose();
+        }
+
+        internal FlexDictionaryValue<T> GetDataExtension<T>(TKey identifier)
+        {
+            return m_memory.ContainsKey(identifier) ? m_memory[identifier] : null;
         }
     }
 }

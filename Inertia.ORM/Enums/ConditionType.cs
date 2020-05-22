@@ -6,9 +6,18 @@ using System.Threading.Tasks;
 
 namespace Inertia.ORM
 {
+    /// <summary>
+    /// Conditional type (AND, OR)
+    /// </summary>
     public enum ConditionType
     {
-        AND,
-        OR
+        /// <summary>
+        /// "AND" condition
+        /// </summary>
+        And,
+        /// <summary>
+        /// "OR condition"
+        /// </summary>
+        Or
     }
 }

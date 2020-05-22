@@ -9,9 +9,10 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Inertia</RootNamespace>
     <AssemblyName>Inertia</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -44,83 +45,51 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Core\Tools\StringConventionNormalizer.cs" />
-    <Compile Include="Core\Tools\ThreadingDependency\DependentThread.cs" />
+    <Compile Include="Core\IO\Exceptions\TypeNonSerializableException.cs" />
+    <Compile Include="Core\PathExtensions.cs" />
+    <Compile Include="Core\Tools\BaseLogger.cs" />
+    <Compile Include="Core\Tools\ConsoleLogger.cs" />
+    <Compile Include="Core\Tools\DependentThread.cs" />
     <Compile Include="InertiaDelegates.cs" />
     <Compile Include="Core\InertiaExtensions.cs" />
-    <Compile Include="Systems\Command\Commands\HelpCommand.cs" />
-    <Compile Include="Systems\Network\Core\Client\NetworkClient.cs" />
-    <Compile Include="Systems\Network\Core\InternalNetworkProcessor.cs" />
-    <Compile Include="Systems\Network\Core\Client\TcpNetworkClient.cs" />
-    <Compile Include="Systems\Network\Core\Client\UdpNetworkClient.cs" />
-    <Compile Include="Systems\Network\Core\Server\NetworkServer.cs" />
-    <Compile Include="Systems\Network\Core\Server\TcpNetworkServer.cs" />
-    <Compile Include="Systems\Network\Core\Server\TcpNetworkUser.cs" />
-    <Compile Include="Systems\Network\Core\Server\UdpNetworkServer.cs" />
-    <Compile Include="Systems\Network\Core\Server\UdpNetworkUser.cs" />
-    <Compile Include="Systems\Network\Core\Server\NetworkUser.cs" />
-    <Compile Include="Systems\Network\Data\NetworkDeserializedPacket.cs" />
-    <Compile Include="Systems\Network\Core\NetworkMessage.cs" />
-    <Compile Include="Systems\Network\Data\NetworkPacket.cs" />
-    <Compile Include="Systems\Network\Data\NetworkProcessor.cs" />
-    <Compile Include="Systems\Network\Core\Server\Server.cs" />
-    <Compile Include="Systems\Network\Data\NetworkProcessData.cs" />
-    <Compile Include="Systems\Network\Data\NetworkUserGroup.cs" />
-    <Compile Include="Systems\Network\Enums\NetDisconnectReason.cs" />
-    <Compile Include="Systems\Network\Enums\NetworkProtocole.cs" />
-    <Compile Include="Systems\Network\Enums\NetworkState.cs" />
-    <Compile Include="Systems\Network\Core\Client\Client.cs" />
-    <Compile Include="Systems\Network\Interfaces\IUserCore.cs" />
-    <Compile Include="Systems\Scripting\Exceptions\CriticalScriptManagement.cs" />
-    <Compile Include="Systems\Storage\DataStorage.cs" />
-    <Compile Include="Systems\Storage\Data\FileMemoryData.cs" />
-    <Compile Include="Systems\Storage\Data\InertiaStorage.cs" />
-    <Compile Include="Systems\Storage\Enums\ArrayTypeCode.cs" />
-    <Compile Include="Systems\Storage\Enums\FileMemoryStorageType.cs" />
-    <Compile Include="Systems\Storage\Enums\SaveMethod.cs" />
-    <Compile Include="Systems\Storage\FileStorage.cs" />
-    <Compile Include="Core\IO\Interfaces\ISerializableObject.cs" />
-    <Compile Include="Systems\Storage\Exceptions\InvalidDataTypeException.cs" />
-    <Compile Include="Systems\Storage\Exceptions\InvalidKeyTypeException.cs" />
-    <Compile Include="Systems\Storage\Exceptions\InvalidPasswordException.cs" />
-    <Compile Include="Systems\Storage\Exceptions\InvalidSerializableTypeException.cs" />
-    <Compile Include="Systems\Storage\Exceptions\KeyTypeUnmatchException.cs" />
-    <Compile Include="Core\IO\Compression\Consts.cs" />
-    <Compile Include="Core\IO\Compression\Deflator.cs" />
-    <Compile Include="Core\IO\Compression\Inflator.cs" />
-    <Compile Include="Core\IO\Compression\Utils.cs" />
+    <Compile Include="Systems\Network\Core\NetTcpClient.cs" />
+    <Compile Include="Systems\Network\Core\NetTcpServer.cs" />
+    <Compile Include="Systems\Network\Core\NetUdpClient.cs" />
+    <Compile Include="Systems\Network\Core\NetUdpServer.cs" />
+    <Compile Include="Systems\Network\Data\Abstract\NetClient.cs" />
+    <Compile Include="Systems\Network\Data\Abstract\NetServer.cs" />
+    <Compile Include="Systems\Network\Data\Core\NetTcpConnection.cs" />
+    <Compile Include="Systems\Network\Data\CustomNetPacket.cs" />
+    <Compile Include="Systems\Network\Core\DefaultNetworkProtocol.cs" />
+    <Compile Include="Systems\Network\Data\NetPacket.cs" />
+    <Compile Include="Systems\Network\Data\NetConnectionGroup.cs" />
+    <Compile Include="Systems\Network\Data\Core\NetUdpConnection.cs" />
+    <Compile Include="Systems\Network\Data\Core\NetworkProtocol.cs" />
+    <Compile Include="Systems\Network\Enums\NetworkDisconnectReason.cs" />
+    <Compile Include="Systems\Network\Exceptions\UserDatagramDataLengthLimitException.cs" />
+    <Compile Include="Systems\Scripting\Core\Script.cs" />
+    <Compile Include="Systems\Scripting\Data\ScriptArgumentsCollection.cs" />
+    <Compile Include="Systems\Scripting\Core\ScriptCollection.cs" />
+    <Compile Include="Systems\Scripting\Data\ScriptExecutorLayer.cs" />
+    <Compile Include="Systems\Scripting\RealtimeManager.cs" />
     <Compile Include="Core\IO\FlexDictionary\FlexDictionary.cs" />
     <Compile Include="Core\IO\FlexDictionary\FlexDictionaryValue.cs" />
     <Compile Include="Core\IO\InertiaIO.cs" />
-    <Compile Include="Core\IO\InertiaReader.cs" />
-    <Compile Include="Core\IO\InertiaWriter.cs" />
+    <Compile Include="Core\IO\SimpleReader.cs" />
+    <Compile Include="Core\IO\SimpleWriter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Systems\Command\CommandManager.cs" />
     <Compile Include="Systems\Command\ArgumentsCollection.cs" />
-    <Compile Include="Systems\Command\InertiaCommand.cs" />
+    <Compile Include="Systems\Command\TextCommand.cs" />
     <Compile Include="Core\Tools\Clock.cs" />
     <Compile Include="Core\Queue\AutoQueue.cs" />
-    <Compile Include="Core\Queue\Enums\QueueMod.cs" />
     <Compile Include="Core\Queue\ManualQueue.cs" />
-    <Compile Include="Systems\Scripting\Data\Scriptable.cs" />
-    <Compile Include="Systems\Scripting\Data\Updater.cs" />
-    <Compile Include="Systems\Scripting\Data\ScriptCollection.cs" />
-    <Compile Include="Systems\Scripting\ScriptingManager.cs" />
-    <Compile Include="Systems\Scripting\Scripts\ExecuteInScript.cs" />
-    <Compile Include="Core\InertiaConfiguration.cs" />
-    <Compile Include="Core\Tools\InertiaLogger.cs" />
-    <Compile Include="Systems\Storage\Data\StorageAsyncProgression.cs" />
-    <Compile Include="Systems\Web\Download\FtpDownloader.cs" />
-    <Compile Include="Systems\Web\Download\WebDownloader.cs" />
-    <Compile Include="Systems\Web\Data\FtpCredentials.cs" />
-    <Compile Include="Systems\Web\Download\WebFileData.cs" />
-    <Compile Include="Systems\Web\Data\WebModuleConfiguration.cs" />
-    <Compile Include="Systems\Web\Upload\WebUploadFileData.cs" />
-    <Compile Include="Systems\Web\Exceptions\EnqueueInvalidInformationsException.cs" />
-    <Compile Include="Systems\Web\Exceptions\WebModuleBusyException.cs" />
-    <Compile Include="Systems\Web\Download\InertiaDownloaderModule.cs" />
-    <Compile Include="Systems\Web\WebManager.cs" />
-    <Compile Include="Systems\Web\Upload\FtpUploader.cs" />
+    <Compile Include="Systems\Storage\Core\DataStorage.cs" />
+    <Compile Include="Systems\Storage\Core\FileStorage.cs" />
+    <Compile Include="Systems\Storage\Data\FileStorageData.cs" />
+    <Compile Include="Systems\Storage\Data\StorageProgressionEventArgs.cs" />
+    <Compile Include="Systems\Storage\Exceptions\InvalidPasswordException.cs" />
+    <Compile Include="Systems\Storage\Interfaces\IStorage.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

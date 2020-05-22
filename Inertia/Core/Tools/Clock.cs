@@ -6,25 +6,33 @@ using System.Threading.Tasks;
 
 namespace Inertia
 {
+    /// <summary>
+    /// Offers the possibility to obtain the time elapsed between a block of code.
+    /// </summary>
     public class Clock : IDisposable
     {
-        public static Clock Create()
+        /// <summary>
+        /// Automatically creates an instance of the class Clock and returns in milliseconds the execution time of the indicated code then dispose the instance
+        /// </summary>
+        /// <param name="handler">The code to execute</param>
+        /// <returns>Time elapsed in milliseconds</returns>
+        public static double GetElapsedMilliseconds(SimpleAction handler)
         {
-            return new Clock();
-        }
-
-        public static double GetElapsedMilliseconds(InertiaAction handler)
-        {
-            var clock = Create();
+            var clock = new Clock();
             handler();
             var result = clock.GetElapsedMilliseconds();
             clock.Dispose();
 
             return result;
         }
-        public static double GetElapsedSeconds(InertiaAction handler)
+        /// <summary>
+        /// Automatically creates an instance of the class Clock and returns in seconds the execution time of the indicated code then dispose the instance
+        /// </summary>
+        /// <param name="handler">The code to execute</param>
+        /// <returns>Time elapsed in seconds</returns>
+        public static double GetElapsedSeconds(SimpleAction handler)
         {
-            var clock = Create();
+            var clock = new Clock();
             handler();
             var result = clock.GetElapsedSeconds();
             clock.Dispose();
@@ -34,46 +42,72 @@ namespace Inertia
 
         #region Private variables
 
-        private DateTime StartTime;
+        private DateTime m_startTime;
 
         #endregion
 
         #region Constructors
 
-        private Clock()
+        /// <summary>
+        /// Initialize a new instance of the class <see cref="Clock"/>
+        /// </summary>
+        public Clock()
         {
             Reset();
         }
 
         #endregion
 
+        /// <summary>
+        /// Reset the start time of the clock
+        /// </summary>
+        /// <returns>Return the current instance</returns>
         public Clock Reset()
         {
-            StartTime = DateTime.Now;
+            m_startTime = DateTime.Now;
             return this;
         }
 
+        /// <summary>
+        /// Returns in milliseconds the execution time between the last reset
+        /// </summary>
+        /// <returns>Time elapsed in milliseconds</returns>
         public double GetElapsedMilliseconds()
         {
-            var time = StartTime - DateTime.Now;
+            var time = m_startTime - DateTime.Now;
             return Math.Abs(time.TotalMilliseconds);
         }
+        /// <summary>
+        /// Returns in milliseconds the execution time between the last reset and then reset the clock
+        /// </summary>
+        /// <returns>Time elapsed in milliseconds</returns>
         public double GetElapsedMillisecondsAndReset()
         {
-            var time = StartTime - DateTime.Now;
+            var time = m_startTime - DateTime.Now;
             Reset();
             return Math.Abs(time.TotalMilliseconds);
         }
 
+        /// <summary>
+        /// Returns in seconds the execution time between the last reset
+        /// </summary>
+        /// <returns>Time elapsed in seconds</returns>
         public double GetElapsedSeconds()
         {
             return GetElapsedMilliseconds() / 1000;
         }
+        /// <summary>
+        /// Returns in seconds the execution time between the last reset and then reset the clock
+        /// </summary>
+        /// <returns>Time elapsed in seconds</returns>
         public double GetElapsedSecondsAndReset()
         {
             return GetElapsedMillisecondsAndReset() / 1000;
         }
 
+        /// <summary>
+        /// Dispose the current instance of the class
+        /// </summary>
         public void Dispose()
         {
         }

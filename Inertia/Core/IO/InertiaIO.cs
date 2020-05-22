@@ -2,27 +2,34 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
+using System.IO.Compression;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using Inertia.Internal;
 
 namespace Inertia
 {
+    /// <summary>
+    /// Class containing methods for managing and transforming data
+    /// </summary>
     public static class InertiaIO
     {
         #region Private variables
 
-        private readonly static Random ioRand = new Random();
+        internal readonly static Random m_rand = new Random();
 
         #endregion
 
+        /// <summary>
+        /// Returns all file paths of the files contained in the specified folder
+        /// </summary>
+        /// <param name="path">The target folder path</param>
+        /// <param name="inheritance">True if sub folders has to be included</param>
+        /// <returns>String array representing all paths</returns>
         public static string[] GetFilesPathFromDirectory(string path, bool inheritance)
         {
-            path = StringConventionNormalizer.GetNormalizedFolderPath(path);
-
+            path = path.VerifyPathForFolder();
+            
             if (!Directory.Exists(path))
                 return new string[] { };
 
@@ -45,33 +52,33 @@ namespace Inertia
 
             return result.ToArray();
         }
+        /// <summary>
+        /// Open the target folder path in the file explorer
+        /// </summary>
+        /// <param name="path">Target folder to open</param>
         public static void OpenInExplorer(string path)
         {
-            path = StringConventionNormalizer.GetNormalizedFolderPath(path);
+            path = path.VerifyPathForFolder();
 
             if (Directory.Exists(path))
                 Process.Start("explorer.exe", path);
         }
+        /// <summary>
+        /// Add the specified byte array to the end of the target file path
+        /// </summary>
+        /// <param name="path">Path of the target file</param>
+        /// <param name="data">The byte array to add</param>
         public static void AppendAllBytes(string path, byte[] data)
         {
             using (var stream = new FileStream(path, FileMode.Append))
                 stream.Write(data, 0, data.Length);
         }
 
-        public static void Shuffle<T>(this IList<T> collection)
-        {
-            var idStart = 0;
-            T valueSave;
-
-            while (idStart < collection.Count - 1)
-            {
-                int idRand = ioRand.Next(idStart, collection.Count);
-                valueSave = collection[idStart];
-                collection[idStart++] = collection[idRand];
-                collection[idRand] = valueSave;
-            }
-        }
-
+        /// <summary>
+        /// Get the SHA256 key representation of the specified byte array data
+        /// </summary>
+        /// <param name="data">Target byte array data</param>
+        /// <returns>The SHA256 representation</returns>
         public static string GetSHA256(byte[] data)
         {
             string result = string.Empty;
@@ -86,6 +93,11 @@ namespace Inertia
 
             return result;
         }
+        /// <summary>
+        /// Get the SHA256 key representation of the specified <see cref="FileStream"/>
+        /// </summary>
+        /// <param name="stream">Target <see cref="FileStream"/></param>
+        /// <returns>The SHA256 representation</returns>
         public static string GetSHA256(FileStream stream)
         {
             using (stream)
@@ -110,39 +122,54 @@ namespace Inertia
                 return bigDatas;
             }
         }
-        public static string GetSHA256(this string text)
-        {
-            var data = InertiaConfiguration.BaseEncodage.GetBytes(text);
-            return GetSHA256(data);
-        }
-        public static string GetSHA256(this string text, Encoding encoding)
-        {
-            var data = encoding.GetBytes(text);
-            return GetSHA256(data);
-        }
 
-        public static bool Compress(byte[] data, out byte[] buffer)
+        /// <summary>
+        /// Compress the specified byte array and return the compressed one
+        /// </summary>
+        /// <param name="data">Target byte array to compress</param>
+        /// <param name="compressed">Return true if the returned data is lower in length than the non-compressed data</param>
+        /// <returns>Compressed byte array</returns>
+        public static byte[] Compress(byte[] data, out bool compressed)
         {
-            buffer = AcedDeflator.Instance.Compress(data, 0, data.Length, AcedCompressionLevel.Fast, 0, 0);
-            AcedDeflator.Instance.Dispose();
+            using (var cms = new MemoryStream())
+            {
+                using (var gzs = new BufferedStream(new GZipStream(cms, CompressionMode.Compress)))
+                    gzs.Write(data, 0, data.Length);
 
-            var isBetter = buffer.Length < data.Length;
-            if (!isBetter)
-                buffer = data;
+                var compressedData = cms.ToArray();
 
-            return isBetter;
+                compressed = compressedData.Length < data.Length;
+                return compressedData;
+            }
         }
+        /// <summary>
+        /// Decompress the specified byte array and return the decompressed one
+        /// </summary>
+        /// <param name="compressedData">Target byte array to decompress</param>
+        /// <returns>Decompressed byte array</returns>
         public static byte[] Decompress(byte[] compressedData)
         {
-            var result = AcedInflator.Instance.Decompress(compressedData, 0, 0, 0);
-            AcedInflator.Instance.Dispose();
+            using (var cms = new MemoryStream(compressedData))
+            {
+                using (var dms = new MemoryStream())
+                {
+                    using (var gzs = new BufferedStream(new GZipStream(cms, CompressionMode.Decompress)))
+                        gzs.CopyTo(dms);
 
-            return result;
+                    return dms.ToArray();
+                }
+            }
         }
-    
-        public static byte[] EncryptWithString(byte[] data, string value)
+
+        /// <summary>
+        /// Encrypt the target byte array with the specified string key
+        /// </summary>
+        /// <param name="data">Target byte array to encrypt</param>
+        /// <param name="key">Target string key for encryption</param>
+        /// <returns>Encrypted byte array</returns>
+        public static byte[] EncryptWithString(byte[] data, string key)
         {
-            var pdb =new PasswordDeriveBytes(value, Encoding.ASCII.GetBytes(value));
+            var pdb =new PasswordDeriveBytes(key, Encoding.ASCII.GetBytes(key));
             var ms = new MemoryStream();
 
             var aes = new AesManaged();
@@ -158,9 +185,15 @@ namespace Inertia
 
             return ms.ToArray();
         }
-        public static byte[] DecryptWithString(byte[] cryptedData, string value)
+        /// <summary>
+        /// Encrypt the target byte array with the specified string key
+        /// </summary>
+        /// <param name="encryptedData">Target byte array to encrypt</param>
+        /// <param name="key">Target string key for encryption</param>
+        /// <returns>Decrypted byte array</returns>
+        public static byte[] DecryptWithString(byte[] encryptedData, string key)
         {
-            var pdb = new PasswordDeriveBytes(value, Encoding.ASCII.GetBytes(value));
+            var pdb = new PasswordDeriveBytes(key, Encoding.ASCII.GetBytes(key));
             var ms = new MemoryStream();
 
             var aes = new AesManaged();
@@ -168,7 +201,7 @@ namespace Inertia
             aes.IV = pdb.GetBytes(aes.BlockSize / 8);
 
             var cs = new CryptoStream(ms, aes.CreateDecryptor(), CryptoStreamMode.Write);
-            cs.Write(cryptedData, 0, cryptedData.Length);
+            cs.Write(encryptedData, 0, encryptedData.Length);
             cs.Close();
 
             aes.Dispose();
