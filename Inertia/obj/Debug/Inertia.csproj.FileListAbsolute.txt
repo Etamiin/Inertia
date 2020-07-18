@@ -14,3 +14,4 @@ C:\Users\abdel\Desktop\projetsPerso\Inertia\InertiaLib\Inertia\bin\Debug\Inertia
 C:\Users\abdel\Desktop\projetsPerso\Inertia\InertiaLib\Inertia\bin\Debug\Inertia.pdb
 C:\Users\abdel\Desktop\projetsPerso\Inertia\InertiaLib\Inertia\obj\Debug\Inertia.dll
 C:\Users\abdel\Desktop\projetsPerso\Inertia\InertiaLib\Inertia\obj\Debug\Inertia.pdb
+C:\Users\abdel\Desktop\projetsPerso\Inertia\InertiaLib\Inertia\obj\Debug\Inertia.csproj.CoreCompileInputs.cache

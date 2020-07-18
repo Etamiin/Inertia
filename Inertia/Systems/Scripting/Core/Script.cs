@@ -18,6 +18,10 @@ namespace Inertia.Realtime
         /// Returns the time elapsed since the last execution of the scripts. 
         /// </summary>
         public static float DeltaTime { get; internal set; }
+        /// <summary>
+        /// Returns the time elapsed from the process start time
+        /// </summary>
+        public static float Time { get; internal set; }
 
         #endregion
 

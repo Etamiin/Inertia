@@ -20,7 +20,7 @@ namespace Inertia.ORM
         /// <summary>
         /// Database name to attach
         /// </summary>
-        public readonly string DatabaseName;
+        public readonly Type DatabaseType;
 
         #endregion
 
@@ -29,17 +29,17 @@ namespace Inertia.ORM
         /// <summary>
         /// Instantiate a new instance of the class <see cref="InvalidDatabaseAttachException"/>
         /// </summary>
-        /// <param name="databaseName">Name of the database to attach</param>
-        public InvalidDatabaseAttachException(string databaseName)
+        /// <param name="databaseType">Type of the database to attach</param>
+        public InvalidDatabaseAttachException(Type databaseType)
         {
-            DatabaseName = databaseName;
+            DatabaseType = databaseType;
         }
 
         #endregion
 
         private string GetMessage()
         {
-            return "No database class used the name '" + DatabaseName + "' finded.";
+            return "The type '" + DatabaseType.Name + "' isn't a " + nameof(Database) + " subclass.";
         }
     }
 }

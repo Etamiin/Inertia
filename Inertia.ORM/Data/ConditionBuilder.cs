@@ -107,7 +107,7 @@ namespace Inertia.ORM
 
             m_builder.Append(fieldName);
 
-            if (value == null && (conditionOperator != ConditionOperator.Equal && conditionOperator != ConditionOperator.Different))
+            if (value == null && (conditionOperator != ConditionOperator.Equal && conditionOperator != ConditionOperator.NotEqual))
                 conditionOperator = ConditionOperator.Equal;
 
             switch (conditionOperator)
@@ -118,7 +118,7 @@ namespace Inertia.ORM
                     else
                         m_builder.Append("=");
                     break;
-                case ConditionOperator.Different:
+                case ConditionOperator.NotEqual:
                     if (value == null)
                         m_builder.Append(" IS NOT NULL");
                     else
@@ -135,6 +135,12 @@ namespace Inertia.ORM
                     break;
                 case ConditionOperator.LessOrEqual:
                     m_builder.Append("<=");
+                    break;
+                case ConditionOperator.NotGreater:
+                    m_builder.Append("!>");
+                    break;
+                case ConditionOperator.NotLess:
+                    m_builder.Append("!<");
                     break;
                 case ConditionOperator.In:
                     m_builder.Append(" IN ");
@@ -202,8 +208,8 @@ namespace Inertia.ORM
         internal string GetQuery()
         {
             var query = m_builder.ToString();
-            if (!query.StartsWith("WHERE "))
-                query = "WHERE " + query;
+            if (!query.StartsWith("WHERE BINARY "))
+                query = "WHERE BINARY " + query;
 
             if (m_limit >= 0)
                 query += " LIMIT " + m_limit;

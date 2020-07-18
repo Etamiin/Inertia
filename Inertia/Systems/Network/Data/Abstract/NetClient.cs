@@ -16,7 +16,7 @@ namespace Inertia.Network
         /// <summary>
         /// Occurs when the client is connected
         /// </summary>
-        public event SimpleAction Connected = () => { };
+        public event BasicAction Connected = () => { };
         /// <summary>
         /// Occurs when the client is disconnected
         /// </summary>
@@ -83,13 +83,13 @@ namespace Inertia.Network
             Task.Factory.StartNew(() => Connect());
         }
         /// <summary>
-        /// Send the specified <see cref="NetPacket"/> to the server
+        /// Send the specified <see cref="NetworkMessage"/> to the server
         /// </summary>
         /// <param name="packet">Packet to send</param>
-        public void Send(NetPacket packet)
+        public void Send(NetworkMessage packet)
         {
-            if (packet is CustomNetPacket)
-                Send(NetworkProtocol.Protocol.OnParsePacket((CustomNetPacket)packet));
+            if (packet is NetworkMessage)
+                Send(NetworkProtocol.Protocol.OnParsePacket((NetworkMessage)packet));
             else
                 Send(NetworkProtocol.Protocol.OnParsePacket(packet));
         }

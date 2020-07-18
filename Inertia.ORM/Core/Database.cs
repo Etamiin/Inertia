@@ -50,13 +50,26 @@ namespace Inertia.ORM
         /// <returns><typeparamref name="T"/> instance or null</returns>
         public static T GetDatabase<T>() where T : Database
         {
+            var database = GetDatabase(typeof(T));
+            if (database != null)
+                return (T)database;
+
+            return null;
+        }
+        /// <summary>
+        /// Get a <see cref="Database"/> class instance based on the <see cref="Type"/>
+        /// </summary>
+        /// <typeparam name="T"><see cref="Type"/> of the target <see cref="Database"/></typeparam>
+        /// <returns><typeparamref name="T"/> instance or null</returns>
+        public static Database GetDatabase(Type databaseType)
+        {
             if (m_databases == null)
                 LoadDatabases();
 
             foreach (var db in m_databases.Values)
             {
-                if (db.GetType() == typeof(T))
-                    return (T)db;
+                if (db.GetType() == databaseType)
+                    return db;
             }
 
             return null;
@@ -67,7 +80,7 @@ namespace Inertia.ORM
         /// </summary>
         /// <typeparam name="T"><see cref="Type"/> of <see cref="Database"/> to get</typeparam>
         /// <param name="usage">Action to execute</param>
-        public static void Use<T>(SimpleAction<T> usage) where T : Database
+        public static void Use<T>(BasicAction<T> usage) where T : Database
         {
             var db = GetDatabase<T>();
             if (db != null)
@@ -89,7 +102,7 @@ namespace Inertia.ORM
 
                     if (type.IsClass && type.IsSubclassOf(typeof(Database)))
                     {
-                        var autoCreateAttr = type.GetCustomAttribute<AutoCreateTables>();
+                        var autoCreateAttr = type.GetCustomAttribute<AutoGenerateTables>();
                         var database = (Database)OrmHelper.InstantiateObject(type);
                         if (database != null && !m_databases.ContainsKey(database.Name))
                         {
@@ -153,6 +166,10 @@ namespace Inertia.ORM
         /// Get the password to use for the connection
         /// </summary>
         public abstract string Password { get; }
+        /// <summary>
+        /// Get the port to use for the connection
+        /// </summary>
+        public virtual int Port { get => 3306; }
 
         #endregion
 
@@ -217,101 +234,140 @@ namespace Inertia.ORM
         /// <summary>
         /// Delete all rows in the specified <typeparamref name="T"/> table
         /// </summary>
+        /// <param name="onDeleted">Callback to call when delete query is executed</param>
         /// <typeparam name="T"><see cref="Type"/> of the table</typeparam>
-        public void DeleteAll<T>() where T : Table
+        public void DeleteAll<T>(BasicAction onDeleted = null) where T : Table
         {
-            ExecuteQueryFromInstance<T>(QueryType.DeleteAll, null, null, null, "Executing truncate query failed: {0}");
+            SqlManager.AsyncOperation(this, (db) => {
+                ExecuteQueryFromInstance<T>(QueryType.DeleteAll, null, null, null, "Executing truncate query failed: {0}");
+                return null;
+            }, (success, obj) => {
+                onDeleted?.Invoke();
+            });
         }
         /// <summary>
         /// Delete all rows based on the specified <see cref="ConditionBuilder"/> in specified <typeparamref name="T"/> table
         /// </summary>
         /// <param name="condition"><see cref="ConditionBuilder"/> condition of the deletion</param>
+        /// <param name="onDeleted">Callback to call when delete query is executed</param>
         /// <typeparam name="T"><see cref="Type"/> of the table</typeparam>
-        public void Delete<T>(ConditionBuilder condition) where T : Table
+        public void Delete<T>(ConditionBuilder condition, BasicAction onDeleted = null) where T : Table
         {
             if (condition == null)
                 throw new NullReferenceException();
 
-            ExecuteQueryFromInstance<T>(QueryType.Delete, condition, null, null, "Executing delete query failed: {0}");
+            SqlManager.AsyncOperation(this, (db) => {
+                ExecuteQueryFromInstance<T>(QueryType.Delete, condition, null, null, "Executing delete query failed: {0}");
+                return null;
+            }, (success, obj) => {
+                onDeleted?.Invoke();
+            });
         }
         /// <summary>
         /// Select all values based on the specified <see cref="ConditionBuilder"/> in the specified <typeparamref name="T"/> table
         /// </summary>
         /// <param name="condition"><see cref="ConditionBuilder"/> for the selection</param>
+        /// <param name="onSelected">Callback to call when select query is executed</param>
         /// <param name="columns">Columns to select</param>
         /// <typeparam name="T"><see cref="Type"/> of the table</typeparam>
         /// <returns><typeparamref name="T"/> array</returns>
-        public T[] Select<T>(ConditionBuilder condition, params string[] columns) where T : Table
+        public void Select<T>(ConditionBuilder condition, BasicAction<T[]> onSelected = null, params string[] columns) where T : Table
         {
-            var result = new List<T>();
+            SqlManager.AsyncOperation(this, (db) => {
+                var result = new List<T>();
 
-            ExecuteQueryFromInstance<T>(QueryType.Select, condition, columns, (reader) => {
-                while (reader.Read())
-                {
-                    var instance = OrmHelper.InstantiateObject(typeof(T)) as T;
-
-                    for (var i = 0; i < reader.FieldCount; i++)
+                ExecuteQueryFromInstance<T>(QueryType.Select, condition, columns, (reader) => {
+                    while (reader.Read())
                     {
-                        var field = instance.GetType().GetField(reader.GetName(i));
-                        if (field != null)
+                        var instance = OrmHelper.InstantiateObject(typeof(T)) as T;
+
+                        for (var i = 0; i < reader.FieldCount; i++)
                         {
-                            var value = reader.GetValue(i);
-                            if (value.GetType() == typeof(DBNull))
-                                value = null;
+                            var field = instance.GetType().GetField(reader.GetName(i));
+                            if (field != null)
+                            {
+                                var value = reader.GetValue(i);
+                                if (value.GetType() == typeof(DBNull))
+                                    value = null;
 
-                            field.SetValue(instance, value);
+                                field.SetValue(instance, value);
+                            }
                         }
+
+                        result.Add(instance);
                     }
+                }, "Executing select query failed: {0}");
 
-                    result.Add(instance);
-                }
-            }, "Executing select query failed: {0}");
-
-            return result.ToArray();
+                return result.ToArray();
+            }, (success, obj) => {
+                onSelected?.Invoke((T[])obj);
+            });
         }
         /// <summary>
         /// Select specified columns of each rows in the specified <typeparamref name="T"/> table
         /// </summary>
         /// <param name="columns">Columns to select</param>
+        /// <param name="onSelected">Callback to call when select query is executed</param>
         /// <typeparam name="T"><see cref="Type"/> of the table</typeparam>
         /// <returns><typeparamref name="T"/> array</returns>
-        public T[] SelectAll<T>(params string[] columns) where T : Table
+        public void SelectAll<T>(BasicAction<T[]> onSelected = null, params string[] columns) where T : Table
         {
-            return Select<T>(null, columns);
+            Select(null, onSelected, columns);
         }
         /// <summary>
         /// Get the number of rows based on the specified <see cref="ConditionBuilder"/> in the specified <typeparamref name="T"/> table
         /// </summary>
         /// <param name="condition"><see cref="ConditionBuilder" /> to use</param>
+        /// <param name="onCounted">Callback to call when count query is executed</param>
         /// <param name="columnName">Column name to focus on (or all in not specified)</param>
         /// <typeparam name="T"><see cref="Type"/> of the table</typeparam>
         /// <returns>The number of rows</returns>
-        public long Count<T>(ConditionBuilder condition, string columnName = "*") where T : Table
+        public void Count<T>(ConditionBuilder condition, BasicAction<long> onCounted,  string columnName = "*") where T : Table
         {
-            var count = 0L;
+            SqlManager.AsyncOperation(this, (db) => {
+                var count = 0L;
 
-            ExecuteQueryFromInstance<T>(QueryType.Count, condition, columnName, (reader) => {
-                if (reader.Read())
-                    count = (long)reader.GetValue(0);
-            }, "Executing count query failed: {0}");
+                ExecuteQueryFromInstance<T>(QueryType.Count, condition, columnName, (reader) => {
+                    if (reader.Read())
+                        count = (long)reader.GetValue(0);
+                }, "Executing count query failed: {0}");
 
-            return count;
+                return count;
+            }, (success, obj) => {
+                onCounted((long)obj);
+            });
         }
         /// <summary>
         /// Return true if a value based on the specified <see cref="ConditionBuilder"/> in the <typeparamref name="T"/> table exist
         /// </summary>
         /// <param name="condition"><see cref="ConditionBuilder"/> to use</param>
+        /// <param name="onChecked">Callback to call when query is executed</param>
         /// <typeparam name="T"><see cref="Type"/> of the table</typeparam>
         /// <returns>True if exist</returns>
-        public bool Exist<T>(ConditionBuilder condition) where T : Table
+        public void Exist<T>(ConditionBuilder condition, BasicAction<bool> onChecked) where T : Table
         {
             condition.SetLimit(1);
-            return Count<T>(condition) > 0;
+            Count<T>(condition, (count) => onChecked(count > 0));
+        }
+        /// <summary>
+        /// Update rows based on the specified <see cref="ConditionBuilder"/> by the specified <typeparamref name="T"/> values
+        /// </summary>
+        /// <param name="condition">Conditions for update</param>
+        /// <param name="onUpdated">Callback to call when query update is executed</param>
+        /// <param name="reference">Reference instance</param>
+        public void Update<T>(ConditionBuilder condition, T reference, BasicAction onUpdated = null) where T : Table
+        {
+            SqlManager.AsyncOperation(this, (db) => {
+                reference.ExecuteQuery(QueryType.Update, condition, null, null, "Executing update query failed: {0}");
+                return null;
+            }, (success, obj) => {
+                onUpdated?.Invoke();
+            });
         }
 
         internal MySqlConnection CreateConnection()
         {
-            var conn = new MySqlConnection("server=" + Host + ";uid=" + User + ";pwd=" + Password + ";database=" + Name);
+            var conn = new MySqlConnection("server=" + Host + ";uid=" + User + ";pwd=" + Password + ";database=" + Name + ";port=" + Port);
             conn.Open();
 
             return conn;
@@ -352,17 +408,21 @@ namespace Inertia.ORM
             if (table.IgnoreCreation)
                 return;
 
-            table.ExecuteQuery(QueryType.CreateTable, null, null, null, "Executing create table query failed: {0}");
+            SqlManager.AsyncOperation(this, (db) => {
+                return table.ExecuteQuery(QueryType.CreateTable, null, null, null, "Executing create table query failed: {0}");
+            });
         }
         private void DropTable(Table table)
         {
-            table.ExecuteQuery(QueryType.DropTable, null, null, null, "Executing drop table query failed: {0}");
+            SqlManager.AsyncOperation(this, (db) => {
+                return table.ExecuteQuery(QueryType.DropTable, null, null, null, "Executing drop table query failed: {0}");
+            });
         }
-        private void ExecuteQueryFromInstance<T>(QueryType queryType, ConditionBuilder condition, object data, SimpleAction<MySqlDataReader> onReader, string errorMessage) where T : Table
+        private void ExecuteQueryFromInstance<T>(QueryType queryType, ConditionBuilder condition, object data, BasicAction<MySqlDataReader> onReader, string errorMessage) where T : Table
         {
             var table = GetTable<T>();
             if (table == null)
-                throw new InvalidDatabaseAttachException(Name);
+                throw new InvalidDatabaseAttachException(GetType());
 
             table.ExecuteQuery(queryType, condition, data, onReader, errorMessage);
         }

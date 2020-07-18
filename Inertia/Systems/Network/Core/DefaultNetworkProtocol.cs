@@ -35,7 +35,7 @@ namespace Inertia.Network
 
         #region Private variables
 
-        private readonly Dictionary<uint, Type> m_packets;
+        private readonly AutoQueue m_queue;
 
         #endregion
 
@@ -43,7 +43,7 @@ namespace Inertia.Network
 
         internal DefaultNetworkProtocol()
         {
-            m_packets = new Dictionary<uint, Type>();
+            PacketTypes = new Dictionary<uint, Type>();
 
             var assemblys = AppDomain.CurrentDomain.GetAssemblies();
             foreach (var assembly in assemblys)
@@ -51,68 +51,41 @@ namespace Inertia.Network
                 var types = assembly.GetTypes();
                 foreach (var type in types)
                 {
-                    if (type.IsClass && type.IsSubclassOf(typeof(NetPacket)))
+                    if (type.IsClass && type.IsSubclassOf(typeof(NetworkMessage)))
                     {
                         if (type.IsAbstract)
                             continue;
 
                         var packet = CreateInstance(type);
-                        if (m_packets.ContainsKey(packet.Id))
+                        if (PacketTypes.ContainsKey(packet.Id))
                             continue;
 
-                        m_packets.Add(packet.Id, type);
+                        PacketTypes.Add(packet.Id, type);
                     }
                 }
             }
 
+            m_queue = new AutoQueue();
         }
 
         #endregion
 
         /// <summary>
-        /// Happens when parsing a <see cref="NetPacket"/> instance
+        /// Happens when parsing a <see cref="NetworkMessage"/> instance
         /// </summary>
         /// <param name="packet">Packet to parse</param>
         /// <returns>Parsed packet to byte array</returns>
-        public override byte[] OnParsePacket(NetPacket packet)
+        public override byte[] OnParsePacket(NetworkMessage packet)
         {
-            var writer = new SimpleWriter();
-            var coreWriter = new SimpleWriter()
-                .SetObject(packet);
-
-            var core = coreWriter.ToArrayAndDispose();
-            var compressed = false;
-            if (core.LongLength > byte.MaxValue)
-                core = core.Compress(out compressed);
-
-            writer
-                .SetBool(false)
-                .SetBool(compressed)
-                .SetLong(core.LongLength)
-                .SetBytesWithoutHeader(core);
-
-            return writer.ToArrayAndDispose();
-        }
-        /// <summary>
-        /// Happens when parsing a <see cref="CustomNetPacket"/> instance
-        /// </summary>
-        /// <param name="packet">Packet to parse</param>
-        /// <returns>Parsed packet to byte array</returns>
-        public override byte[] OnParsePacket(CustomNetPacket packet)
-        {
-            var writer = new SimpleWriter();
-            var coreWriter = new SimpleWriter();
+            var writer = new BasicWriter();
+            var coreWriter = new BasicWriter();
 
             packet.OnSerialize(coreWriter);
 
             var core = coreWriter.ToArrayAndDispose();
-            var compressed = false;
-            if (core.LongLength > byte.MaxValue)
-                core = core.Compress(out compressed);
 
             writer
                 .SetBool(true)
-                .SetBool(compressed)
                 .SetLong(core.LongLength)
                 .SetBytesWithoutHeader(core)
                 .SetUInt(packet.Id);
@@ -124,8 +97,8 @@ namespace Inertia.Network
         /// Happens when receiving data from a <see cref="NetTcpClient"/>
         /// </summary>
         /// <param name="client">The connection that received the data</param>
-        /// <param name="reader">The data in a <see cref="SimpleReader"/> instance</param>
-        public override void OnReceiveData(NetTcpClient client, SimpleReader reader)
+        /// <param name="reader">The data in a <see cref="BasicReader"/> instance</param>
+        public override void OnReceiveData(NetTcpClient client, BasicReader reader)
         {
             ParseMessages(reader, (packet) => packet.OnReceived(client));
         }
@@ -133,8 +106,8 @@ namespace Inertia.Network
         /// Happens when receiving data from a <see cref="NetUdpClient"/>
         /// </summary>
         /// <param name="client">The connection that received the data</param>
-        /// <param name="reader">The data in a <see cref="SimpleReader"/> instance</param>
-        public override void OnReceiveData(NetUdpClient client, SimpleReader reader)
+        /// <param name="reader">The data in a <see cref="BasicReader"/> instance</param>
+        public override void OnReceiveData(NetUdpClient client, BasicReader reader)
         {
             ParseMessages(reader, (packet) => packet.OnReceived(client));
         }
@@ -142,8 +115,8 @@ namespace Inertia.Network
         /// Happens when receiving data from a <see cref="NetTcpConnection"/>
         /// </summary>
         /// <param name="connection">The connection that received the data</param>
-        /// <param name="reader">The data in a <see cref="SimpleReader"/> instance</param>
-        public override void OnReceiveData(NetTcpConnection connection, SimpleReader reader)
+        /// <param name="reader">The data in a <see cref="BasicReader"/> instance</param>
+        public override void OnReceiveData(NetTcpConnection connection, BasicReader reader)
         {
             ParseMessages(reader, (packet) => packet.OnReceived(connection));
         }
@@ -151,67 +124,73 @@ namespace Inertia.Network
         /// Happens when receiving data from a <see cref="NetUdpConnection"/>
         /// </summary>
         /// <param name="connection">The connection that received the data</param>
-        /// <param name="reader">The data in a <see cref="SimpleReader"/> instance</param>
-        public override void OnReceiveData(NetUdpConnection connection, SimpleReader reader)
+        /// <param name="reader">The data in a <see cref="BasicReader"/> instance</param>
+        public override void OnReceiveData(NetUdpConnection connection, BasicReader reader)
         {
             ParseMessages(reader, (packet) => packet.OnReceived(connection));
         }
 
-        private NetPacket CreateInstance(Type packetType)
+        private bool IsSizeComplete(BasicReader reader, out long size)
         {
-            var constr = packetType.GetConstructors()[0];
-            var parameters = constr.GetParameters();
-            var objs = new object[parameters.Length];
+            if (reader.UnreadedLength < sizeof(long))
+            {
+                size = 0;
+                return false;
+            }
 
-            for (var i = 0; i < parameters.Length; i++)
-                objs[i] = null;
-
-            return (NetPacket)constr.Invoke(objs);
-        }
-        private bool IsSizeComplete(SimpleReader reader, out long size)
-        {
             size = reader.GetLong();
-            return reader.UnreadedLength >= size;
+            return reader.UnreadedLength >= size + sizeof(int);
         }
-        private void ParseMessages(SimpleReader reader, SimpleAction<NetPacket> onPacketParsed)
+        private void ParseMessages(BasicReader reader, BasicAction<NetworkMessage> onPacketParsed)
         {
             while (reader.UnreadedLength > 0)
             {
                 reader.Position = 0;
 
                 var isCustomPacket = reader.GetBool();
-                var isCompressed = reader.GetBool();
                 var complete = IsSizeComplete(reader, out long size);
                 if (!complete)
                     break;
 
                 var data = reader.GetBytes(size);
-                if (isCompressed)
-                    data = data.Decompress();
 
-                var coreReader = new SimpleReader(data);
-
-                if (isCustomPacket)
+                try
                 {
-                    var packetId = reader.GetUInt();
-                    if (!m_packets.ContainsKey(packetId))
-                        throw new Exception();
+                    var coreReader = new BasicReader();
 
-                    var packet = (CustomNetPacket)CreateInstance(m_packets[packetId]);
+                    if (isCustomPacket)
+                    {
+                        var packetId = reader.GetUInt();
+                        if (!PacketTypes.ContainsKey(packetId))
+                            throw new Exception();
 
-                    packet.OnDeserialize(coreReader);
-                    onPacketParsed(packet);
+                        coreReader.Fill(data);
+
+                        var packet = (NetworkMessage)CreateInstance(PacketTypes[packetId]);
+                        packet.OnDeserialize(coreReader);
+
+                        m_queue.Enqueue(() => onPacketParsed(packet));
+                    }
+                    else
+                    {
+                        var isCompressed = reader.GetBool();
+                        if (isCompressed)
+                            data = data.Decompress();
+
+                        var obj = (NetworkMessage)coreReader.GetObject();
+                        if (!PacketTypes.ContainsKey(obj.Id))
+                            throw new Exception();
+
+                        coreReader.Fill(data);
+
+                        var parsedObj = Convert.ChangeType(obj, PacketTypes[obj.Id]);
+                        m_queue.Enqueue(() => onPacketParsed((NetworkMessage)parsedObj));
+                    }
+
+                    coreReader.Dispose();
                 }
-                else {
-                    var obj = (NetPacket)coreReader.GetObject();
-                    if (!m_packets.ContainsKey(obj.Id))
-                        throw new Exception();
+                catch (Exception ex) { BaseLogger.DefaultLogger.Log(ex); }
 
-                    var parsedObj = Convert.ChangeType(obj, m_packets[obj.Id]);
-                    onPacketParsed((NetPacket)parsedObj);
-                }
-
-                coreReader.Dispose();
                 reader.RemoveReadedBytes();
             }
         }

@@ -16,7 +16,7 @@ namespace Inertia.Network
         /// <summary>
         /// Occurs when the server is started
         /// </summary>
-        public event SimpleAction Started = () => { };
+        public event BasicAction Started = () => { };
         /// <summary>
         /// Occurs when the server is closed
         /// </summary>

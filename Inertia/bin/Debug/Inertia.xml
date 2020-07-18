@@ -110,27 +110,6 @@
             <param name="log">The string content of the log</param>
             <param name="parameters">The parameters used to parse the string content</param>
         </member>
-        <member name="T:Inertia.DependentThread">
-            <summary>
-            Offers the possibility to asynchronously execute an action under the dependency of a <see cref="T:System.Threading.Thread"/>
-            </summary>
-        </member>
-        <member name="M:Inertia.DependentThread.ExecuteThreadWhileDependencyIsAlive(SimpleAction,SimpleAction,SimpleReturnAction{System.Boolean})">
-            <summary>
-            Asynchronously executes an action in a new <see cref="T:System.Threading.Thread"/> as long as the parent <see cref="T:System.Threading.Thread"/> is executing
-            </summary>
-            <param name="executionCode">The code to continually execute (loop)</param>
-            <param name="onDependencyDied">Code to execute when the dependency is ended</param>
-            <param name="additionalConditions">The additional conditions to process the specified code</param>
-        </member>
-        <member name="M:Inertia.DependentThread.ExecuteTaskWhileDependencyIsAlive(SimpleAction,SimpleAction,SimpleReturnAction{System.Boolean})">
-            <summary>
-            Asynchronously executes an action in a new <see cref="T:System.Threading.Tasks.Task"/> as long as the parent <see cref="T:System.Threading.Thread"/> is executing
-            </summary>
-            <param name="executionCode">The code to continually execute (loop)</param>
-            <param name="onDependencyDied">Code to execute when the dependency is ended</param>
-            <param name="additionalConditions">The additional conditions to process the specified code</param>
-        </member>
         <member name="T:Inertia.InertiaExtensions">
             <summary>
             Contains all the framework extension
@@ -358,9 +337,9 @@
             <param name="connection">Connection to sent data</param>
             <param name="data">Data to send</param>
         </member>
-        <member name="M:Inertia.Network.NetUdpServer.SendTo(Inertia.Network.NetUdpConnection,Inertia.Network.NetPacket)">
+        <member name="M:Inertia.Network.NetUdpServer.SendTo(Inertia.Network.NetUdpConnection,Inertia.Network.NetworkMessage)">
             <summary>
-            Send <see cref="T:Inertia.Network.NetPacket"/> instance to the specified <see cref="T:Inertia.Network.NetUdpConnection"/>
+            Send <see cref="T:Inertia.Network.NetworkMessage"/> instance to the specified <see cref="T:Inertia.Network.NetUdpConnection"/>
             </summary>
             <param name="connection">Connection to sent data</param>
             <param name="packet">Packet to send</param>
@@ -419,9 +398,9 @@
             Connect the client asynchronously
             </summary>
         </member>
-        <member name="M:Inertia.Network.NetClient.Send(Inertia.Network.NetPacket)">
+        <member name="M:Inertia.Network.NetClient.Send(Inertia.Network.NetworkMessage)">
             <summary>
-            Send the specified <see cref="T:Inertia.Network.NetPacket"/> to the server
+            Send the specified <see cref="T:Inertia.Network.NetworkMessage"/> to the server
             </summary>
             <param name="packet">Packet to send</param>
         </member>
@@ -500,9 +479,9 @@
             </summary>
             <param name="data">Data to send</param>
         </member>
-        <member name="M:Inertia.Network.NetTcpConnection.Send(Inertia.Network.NetPacket)">
+        <member name="M:Inertia.Network.NetTcpConnection.Send(Inertia.Network.NetworkMessage)">
             <summary>
-            Send a <see cref="T:Inertia.Network.NetPacket"/>instance to the current TCP connection
+            Send a <see cref="T:Inertia.Network.NetworkMessage"/>instance to the current TCP connection
             </summary>
             <param name="packet">Packet to send</param>
         </member>
@@ -511,22 +490,51 @@
             Dispose the current instance
             </summary>
         </member>
-        <member name="T:Inertia.Network.CustomNetPacket">
+        <member name="T:Inertia.Network.NetworkMessage">
             <summary>
             Custom network packet
             </summary>
         </member>
-        <member name="M:Inertia.Network.CustomNetPacket.OnSerialize(Inertia.SimpleWriter)">
+        <member name="P:Inertia.Network.NetworkMessage.Id">
+            <summary>
+            Get the id of the current packet
+            </summary>
+        </member>
+        <member name="M:Inertia.Network.NetworkMessage.OnSerialize(Inertia.BasicWriter)">
             <summary>
             Serialize the current packet instance
             </summary>
             <param name="writer">The writer to use for serialization</param>
         </member>
-        <member name="M:Inertia.Network.CustomNetPacket.OnDeserialize(Inertia.SimpleReader)">
+        <member name="M:Inertia.Network.NetworkMessage.OnDeserialize(Inertia.BasicReader)">
             <summary>
             Deserialization method for the current packet instance
             </summary>
             <param name="reader">The reader to use for deserialization</param>
+        </member>
+        <member name="M:Inertia.Network.NetworkMessage.OnReceived(Inertia.Network.NetTcpClient)">
+            <summary>
+            Happens when receiving this packet from a <see cref="T:Inertia.Network.NetTcpClient"/>
+            </summary>
+            <param name="client">Client that received the packet</param>
+        </member>
+        <member name="M:Inertia.Network.NetworkMessage.OnReceived(Inertia.Network.NetUdpClient)">
+            <summary>
+            Happens when receiving this packet from a <see cref="T:Inertia.Network.NetUdpClient"/>
+            </summary>
+            <param name="client">Client that received the packet</param>
+        </member>
+        <member name="M:Inertia.Network.NetworkMessage.OnReceived(Inertia.Network.NetTcpConnection)">
+            <summary>
+            Happens when receiving this packet from a <see cref="T:Inertia.Network.NetTcpConnection"/>
+            </summary>
+            <param name="connection">Connection that received the packet</param>
+        </member>
+        <member name="M:Inertia.Network.NetworkMessage.OnReceived(Inertia.Network.NetUdpConnection)">
+            <summary>
+            Happens when receiving this packet from a <see cref="T:Inertia.Network.NetUdpConnection"/>
+            </summary>
+            <param name="connection">Connection that received the packet</param>
         </member>
         <member name="T:Inertia.Network.DefaultNetworkProtocol">
             <summary>
@@ -538,81 +546,40 @@
             Get the instance of <see cref="T:Inertia.Network.DefaultNetworkProtocol"/> used
             </summary>
         </member>
-        <member name="M:Inertia.Network.DefaultNetworkProtocol.OnParsePacket(Inertia.Network.NetPacket)">
+        <member name="M:Inertia.Network.DefaultNetworkProtocol.OnParsePacket(Inertia.Network.NetworkMessage)">
             <summary>
-            Happens when parsing a <see cref="T:Inertia.Network.NetPacket"/> instance
+            Happens when parsing a <see cref="T:Inertia.Network.NetworkMessage"/> instance
             </summary>
             <param name="packet">Packet to parse</param>
             <returns>Parsed packet to byte array</returns>
         </member>
-        <member name="M:Inertia.Network.DefaultNetworkProtocol.OnParsePacket(Inertia.Network.CustomNetPacket)">
-            <summary>
-            Happens when parsing a <see cref="T:Inertia.Network.CustomNetPacket"/> instance
-            </summary>
-            <param name="packet">Packet to parse</param>
-            <returns>Parsed packet to byte array</returns>
-        </member>
-        <member name="M:Inertia.Network.DefaultNetworkProtocol.OnReceiveData(Inertia.Network.NetTcpClient,Inertia.SimpleReader)">
+        <member name="M:Inertia.Network.DefaultNetworkProtocol.OnReceiveData(Inertia.Network.NetTcpClient,Inertia.BasicReader)">
             <summary>
             Happens when receiving data from a <see cref="T:Inertia.Network.NetTcpClient"/>
             </summary>
             <param name="client">The connection that received the data</param>
-            <param name="reader">The data in a <see cref="T:Inertia.SimpleReader"/> instance</param>
+            <param name="reader">The data in a <see cref="T:Inertia.BasicReader"/> instance</param>
         </member>
-        <member name="M:Inertia.Network.DefaultNetworkProtocol.OnReceiveData(Inertia.Network.NetUdpClient,Inertia.SimpleReader)">
+        <member name="M:Inertia.Network.DefaultNetworkProtocol.OnReceiveData(Inertia.Network.NetUdpClient,Inertia.BasicReader)">
             <summary>
             Happens when receiving data from a <see cref="T:Inertia.Network.NetUdpClient"/>
             </summary>
             <param name="client">The connection that received the data</param>
-            <param name="reader">The data in a <see cref="T:Inertia.SimpleReader"/> instance</param>
+            <param name="reader">The data in a <see cref="T:Inertia.BasicReader"/> instance</param>
         </member>
-        <member name="M:Inertia.Network.DefaultNetworkProtocol.OnReceiveData(Inertia.Network.NetTcpConnection,Inertia.SimpleReader)">
+        <member name="M:Inertia.Network.DefaultNetworkProtocol.OnReceiveData(Inertia.Network.NetTcpConnection,Inertia.BasicReader)">
             <summary>
             Happens when receiving data from a <see cref="T:Inertia.Network.NetTcpConnection"/>
             </summary>
             <param name="connection">The connection that received the data</param>
-            <param name="reader">The data in a <see cref="T:Inertia.SimpleReader"/> instance</param>
+            <param name="reader">The data in a <see cref="T:Inertia.BasicReader"/> instance</param>
         </member>
-        <member name="M:Inertia.Network.DefaultNetworkProtocol.OnReceiveData(Inertia.Network.NetUdpConnection,Inertia.SimpleReader)">
+        <member name="M:Inertia.Network.DefaultNetworkProtocol.OnReceiveData(Inertia.Network.NetUdpConnection,Inertia.BasicReader)">
             <summary>
             Happens when receiving data from a <see cref="T:Inertia.Network.NetUdpConnection"/>
             </summary>
             <param name="connection">The connection that received the data</param>
-            <param name="reader">The data in a <see cref="T:Inertia.SimpleReader"/> instance</param>
-        </member>
-        <member name="T:Inertia.Network.NetPacket">
-            <summary>
-            Auto serializing network packet
-            </summary>
-        </member>
-        <member name="P:Inertia.Network.NetPacket.Id">
-            <summary>
-            Get the id of the current packet
-            </summary>
-        </member>
-        <member name="M:Inertia.Network.NetPacket.OnReceived(Inertia.Network.NetTcpClient)">
-            <summary>
-            Happens when receiving this packet from a <see cref="T:Inertia.Network.NetTcpClient"/>
-            </summary>
-            <param name="client">Client that received the packet</param>
-        </member>
-        <member name="M:Inertia.Network.NetPacket.OnReceived(Inertia.Network.NetUdpClient)">
-            <summary>
-            Happens when receiving this packet from a <see cref="T:Inertia.Network.NetUdpClient"/>
-            </summary>
-            <param name="client">Client that received the packet</param>
-        </member>
-        <member name="M:Inertia.Network.NetPacket.OnReceived(Inertia.Network.NetTcpConnection)">
-            <summary>
-            Happens when receiving this packet from a <see cref="T:Inertia.Network.NetTcpConnection"/>
-            </summary>
-            <param name="connection">Connection that received the packet</param>
-        </member>
-        <member name="M:Inertia.Network.NetPacket.OnReceived(Inertia.Network.NetUdpConnection)">
-            <summary>
-            Happens when receiving this packet from a <see cref="T:Inertia.Network.NetUdpConnection"/>
-            </summary>
-            <param name="connection">Connection that received the packet</param>
+            <param name="reader">The data in a <see cref="T:Inertia.BasicReader"/> instance</param>
         </member>
         <member name="T:Inertia.Network.NetConnectionGroup">
             <summary>
@@ -666,9 +633,9 @@
             <param name="connection">Connection to remove</param>
             <returns>The current instance</returns>
         </member>
-        <member name="M:Inertia.Network.NetConnectionGroup.Send(Inertia.Network.NetPacket)">
+        <member name="M:Inertia.Network.NetConnectionGroup.Send(Inertia.Network.NetworkMessage)">
             <summary>
-            Send the specified <see cref="T:Inertia.Network.NetPacket"/> to the group
+            Send the specified <see cref="T:Inertia.Network.NetworkMessage"/> to the group
             </summary>
             <param name="packet">Packet instance to send</param>
         </member>
@@ -693,9 +660,9 @@
             </summary>
             <param name="data">Data to send</param>
         </member>
-        <member name="M:Inertia.Network.NetUdpConnection.Send(Inertia.Network.NetPacket)">
+        <member name="M:Inertia.Network.NetUdpConnection.Send(Inertia.Network.NetworkMessage)">
             <summary>
-            Send a <see cref="T:Inertia.Network.NetPacket"/>instance to the current UDP connection
+            Send a <see cref="T:Inertia.Network.NetworkMessage"/>instance to the current UDP connection
             </summary>
             <param name="packet">Packet to send</param>
         </member>
@@ -715,47 +682,60 @@
             </summary>
             <param name="protocol"><see cref="T:Inertia.Network.NetworkProtocol"/> instance to use</param>
         </member>
-        <member name="M:Inertia.Network.NetworkProtocol.OnParsePacket(Inertia.Network.NetPacket)">
+        <member name="M:Inertia.Network.NetworkProtocol.CreateInstance``1">
             <summary>
-            Happens when parsing a <see cref="T:Inertia.Network.NetPacket"/> instance
+            Create an instance of the specified Type if it's an <see cref="T:Inertia.Network.NetworkMessage"/>
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.Network.NetworkProtocol.CreateInstance(System.Type)">
+            <summary>
+            Create an instance of the specified Type if it's an <see cref="T:Inertia.Network.NetworkMessage"/>
+            </summary>
+            <param name="packetType"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.Network.NetworkProtocol.CreateInstance(System.UInt32)">
+            <summary>
+            Create an instance of a <see cref="T:Inertia.Network.NetworkMessage"/> based on his Id
+            </summary>
+            <param name="packetId">Id of the target <see cref="T:Inertia.Network.NetworkMessage"/></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.Network.NetworkProtocol.OnParsePacket(Inertia.Network.NetworkMessage)">
+            <summary>
+            Happens when parsing a <see cref="T:Inertia.Network.NetworkMessage"/> instance
             </summary>
             <param name="packet">Packet to parse</param>
             <returns>Parsed packet to byte array</returns>
         </member>
-        <member name="M:Inertia.Network.NetworkProtocol.OnParsePacket(Inertia.Network.CustomNetPacket)">
-            <summary>
-            Happens when parsing a <see cref="T:Inertia.Network.CustomNetPacket"/> instance
-            </summary>
-            <param name="packet">Packet to parse</param>
-            <returns>Parsed packet to byte array</returns>
-        </member>
-        <member name="M:Inertia.Network.NetworkProtocol.OnReceiveData(Inertia.Network.NetTcpClient,Inertia.SimpleReader)">
+        <member name="M:Inertia.Network.NetworkProtocol.OnReceiveData(Inertia.Network.NetTcpClient,Inertia.BasicReader)">
             <summary>
             Happens when receiving data from a <see cref="T:Inertia.Network.NetTcpClient"/>
             </summary>
             <param name="client">The connection that received the data</param>
-            <param name="reader">The data in a <see cref="T:Inertia.SimpleReader"/> instance</param>
+            <param name="reader">The data in a <see cref="T:Inertia.BasicReader"/> instance</param>
         </member>
-        <member name="M:Inertia.Network.NetworkProtocol.OnReceiveData(Inertia.Network.NetUdpClient,Inertia.SimpleReader)">
+        <member name="M:Inertia.Network.NetworkProtocol.OnReceiveData(Inertia.Network.NetUdpClient,Inertia.BasicReader)">
             <summary>
             Happens when receiving data from a <see cref="T:Inertia.Network.NetUdpClient"/>
             </summary>
             <param name="client">The connection that received the data</param>
-            <param name="reader">The data in a <see cref="T:Inertia.SimpleReader"/> instance</param>
+            <param name="reader">The data in a <see cref="T:Inertia.BasicReader"/> instance</param>
         </member>
-        <member name="M:Inertia.Network.NetworkProtocol.OnReceiveData(Inertia.Network.NetTcpConnection,Inertia.SimpleReader)">
+        <member name="M:Inertia.Network.NetworkProtocol.OnReceiveData(Inertia.Network.NetTcpConnection,Inertia.BasicReader)">
             <summary>
             Happens when receiving data from a <see cref="T:Inertia.Network.NetTcpConnection"/>
             </summary>
             <param name="connection">The connection that received the data</param>
-            <param name="reader">The data in a <see cref="T:Inertia.SimpleReader"/> instance</param>
+            <param name="reader">The data in a <see cref="T:Inertia.BasicReader"/> instance</param>
         </member>
-        <member name="M:Inertia.Network.NetworkProtocol.OnReceiveData(Inertia.Network.NetUdpConnection,Inertia.SimpleReader)">
+        <member name="M:Inertia.Network.NetworkProtocol.OnReceiveData(Inertia.Network.NetUdpConnection,Inertia.BasicReader)">
             <summary>
             Happens when receiving data from a <see cref="T:Inertia.Network.NetUdpConnection"/>
             </summary>
             <param name="connection">The connection that received the data</param>
-            <param name="reader">The data in a <see cref="T:Inertia.SimpleReader"/> instance</param>
+            <param name="reader">The data in a <see cref="T:Inertia.BasicReader"/> instance</param>
         </member>
         <member name="T:Inertia.Network.NetworkDisconnectReason">
             <summary>
@@ -806,6 +786,11 @@
         <member name="P:Inertia.Realtime.Script.DeltaTime">
             <summary>
             Returns the time elapsed since the last execution of the scripts. 
+            </summary>
+        </member>
+        <member name="P:Inertia.Realtime.Script.Time">
+            <summary>
+            Returns the time elapsed from the process start time
             </summary>
         </member>
         <member name="P:Inertia.Realtime.Script.IsDestroyed">
@@ -1073,6 +1058,13 @@
             <param name="path">Path of the target file</param>
             <param name="data">The byte array to add</param>
         </member>
+        <member name="M:Inertia.InertiaIO.GetSHA256(System.String)">
+            <summary>
+            Get the SHA256 key representation of the specified string data
+            </summary>
+            <param name="content">Target string data</param>
+            <returns>The SHA256 representation</returns>
+        </member>
         <member name="M:Inertia.InertiaIO.GetSHA256(System.Byte[])">
             <summary>
             Get the SHA256 key representation of the specified byte array data
@@ -1118,358 +1110,379 @@
             <param name="key">Target string key for encryption</param>
             <returns>Decrypted byte array</returns>
         </member>
-        <member name="T:Inertia.SimpleReader">
+        <member name="T:Inertia.BasicReader">
             <summary>
             Provides read-only data management
             </summary>
         </member>
-        <member name="P:Inertia.SimpleReader.IsDisposed">
+        <member name="P:Inertia.BasicReader.IsDisposed">
             <summary>
             Return true is the current instance is disposed
             </summary>
         </member>
-        <member name="P:Inertia.SimpleReader.TotalLength">
+        <member name="P:Inertia.BasicReader.TotalLength">
             <summary>
             Get the total length currently in the stream
             </summary>
         </member>
-        <member name="P:Inertia.SimpleReader.UnreadedLength">
+        <member name="P:Inertia.BasicReader.UnreadedLength">
             <summary>
             Get the total length unreaded (based on current position in the stream)
             </summary>
         </member>
-        <member name="P:Inertia.SimpleReader.Position">
+        <member name="P:Inertia.BasicReader.Position">
             <summary>
             Get or set the current position in the stream
             </summary>
         </member>
-        <member name="M:Inertia.SimpleReader.#ctor">
+        <member name="M:Inertia.BasicReader.#ctor">
             <summary>
             Create a new instance with empty data
             </summary>
         </member>
-        <member name="M:Inertia.SimpleReader.#ctor(System.Text.Encoding)">
+        <member name="M:Inertia.BasicReader.#ctor(System.Text.Encoding)">
             <summary>
             Create a new instance with empty data based on the specified <see cref="T:System.Text.Encoding"/>
             </summary>
             <param name="encoding">Target <see cref="T:System.Text.Encoding"/> for the reader</param>
         </member>
-        <member name="M:Inertia.SimpleReader.#ctor(System.Byte[])">
+        <member name="M:Inertia.BasicReader.#ctor(System.Byte[])">
             <summary>
             Create a new instance with the specified byte array data
             </summary>
             <param name="data">The target byte array</param>
         </member>
-        <member name="M:Inertia.SimpleReader.#ctor(System.Byte[],System.Text.Encoding)">
+        <member name="M:Inertia.BasicReader.#ctor(System.Byte[],System.Text.Encoding)">
             <summary>
             Create a new instance with the specified byte array data based on the specified <see cref="T:System.Text.Encoding"/>
             </summary>
             <param name="data">The target byte array</param>
             <param name="encoding">Target <see cref="T:System.Text.Encoding"/> for the reader</param>
         </member>
-        <member name="M:Inertia.SimpleReader.Clear">
+        <member name="M:Inertia.BasicReader.Clear">
             <summary>
             Clear the current instance and create a new empty stream
             </summary>
         </member>
-        <member name="M:Inertia.SimpleReader.Fill(System.Byte[])">
+        <member name="M:Inertia.BasicReader.Fill(System.Byte[])">
             <summary>
             Fill the current stream with the specified byte array data (added at the end)
             </summary>
             <param name="data">Target byte array data to add</param>
             <returns></returns>
         </member>
-        <member name="M:Inertia.SimpleReader.RemoveReadedBytes">
+        <member name="M:Inertia.BasicReader.Fill(System.Byte[],System.Int64)">
+            <summary>
+            Fill the current stream with the specified byte array data (added at the end)
+            </summary>
+            <param name="data">Target byte array data to add</param>
+            <param name="startIndex">Start index</param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.BasicReader.RemoveReadedBytes">
             <summary>
             Remove all the readed bytes in the stream (before the current position) and refresh the stream with the non-readed bytes
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Inertia.SimpleReader.GetBool">
+        <member name="M:Inertia.BasicReader.GetBool">
             <summary>
             Read a <see cref="T:System.Boolean"/> value in the stream and change the position
             </summary>
             <returns>Readed <see cref="T:System.Boolean"/> value (or false if nothing can be read)</returns>
         </member>
-        <member name="M:Inertia.SimpleReader.GetString">
+        <member name="M:Inertia.BasicReader.GetString">
             <summary>
             Read a <see cref="T:System.String"/> value with the current instance <see cref="T:System.Text.Encoding"/> algorithm in the stream and change the position
             </summary>
             <returns>Readed string value (or <see cref="F:System.String.Empty"/> if nothing can be read)</returns>
         </member>
-        <member name="M:Inertia.SimpleReader.GetByte">
+        <member name="M:Inertia.BasicReader.GetByte">
             <summary>
             Read a <see cref="T:System.Byte"/> value in the stream and change the position
             </summary>
             <returns>Readed <see cref="T:System.Byte"/> value (or 0 if nothing can be read)</returns>
         </member>
-        <member name="M:Inertia.SimpleReader.GetSByte">
+        <member name="M:Inertia.BasicReader.GetSByte">
             <summary>
             Read a <see cref="T:System.SByte"/> value in the stream and change the position
             </summary>
             <returns>Readed <see cref="T:System.SByte"/> value (or 0 if nothing can be read)</returns>
         </member>
-        <member name="M:Inertia.SimpleReader.GetChar">
+        <member name="M:Inertia.BasicReader.GetChar">
             <summary>
             Read a <see cref="T:System.Char"/> value in the stream and change the position
             </summary>
             <returns>Readed <see cref="T:System.Char"/> value (or (char)0 if nothing can be read)</returns>
         </member>
-        <member name="M:Inertia.SimpleReader.GetShort">
+        <member name="M:Inertia.BasicReader.GetShort">
             <summary>
             Read a <see cref="T:System.Int16"/> value in the stream and change the position
             </summary>
             <returns>Readed <see cref="T:System.Int16"/> value (or 0 if nothing can be read)</returns>
         </member>
-        <member name="M:Inertia.SimpleReader.GetUShort">
+        <member name="M:Inertia.BasicReader.GetUShort">
             <summary>
             Read a <see cref="T:System.UInt16"/> value in the stream and change the position
             </summary>
             <returns>Readed <see cref="T:System.UInt16"/> value (or 0 if nothing can be read)</returns>
         </member>
-        <member name="M:Inertia.SimpleReader.GetFloat">
+        <member name="M:Inertia.BasicReader.GetFloat">
             <summary>
             Read a <see cref="T:System.Single"/> value in the stream and change the position
             </summary>
             <returns>Readed <see cref="T:System.Single"/> value (or 0 if nothing can be read)</returns>
         </member>
-        <member name="M:Inertia.SimpleReader.GetDouble">
+        <member name="M:Inertia.BasicReader.GetDouble">
             <summary>
             Read a <see cref="T:System.Double"/> value in the stream and change the position
             </summary>
             <returns>Readed <see cref="T:System.Double"/> value (or 0 if nothing can be read)</returns>
         </member>
-        <member name="M:Inertia.SimpleReader.GetDecimal">
+        <member name="M:Inertia.BasicReader.GetDecimal">
             <summary>
             Read a <see cref="T:System.Decimal"/> value in the stream and change the position
             </summary>
             <returns>Readed <see cref="T:System.Decimal"/> value (or 0 if nothing can be read)</returns>
         </member>
-        <member name="M:Inertia.SimpleReader.GetInt">
+        <member name="M:Inertia.BasicReader.GetInt">
             <summary>
             Read a <see cref="T:System.Int32"/> value in the stream and change the position
             </summary>
             <returns>Readed <see cref="T:System.Int32"/> value (or 0 if nothing can be read)</returns>
         </member>
-        <member name="M:Inertia.SimpleReader.GetUInt">
+        <member name="M:Inertia.BasicReader.GetUInt">
             <summary>
             Read a <see cref="T:System.UInt32"/> value in the stream and change the position
             </summary>
             <returns>Readed <see cref="T:System.UInt32"/> value (or 0 if nothing can be read)</returns>
         </member>
-        <member name="M:Inertia.SimpleReader.GetLong">
+        <member name="M:Inertia.BasicReader.GetLong">
             <summary>
             Read a <see cref="T:System.Int64"/> value in the stream and change the position
             </summary>
             <returns>Readed <see cref="T:System.Int64"/> value (or 0 if nothing can be read)</returns>
         </member>
-        <member name="M:Inertia.SimpleReader.GetULong">
+        <member name="M:Inertia.BasicReader.GetULong">
             <summary>
             Read a <see cref="T:System.UInt64"/> value in the stream and change the position
             </summary>
             <returns>Readed <see cref="T:System.UInt64"/> value (or 0 if nothing can be read)</returns>
         </member>
-        <member name="M:Inertia.SimpleReader.GetBytes">
+        <member name="M:Inertia.BasicReader.GetBytes">
             <summary>
             Read a byte array (with an <see cref="T:System.Int32"/> length header) in the stream and change the position
             </summary>
             <returns>Readed <see cref="T:System.Int16"/> value (or 0 if nothing can be read)</returns>
         </member>
-        <member name="M:Inertia.SimpleReader.GetBytes(System.Int64)">
+        <member name="M:Inertia.BasicReader.GetBytes(System.Int64)">
             <summary>
             Read specified number of <see cref="T:System.Byte"/> in the stream and change the position
             </summary>
             <param name="length">Length ot the byte array result</param>
-            <returns>Complete byte array of specified length (or an empty byte array if the <see cref="P:Inertia.SimpleReader.UnreadedLength"/> is too small)</returns>
+            <returns>Complete byte array of specified length (or an empty byte array if the <see cref="P:Inertia.BasicReader.UnreadedLength"/> is too small)</returns>
         </member>
-        <member name="M:Inertia.SimpleReader.GetObject``1">
+        <member name="M:Inertia.BasicReader.GetDateTime">
+            <summary>
+            Read DateTime in the stream and change the position
+            </summary>
+            <returns>Return a DateTime instance</returns>
+        </member>
+        <member name="M:Inertia.BasicReader.GetObject``1">
             <summary>
             Read the specified <typeparamref name="T"/> in the stream (only if the type has a <see cref="T:System.SerializableAttribute"/>)
             </summary>
             <typeparam name="T">Target type to deserialize</typeparam>
             <returns>An deserialized instance of the specified Type</returns>
         </member>
-        <member name="M:Inertia.SimpleReader.GetObject">
+        <member name="M:Inertia.BasicReader.GetObject">
             <summary>
             Read the next object in the stream (only if the type has a <see cref="T:System.SerializableAttribute"/>)
             </summary>
             <returns>An deserialized object</returns>
         </member>
-        <member name="M:Inertia.SimpleReader.GetValue(System.Type)">
+        <member name="M:Inertia.BasicReader.GetValue(System.Type)">
             <summary>
             Read the specified <see cref="T:System.Type"/> and return it (if it's readable, or null)
             </summary>
             <param name="valueType">The type of the target object</param>
             <returns>Return the readed value (or null)</returns>
         </member>
-        <member name="M:Inertia.SimpleReader.GetValues(System.Type[])">
+        <member name="M:Inertia.BasicReader.GetValues(System.Type[])">
             <summary>
             Read all object corresponding to the specified <see cref="T:System.Type"/> in the array (null if unreadable)
             </summary>
             <param name="valuesType">Array of <see cref="T:System.Type"/> to read</param>
             <returns><see cref="T:System.Collections.IList"/> of all objects readed (can contains null elements)</returns>
         </member>
-        <member name="M:Inertia.SimpleReader.Dispose">
+        <member name="M:Inertia.BasicReader.Dispose">
             <summary>
             Dispose the reader (can't be used anymore)
             </summary>
         </member>
-        <member name="T:Inertia.SimpleWriter">
+        <member name="T:Inertia.BasicWriter">
             <summary>
             Provides methods for writing data
             </summary>
         </member>
-        <member name="P:Inertia.SimpleWriter.IsDisposed">
+        <member name="P:Inertia.BasicWriter.IsDisposed">
             <summary>
             Return true is the current instance is disposed
             </summary>
         </member>
-        <member name="P:Inertia.SimpleWriter.TotalLength">
+        <member name="P:Inertia.BasicWriter.TotalLength">
             <summary>
             Get the total length currently in the stream
             </summary>
         </member>
-        <member name="P:Inertia.SimpleWriter.Position">
+        <member name="P:Inertia.BasicWriter.Position">
             <summary>
             Get or set the current position in the stream
             </summary>
         </member>
-        <member name="M:Inertia.SimpleWriter.#ctor">
+        <member name="M:Inertia.BasicWriter.#ctor">
             <summary>
             Create a new instance based on <see cref="P:System.Text.Encoding.UTF8"/> algorithm
             </summary>
         </member>
-        <member name="M:Inertia.SimpleWriter.#ctor(System.Text.Encoding)">
+        <member name="M:Inertia.BasicWriter.#ctor(System.Text.Encoding)">
             <summary>
             Create a new instance based on the specified <see cref="T:System.Text.Encoding"/> algorithm
             </summary>
             <param name="encoding"></param>
         </member>
-        <member name="M:Inertia.SimpleWriter.Clear">
+        <member name="M:Inertia.BasicWriter.Clear">
             <summary>
             Clear the current instance and create a new empty stream
             </summary>
         </member>
-        <member name="M:Inertia.SimpleWriter.SetEmpty(System.UInt32)">
+        <member name="M:Inertia.BasicWriter.SetEmpty(System.UInt32)">
             <summary>
             Write an empty (0) byte array without header of specified size
             </summary>
             <param name="size">Target byte array size</param>
             <returns>Return the current instance</returns>
         </member>
-        <member name="M:Inertia.SimpleWriter.SetBool(System.Boolean)">
+        <member name="M:Inertia.BasicWriter.SetBool(System.Boolean)">
             <summary>
             Write the specified value in the stream
             </summary>
             <param name="value">Target value to write</param>
             <returns>Return the current instance</returns>
         </member>
-        <member name="M:Inertia.SimpleWriter.SetString(System.String)">
+        <member name="M:Inertia.BasicWriter.SetString(System.String)">
             <summary>
             Write the specified value in the stream
             </summary>
             <param name="value">Target value to write</param>
             <returns>Return the current instance</returns>
         </member>
-        <member name="M:Inertia.SimpleWriter.SetFloat(System.Single)">
+        <member name="M:Inertia.BasicWriter.SetFloat(System.Single)">
             <summary>
             Write the specified value in the stream
             </summary>
             <param name="value">Target value to write</param>
             <returns>Return the current instance</returns>
         </member>
-        <member name="M:Inertia.SimpleWriter.SetDecimal(System.Decimal)">
+        <member name="M:Inertia.BasicWriter.SetDecimal(System.Decimal)">
             <summary>
             Write the specified value in the stream
             </summary>
             <param name="value">Target value to write</param>
             <returns>Return the current instance</returns>
         </member>
-        <member name="M:Inertia.SimpleWriter.SetDouble(System.Double)">
+        <member name="M:Inertia.BasicWriter.SetDouble(System.Double)">
             <summary>
             Write the specified value in the stream
             </summary>
             <param name="value">Target value to write</param>
             <returns>Return the current instance</returns>
         </member>
-        <member name="M:Inertia.SimpleWriter.SetByte(System.Byte)">
+        <member name="M:Inertia.BasicWriter.SetByte(System.Byte)">
             <summary>
             Write the specified value in the stream
             </summary>
             <param name="value">Target value to write</param>
             <returns>Return the current instance</returns>
         </member>
-        <member name="M:Inertia.SimpleWriter.SetSByte(System.SByte)">
+        <member name="M:Inertia.BasicWriter.SetSByte(System.SByte)">
             <summary>
             Write the specified value in the stream
             </summary>
             <param name="value">Target value to write</param>
             <returns>Return the current instance</returns>
         </member>
-        <member name="M:Inertia.SimpleWriter.SetChar(System.Char)">
+        <member name="M:Inertia.BasicWriter.SetChar(System.Char)">
             <summary>
             Write the specified value in the stream
             </summary>
             <param name="value">Target value to write</param>
             <returns>Return the current instance</returns>
         </member>
-        <member name="M:Inertia.SimpleWriter.SetShort(System.Int16)">
+        <member name="M:Inertia.BasicWriter.SetShort(System.Int16)">
             <summary>
             Write the specified value in the stream
             </summary>
             <param name="value">Target value to write</param>
             <returns>Return the current instance</returns>
         </member>
-        <member name="M:Inertia.SimpleWriter.SetUShort(System.UInt16)">
+        <member name="M:Inertia.BasicWriter.SetUShort(System.UInt16)">
             <summary>
             Write the specified value in the stream
             </summary>
             <param name="value">Target value to write</param>
             <returns>Return the current instance</returns>
         </member>
-        <member name="M:Inertia.SimpleWriter.SetInt(System.Int32)">
+        <member name="M:Inertia.BasicWriter.SetInt(System.Int32)">
             <summary>
             Write the specified value in the stream
             </summary>
             <param name="value">Target value to write</param>
             <returns>Return the current instance</returns>
         </member>
-        <member name="M:Inertia.SimpleWriter.SetUInt(System.UInt32)">
+        <member name="M:Inertia.BasicWriter.SetUInt(System.UInt32)">
             <summary>
             Write the specified value in the stream
             </summary>
             <param name="value">Target value to write</param>
             <returns>Return the current instance</returns>
         </member>
-        <member name="M:Inertia.SimpleWriter.SetLong(System.Int64)">
+        <member name="M:Inertia.BasicWriter.SetLong(System.Int64)">
             <summary>
             Write the specified value in the stream
             </summary>
             <param name="value">Target value to write</param>
             <returns>Return the current instance</returns>
         </member>
-        <member name="M:Inertia.SimpleWriter.SetULong(System.UInt64)">
+        <member name="M:Inertia.BasicWriter.SetULong(System.UInt64)">
             <summary>
             Write the specified value in the stream
             </summary>
             <param name="value">Target value to write</param>
             <returns>Return the current instance</returns>
         </member>
-        <member name="M:Inertia.SimpleWriter.SetBytes(System.Byte[])">
+        <member name="M:Inertia.BasicWriter.SetBytes(System.Byte[])">
             <summary>
             Write the specified value in the stream (with size)
             </summary>
             <param name="value">Target value to write</param>
             <returns>Return the current instance</returns>
         </member>
-        <member name="M:Inertia.SimpleWriter.SetBytesWithoutHeader(System.Byte[])">
+        <member name="M:Inertia.BasicWriter.SetBytesWithoutHeader(System.Byte[])">
             <summary>
             Write the specified value in the stream (without size)
             </summary>
             <param name="value">Target value to write</param>
             <returns>Return the current instance</returns>
         </member>
-        <member name="M:Inertia.SimpleWriter.SetObject``1(``0)">
+        <member name="M:Inertia.BasicWriter.SetDateTime(System.DateTime)">
+            <summary>
+            Write the specified value in the stream (without size)
+            </summary>
+            <param name="value">Target value to write</param>
+            <returns>Return the current instance</returns>
+        </member>
+        <member name="M:Inertia.BasicWriter.SetObject``1(``0)">
             <summary>
             Write the specified serializable value in the stream
             </summary>
@@ -1477,39 +1490,39 @@
             <param name="value">The object to serialize</param>
             <returns></returns>
         </member>
-        <member name="M:Inertia.SimpleWriter.SetValue(System.Object)">
+        <member name="M:Inertia.BasicWriter.SetValue(System.Object)">
             <summary>
             Automatically write the specified value in the stream (if serializable)
             </summary>
             <param name="value">Serializable value</param>
             <returns>Return the current instance</returns>
         </member>
-        <member name="M:Inertia.SimpleWriter.SetValues(System.Object[])">
+        <member name="M:Inertia.BasicWriter.SetValues(System.Object[])">
             <summary>
             Automatically write the specified values in the stream (if serializable)
             </summary>
             <param name="values">All serializable values to write</param>
             <returns>Return the current instance</returns>
         </member>
-        <member name="M:Inertia.SimpleWriter.ToArray">
+        <member name="M:Inertia.BasicWriter.ToArray">
             <summary>
             Export all writed data as byte array
             </summary>
             <returns>A byte array representing the data written</returns>
         </member>
-        <member name="M:Inertia.SimpleWriter.ToArrayAndClear">
+        <member name="M:Inertia.BasicWriter.ToArrayAndClear">
             <summary>
             Export all writed data as byte array and clear the current instance
             </summary>
             <returns>A byte array representing the data written</returns>
         </member>
-        <member name="M:Inertia.SimpleWriter.ToArrayAndDispose">
+        <member name="M:Inertia.BasicWriter.ToArrayAndDispose">
             <summary>
             Export all writed data as byte array and dispose the current instance
             </summary>
             <returns>A byte array representing the data written</returns>
         </member>
-        <member name="M:Inertia.SimpleWriter.Dispose">
+        <member name="M:Inertia.BasicWriter.Dispose">
             <summary>
             Dispose the reader (can't be used anymore)
             </summary>
@@ -1552,6 +1565,11 @@
         <member name="T:Inertia.TextCommandArgs">
             <summary>
             Represent the class manager for the <see cref="T:Inertia.TextCommand"/>'s arguments
+            </summary>
+        </member>
+        <member name="P:Inertia.TextCommandArgs.Name">
+            <summary>
+            Get the name of the executed <see cref="T:Inertia.TextCommand"/>
             </summary>
         </member>
         <member name="P:Inertia.TextCommandArgs.Count">
@@ -1610,6 +1628,33 @@
             </summary>
             <returns>Return an array of object representing the data objects arguments</returns>
         </member>
+        <member name="M:Inertia.TextCommandArgs.CombineArguments(System.Int32)">
+            <summary>
+            Combine all arguments to a string starting at the specified index
+            </summary>
+            <param name="startIndex">Index where to start</param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.TextCommandArgs.CombineArguments(System.Int32,System.Int32)">
+            <summary>
+            Combine all arguments to a string starting at the specified index
+            </summary>
+            <param name="startIndex">Index where to start</param>
+            <param name="length">Number of arguments to include</param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.TextCommandArgs.CombineAllArguments">
+            <summary>
+            Combine all arguments to a string from the start to the end
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.TextCommandArgs.ToString">
+            <summary>
+            Get the base command line
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:Inertia.TextCommandArgs.Dispose">
             <summary>
             Dispose the current instance
@@ -1636,14 +1681,14 @@
             Offers the possibility to obtain the time elapsed between a block of code.
             </summary>
         </member>
-        <member name="M:Inertia.Clock.GetElapsedMilliseconds(SimpleAction)">
+        <member name="M:Inertia.Clock.GetElapsedMilliseconds(BasicAction)">
             <summary>
             Automatically creates an instance of the class Clock and returns in milliseconds the execution time of the indicated code then dispose the instance
             </summary>
             <param name="handler">The code to execute</param>
             <returns>Time elapsed in milliseconds</returns>
         </member>
-        <member name="M:Inertia.Clock.GetElapsedSeconds(SimpleAction)">
+        <member name="M:Inertia.Clock.GetElapsedSeconds(BasicAction)">
             <summary>
             Automatically creates an instance of the class Clock and returns in seconds the execution time of the indicated code then dispose the instance
             </summary>
@@ -1710,7 +1755,7 @@
             Create a new instance
             </summary>
         </member>
-        <member name="M:Inertia.AutoQueue.Enqueue(SimpleAction[])">
+        <member name="M:Inertia.AutoQueue.Enqueue(BasicAction[])">
             <summary>
             Enqueue the specified actions at the end of the queue
             </summary>
@@ -1741,7 +1786,7 @@
             Create a new instance
             </summary>
         </member>
-        <member name="M:Inertia.ManualQueue.Enqueue(SimpleAction[])">
+        <member name="M:Inertia.ManualQueue.Enqueue(BasicAction[])">
             <summary>
             Enqueue the specified actions at the end of the queue
             </summary>
@@ -2082,32 +2127,32 @@
             Initialize a new instance of the class <see cref="T:Inertia.InvalidPasswordException"/>
             </summary>
         </member>
-        <member name="T:SimpleAction">
+        <member name="T:BasicAction">
             <summary>
             Execute code
             </summary>
         </member>
-        <member name="T:SimpleAction`1">
+        <member name="T:BasicAction`1">
             <summary>
             Execute code with <typeparamref name="T"/> parameter
             </summary>
         </member>
-        <member name="T:SimpleAction`2">
+        <member name="T:BasicAction`2">
             <summary>
             Execute code with multiples types parameters
             </summary>
         </member>
-        <member name="T:SimpleAction`3">
+        <member name="T:BasicAction`3">
             <summary>
             Execute code with multiples types parameters
             </summary>
         </member>
-        <member name="T:SimpleAction`4">
+        <member name="T:BasicAction`4">
             <summary>
             Execute code with multiples types parameters
             </summary>
         </member>
-        <member name="T:SimpleAction`5">
+        <member name="T:BasicAction`5">
             <summary>
             Execute code with multiples types parameters
             </summary>

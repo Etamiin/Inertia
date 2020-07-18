@@ -86,7 +86,7 @@ namespace Inertia
         /// <param name="commandLine">The string line to parse</param>
         /// <param name="dataCollection">Facultative data objects</param>
         /// <returns>Return true if the command was executed</returns>
-        public static bool ExecuteTextCommand(string commandLine, params object[] dataCollection)
+        public static TextCommandArgs ExecuteTextCommand(string commandLine, params object[] dataCollection)
         {
             var args = commandLine.Split(' ');
             var others = new string[args.Length - 1];
@@ -101,14 +101,16 @@ namespace Inertia
         /// <param name="dataCollection">Facultative data objects</param>
         /// <param name="arguments">Facultative string arguments</param>
         /// <returns></returns>
-        public static bool ExecuteCommandByName(string commandName, object[] dataCollection = null, params string[] arguments)
+        public static TextCommandArgs ExecuteCommandByName(string commandName, object[] dataCollection = null, params string[] arguments)
         {
             var command = GetCommandByName(commandName);
             if (command == null)
-                return false;
+                return null;
 
-            command.Execute(new TextCommandArgs(arguments, dataCollection));
-            return true;
+            var args = new TextCommandArgs(commandName, arguments, dataCollection);
+            command.Execute(args);
+
+            return args;
         }
     }
 }

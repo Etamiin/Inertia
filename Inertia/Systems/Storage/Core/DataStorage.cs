@@ -18,11 +18,11 @@ namespace Inertia.Storage
         /// <summary>
         /// Occurs when the current instance is saved by <see cref="SaveAsync(string, string)"/>
         /// </summary>
-        public event SimpleAction Saved = () => { };
+        public event BasicAction Saved = () => { };
         /// <summary>
         /// Occurs when the current instance is loaded by <see cref="LoadAsync(string)"/>
         /// </summary>
-        public event SimpleAction Loaded = () => { };
+        public event BasicAction Loaded = () => { };
         /// <summary>
         /// Occurs when the save procedure progress
         /// </summary>
@@ -70,7 +70,7 @@ namespace Inertia.Storage
 
         #endregion
 
-        internal override byte[] Serialize(SimpleAction<StorageProgressionEventArgs> progressCallback)
+        internal override byte[] Serialize(BasicAction<StorageProgressionEventArgs> progressCallback)
         {
             if (!string.IsNullOrEmpty(Password)) {
                 return base
@@ -80,7 +80,7 @@ namespace Inertia.Storage
             else
                 return base.Serialize(progressCallback);
         }
-        internal override void Deserialize(byte[] data, SimpleAction<StorageProgressionEventArgs> progressCallback)
+        internal override void Deserialize(byte[] data, BasicAction<StorageProgressionEventArgs> progressCallback)
         {
             if (!string.IsNullOrEmpty(Password))
             {
@@ -156,7 +156,7 @@ namespace Inertia.Storage
             LoadFailed = null;
         }
 
-        private void StartAsync(SimpleAction asyncAction, SimpleAction successCallback, SimpleAction<Exception> failedCallback)
+        private void StartAsync(BasicAction asyncAction, BasicAction successCallback, BasicAction<Exception> failedCallback)
         {
             Task.Factory.StartNew(() => {
                 try

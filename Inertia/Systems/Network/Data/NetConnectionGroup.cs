@@ -90,10 +90,10 @@ namespace Inertia.Network
         }
 
         /// <summary>
-        /// Send the specified <see cref="NetPacket"/> to the group
+        /// Send the specified <see cref="NetworkMessage"/> to the group
         /// </summary>
         /// <param name="packet">Packet instance to send</param>
-        public void Send(NetPacket packet)
+        public void Send(NetworkMessage packet)
         {
             if (Sender == null)
                 return;

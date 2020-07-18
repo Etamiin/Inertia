@@ -75,6 +75,15 @@ namespace Inertia
         }
 
         /// <summary>
+        /// Get the SHA256 key representation of the specified string data
+        /// </summary>
+        /// <param name="content">Target string data</param>
+        /// <returns>The SHA256 representation</returns>
+        public static string GetSHA256(string content)
+        {
+            return GetSHA256(Encoding.UTF8.GetBytes(content));
+        }
+        /// <summary>
         /// Get the SHA256 key representation of the specified byte array data
         /// </summary>
         /// <param name="data">Target byte array data</param>

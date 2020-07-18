@@ -12,7 +12,7 @@ namespace Inertia.Internal
     {
         #region Events
 
-        private static event SimpleAction Destroyer = () => {};
+        private static event BasicAction Destroyer = () => {};
 
         #endregion
 
@@ -46,34 +46,37 @@ namespace Inertia.Internal
             var targetMsUpdate = (int)Math.Round(1f / m_executionLimit * 1000);
             var clock = new Clock();
 
-            DependentThread.ExecuteThreadWhileDependencyIsAlive(() => {
-                var currentMsUpdate = (int)clock.GetElapsedMilliseconds();
-
-                if (currentMsUpdate < targetMsUpdate)
+            Task.Factory.StartNew(() => { 
+                while (true)
                 {
-                    Thread.Sleep(targetMsUpdate - currentMsUpdate);
-                    currentMsUpdate = (int)clock.GetElapsedMilliseconds();
+                    var currentMsUpdate = (int)clock.GetElapsedMilliseconds();
+
+                    if (currentMsUpdate < targetMsUpdate)
+                    {
+                        Thread.Sleep(targetMsUpdate - currentMsUpdate);
+                        currentMsUpdate = (int)clock.GetElapsedMilliseconds();
+                    }
+
+                    Script.DeltaTime = currentMsUpdate / 1000f;
+                    Script.Time += Script.DeltaTime;
+
+                    clock.Reset();
+
+                    ScriptExecutorLayer[] updaters = null;
+
+                    try
+                    {
+                        lock (m_executorLayers)
+                            updaters = m_executorLayers.ToArray();
+
+                        for (var i = 0; i < updaters.Length; i++)
+                            updaters[i].Execute();
+
+                        lock (Destroyer)
+                            Destroyer?.Invoke();
+                    }
+                    catch { }
                 }
-
-                Script.DeltaTime = currentMsUpdate / 1000f;
-                clock.Reset();
-
-                ScriptExecutorLayer[] updaters = null;
-
-                try
-                {
-                    lock (m_executorLayers)
-                        updaters = m_executorLayers.ToArray();
-
-                    for (var i = 0; i < updaters.Length; i++)
-                        updaters[i].Execute();
-
-                    lock (Destroyer)
-                        Destroyer?.Invoke();
-                }
-                catch { }
-            }, onDependencyDied: () => {
-                clock.Dispose();
             });
         }
 

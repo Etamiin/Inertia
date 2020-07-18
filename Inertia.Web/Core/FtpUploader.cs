@@ -19,7 +19,7 @@ namespace Inertia.Web
         /// <summary>
         /// Occurs when the current queue is completely uploaded
         /// </summary>
-        public event SimpleAction QueueUploaded = () => { };
+        public event BasicAction QueueUploaded = () => { };
         /// <summary>
         /// Occurs when a file start to be uploaded
         /// </summary>
@@ -67,6 +67,16 @@ namespace Inertia.Web
         /// Get the credentials used in the current instance
         /// </summary>
         public FtpCredential Credentials { get; private set; }
+        /// <summary>
+        /// Get the number of files in the queue
+        /// </summary>
+        public int QueuedCount
+        {
+            get
+            {
+                return m_files.Count;
+            }
+        }
 
         #endregion
 

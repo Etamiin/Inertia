@@ -132,7 +132,7 @@ namespace Inertia.Network
                 IPEndPoint endPoint = null;
                 var data = ((UdpClient)iar.AsyncState).EndReceive(iar, ref endPoint);
 
-                NetworkProtocol.Protocol.OnReceiveData(this, new SimpleReader(data));
+                NetworkProtocol.Protocol.OnReceiveData(this, new BasicReader(data));
             }
             catch (Exception e)
             {

@@ -49,7 +49,6 @@
     <Compile Include="Core\PathExtensions.cs" />
     <Compile Include="Core\Tools\BaseLogger.cs" />
     <Compile Include="Core\Tools\ConsoleLogger.cs" />
-    <Compile Include="Core\Tools\DependentThread.cs" />
     <Compile Include="InertiaDelegates.cs" />
     <Compile Include="Core\InertiaExtensions.cs" />
     <Compile Include="Systems\Network\Core\NetTcpClient.cs" />
@@ -59,9 +58,8 @@
     <Compile Include="Systems\Network\Data\Abstract\NetClient.cs" />
     <Compile Include="Systems\Network\Data\Abstract\NetServer.cs" />
     <Compile Include="Systems\Network\Data\Core\NetTcpConnection.cs" />
-    <Compile Include="Systems\Network\Data\CustomNetPacket.cs" />
+    <Compile Include="Systems\Network\Data\NetworkMessage.cs" />
     <Compile Include="Systems\Network\Core\DefaultNetworkProtocol.cs" />
-    <Compile Include="Systems\Network\Data\NetPacket.cs" />
     <Compile Include="Systems\Network\Data\NetConnectionGroup.cs" />
     <Compile Include="Systems\Network\Data\Core\NetUdpConnection.cs" />
     <Compile Include="Systems\Network\Data\Core\NetworkProtocol.cs" />
@@ -75,11 +73,11 @@
     <Compile Include="Core\IO\FlexDictionary\FlexDictionary.cs" />
     <Compile Include="Core\IO\FlexDictionary\FlexDictionaryValue.cs" />
     <Compile Include="Core\IO\InertiaIO.cs" />
-    <Compile Include="Core\IO\SimpleReader.cs" />
-    <Compile Include="Core\IO\SimpleWriter.cs" />
+    <Compile Include="Core\IO\BasicReader.cs" />
+    <Compile Include="Core\IO\BasicWriter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Systems\Command\CommandManager.cs" />
-    <Compile Include="Systems\Command\ArgumentsCollection.cs" />
+    <Compile Include="Systems\Command\TextCommandArgs.cs" />
     <Compile Include="Systems\Command\TextCommand.cs" />
     <Compile Include="Core\Tools\Clock.cs" />
     <Compile Include="Core\Queue\AutoQueue.cs" />

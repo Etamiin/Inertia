@@ -52,10 +52,10 @@ namespace Inertia.Network
             m_server.SendTo(this, data);
         }
         /// <summary>
-        /// Send a <see cref="NetPacket"/>instance to the current UDP connection
+        /// Send a <see cref="NetworkMessage"/>instance to the current UDP connection
         /// </summary>
         /// <param name="packet">Packet to send</param>
-        public void Send(NetPacket packet)
+        public void Send(NetworkMessage packet)
         {
             m_server.SendTo(this, packet);
         }

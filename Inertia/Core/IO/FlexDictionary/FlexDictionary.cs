@@ -201,9 +201,9 @@ namespace Inertia
             m_memory = null;
         }
 
-        internal virtual byte[] Serialize(SimpleAction<StorageProgressionEventArgs> progressCallback)
+        internal virtual byte[] Serialize(BasicAction<StorageProgressionEventArgs> progressCallback)
         {
-            var serializer = new SimpleWriter();
+            var serializer = new BasicWriter();
             var keys = GetKeys();
             var progression = new StorageProgressionEventArgs(keys.Length);
 
@@ -230,9 +230,9 @@ namespace Inertia
 
             return serializer.ToArrayAndDispose().Compress(out _);
         }
-        internal virtual void Deserialize(byte[] data, SimpleAction<StorageProgressionEventArgs> progressCallback)
+        internal virtual void Deserialize(byte[] data, BasicAction<StorageProgressionEventArgs> progressCallback)
         {
-            var deserializer = new SimpleReader(data.Decompress());
+            var deserializer = new BasicReader(data.Decompress());
             var length = deserializer.GetInt();
             var progression = new StorageProgressionEventArgs(length);
 

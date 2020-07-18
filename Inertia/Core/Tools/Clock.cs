@@ -16,7 +16,7 @@ namespace Inertia
         /// </summary>
         /// <param name="handler">The code to execute</param>
         /// <returns>Time elapsed in milliseconds</returns>
-        public static double GetElapsedMilliseconds(SimpleAction handler)
+        public static double GetElapsedMilliseconds(BasicAction handler)
         {
             var clock = new Clock();
             handler();
@@ -30,7 +30,7 @@ namespace Inertia
         /// </summary>
         /// <param name="handler">The code to execute</param>
         /// <returns>Time elapsed in seconds</returns>
-        public static double GetElapsedSeconds(SimpleAction handler)
+        public static double GetElapsedSeconds(BasicAction handler)
         {
             var clock = new Clock();
             handler();

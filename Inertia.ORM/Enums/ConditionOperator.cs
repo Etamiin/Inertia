@@ -16,25 +16,33 @@ namespace Inertia.ORM
         /// </summary>
         Equal,
         /// <summary>
-        /// ">" operator
+        /// greater operator
         /// </summary>
         Greater,
         /// <summary>
-        /// <![CDATA["<"]]> operator
+        /// less operator
         /// </summary>
         Less,
         /// <summary>
-        /// ">=" operator
+        /// greater or equal operator
         /// </summary>
         GreaterOrEqual,
         /// <summary>
-        /// <![CDATA["<="]]> operator operator
+        /// less or equal operator
         /// </summary>
         LessOrEqual,
         /// <summary>
-        /// <![CDATA["<>"]]> operator operator
+        /// not equal operator
         /// </summary>
-        Different,
+        NotEqual,
+        /// <summary>
+        /// not greater operator
+        /// </summary>
+        NotGreater,
+        /// <summary>
+        /// not less operator
+        /// </summary>
+        NotLess,
         /// <summary>
         /// "IN" operator
         /// </summary>

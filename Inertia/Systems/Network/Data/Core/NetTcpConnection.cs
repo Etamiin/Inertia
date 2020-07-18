@@ -50,7 +50,7 @@ namespace Inertia.Network
 
         private byte[] m_buffer;
         private Socket m_socket;
-        private SimpleReader m_reader;
+        private BasicReader m_reader;
 
         #endregion
 
@@ -60,7 +60,7 @@ namespace Inertia.Network
         {
             m_socket = socket;
             m_buffer = new byte[BufferLength];
-            m_reader = new SimpleReader();
+            m_reader = new BasicReader();
             m_socket.BeginReceive(m_buffer, 0, m_buffer.Length, SocketFlags.None, new AsyncCallback(OnReceiveData), m_socket);
         }
 
@@ -107,13 +107,13 @@ namespace Inertia.Network
             m_socket.Send(data);
         }
         /// <summary>
-        /// Send a <see cref="NetPacket"/>instance to the current TCP connection
+        /// Send a <see cref="NetworkMessage"/>instance to the current TCP connection
         /// </summary>
         /// <param name="packet">Packet to send</param>
-        public void Send(NetPacket packet)
+        public void Send(NetworkMessage packet)
         {
-            if (packet is CustomNetPacket)
-                Send(NetworkProtocol.Protocol.OnParsePacket((CustomNetPacket)packet));
+            if (packet is NetworkMessage)
+                Send(NetworkProtocol.Protocol.OnParsePacket((NetworkMessage)packet));
             else
                 Send(NetworkProtocol.Protocol.OnParsePacket(packet));
         }
@@ -140,7 +140,7 @@ namespace Inertia.Network
 
                 var data = new byte[received];
                 Array.Copy(m_buffer, data, received);
-
+                
                 NetworkProtocol.Protocol.OnReceiveData(this, m_reader.Fill(data));
             }
             catch (Exception e)
@@ -155,8 +155,12 @@ namespace Inertia.Network
                 }
             }
 
-            if (IsConnected)
-                m_socket.BeginReceive(m_buffer, 0, m_buffer.Length, SocketFlags.None, new AsyncCallback(OnReceiveData), m_socket);
+            try
+            {
+                if (IsConnected)
+                    m_socket.BeginReceive(m_buffer, 0, m_buffer.Length, SocketFlags.None, new AsyncCallback(OnReceiveData), m_socket);
+            }
+            catch { }
         }
     }
 }

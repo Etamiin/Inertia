@@ -18,7 +18,7 @@ namespace Inertia.Web
         /// <summary>
         /// Occurs when the current queue is completely downloaded
         /// </summary>
-        public event SimpleAction QueueDownloaded = () => { };
+        public event BasicAction QueueDownloaded = () => { };
         /// <summary>
         /// Occurs when a file start to be downloaded
         /// </summary>
@@ -62,6 +62,16 @@ namespace Inertia.Web
         /// Get or set the max attempts
         /// </summary>
         public int MaxAttempts { get; set; } = 5;
+        /// <summary>
+        /// Get the number of files queued
+        /// </summary>
+        public int QueuedCount
+        {
+            get
+            {
+                return m_files.Count;
+            }
+        }
 
         #endregion
 

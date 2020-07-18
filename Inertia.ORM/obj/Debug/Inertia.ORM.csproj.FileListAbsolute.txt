@@ -7,10 +7,12 @@ C:\Users\abdel\Desktop\InertiaLib\InertiaLib.ORM\obj\Debug\Inertia.ORM.pdb
 C:\Users\abdel\Desktop\projetsPerso\Inertia\InertiaLib\Inertia.ORM\bin\Debug\Inertia.ORM.xml
 C:\Users\abdel\Desktop\projetsPerso\Inertia\InertiaLib\Inertia.ORM\bin\Debug\Inertia.ORM.dll
 C:\Users\abdel\Desktop\projetsPerso\Inertia\InertiaLib\Inertia.ORM\bin\Debug\Inertia.ORM.pdb
+C:\Users\abdel\Desktop\projetsPerso\Inertia\InertiaLib\Inertia.ORM\bin\Debug\Inertia.dll
 C:\Users\abdel\Desktop\projetsPerso\Inertia\InertiaLib\Inertia.ORM\bin\Debug\MySql.Data.dll
+C:\Users\abdel\Desktop\projetsPerso\Inertia\InertiaLib\Inertia.ORM\bin\Debug\Inertia.pdb
+C:\Users\abdel\Desktop\projetsPerso\Inertia\InertiaLib\Inertia.ORM\bin\Debug\Inertia.xml
+C:\Users\abdel\Desktop\projetsPerso\Inertia\InertiaLib\Inertia.ORM\obj\Debug\Inertia.ORM.csproj.CoreCompileInputs.cache
 C:\Users\abdel\Desktop\projetsPerso\Inertia\InertiaLib\Inertia.ORM\obj\Debug\Inertia.ORM.csproj.CopyComplete
 C:\Users\abdel\Desktop\projetsPerso\Inertia\InertiaLib\Inertia.ORM\obj\Debug\Inertia.ORM.dll
 C:\Users\abdel\Desktop\projetsPerso\Inertia\InertiaLib\Inertia.ORM\obj\Debug\Inertia.ORM.pdb
-C:\Users\abdel\Desktop\projetsPerso\Inertia\InertiaLib\Inertia.ORM\bin\Debug\Inertia.dll
-C:\Users\abdel\Desktop\projetsPerso\Inertia\InertiaLib\Inertia.ORM\bin\Debug\Inertia.pdb
-C:\Users\abdel\Desktop\projetsPerso\Inertia\InertiaLib\Inertia.ORM\bin\Debug\Inertia.xml
+C:\Users\abdel\Desktop\projetsPerso\Inertia\InertiaLib\Inertia.ORM\obj\Debug\Inertia.ORM.csprojAssemblyReference.cache

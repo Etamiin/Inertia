@@ -34,8 +34,7 @@ namespace Inertia
 
         #region Private variables
 
-        private List<SimpleAction> m_queue;
-        private Clock m_clock;
+        private List<BasicAction> m_queue;
 
         #endregion
 
@@ -46,10 +45,14 @@ namespace Inertia
         /// </summary>
         public AutoQueue()
         {
-            m_queue = new List<SimpleAction>();;
-            m_clock = new Clock();
+            m_queue = new List<BasicAction>();;
 
-            DependentThread.ExecuteTaskWhileDependencyIsAlive(Execute, additionalConditions: () => !IsDisposed);
+            Task.Factory.StartNew(() => { 
+                while (!IsDisposed)
+                {
+                    Execute();
+                }
+            });
         }
 
         #endregion
@@ -58,16 +61,13 @@ namespace Inertia
         /// Enqueue the specified actions at the end of the queue
         /// </summary>
         /// <param name="handlers">Actions to enqueue</param>
-        public void Enqueue(params SimpleAction[] handlers)
+        public void Enqueue(params BasicAction[] handlers)
         {
             if (IsDisposed)
                 throw new ObjectDisposedException(nameof(AutoQueue));
 
-            lock (m_queue)
-            {
-                foreach (var handler in handlers)
-                    m_queue.Add(handler);
-            }
+            foreach (var handler in handlers)
+                m_queue.Add(handler);
         }
         
         /// <summary>
@@ -77,27 +77,33 @@ namespace Inertia
         {
             IsDisposed = true;
             m_queue.Clear();
-            m_clock.Dispose();
             m_queue = null;
-            m_clock = null;
         }
 
         private void Execute()
         {
             if (Count == 0)
+            {
                 Thread.Sleep(10);
+                return;
+            }
 
             lock (m_queue)
             {
-                foreach (var action in m_queue)
-                    action();
+                for (var i = 0; i < m_queue.Count; i++)
+                {
+                    var action = m_queue[i];
+                    try
+                    {
+                        action();
+                    }
+                    catch (Exception ex) { BaseLogger.DefaultLogger.Log(ex); }
+                }
 
                 m_queue.Clear();
             }
 
-            m_clock.Reset();
             Thread.Sleep(1);
-
         }
     }
 }

@@ -13,7 +13,7 @@ namespace Inertia
     {
         #region Events
 
-        private event SimpleAction QueueExecutor = () => { };
+        private event BasicAction QueueExecutor = () => { };
 
         #endregion
 
@@ -46,7 +46,7 @@ namespace Inertia
         /// </summary>
         /// <param name="actions">Actions to enqueue</param>
         /// <returns>Return the current instance</returns>
-        public ManualQueue Enqueue(params SimpleAction[] actions)
+        public ManualQueue Enqueue(params BasicAction[] actions)
         {
             if (IsDisposed)
                 throw new ObjectDisposedException(nameof(ManualQueue));
@@ -55,7 +55,12 @@ namespace Inertia
             {
                 void handler()
                 {
-                    action();
+                    try
+                    {
+                        action();
+                    }
+                    catch (Exception ex) { BaseLogger.DefaultLogger.Log(ex); }
+
                     QueueExecutor -= handler;
                     Count--;
                 }

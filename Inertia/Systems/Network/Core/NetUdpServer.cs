@@ -120,17 +120,17 @@ namespace Inertia.Network
             SendTo(connection.EndPoint, data);
         }
         /// <summary>
-        /// Send <see cref="NetPacket"/> instance to the specified <see cref="NetUdpConnection"/>
+        /// Send <see cref="NetworkMessage"/> instance to the specified <see cref="NetUdpConnection"/>
         /// </summary>
         /// <param name="connection">Connection to sent data</param>
         /// <param name="packet">Packet to send</param>
-        public void SendTo(NetUdpConnection connection, NetPacket packet)
+        public void SendTo(NetUdpConnection connection, NetworkMessage packet)
         {
             if (connection.IsDisposed)
                 throw new ObjectDisposedException(nameof(NetUdpConnection));
 
-            if (packet is CustomNetPacket)
-                SendTo(connection.EndPoint, NetworkProtocol.Protocol.OnParsePacket((CustomNetPacket)packet));
+            if (packet is NetworkMessage)
+                SendTo(connection.EndPoint, NetworkProtocol.Protocol.OnParsePacket((NetworkMessage)packet));
             else
                 SendTo(connection.EndPoint, NetworkProtocol.Protocol.OnParsePacket(packet));
         }
@@ -176,7 +176,7 @@ namespace Inertia.Network
                     ConnectionAdded(connection);
                 }
 
-                NetworkProtocol.Protocol.OnReceiveData(m_connections[endPoint], new SimpleReader(data));
+                NetworkProtocol.Protocol.OnReceiveData(m_connections[endPoint], new BasicReader(data));
             }
             catch (Exception ex) 
             {

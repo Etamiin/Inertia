@@ -18,19 +18,19 @@ namespace Inertia.Storage
         /// <summary>
         /// Occurs when the current instance is saved by <see cref="SaveAsync(string, string)"/>
         /// </summary>
-        public event SimpleAction Saved = () => { };
+        public event BasicAction Saved = () => { };
         /// <summary>
         /// Occurs when the current instance is loaded by <see cref="LoadAsync(string)"/>
         /// </summary>
-        public event SimpleAction Loaded = () => { };
+        public event BasicAction Loaded = () => { };
         /// <summary>
         /// Occurs when the current instance extracted all files by <see cref="ExtractAllAsync(string)"/>
         /// </summary>
-        public event SimpleAction Extracted = () => { };
+        public event BasicAction Extracted = () => { };
         /// <summary>
         /// occurs when all files from a folder are added by <see cref="AddFolderAsync(string, bool)"/>
         /// </summary>
-        public event SimpleAction FolderAdded = () => { };
+        public event BasicAction FolderAdded = () => { };
         /// <summary>
         /// Occurs when the save procedure progress
         /// </summary>
@@ -266,7 +266,7 @@ namespace Inertia.Storage
             if (File.Exists(path))
                 File.Delete(path);
 
-            var writer = new SimpleWriter()
+            var writer = new BasicWriter()
                 .SetInt(Count);
 
             File.WriteAllBytes(path, writer.ToArrayAndDispose());
@@ -274,7 +274,7 @@ namespace Inertia.Storage
             foreach (var pair in m_files)
             {
                 var file = pair.Value;
-                var fileWriter = new SimpleWriter()
+                var fileWriter = new BasicWriter()
                     .SetString(file.Key);
 
                 var iData = file.GetData();
@@ -323,7 +323,7 @@ namespace Inertia.Storage
             LoadedPath = filePath;
             m_files.Clear();
 
-            var reader = new SimpleReader(File.ReadAllBytes(filePath));
+            var reader = new BasicReader(File.ReadAllBytes(filePath));
             var count = reader.GetInt();
             var progression = new StorageProgressionEventArgs(count);
 
@@ -369,7 +369,7 @@ namespace Inertia.Storage
             LoadFailed = null;
         }
     
-        private FileStorage StartAsync(SimpleAction asyncAction, SimpleAction successCallback, SimpleAction<Exception> failedCallback)
+        private FileStorage StartAsync(BasicAction asyncAction, BasicAction successCallback, BasicAction<Exception> failedCallback)
         {
             Task.Factory.StartNew(() => { 
                 try

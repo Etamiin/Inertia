@@ -32,7 +32,7 @@ namespace Inertia.Network
 
         private byte[] m_buffer;
         private Socket m_socket;
-        private SimpleReader m_reader;
+        private BasicReader m_reader;
 
         #endregion
 
@@ -55,7 +55,7 @@ namespace Inertia.Network
         public NetTcpClient(string ip, int port, int bufferLength) : base(ip, port)
         {
             m_buffer = new byte[bufferLength];
-            m_reader = new SimpleReader();
+            m_reader = new BasicReader();
         }
 
         #endregion
@@ -77,13 +77,14 @@ namespace Inertia.Network
                 m_socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 m_socket.Connect(new IPEndPoint(IPAddress.Parse(m_targetIp), m_targetPort));
                 m_socket.BeginReceive(m_buffer, 0, m_buffer.Length, SocketFlags.None, OnReceiveData, m_socket);
-
-                OnConnected();
             }
             catch
             {
                 Disconnect(NetworkDisconnectReason.ConnectionFailed);
+                return;
             }
+
+            OnConnected();
         }
         /// <summary>
         /// Disconnect the client
@@ -118,10 +119,7 @@ namespace Inertia.Network
             if (!IsConnected)
                 return;
 
-            var asyncArgs = new SocketAsyncEventArgs();
-            asyncArgs.SetBuffer(data, 0, data.Length);
-
-            m_socket.SendAsync(asyncArgs);
+            m_socket.Send(data);
         }
 
         /// <summary>

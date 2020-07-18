@@ -12,27 +12,27 @@ using Inertia.Storage;
 /// <summary>
 /// Execute code
 /// </summary>
-public delegate void SimpleAction();
+public delegate void BasicAction();
 /// <summary>
 /// Execute code with <typeparamref name="T"/> parameter
 /// </summary>
-public delegate void SimpleAction<T>(T value);
+public delegate void BasicAction<T>(T value);
 /// <summary>
 /// Execute code with multiples types parameters
 /// </summary>
-public delegate void SimpleAction<T1, T2>(T1 value1, T2 value2);
+public delegate void BasicAction<T1, T2>(T1 value1, T2 value2);
 /// <summary>
 /// Execute code with multiples types parameters
 /// </summary>
-public delegate void SimpleAction<T1, T2, T3>(T1 value1, T2 value2, T3 value3);
+public delegate void BasicAction<T1, T2, T3>(T1 value1, T2 value2, T3 value3);
 /// <summary>
 /// Execute code with multiples types parameters
 /// </summary>
-public delegate void SimpleAction<T1, T2, T3, T4>(T1 value1, T2 value2, T3 value3, T4 value4);
+public delegate void BasicAction<T1, T2, T3, T4>(T1 value1, T2 value2, T3 value3, T4 value4);
 /// <summary>
 /// Execute code with multiples types parameters
 /// </summary>
-public delegate void SimpleAction<T1, T2, T3, T4, T5>(T1 value1, T2 value2, T3 value3, T4 value4, T5 value5);
+public delegate void BasicAction<T1, T2, T3, T4, T5>(T1 value1, T2 value2, T3 value3, T4 value4, T5 value5);
 /// <summary>
 /// Execute code with a <typeparamref name="R"/> returned object
 /// </summary>
@@ -97,7 +97,7 @@ public delegate void NetworkTcpClientConnectionDisconnectedHandler(NetTcpConnect
 /// Network group sender handler
 /// </summary>
 /// <param name="packet"></param>
-public delegate void NetworkGroupSenderHandler(NetPacket packet);
+public delegate void NetworkGroupSenderHandler(NetworkMessage packet);
 /// <summary>
 /// Network user datagram added handler
 /// </summary>

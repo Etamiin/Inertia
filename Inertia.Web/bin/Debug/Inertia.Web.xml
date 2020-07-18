@@ -54,6 +54,11 @@
             Get or set the max attempts
             </summary>
         </member>
+        <member name="P:Inertia.Web.FtpDownloader.QueuedCount">
+            <summary>
+            Get the number of files queued
+            </summary>
+        </member>
         <member name="M:Inertia.Web.FtpDownloader.#ctor(Inertia.Web.FtpCredential)">
             <summary>
             Instantiate a new instance of the class <see cref="T:Inertia.Web.WebDownloader"/>
@@ -137,6 +142,11 @@
             Get the credentials used in the current instance
             </summary>
         </member>
+        <member name="P:Inertia.Web.FtpUploader.QueuedCount">
+            <summary>
+            Get the number of files in the queue
+            </summary>
+        </member>
         <member name="M:Inertia.Web.FtpUploader.#ctor(Inertia.Web.FtpCredential)">
             <summary>
             Instantiate a new instance of the class <see cref="T:Inertia.Web.FtpUploader"/>
@@ -196,6 +206,11 @@
             Occurs when the current queue is completely downloaded
             </summary>
         </member>
+        <member name="E:Inertia.Web.WebDownloader.QueueDownloadProgress">
+            <summary>
+            Occurs when the current queue downloading progress
+            </summary>
+        </member>
         <member name="E:Inertia.Web.WebDownloader.FileDownloadStarted">
             <summary>
             Occurs when a file start to be downloaded
@@ -234,6 +249,11 @@
         <member name="P:Inertia.Web.WebDownloader.MaxAttempts">
             <summary>
             Get or set the max attempts
+            </summary>
+        </member>
+        <member name="P:Inertia.Web.WebDownloader.QueuedCount">
+            <summary>
+            Get the number of files queued
             </summary>
         </member>
         <member name="M:Inertia.Web.WebDownloader.#ctor(System.String)">
@@ -377,6 +397,79 @@
             <summary>
             Instantiate a new instance of the class <see cref="T:Inertia.Web.WebModuleBusyException"/>
             </summary>
+        </member>
+        <member name="T:Inertia.Web.WebHelper">
+            <summary>
+            Offers multiple utilities functions for web networking
+            </summary>
+        </member>
+        <member name="M:Inertia.Web.WebHelper.GetRequest(System.Uri)">
+            <summary>
+            Execute a HTTP GET request and return the string response
+            </summary>
+            <param name="uriRequest">Uri to request</param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.Web.WebHelper.GetRequestData(System.Uri)">
+            <summary>
+            Execute a HTTP GET request and return the byte[] data response
+            </summary>
+            <param name="uriRequest">Uri to request</param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.Web.WebHelper.GetRequestAsync(System.Uri,BasicAction{System.String})">
+            <summary>
+            Execute a HTTP GET asynchronously request
+            </summary>
+            <param name="uriRequest">Uri to request</param>
+            <param name="callback">Action to execute when receiving response</param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.Web.WebHelper.GetRequestDataAsync(System.Uri,BasicAction{System.Byte[]})">
+            <summary>
+            Execute a HTTP GET asynchronously request
+            </summary>
+            <param name="uriRequest">Uri to request</param>
+            <param name="callback">Action to execute when receiving response</param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.Web.WebHelper.PostRequest(System.Uri,System.String,System.String)">
+            <summary>
+            Execute a HTTP POST request and return the string response
+            </summary>
+            <param name="uriRequest">Uri to request</param>
+            <param name="data">Data to post</param>
+            <param name="contentType">Content-Type of the request</param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.Web.WebHelper.PostRequestData(System.Uri,System.String,System.String)">
+            <summary>
+            Execute a HTTP POST request and return the byte[] data response
+            </summary>
+            <param name="uriRequest">Uri to request</param>
+            <param name="data">Data to post</param>
+            <param name="contentType">Content-Type of the request</param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.Web.WebHelper.PostRequestAsync(System.Uri,System.String,BasicAction{System.String},System.String)">
+            <summary>
+            Execute a HTTP POST asynchronously request
+            </summary>
+            <param name="uriRequest">Uri to request</param>
+            <param name="data">Data to post</param>
+            <param name="callback">Action to execute when receiving response</param>
+            <param name="contentType">Content-Type of the request</param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.Web.WebHelper.PostRequestDataAsync(System.Uri,System.String,BasicAction{System.Byte[]},System.String)">
+            <summary>
+            Execute a HTTP POST asynchronously request
+            </summary>
+            <param name="uriRequest">Uri to request</param>
+            <param name="data">Data to post</param>
+            <param name="callback">Action to execute when receiving response</param>
+            <param name="contentType">Content-Type of the request</param>
+            <returns></returns>
         </member>
         <member name="T:DownloadUpdateHandler">
             <summary>

@@ -17,7 +17,7 @@ namespace Inertia.ORM
         /// <summary>
         /// Database name attached to
         /// </summary>
-        public readonly string Database;
+        public readonly Type DatabaseType;
 
         #endregion
 
@@ -26,10 +26,13 @@ namespace Inertia.ORM
         /// <summary>
         /// Instantiate a new instance of the class <see cref="DatabaseAttach"/>
         /// </summary>
-        /// <param name="database">Database name to attach</param>
-        public DatabaseAttach(string database)
+        /// <param name="databaseType">Database type to attach</param>
+        public DatabaseAttach(Type databaseType)
         {
-            Database = database;
+            if (databaseType.IsAbstract || !databaseType.IsSubclassOf(typeof(Database)))
+                return;
+
+            DatabaseType = databaseType;
         }
         
         #endregion

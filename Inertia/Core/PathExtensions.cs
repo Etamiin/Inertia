@@ -12,6 +12,8 @@ namespace Inertia
         internal static string VerifyPathForFolder(this string folderPath)
         {
             var path = folderPath;
+            if (string.IsNullOrEmpty(path))
+                path = Directory.GetCurrentDirectory();
 
             if (!File.Exists(path) || !File.GetAttributes(path).HasFlag(FileAttributes.Directory))
             {

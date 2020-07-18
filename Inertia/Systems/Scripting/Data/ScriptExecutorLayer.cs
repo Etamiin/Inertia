@@ -11,7 +11,7 @@ namespace Inertia.Internal
     {
         #region Events
 
-        public event SimpleAction Executor = () => { };
+        public event BasicAction Executor = () => { };
 
         #endregion
 
