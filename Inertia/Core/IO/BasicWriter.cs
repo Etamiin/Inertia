@@ -131,6 +131,25 @@ namespace Inertia
             return this;
         }
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="values"></param>
+        /// <returns></returns>
+        public BasicWriter SetBoolFlag(params bool[] values)
+        {
+            var length = values.Length;
+            if (length > 8)
+                length = 8;
+
+            var flag = (byte)0;
+            for (var i = 0; i < length; i++)
+            {
+                flag = values[i] ? (byte)(flag | (1 << i)) : (byte)(flag & 255 - (1 << i));
+            }
+
+            return SetByte(flag);
+        }
+        /// <summary>
         /// Write the specified value in the stream
         /// </summary>
         /// <param name="value">Target value to write</param>
@@ -179,6 +198,7 @@ namespace Inertia
             m_writer.Write(value);
             return this;
         }
+
         /// <summary>
         /// Write the specified value in the stream
         /// </summary>

@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Inertia.Internal;
+using System.Diagnostics;
 
 namespace Inertia.ORM
 {
@@ -115,10 +116,12 @@ namespace Inertia.ORM
 
             LoadTables();
 
-            foreach (var db in m_databases)
+            foreach (var db in m_databases.Values)
             {
-                if (db.Value.AutoCreateTables)
-                    db.Value.CreateTables();
+                if (db.AutoCreateTables)
+                    db.CreateTables();
+
+                db.OnCreated();
             }
         }
         private static void LoadTables()
@@ -183,7 +186,7 @@ namespace Inertia.ORM
         #region Constructors
 
         /// <summary>
-        /// Instantiate a new instance of the class <see cref="Database"/>
+        /// 
         /// </summary>
         public Database()
         {
@@ -191,6 +194,13 @@ namespace Inertia.ORM
         }
 
         #endregion
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public virtual void OnCreated()
+        {
+        }
 
         /// <summary>
         /// Create all tables of the current <see cref="Database"/>
@@ -271,36 +281,23 @@ namespace Inertia.ORM
         /// <param name="columns">Columns to select</param>
         /// <typeparam name="T"><see cref="Type"/> of the table</typeparam>
         /// <returns><typeparamref name="T"/> array</returns>
-        public void Select<T>(ConditionBuilder condition, BasicAction<T[]> onSelected = null, params string[] columns) where T : Table
+        public void Select<T>(ConditionBuilder condition, BasicAction<T> onSelected = null, params string[] columns) where T : Table
         {
+            if (condition == null)
+                return;
+
+            condition.SetLimit(1);
+
             SqlManager.AsyncOperation(this, (db) => {
-                var result = new List<T>();
-
+                var result = (T)null;
                 ExecuteQueryFromInstance<T>(QueryType.Select, condition, columns, (reader) => {
-                    while (reader.Read())
-                    {
-                        var instance = OrmHelper.InstantiateObject(typeof(T)) as T;
-
-                        for (var i = 0; i < reader.FieldCount; i++)
-                        {
-                            var field = instance.GetType().GetField(reader.GetName(i));
-                            if (field != null)
-                            {
-                                var value = reader.GetValue(i);
-                                if (value.GetType() == typeof(DBNull))
-                                    value = null;
-
-                                field.SetValue(instance, value);
-                            }
-                        }
-
-                        result.Add(instance);
-                    }
+                    if (reader.Read())
+                        result = Select<T>(reader);
                 }, "Executing select query failed: {0}");
 
-                return result.ToArray();
+                return result;
             }, (success, obj) => {
-                onSelected?.Invoke((T[])obj);
+                onSelected?.Invoke(obj as T);
             });
         }
         /// <summary>
@@ -312,7 +309,21 @@ namespace Inertia.ORM
         /// <returns><typeparamref name="T"/> array</returns>
         public void SelectAll<T>(BasicAction<T[]> onSelected = null, params string[] columns) where T : Table
         {
-            Select(null, onSelected, columns);
+            SqlManager.AsyncOperation(this, (db) => {
+                var result = new List<T>();
+
+                ExecuteQueryFromInstance<T>(QueryType.Select, null, columns, (reader) => {
+                    while (reader.Read())
+                    {
+                        var instance = Select<T>(reader);
+                        result.Add(instance);
+                    }
+                }, "Executing select query failed: {0}");
+
+                return result.ToArray();
+            }, (success, obj) => {
+                onSelected?.Invoke((T[])obj);
+            });
         }
         /// <summary>
         /// Get the number of rows based on the specified <see cref="ConditionBuilder"/> in the specified <typeparamref name="T"/> table
@@ -364,6 +375,18 @@ namespace Inertia.ORM
                 onUpdated?.Invoke();
             });
         }
+        /// <summary>
+        /// Update all rows in the database by the current instance values
+        /// </summary>
+        public void UpdateAll<T>(BasicAction onUpdated = null) where T : Table
+        {
+            SqlManager.AsyncOperation(this, (db) => {
+                ExecuteQueryFromInstance<T>(QueryType.Update, null, null, null, "Executing update query failed: {0}");
+                return null;
+            }, (success, obj) => {
+                onUpdated?.Invoke();
+            });
+        }
 
         internal MySqlConnection CreateConnection()
         {
@@ -403,6 +426,28 @@ namespace Inertia.ORM
             return null;
         }
 
+        private T Select<T>(MySqlDataReader reader) where T : Table
+        {
+            var instance = OrmHelper.InstantiateObject(typeof(T)) as T;
+
+            for (var i = 0; i < reader.FieldCount; i++)
+            {
+                var field = instance.GetType().GetField(reader.GetName(i));
+                if (field != null)
+                {
+                    var value = reader.GetValue(i);
+                    if (value.GetType() == typeof(DBNull))
+                        value = null;
+
+                    if (field.FieldType == typeof(bool))
+                        value = reader.GetBoolean(i);
+
+                    field.SetValue(instance, value);
+                }
+            }
+
+            return instance;
+        }
         private void CreateTable(Table table)
         {
             if (table.IgnoreCreation)

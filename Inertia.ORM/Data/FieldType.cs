@@ -35,7 +35,8 @@ namespace Inertia.Internal
                 { typeof(DateTime), new FieldType("datetime", false, TypeCode.DateTime) },
                 { typeof(byte[]), new FieldType("blob", false, TypeCode.Byte) },
                 { typeof(string), new FieldType("text", false, TypeCode.String) },
-                { typeof(object), new FieldType("object", false, TypeCode.Object) }
+                { typeof(object), new FieldType("object", false, TypeCode.Object) },
+                { typeof(bool), new FieldType("bit", false, TypeCode.Boolean) }
             };
         }
 

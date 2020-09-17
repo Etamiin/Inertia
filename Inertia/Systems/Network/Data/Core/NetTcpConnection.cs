@@ -140,7 +140,7 @@ namespace Inertia.Network
 
                 var data = new byte[received];
                 Array.Copy(m_buffer, data, received);
-                
+
                 NetworkProtocol.Protocol.OnReceiveData(this, m_reader.Fill(data));
             }
             catch (Exception e)

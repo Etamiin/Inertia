@@ -20,13 +20,21 @@ namespace Inertia.Web
         /// <returns></returns>
         public static string GetRequest(Uri uriRequest)
         {
-            var request = (HttpWebRequest)WebRequest.Create(uriRequest);
-            request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create(uriRequest);
+                request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
 
-            using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
-            using (Stream stream = response.GetResponseStream())
-            using (StreamReader reader = new StreamReader(stream))
-                return reader.ReadToEnd();
+                using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
+                using (Stream stream = response.GetResponseStream())
+                using (StreamReader reader = new StreamReader(stream))
+                    return reader.ReadToEnd();
+            }
+            catch (Exception ex)
+            {
+                BaseLogger.DefaultLogger.Log("GetRequest exception:: " + ex);
+                return string.Empty;
+            }
         }
         /// <summary>
         /// Execute a HTTP GET request and return the byte[] data response
@@ -35,15 +43,23 @@ namespace Inertia.Web
         /// <returns></returns>
         public static byte[] GetRequestData(Uri uriRequest)
         {
-            var request = (HttpWebRequest)WebRequest.Create(uriRequest);
-            request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
-            using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
-            using (Stream stream = response.GetResponseStream())
+            try
             {
-                var ms = new MemoryStream();
-                stream.CopyTo(ms);
+                var request = (HttpWebRequest)WebRequest.Create(uriRequest);
+                request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+                using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
+                using (Stream stream = response.GetResponseStream())
+                {
+                    var ms = new MemoryStream();
+                    stream.CopyTo(ms);
 
-                return ms.ToArray();
+                    return ms.ToArray();
+                }
+            }
+            catch (Exception ex)
+            {
+                BaseLogger.DefaultLogger.Log("GetRequestData exception:: " + ex);
+                return new byte[] { };
             }
         }
         /// <summary>
@@ -76,24 +92,31 @@ namespace Inertia.Web
         /// <returns></returns>
         public static string PostRequest(Uri uriRequest, string data, string contentType = "text/html")
         {
-            byte[] dataBytes = Encoding.UTF8.GetBytes(data);
-
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uriRequest);
-            request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
-            request.ContentLength = dataBytes.Length;
-            request.ContentType = contentType;
-            request.Method = "POST";
-
-            using (Stream requestBody = request.GetRequestStream())
+            try
             {
-                requestBody.Write(dataBytes, 0, dataBytes.Length);
+                var body = Encoding.ASCII.GetBytes(data);
+
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uriRequest);
+                request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+                request.ContentLength = body.Length;
+                request.ContentType = contentType;
+                request.Method = "POST";
+
+                using (var requestBody = request.GetRequestStream())
+                {
+                    requestBody.Write(body, 0, body.Length);
+                }
+                using (var response = (HttpWebResponse)request.GetResponse())
+                using (var stream = response.GetResponseStream())
+                using (var reader = new StreamReader(stream))
+                {
+                    return reader.ReadToEnd();
+                }
             }
-
-            using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
-            using (Stream stream = response.GetResponseStream())
-            using (StreamReader reader = new StreamReader(stream))
+            catch (Exception ex)
             {
-                return reader.ReadToEnd();
+                BaseLogger.DefaultLogger.Log("PostRequest exception:: " + ex);
+                return string.Empty;
             }
         }
         /// <summary>
@@ -105,26 +128,34 @@ namespace Inertia.Web
         /// <returns></returns>
         public static byte[] PostRequestData(Uri uriRequest, string data, string contentType = "text/html")
         {
-            byte[] dataBytes = Encoding.UTF8.GetBytes(data);
-
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uriRequest);
-            request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
-            request.ContentLength = dataBytes.Length;
-            request.ContentType = contentType;
-            request.Method = "POST";
-
-            using (Stream requestBody = request.GetRequestStream())
+            try
             {
-                requestBody.Write(dataBytes, 0, dataBytes.Length);
+                byte[] dataBytes = Encoding.UTF8.GetBytes(data);
+
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uriRequest);
+                request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+                request.ContentLength = dataBytes.Length;
+                request.ContentType = contentType;
+                request.Method = "POST";
+
+                using (Stream requestBody = request.GetRequestStream())
+                {
+                    requestBody.Write(dataBytes, 0, dataBytes.Length);
+                }
+
+                using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
+                using (Stream stream = response.GetResponseStream())
+                {
+                    var ms = new MemoryStream();
+                    stream.CopyTo(ms);
+
+                    return ms.ToArray();
+                }
             }
-
-            using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
-            using (Stream stream = response.GetResponseStream())
+            catch (Exception ex)
             {
-                var ms = new MemoryStream();
-                stream.CopyTo(ms);
-
-                return ms.ToArray();
+                BaseLogger.DefaultLogger.Log("PostRequestData exception:: " + ex);
+                return new byte[] { };
             }
         }
         /// <summary>

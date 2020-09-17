@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Inertia</RootNamespace>
     <AssemblyName>Inertia</AssemblyName>
-    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
     <TargetFrameworkProfile />
@@ -51,6 +51,7 @@
     <Compile Include="Core\Tools\ConsoleLogger.cs" />
     <Compile Include="InertiaDelegates.cs" />
     <Compile Include="Core\InertiaExtensions.cs" />
+    <Compile Include="Systems\Network\Attributes\NetworkMessageHooker.cs" />
     <Compile Include="Systems\Network\Core\NetTcpClient.cs" />
     <Compile Include="Systems\Network\Core\NetTcpServer.cs" />
     <Compile Include="Systems\Network\Core\NetUdpClient.cs" />
@@ -63,7 +64,9 @@
     <Compile Include="Systems\Network\Data\NetConnectionGroup.cs" />
     <Compile Include="Systems\Network\Data\Core\NetUdpConnection.cs" />
     <Compile Include="Systems\Network\Data\Core\NetworkProtocol.cs" />
+    <Compile Include="Systems\Network\Data\NetworkMessageHookerRefs.cs" />
     <Compile Include="Systems\Network\Enums\NetworkDisconnectReason.cs" />
+    <Compile Include="Systems\Network\Exceptions\HookerInvalidTypeException.cs" />
     <Compile Include="Systems\Network\Exceptions\UserDatagramDataLengthLimitException.cs" />
     <Compile Include="Systems\Scripting\Core\Script.cs" />
     <Compile Include="Systems\Scripting\Data\ScriptArgumentsCollection.cs" />

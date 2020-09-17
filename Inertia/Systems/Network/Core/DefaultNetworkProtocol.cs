@@ -3,9 +3,9 @@ using System.CodeDom;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using Inertia.Network;
 
 namespace Inertia.Network
 {
@@ -43,28 +43,6 @@ namespace Inertia.Network
 
         internal DefaultNetworkProtocol()
         {
-            PacketTypes = new Dictionary<uint, Type>();
-
-            var assemblys = AppDomain.CurrentDomain.GetAssemblies();
-            foreach (var assembly in assemblys)
-            {
-                var types = assembly.GetTypes();
-                foreach (var type in types)
-                {
-                    if (type.IsClass && type.IsSubclassOf(typeof(NetworkMessage)))
-                    {
-                        if (type.IsAbstract)
-                            continue;
-
-                        var packet = CreateInstance(type);
-                        if (PacketTypes.ContainsKey(packet.Id))
-                            continue;
-
-                        PacketTypes.Add(packet.Id, type);
-                    }
-                }
-            }
-
             m_queue = new AutoQueue();
         }
 
@@ -100,7 +78,7 @@ namespace Inertia.Network
         /// <param name="reader">The data in a <see cref="BasicReader"/> instance</param>
         public override void OnReceiveData(NetTcpClient client, BasicReader reader)
         {
-            ParseMessages(reader, (packet) => packet.OnReceived(client));
+            ParseMessages(reader, (packet) => { ExecuteHooker(packet, client); });
         }
         /// <summary>
         /// Happens when receiving data from a <see cref="NetUdpClient"/>
@@ -109,7 +87,7 @@ namespace Inertia.Network
         /// <param name="reader">The data in a <see cref="BasicReader"/> instance</param>
         public override void OnReceiveData(NetUdpClient client, BasicReader reader)
         {
-            ParseMessages(reader, (packet) => packet.OnReceived(client));
+            ParseMessages(reader, (packet) => ExecuteHooker(packet, client));
         }
         /// <summary>
         /// Happens when receiving data from a <see cref="NetTcpConnection"/>
@@ -118,7 +96,7 @@ namespace Inertia.Network
         /// <param name="reader">The data in a <see cref="BasicReader"/> instance</param>
         public override void OnReceiveData(NetTcpConnection connection, BasicReader reader)
         {
-            ParseMessages(reader, (packet) => packet.OnReceived(connection));
+            ParseMessages(reader, (packet) => ExecuteHooker(packet, connection));
         }
         /// <summary>
         /// Happens when receiving data from a <see cref="NetUdpConnection"/>
@@ -127,7 +105,7 @@ namespace Inertia.Network
         /// <param name="reader">The data in a <see cref="BasicReader"/> instance</param>
         public override void OnReceiveData(NetUdpConnection connection, BasicReader reader)
         {
-            ParseMessages(reader, (packet) => packet.OnReceived(connection));
+            ParseMessages(reader, (packet) => ExecuteHooker(packet, connection));
         }
 
         private bool IsSizeComplete(BasicReader reader, out long size)
@@ -161,12 +139,12 @@ namespace Inertia.Network
                     if (isCustomPacket)
                     {
                         var packetId = reader.GetUInt();
-                        if (!PacketTypes.ContainsKey(packetId))
+                        if (!MessageTypes.ContainsKey(packetId))
                             throw new Exception();
 
                         coreReader.Fill(data);
 
-                        var packet = (NetworkMessage)CreateInstance(PacketTypes[packetId]);
+                        var packet = (NetworkMessage)CreateInstance(MessageTypes[packetId]);
                         packet.OnDeserialize(coreReader);
 
                         m_queue.Enqueue(() => onPacketParsed(packet));
@@ -178,12 +156,12 @@ namespace Inertia.Network
                             data = data.Decompress();
 
                         var obj = (NetworkMessage)coreReader.GetObject();
-                        if (!PacketTypes.ContainsKey(obj.Id))
+                        if (!MessageTypes.ContainsKey(obj.Id))
                             throw new Exception();
 
                         coreReader.Fill(data);
 
-                        var parsedObj = Convert.ChangeType(obj, PacketTypes[obj.Id]);
+                        var parsedObj = Convert.ChangeType(obj, MessageTypes[obj.Id]);
                         m_queue.Enqueue(() => onPacketParsed((NetworkMessage)parsedObj));
                     }
 

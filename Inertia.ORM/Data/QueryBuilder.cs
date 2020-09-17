@@ -52,42 +52,15 @@ namespace Inertia.Internal
         {
             m_builder.Clear();
 
-            switch (m_queryType)
-            {
-                case QueryType.CreateTable:
-                    CreateTable();
-                    break;
-                case QueryType.DropTable:
-                    DropTable();
-                    break;
-                case QueryType.Insert:
-                    Insert();
-                    break;
-                case QueryType.Update:
-                    Update();
-                    break;
-                case QueryType.Select:
-                    Select();
-                    break;
-                case QueryType.Delete:
-                    Delete();
-                    break;
-                case QueryType.DeleteWithAutoCondition:
-                    DeleteWithAutoCondition();
-                    break;
-                case QueryType.DeleteAll:
-                    DeleteAll();
-                    break;
-                case QueryType.Count:
-                    Count();
-                    break;
-                default:
-                    throw new NotImplementedException();
-            }
+            var methodQuery = GetType().GetMethod(m_queryType.ToString(), BindingFlags.Instance | BindingFlags.NonPublic);
+            if (methodQuery == null)
+                throw new Exception();
+
+            methodQuery.Invoke(this, new object[] { });
 
             var query = m_builder.ToString();
-            if (m_condition != null && m_condition.Length > 0)
-                query += " " + m_condition.GetQuery();
+            if (m_condition != null)
+                query += " " + m_condition.ToString();
 
             return query;
         }
@@ -169,7 +142,7 @@ namespace Inertia.Internal
             m_builder.Append("UPDATE `" + m_table.Name + "` SET ");
             m_table.TreatDefaultFields((field, index, length, value) => {
                 var paramName = OrmHelper.GetRandomName(7);
-
+                
                 m_builder.Append(field.Name + "=" + paramName);
                 Command.Parameters.AddWithValue(paramName, value);
 
@@ -177,7 +150,7 @@ namespace Inertia.Internal
                     m_builder.Append(",");
 
                 hasFields = true;
-            });
+            }, true);
 
             if (m_builder[m_builder.Length - 1] == ',')
                 m_builder.Remove(m_builder.Length - 1, 1);
@@ -202,16 +175,18 @@ namespace Inertia.Internal
                 m_builder.Append("*");
 
             m_builder.Append(" FROM `" + m_table.Name + "`");
-            QueryWithAutoCondition();
+
+            if (m_condition == null)
+                return;
+
+            var default_value = OrmHelper.InstantiateObject(m_table.GetType());
+            m_table.TreatDefaultFields((field, index, length, value) => {
+                m_condition.AddCondition(field.Name, value, ConditionOperator.Equal);
+            });
         }
         private void Delete()
         {
             m_builder.Append("DELETE FROM `" + m_table.Name + "`");
-        }
-        private void DeleteWithAutoCondition()
-        {
-            m_builder.Append("DELETE FROM `" + m_table.Name + "`");
-            QueryWithAutoCondition();
         }
         private void DeleteAll()
         {
@@ -221,19 +196,6 @@ namespace Inertia.Internal
         {
             var columnName = (string)m_data;
             m_builder.Append("SELECT COUNT(" + columnName + ") FROM `" + m_table.Name + "`");
-
-            QueryWithAutoCondition();
-        }
-
-        private void QueryWithAutoCondition()
-        {
-            if (m_condition == null)
-                return;
-
-            var default_value = OrmHelper.InstantiateObject(m_table.GetType());
-            m_table.TreatDefaultFields((field, index, length, value) => {
-                m_condition.AddCondition(field.Name, value, ConditionOperator.Equal);
-            });
         }
     }
 }

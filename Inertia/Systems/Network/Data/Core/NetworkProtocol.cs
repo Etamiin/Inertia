@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Inertia.Internal;
@@ -14,8 +15,10 @@ namespace Inertia.Network
     {
         #region Static
 
-        internal static Dictionary<uint, Type> PacketTypes;
+        internal static Dictionary<uint, Type> MessageTypes;
+        internal static Dictionary<Type, NetworkMessageHookerRefs> MessageHookers;
         internal static NetworkProtocol Protocol { get; private set; } = DefaultNetworkProtocol.Instance;
+        
         /// <summary>
         /// Set a custom protocol instance to be used by the system
         /// </summary>
@@ -58,10 +61,93 @@ namespace Inertia.Network
         /// <returns></returns>
         public static NetworkMessage CreateInstance(uint packetId)
         {
-            if (!PacketTypes.ContainsKey(packetId))
+            if (!MessageTypes.ContainsKey(packetId))
                 return null;
 
-            return CreateInstance(PacketTypes[packetId]);
+            return CreateInstance(MessageTypes[packetId]);
+        }
+
+        /// <summary>
+        /// Execute a <see cref="NetworkMessageHooker"/> if exist
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="networkObj"></param>
+        public static bool ExecuteHooker(NetworkMessage message, object networkObj)
+        {
+            if (MessageHookers.TryGetValue(message.GetType(), out NetworkMessageHookerRefs refs))
+            {
+                try
+                {
+                    if (networkObj is NetTcpClient)
+                        refs.CallRef(message, networkObj as NetTcpClient);
+                    else if (networkObj is NetUdpClient)
+                        refs.CallRef(message, networkObj as NetUdpClient);
+                    else if (networkObj is NetTcpConnection)
+                        refs.CallRef(message, networkObj as NetTcpConnection);
+                    else if (networkObj is NetUdpConnection)
+                        refs.CallRef(message, networkObj as NetUdpConnection);
+                }
+                catch { }
+            }
+
+            return false;
+        }
+
+        #endregion
+        
+        #region Constructors
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public NetworkProtocol()
+        {
+            MessageTypes = new Dictionary<uint, Type>();
+            MessageHookers = new Dictionary<Type, NetworkMessageHookerRefs>();
+
+            var assemblys = AppDomain.CurrentDomain.GetAssemblies();
+            foreach (var assembly in assemblys)
+            {
+                var types = assembly.GetTypes();
+                foreach (var type in types)
+                {
+                    if (type.IsClass && type.IsSubclassOf(typeof(NetworkMessage)))
+                    {
+                        if (type.IsAbstract)
+                            continue;
+
+                        var packet = CreateInstance(type);
+                        if (MessageTypes.ContainsKey(packet.Id))
+                            continue;
+
+                        MessageTypes.Add(packet.Id, type);
+                    }
+
+                    var sMethods = type.GetMethods(BindingFlags.Static | BindingFlags.Public);
+                    if (sMethods.Length == 0)
+                        continue;
+
+                    foreach (var smethod in sMethods)
+                    {
+                        var attr = smethod.GetCustomAttribute<NetworkMessageHooker>();
+                        if (attr != null)
+                        {
+                            var ps = smethod.GetParameters();
+                            if (ps.Length < 2)
+                                continue;
+
+                            if (ps[0].ParameterType.IsSubclassOf(typeof(NetworkMessage)) && 
+                               (ps[1].ParameterType.IsSubclassOf(typeof(NetClient)) || ps[1].ParameterType == typeof(NetTcpConnection) || ps[1].ParameterType == typeof(NetUdpConnection)))
+                            {
+                                if (!MessageHookers.ContainsKey(attr.MessageType))
+                                    MessageHookers.Add(attr.MessageType, new NetworkMessageHookerRefs());
+
+                                MessageHookers[attr.MessageType].RegisterRef(smethod, ps[1].ParameterType);
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         #endregion

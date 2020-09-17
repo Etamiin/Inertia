@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -48,6 +49,10 @@ namespace Inertia.Storage
         /// Get or set the password that will be used for the current instance
         /// </summary>
         public string Password { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool AutoCompression { get; set; }
 
         #endregion
 
@@ -56,37 +61,40 @@ namespace Inertia.Storage
         /// <summary>
         /// Initialize a new instance of the class <see cref="DataStorage{KeyType}"/>
         /// </summary>
-        public DataStorage() : base()
+        public DataStorage(bool autoCompression = false) : base()
         {
+            AutoCompression = autoCompression;
         }
         /// <summary>
         /// Initialize a new instance of the class <see cref="DataStorage{KeyType}"/>
         /// </summary>
         /// <param name="password">The password to use in the current instance</param>
-        public DataStorage(string password) : base()
+        /// <param name="autoCompression"></param>
+        public DataStorage(string password, bool autoCompression = false) : base()
         {
             Password = password;
+            AutoCompression = autoCompression;
         }
 
         #endregion
 
-        internal override byte[] Serialize(BasicAction<StorageProgressionEventArgs> progressCallback)
+        internal override byte[] Serialize(bool autoCompression, BasicAction<StorageProgressionEventArgs> progressCallback)
         {
             if (!string.IsNullOrEmpty(Password)) {
                 return base
-                    .Serialize(progressCallback)
+                    .Serialize(autoCompression, progressCallback)
                     .EncryptWithString(Password);
             }
             else
-                return base.Serialize(progressCallback);
+                return base.Serialize(autoCompression, progressCallback);
         }
-        internal override void Deserialize(byte[] data, BasicAction<StorageProgressionEventArgs> progressCallback)
+        internal override void Deserialize(bool autoCompression, byte[] data, BasicAction<StorageProgressionEventArgs> progressCallback)
         {
             if (!string.IsNullOrEmpty(Password))
             {
                 try
                 {
-                    base.Deserialize(data.DecryptWithString(Password), progressCallback);
+                    base.Deserialize(autoCompression, data.DecryptWithString(Password), progressCallback);
                 }
                 catch
                 {
@@ -94,7 +102,7 @@ namespace Inertia.Storage
                 }
             }
             else
-                base.Deserialize(data, progressCallback);
+                base.Deserialize(autoCompression, data, progressCallback);
         }
 
         /// <summary>
@@ -110,7 +118,7 @@ namespace Inertia.Storage
             if (File.Exists(path))
                 File.Delete(path);
 
-            File.WriteAllBytes(path, Serialize((progression) => SaveProgress(progression)));
+            File.WriteAllBytes(path, Serialize(AutoCompression, (progression) => SaveProgress(progression)));
         }
         /// <summary>
         /// Save asynchronously the current storage to the specified folder path using the specified file name
@@ -131,7 +139,7 @@ namespace Inertia.Storage
                 throw new FileNotFoundException();
 
             base.Clear();
-            Deserialize(File.ReadAllBytes(filePath), (progression) => LoadProgress(progression));
+            Deserialize(AutoCompression, File.ReadAllBytes(filePath), (progression) => LoadProgress(progression));
         }
         /// <summary>
         /// Load asynchronously the target file in the current storage

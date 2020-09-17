@@ -15,4 +15,3 @@ C:\Users\abdel\Desktop\projetsPerso\Inertia\InertiaLib\Inertia.ORM\obj\Debug\Ine
 C:\Users\abdel\Desktop\projetsPerso\Inertia\InertiaLib\Inertia.ORM\obj\Debug\Inertia.ORM.csproj.CopyComplete
 C:\Users\abdel\Desktop\projetsPerso\Inertia\InertiaLib\Inertia.ORM\obj\Debug\Inertia.ORM.dll
 C:\Users\abdel\Desktop\projetsPerso\Inertia\InertiaLib\Inertia.ORM\obj\Debug\Inertia.ORM.pdb
-C:\Users\abdel\Desktop\projetsPerso\Inertia\InertiaLib\Inertia.ORM\obj\Debug\Inertia.ORM.csprojAssemblyReference.cache

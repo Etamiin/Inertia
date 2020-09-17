@@ -168,6 +168,22 @@
             <param name="key">Target string key for encryption</param>
             <returns>Decrypted byte array</returns>
         </member>
+        <member name="T:Inertia.Network.NetworkMessageHooker">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:Inertia.Network.NetworkMessageHooker.MessageType">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Inertia.Network.NetworkMessageHooker.#ctor(System.Type)">
+            <summary>
+            
+            </summary>
+            <param name="messageType"></param>
+        </member>
         <member name="T:Inertia.Network.NetTcpClient">
             <summary>
             Represent the TCP client
@@ -512,30 +528,6 @@
             </summary>
             <param name="reader">The reader to use for deserialization</param>
         </member>
-        <member name="M:Inertia.Network.NetworkMessage.OnReceived(Inertia.Network.NetTcpClient)">
-            <summary>
-            Happens when receiving this packet from a <see cref="T:Inertia.Network.NetTcpClient"/>
-            </summary>
-            <param name="client">Client that received the packet</param>
-        </member>
-        <member name="M:Inertia.Network.NetworkMessage.OnReceived(Inertia.Network.NetUdpClient)">
-            <summary>
-            Happens when receiving this packet from a <see cref="T:Inertia.Network.NetUdpClient"/>
-            </summary>
-            <param name="client">Client that received the packet</param>
-        </member>
-        <member name="M:Inertia.Network.NetworkMessage.OnReceived(Inertia.Network.NetTcpConnection)">
-            <summary>
-            Happens when receiving this packet from a <see cref="T:Inertia.Network.NetTcpConnection"/>
-            </summary>
-            <param name="connection">Connection that received the packet</param>
-        </member>
-        <member name="M:Inertia.Network.NetworkMessage.OnReceived(Inertia.Network.NetUdpConnection)">
-            <summary>
-            Happens when receiving this packet from a <see cref="T:Inertia.Network.NetUdpConnection"/>
-            </summary>
-            <param name="connection">Connection that received the packet</param>
-        </member>
         <member name="T:Inertia.Network.DefaultNetworkProtocol">
             <summary>
             Represent the main <see cref="T:Inertia.Network.NetworkProtocol"/> used for internal networking
@@ -702,6 +694,18 @@
             <param name="packetId">Id of the target <see cref="T:Inertia.Network.NetworkMessage"/></param>
             <returns></returns>
         </member>
+        <member name="M:Inertia.Network.NetworkProtocol.ExecuteHooker(Inertia.Network.NetworkMessage,System.Object)">
+            <summary>
+            Execute a <see cref="T:Inertia.Network.NetworkMessageHooker"/> if exist
+            </summary>
+            <param name="message"></param>
+            <param name="networkObj"></param>
+        </member>
+        <member name="M:Inertia.Network.NetworkProtocol.#ctor">
+            <summary>
+            
+            </summary>
+        </member>
         <member name="M:Inertia.Network.NetworkProtocol.OnParsePacket(Inertia.Network.NetworkMessage)">
             <summary>
             Happens when parsing a <see cref="T:Inertia.Network.NetworkMessage"/> instance
@@ -756,6 +760,27 @@
             <summary>
             Connection failed
             </summary>
+        </member>
+        <member name="T:Inertia.Network.HookerInvalidTypeException">
+            <summary>
+            Thrown when using a <see cref="T:System.Type"/> that isn't a subclass of <see cref="T:Inertia.Network.NetworkMessage"/>
+            </summary>
+        </member>
+        <member name="P:Inertia.Network.HookerInvalidTypeException.Message">
+            <summary>
+            Message of the exception
+            </summary>
+        </member>
+        <member name="F:Inertia.Network.HookerInvalidTypeException.SpecifiedType">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Inertia.Network.HookerInvalidTypeException.#ctor(System.Type)">
+            <summary>
+            
+            </summary>
+            <param name="messageType"></param>
         </member>
         <member name="T:Inertia.Network.UserDatagramDataLengthLimitException">
             <summary>
@@ -1191,6 +1216,13 @@
             </summary>
             <returns>Readed <see cref="T:System.Boolean"/> value (or false if nothing can be read)</returns>
         </member>
+        <member name="M:Inertia.BasicReader.GetBoolFlag(System.Int32)">
+            <summary>
+            
+            </summary>
+            <param name="length"></param>
+            <returns></returns>
+        </member>
         <member name="M:Inertia.BasicReader.GetString">
             <summary>
             Read a <see cref="T:System.String"/> value with the current instance <see cref="T:System.Text.Encoding"/> algorithm in the stream and change the position
@@ -1369,6 +1401,13 @@
             </summary>
             <param name="value">Target value to write</param>
             <returns>Return the current instance</returns>
+        </member>
+        <member name="M:Inertia.BasicWriter.SetBoolFlag(System.Boolean[])">
+            <summary>
+            
+            </summary>
+            <param name="values"></param>
+            <returns></returns>
         </member>
         <member name="M:Inertia.BasicWriter.SetString(System.String)">
             <summary>
@@ -1844,16 +1883,22 @@
             Get or set the password that will be used for the current instance
             </summary>
         </member>
-        <member name="M:Inertia.Storage.DataStorage`1.#ctor">
+        <member name="P:Inertia.Storage.DataStorage`1.AutoCompression">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Inertia.Storage.DataStorage`1.#ctor(System.Boolean)">
             <summary>
             Initialize a new instance of the class <see cref="T:Inertia.Storage.DataStorage`1"/>
             </summary>
         </member>
-        <member name="M:Inertia.Storage.DataStorage`1.#ctor(System.String)">
+        <member name="M:Inertia.Storage.DataStorage`1.#ctor(System.String,System.Boolean)">
             <summary>
             Initialize a new instance of the class <see cref="T:Inertia.Storage.DataStorage`1"/>
             </summary>
             <param name="password">The password to use in the current instance</param>
+            <param name="autoCompression"></param>
         </member>
         <member name="M:Inertia.Storage.DataStorage`1.Save(System.String,System.String)">
             <summary>
@@ -2157,32 +2202,32 @@
             Execute code with multiples types parameters
             </summary>
         </member>
-        <member name="T:SimpleReturnAction`1">
+        <member name="T:BasicReturnAction`1">
             <summary>
             Execute code with a <typeparamref name="R"/> returned object
             </summary>
         </member>
-        <member name="T:SimpleReturnAction`2">
+        <member name="T:BasicReturnAction`2">
             <summary>
             Execute code with a <typeparamref name="R"/> returned object and one <typeparamref name="T1"/> parameter
             </summary>
         </member>
-        <member name="T:SimpleReturnAction`3">
+        <member name="T:BasicReturnAction`3">
             <summary>
             Execute code with a <typeparamref name="R"/> returned object and multiples types parameters
             </summary>
         </member>
-        <member name="T:SimpleReturnAction`4">
+        <member name="T:BasicReturnAction`4">
             <summary>
             Execute code with a <typeparamref name="R"/> returned object and multiples types parameters
             </summary>
         </member>
-        <member name="T:SimpleReturnAction`5">
+        <member name="T:BasicReturnAction`5">
             <summary>
             Execute code with a <typeparamref name="R"/> returned object and multiples types parameters
             </summary>
         </member>
-        <member name="T:SimpleReturnAction`6">
+        <member name="T:BasicReturnAction`6">
             <summary>
             Execute code with a <typeparamref name="R"/> returned object and multiples types parameters
             </summary>

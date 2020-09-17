@@ -19,7 +19,7 @@ namespace Inertia.ORM
         /// <typeparam name="T">Database where to execute the operation</typeparam>
         /// <param name="operation">Operation to execute</param>
         /// <param name="onExecuted">Callback called when operation ended with a <see cref="bool"/> parameter (true is success)</param>
-        public static void AsyncOperation<T>(SimpleReturnAction<T, object> operation, BasicAction<bool, object> onExecuted = null) where T : Database
+        public static void AsyncOperation<T>(BasicReturnAction<T, object> operation, BasicAction<bool, object> onExecuted = null) where T : Database
         {
             var database = Database.GetDatabase<T>();
             AsyncOperation(database, (db) => operation((T)db), onExecuted);
@@ -30,7 +30,7 @@ namespace Inertia.ORM
         /// <param name="database">Database where to execute the operation</param>
         /// <param name="operation">Operation to execute</param>
         /// <param name="onExecuted">Callback called when operation ended with a <see cref="bool"/> parameter (true is success)</param>
-        public static void AsyncOperation(Database database, SimpleReturnAction<Database, object> operation, BasicAction<bool, object> onExecuted = null)
+        public static void AsyncOperation(Database database, BasicReturnAction<Database, object> operation, BasicAction<bool, object> onExecuted = null)
         {
             if (database != null)
             {
@@ -43,7 +43,9 @@ namespace Inertia.ORM
                     if (onExecuted == null)
                         return;
 
-                    var success = result.GetType() == typeof(bool) ? (bool)result : (result != null);
+                    var success = false;
+                    if (result != null)
+                        success = result.GetType() == typeof(bool) ? (bool)result : (result != null);
                     onExecuted(success, result);
                 });
             }

@@ -14,7 +14,7 @@ namespace Inertia
     {
         #region Static variables
 
-        internal static Dictionary<Type, SimpleReturnAction<BasicReader, object>> TypageDefinitons { get; private set; }
+        internal static Dictionary<Type, BasicReturnAction<BasicReader, object>> TypageDefinitons { get; private set; }
 
         #endregion
 
@@ -100,7 +100,7 @@ namespace Inertia
             if (TypageDefinitons != null)
                 return;
 
-            TypageDefinitons = new Dictionary<Type, SimpleReturnAction<BasicReader, object>>()
+            TypageDefinitons = new Dictionary<Type, BasicReturnAction<BasicReader, object>>()
             {
                 {  typeof(bool), (reader) => reader.GetBool() },
                 {  typeof(string), (reader) => reader.GetString() },
@@ -212,6 +212,22 @@ namespace Inertia
 
             return default;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="length"></param>
+        /// <returns></returns>
+        public bool[] GetBoolFlag(int length)
+        {
+            var flags = new bool[length];
+            var flag = GetByte();
+
+            for (var i = 0; i < length; i++)
+                flags[i] = (flag & (byte)(1 << i)) != 0;
+
+            return flags;
+        }
+
         /// <summary>
         /// Read a <see cref="string"/> value with the current instance <see cref="Encoding"/> algorithm in the stream and change the position
         /// </summary>

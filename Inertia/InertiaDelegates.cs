@@ -36,27 +36,27 @@ public delegate void BasicAction<T1, T2, T3, T4, T5>(T1 value1, T2 value2, T3 va
 /// <summary>
 /// Execute code with a <typeparamref name="R"/> returned object
 /// </summary>
-public delegate R SimpleReturnAction<R>();
+public delegate R BasicReturnAction<R>();
 /// <summary>
 /// Execute code with a <typeparamref name="R"/> returned object and one <typeparamref name="T1"/> parameter
 /// </summary>
-public delegate R SimpleReturnAction<T1, R>(T1 value1);
+public delegate R BasicReturnAction<T1, R>(T1 value1);
 /// <summary>
 /// Execute code with a <typeparamref name="R"/> returned object and multiples types parameters
 /// </summary>
-public delegate R SimpleReturnAction<T1, T2, R>(T1 value1, T2 value2);
+public delegate R BasicReturnAction<T1, T2, R>(T1 value1, T2 value2);
 /// <summary>
 /// Execute code with a <typeparamref name="R"/> returned object and multiples types parameters
 /// </summary>
-public delegate R SimpleReturnAction<T1, T2, T3, R>(T1 value1, T2 value2, T3 value3);
+public delegate R BasicReturnAction<T1, T2, T3, R>(T1 value1, T2 value2, T3 value3);
 /// <summary>
 /// Execute code with a <typeparamref name="R"/> returned object and multiples types parameters
 /// </summary>
-public delegate R SimpleReturnAction<T1, T2, T3, T4, R>(T1 value1, T2 value2, T3 value3, T4 value4);
+public delegate R BasicReturnAction<T1, T2, T3, T4, R>(T1 value1, T2 value2, T3 value3, T4 value4);
 /// <summary>
 /// Execute code with a <typeparamref name="R"/> returned object and multiples types parameters
 /// </summary>
-public delegate R SimpleReturnAction<T1, T2, T3, T4, T5, R>(T1 value1, T2 value2, T3 value3, T4 value4, T5 value5);
+public delegate R BasicReturnAction<T1, T2, T3, T4, T5, R>(T1 value1, T2 value2, T3 value3, T4 value4, T5 value5);
 
 #endregion
 

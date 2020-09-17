@@ -58,17 +58,6 @@ namespace Inertia.ORM
             });
         }
         /// <summary>
-        /// Update all rows in the database by the current instance values
-        /// </summary>
-        public void UpdateAllRows(BasicAction onUpdated = null)
-        {
-            SqlManager.AsyncOperation(Database, (db) => {
-                return ExecuteQuery(QueryType.Update, null, null, null, "Executing update query failed: {0}");
-            }, (success, obj) => {
-                onUpdated?.Invoke();
-            });
-        }
-        /// <summary>
         /// Set the current instance values by the selected row based on the specified values
         /// </summary>
         /// <param name="onSelected">Callback called when selelct query is executed</param>
@@ -89,6 +78,9 @@ namespace Inertia.ORM
                                     var value = reader.GetValue(i);
                                     if (value.GetType() == typeof(DBNull))
                                         value = null;
+                                    
+                                    if (field.FieldType == typeof(bool))
+                                        value = reader.GetBoolean(i);
 
                                     field.SetValue(this, value);
                                 }
@@ -99,55 +91,6 @@ namespace Inertia.ORM
             }, (success, obj) => {
                 onSelected?.Invoke();
             });
-        }
-        /// <summary>
-        /// Delete rows based on the current instance values
-        /// </summary>
-        /// <param name="onDeleted">Callback called when delete query is executed</param>
-        /// <param name="limit">Number of rows to delete</param>
-        public void Delete(BasicAction onDeleted = null, int limit = 1)
-        {
-            SqlManager.AsyncOperation(Database, (db) => {
-                using (var condition = new ConditionBuilder(Database).SetLimit(limit))
-                    return ExecuteQuery(QueryType.DeleteWithAutoCondition, condition, null, null, "Executing delete query failed: {0}");
-            }, (success, obj) => {
-                onDeleted?.Invoke();
-            });
-        }
-        /// <summary>
-        /// Get the number of rows that have the same values as the current instance
-        /// </summary>
-        /// <param name="onCounted">Callback called when count query is executed</param>
-        /// <param name="limit">Limit to set for counting</param>
-        /// <param name="columnName">Column to focus (or all if not specified)</param>
-        /// <returns>Number of rows</returns>
-        public void Count(BasicAction<long> onCounted, int limit = -1, string columnName = "*")
-        {
-            SqlManager.AsyncOperation(Database, (db) => {
-                var count = 0L;
-
-                using (var condition = new ConditionBuilder(Database))
-                {
-                    condition.SetLimit(limit);
-
-                    ExecuteQuery(QueryType.Count, condition, columnName, (reader) => {
-                        if (reader.Read())
-                            count = (long)reader.GetValue(0);
-                    }, "Executing count query failed: {0}");
-                }
-
-                return count;
-            }, (success, obj) => {
-                onCounted((long)obj);
-            });
-        }
-        /// <summary>
-        /// Return true if the current instance values exist in the table
-        /// </summary>
-        /// <returns></returns>
-        public void Exist(BasicAction<bool> onChecked)
-        {
-            Count((count) => onChecked(count > 0), 1);
         }
 
         internal void LoadInstance()
@@ -183,14 +126,17 @@ namespace Inertia.ORM
                 act(fields[i], i, fields.Length);
             }
         }
-        internal void TreatDefaultFields(BasicAction<FieldInfo, int, int, object> act)
+        internal void TreatDefaultFields(BasicAction<FieldInfo, int, int, object> act, bool withBooleans = false)
         {
             var default_value = OrmHelper.InstantiateObject(GetType());
 
             TreatFields((field, index, length) => {
-                var value = field.GetValue(this);
-                if (value != null && !value.Equals(field.GetValue(default_value)))
-                    act(field, index, length, value);
+                var fieldValue = field.GetValue(this);
+                var defaultFieldValue = field.GetValue(default_value);
+
+                if (fieldValue != null && !fieldValue.Equals(field.GetValue(default_value)) ||
+                    field.FieldType == typeof(bool) && withBooleans)
+                    act(field, index, length, fieldValue);
             });
         }
         internal long ExecuteQuery(QueryType queryType, ConditionBuilder condition, object data, BasicAction<MySqlDataReader> onReader, string errorMessage)

@@ -31,26 +31,5 @@ namespace Inertia.Network
         /// </summary>
         /// <param name="reader">The reader to use for deserialization</param>
         public virtual void OnDeserialize(BasicReader reader) { }
-
-        /// <summary>
-        /// Happens when receiving this packet from a <see cref="NetTcpClient"/>
-        /// </summary>
-        /// <param name="client">Client that received the packet</param>
-        public virtual void OnReceived(NetTcpClient client) { }
-        /// <summary>
-        /// Happens when receiving this packet from a <see cref="NetUdpClient"/>
-        /// </summary>
-        /// <param name="client">Client that received the packet</param>
-        public virtual void OnReceived(NetUdpClient client) { }
-        /// <summary>
-        /// Happens when receiving this packet from a <see cref="NetTcpConnection"/>
-        /// </summary>
-        /// <param name="connection">Connection that received the packet</param>
-        public virtual void OnReceived(NetTcpConnection connection) { }
-        /// <summary>
-        /// Happens when receiving this packet from a <see cref="NetUdpConnection"/>
-        /// </summary>
-        /// <param name="connection">Connection that received the packet</param>
-        public virtual void OnReceived(NetUdpConnection connection) { }
     }
 }

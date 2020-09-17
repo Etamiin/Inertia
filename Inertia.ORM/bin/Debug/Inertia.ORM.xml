@@ -147,7 +147,12 @@
         </member>
         <member name="M:Inertia.ORM.Database.#ctor">
             <summary>
-            Instantiate a new instance of the class <see cref="T:Inertia.ORM.Database"/>
+            
+            </summary>
+        </member>
+        <member name="M:Inertia.ORM.Database.OnCreated">
+            <summary>
+            
             </summary>
         </member>
         <member name="M:Inertia.ORM.Database.CreateTables">
@@ -182,7 +187,7 @@
             <param name="onDeleted">Callback to call when delete query is executed</param>
             <typeparam name="T"><see cref="T:System.Type"/> of the table</typeparam>
         </member>
-        <member name="M:Inertia.ORM.Database.Select``1(Inertia.ORM.ConditionBuilder,BasicAction{``0[]},System.String[])">
+        <member name="M:Inertia.ORM.Database.Select``1(Inertia.ORM.ConditionBuilder,BasicAction{``0},System.String[])">
             <summary>
             Select all values based on the specified <see cref="T:Inertia.ORM.ConditionBuilder"/> in the specified <typeparamref name="T"/> table
             </summary>
@@ -228,6 +233,11 @@
             <param name="onUpdated">Callback to call when query update is executed</param>
             <param name="reference">Reference instance</param>
         </member>
+        <member name="M:Inertia.ORM.Database.UpdateAll``1(BasicAction)">
+            <summary>
+            Update all rows in the database by the current instance values
+            </summary>
+        </member>
         <member name="T:Inertia.ORM.Table">
             <summary>
             Represent the table class
@@ -253,39 +263,12 @@
             Insert the current instance values in the database
             </summary>
         </member>
-        <member name="M:Inertia.ORM.Table.UpdateAllRows(BasicAction)">
-            <summary>
-            Update all rows in the database by the current instance values
-            </summary>
-        </member>
         <member name="M:Inertia.ORM.Table.Select(BasicAction,System.String[])">
             <summary>
             Set the current instance values by the selected row based on the specified values
             </summary>
             <param name="onSelected">Callback called when selelct query is executed</param>
             <param name="columns">Columns to select</param>
-        </member>
-        <member name="M:Inertia.ORM.Table.Delete(BasicAction,System.Int32)">
-            <summary>
-            Delete rows based on the current instance values
-            </summary>
-            <param name="onDeleted">Callback called when delete query is executed</param>
-            <param name="limit">Number of rows to delete</param>
-        </member>
-        <member name="M:Inertia.ORM.Table.Count(BasicAction{System.Int64},System.Int32,System.String)">
-            <summary>
-            Get the number of rows that have the same values as the current instance
-            </summary>
-            <param name="onCounted">Callback called when count query is executed</param>
-            <param name="limit">Limit to set for counting</param>
-            <param name="columnName">Column to focus (or all if not specified)</param>
-            <returns>Number of rows</returns>
-        </member>
-        <member name="M:Inertia.ORM.Table.Exist(BasicAction{System.Boolean})">
-            <summary>
-            Return true if the current instance values exist in the table
-            </summary>
-            <returns></returns>
         </member>
         <member name="T:Inertia.ORM.ConditionBuilder">
             <summary>
@@ -343,6 +326,12 @@
             <summary>
             Dispose the current instance
             </summary>
+        </member>
+        <member name="M:Inertia.ORM.ConditionBuilder.ToString">
+            <summary>
+            Return the condition query as string
+            </summary>
+            <returns></returns>
         </member>
         <member name="T:Inertia.ORM.ConditionOperator">
             <summary>
@@ -451,7 +440,7 @@
             Static class allowing several operations
             </summary>
         </member>
-        <member name="M:Inertia.ORM.SqlManager.AsyncOperation``1(SimpleReturnAction{``0,System.Object},BasicAction{System.Boolean,System.Object})">
+        <member name="M:Inertia.ORM.SqlManager.AsyncOperation``1(BasicReturnAction{``0,System.Object},BasicAction{System.Boolean,System.Object})">
             <summary>
             Execute an operation asynchronously on a <see cref="T:Inertia.ORM.Database"/>
             </summary>
@@ -459,7 +448,7 @@
             <param name="operation">Operation to execute</param>
             <param name="onExecuted">Callback called when operation ended with a <see cref="T:System.Boolean"/> parameter (true is success)</param>
         </member>
-        <member name="M:Inertia.ORM.SqlManager.AsyncOperation(Inertia.ORM.Database,SimpleReturnAction{Inertia.ORM.Database,System.Object},BasicAction{System.Boolean,System.Object})">
+        <member name="M:Inertia.ORM.SqlManager.AsyncOperation(Inertia.ORM.Database,BasicReturnAction{Inertia.ORM.Database,System.Object},BasicAction{System.Boolean,System.Object})">
             <summary>
             Execute an operation asynchronously on a <see cref="T:Inertia.ORM.Database"/>
             </summary>

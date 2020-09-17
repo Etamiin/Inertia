@@ -16,13 +16,7 @@ namespace Inertia.ORM
         #region Internal variables
 
         internal MySqlCommand Command;
-        internal int Length
-        {
-            get
-            {
-                return m_builder.Length;
-            }
-        }
+        internal int Length { get; private set; }
 
         #endregion;
 
@@ -30,6 +24,7 @@ namespace Inertia.ORM
 
         private StringBuilder m_builder;
         private int m_limit = -1;
+        private bool m_bracketOpened;
 
         #endregion
 
@@ -46,6 +41,8 @@ namespace Inertia.ORM
 
             Command = db.CreateCommand();
             m_builder = new StringBuilder();
+
+            PrivOpenBrackets(true);
         }
         /// <summary>
         /// Instantiate a new instance of the class <see cref="ConditionBuilder"/>
@@ -73,11 +70,7 @@ namespace Inertia.ORM
         /// <returns>The current instance</returns>
         public ConditionBuilder OpenBrackets(ConditionType type = ConditionType.And)
         {
-            if (m_builder.Length > 0)
-                m_builder.Append(" " + type.ToString().ToUpper() + " ");
-
-            m_builder.Append("(");
-            return this;
+            return PrivOpenBrackets(false, type);
         }
         /// <summary>
         /// Close brackets in the condition query
@@ -85,8 +78,7 @@ namespace Inertia.ORM
         /// <returns>The current instance</returns>
         public ConditionBuilder CloseBrackets()
         {
-            m_builder.Append(")");
-            return this;
+            return PrivCloseBrackets(false);
         }
         /// <summary>
         /// Add condition to the query
@@ -182,6 +174,8 @@ namespace Inertia.ORM
                 Command.Parameters.AddWithValue(paramName, value);
             }
 
+            Length++;
+
             return this;
         }
         /// <summary>
@@ -205,16 +199,55 @@ namespace Inertia.ORM
             Command = null;
         }
 
-        internal string GetQuery()
+        /// <summary>
+        /// Return the condition query as string
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
         {
-            var query = m_builder.ToString();
-            if (!query.StartsWith("WHERE BINARY "))
-                query = "WHERE BINARY " + query;
+            var query = string.Empty;
+
+            if (Length == 0) {
+                m_builder.Clear();
+            }
+            else {
+                PrivCloseBrackets(true);
+
+                query = m_builder.ToString();
+                if (!query.StartsWith("WHERE BINARY "))
+                    query = "WHERE BINARY " + query;
+            }
 
             if (m_limit >= 0)
                 query += " LIMIT " + m_limit;
 
             return query;
+        }
+
+        private ConditionBuilder PrivOpenBrackets(bool force, ConditionType type = ConditionType.And)
+        {
+            if (!force && m_bracketOpened)
+                CloseBrackets();
+
+            if (m_builder.Length > 0)
+                m_builder.Append(" " + type.ToString().ToUpper() + " ");
+
+            m_builder.Append("(");
+            if (!force)
+                m_bracketOpened = true;
+
+            return this;
+        }
+        private ConditionBuilder PrivCloseBrackets(bool force)
+        {
+            if (!force && !m_bracketOpened)
+                return this;
+
+            m_builder.Append(")");
+            if (!force)
+                m_bracketOpened = false;
+
+            return this;
         }
     }
 }

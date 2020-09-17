@@ -9,7 +9,6 @@ namespace Inertia.Internal
     internal enum QueryType
     {
         Delete,
-        DeleteWithAutoCondition,
         DeleteAll,
         Insert,
         Select,
