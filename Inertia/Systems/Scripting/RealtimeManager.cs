@@ -12,6 +12,7 @@ namespace Inertia.Internal
     {
         #region Events
 
+        internal static event BasicAction ScriptInTimeUpdate = () => { };
         private static event BasicAction Destroyer = () => {};
 
         #endregion
@@ -62,6 +63,7 @@ namespace Inertia.Internal
 
                     clock.Reset();
 
+                    ScriptInTimeUpdate();
                     ScriptExecutorLayer[] updaters = null;
 
                     try

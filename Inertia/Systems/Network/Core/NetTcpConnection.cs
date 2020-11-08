@@ -112,10 +112,7 @@ namespace Inertia.Network
         /// <param name="packet">Packet to send</param>
         public void Send(NetworkMessage packet)
         {
-            if (packet is NetworkMessage)
-                Send(NetworkProtocol.Protocol.OnParsePacket((NetworkMessage)packet));
-            else
-                Send(NetworkProtocol.Protocol.OnParsePacket(packet));
+            Send(NetworkProtocol.Protocol.OnParsePacket(packet));
         }
 
         /// <summary>

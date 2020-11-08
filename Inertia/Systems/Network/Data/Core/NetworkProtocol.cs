@@ -15,6 +15,11 @@ namespace Inertia.Network
     {
         #region Static
 
+        /// <summary>
+        /// Set to True if you want the packets to be executed as multithreaded, otherwise False
+        /// </summary>
+        public static bool MultiThreadedExecution { get; set; } = true;
+        
         internal static Dictionary<uint, Type> MessageTypes;
         internal static Dictionary<Type, NetworkMessageHookerRefs> MessageHookers;
         internal static NetworkProtocol Protocol { get; private set; } = DefaultNetworkProtocol.Instance;

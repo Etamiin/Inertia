@@ -84,7 +84,7 @@ namespace Inertia
         {
             if (Count == 0)
             {
-                Thread.Sleep(10);
+                Thread.Sleep(50);
                 return;
             }
 

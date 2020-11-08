@@ -668,6 +668,11 @@
             Represents the class for writing and reading network data
             </summary>
         </member>
+        <member name="P:Inertia.Network.NetworkProtocol.MultiThreadedExecution">
+            <summary>
+            Set to True if you want the packets to be executed as multithreaded, otherwise False
+            </summary>
+        </member>
         <member name="M:Inertia.Network.NetworkProtocol.SetProtocol(Inertia.Network.NetworkProtocol)">
             <summary>
             Set a custom protocol instance to be used by the system
@@ -949,6 +954,24 @@
             <summary>
             Dispose the current instance
             </summary>
+        </member>
+        <member name="T:Inertia.Realtime.ScriptInTime">
+            <summary>
+            Represent a class that offers scripting execution in specified time
+            </summary>
+        </member>
+        <member name="P:Inertia.Realtime.ScriptInTime.Permanent">
+            <summary>
+            Return true if the current <see cref="T:Inertia.Realtime.ScriptInTime"/> run permanently
+            </summary>
+        </member>
+        <member name="M:Inertia.Realtime.ScriptInTime.#ctor(System.Single,BasicAction,System.Boolean)">
+            <summary>
+            Instantiate a new instance of the class <see cref="T:Inertia.Realtime.ScriptInTime"/>
+            </summary>
+            <param name="time">Time between each execution</param>
+            <param name="action">Action to execute</param>
+            <param name="permanent">True if permanent execution</param>
         </member>
         <member name="T:Inertia.FlexDictionary`1">
             <summary>

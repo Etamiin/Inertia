@@ -144,10 +144,13 @@ namespace Inertia.Network
 
                         coreReader.Fill(data);
 
-                        var packet = (NetworkMessage)CreateInstance(MessageTypes[packetId]);
+                        var packet = CreateInstance(MessageTypes[packetId]);
                         packet.OnDeserialize(coreReader);
 
-                        m_queue.Enqueue(() => onPacketParsed(packet));
+                        if (MultiThreadedExecution)
+                            onPacketParsed(packet);
+                        else
+                            m_queue.Enqueue(() => onPacketParsed(packet));
                     }
                     else
                     {
@@ -162,7 +165,11 @@ namespace Inertia.Network
                         coreReader.Fill(data);
 
                         var parsedObj = Convert.ChangeType(obj, MessageTypes[obj.Id]);
-                        m_queue.Enqueue(() => onPacketParsed((NetworkMessage)parsedObj));
+
+                        if (MultiThreadedExecution)
+                            onPacketParsed((NetworkMessage)parsedObj);
+                        else
+                            m_queue.Enqueue(() => onPacketParsed((NetworkMessage)parsedObj));
                     }
 
                     coreReader.Dispose();

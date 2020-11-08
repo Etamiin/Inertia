@@ -58,11 +58,11 @@
     <Compile Include="Systems\Network\Core\NetUdpServer.cs" />
     <Compile Include="Systems\Network\Data\Abstract\NetClient.cs" />
     <Compile Include="Systems\Network\Data\Abstract\NetServer.cs" />
-    <Compile Include="Systems\Network\Data\Core\NetTcpConnection.cs" />
-    <Compile Include="Systems\Network\Data\NetworkMessage.cs" />
+    <Compile Include="Systems\Network\Core\NetTcpConnection.cs" />
+    <Compile Include="Systems\Network\Data\Core\NetworkMessage.cs" />
     <Compile Include="Systems\Network\Core\DefaultNetworkProtocol.cs" />
     <Compile Include="Systems\Network\Data\NetConnectionGroup.cs" />
-    <Compile Include="Systems\Network\Data\Core\NetUdpConnection.cs" />
+    <Compile Include="Systems\Network\Core\NetUdpConnection.cs" />
     <Compile Include="Systems\Network\Data\Core\NetworkProtocol.cs" />
     <Compile Include="Systems\Network\Data\NetworkMessageHookerRefs.cs" />
     <Compile Include="Systems\Network\Enums\NetworkDisconnectReason.cs" />
@@ -72,6 +72,7 @@
     <Compile Include="Systems\Scripting\Data\ScriptArgumentsCollection.cs" />
     <Compile Include="Systems\Scripting\Core\ScriptCollection.cs" />
     <Compile Include="Systems\Scripting\Data\ScriptExecutorLayer.cs" />
+    <Compile Include="Systems\Scripting\Extends\ScriptInTime.cs" />
     <Compile Include="Systems\Scripting\RealtimeManager.cs" />
     <Compile Include="Core\IO\FlexDictionary\FlexDictionary.cs" />
     <Compile Include="Core\IO\FlexDictionary\FlexDictionaryValue.cs" />

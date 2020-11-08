@@ -129,10 +129,7 @@ namespace Inertia.Network
             if (connection.IsDisposed)
                 throw new ObjectDisposedException(nameof(NetUdpConnection));
 
-            if (packet is NetworkMessage)
-                SendTo(connection.EndPoint, NetworkProtocol.Protocol.OnParsePacket((NetworkMessage)packet));
-            else
-                SendTo(connection.EndPoint, NetworkProtocol.Protocol.OnParsePacket(packet));
+            SendTo(connection.EndPoint, NetworkProtocol.Protocol.OnParsePacket(packet));
         }
 
         /// <summary>
