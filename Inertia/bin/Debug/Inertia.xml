@@ -30,16 +30,33 @@
             Represent the default class for displaying logs
             </summary>
         </member>
-        <member name="M:Inertia.BaseLogger.GetLogger``1">
+        <member name="P:Inertia.BaseLogger.MaxCacheCount">
             <summary>
-            Return the specified <typeparamref name="T"/> instance
+            Specify max saved log count (100 by default)
             </summary>
-            <typeparam name="T">The target <see cref="T:Inertia.BaseLogger"/> derivation class</typeparam>
-            <returns>The target logger instance</returns>
         </member>
-        <member name="P:Inertia.BaseLogger.DefaultLogger">
+        <member name="P:Inertia.BaseLogger.AutoSaveCacheOnMaxCount">
             <summary>
-            This is the default logger used in internal architecture for displaying logs, by default the class used is <see cref="T:Inertia.ConsoleLogger"/>
+            Specify if the <see cref="M:Inertia.BaseLogger.SaveCache"/> method is auto called when max cache capacity (<see cref="P:Inertia.BaseLogger.MaxCacheCount"/>) is reached
+            </summary>
+        </member>
+        <member name="M:Inertia.BaseLogger.SetDefaultLogger``1">
+            <summary>
+            Set the specified <see cref="T:Inertia.BaseLogger"/> logger used as default
+            </summary>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.BaseLogger.AddLoggerPattern(System.String,BasicAction{System.String})">
+            <summary>
+            Register a new log pattern that can be used for logs
+            </summary>
+            <param name="type">Pattern type</param>
+            <param name="onMessage"><see cref="T:BasicAction"/> to execute when a new log is create</param>
+        </member>
+        <member name="M:Inertia.BaseLogger.SaveCache">
+            <summary>
+            Manually save cache
             </summary>
         </member>
         <member name="M:Inertia.BaseLogger.#ctor">
@@ -52,16 +69,18 @@
             This method is called when the class is instantiated
             </summary>
         </member>
-        <member name="M:Inertia.BaseLogger.OnLog(System.String)">
-            <summary>
-            This method is called each time a new log is parsed
-            </summary>
-            <param name="parsedLog">The final parsed log</param>
-        </member>
         <member name="M:Inertia.BaseLogger.Log(System.Object,System.Object[])">
             <summary>
-            Create a new log
+            Call first pattern and use it to log (if exist)
             </summary>
+            <param name="log">The string content of the log</param>
+            <param name="parameters">The parameters used to parse the string content</param>
+        </member>
+        <member name="M:Inertia.BaseLogger.LogPattern(System.String,System.Object,System.Object[])">
+            <summary>
+            Call specified pattern and use it to log
+            </summary>
+            <param name="patternType">Pattern's type to use <see cref="M:Inertia.BaseLogger.AddLoggerPattern(System.String,BasicAction{System.String})"/></param>
             <param name="log">The string content of the log</param>
             <param name="parameters">The parameters used to parse the string content</param>
         </member>
@@ -70,49 +89,14 @@
             Represent the logger for the <see cref="T:System.Console"/>
             </summary>
         </member>
-        <member name="F:Inertia.ConsoleLogger.baseColor">
-            <summary>
-            The color used for basic log
-            </summary>
-        </member>
-        <member name="F:Inertia.ConsoleLogger.successColor">
-            <summary>
-            The color used for success log
-            </summary>
-        </member>
-        <member name="F:Inertia.ConsoleLogger.errorColor">
-            <summary>
-            The color used for error log
-            </summary>
-        </member>
         <member name="M:Inertia.ConsoleLogger.OnInitialized">
             <summary>
             Initialize the current instance of <see cref="T:Inertia.ConsoleLogger"/>
             </summary>
         </member>
-        <member name="M:Inertia.ConsoleLogger.OnLog(System.String)">
-            <summary>
-            Call <see cref="M:System.Console.WriteLine(System.String)"/> with parsed log and specific <see cref="T:System.ConsoleColor"/>
-            </summary>
-            <param name="parsedLog"></param>
-        </member>
-        <member name="M:Inertia.ConsoleLogger.Success(System.Object,System.Object[])">
-            <summary>
-            Create an "success" log using the <see cref="F:Inertia.ConsoleLogger.successColor"/>
-            </summary>
-            <param name="log">The string content of the log</param>
-            <param name="parameters">The parameters used to parse the string content</param>
-        </member>
-        <member name="M:Inertia.ConsoleLogger.Error(System.Object,System.Object[])">
-            <summary>
-            Create an "error" log using the <see cref="F:Inertia.ConsoleLogger.errorColor"/>
-            </summary>
-            <param name="log">The string content of the log</param>
-            <param name="parameters">The parameters used to parse the string content</param>
-        </member>
         <member name="T:Inertia.InertiaExtensions">
             <summary>
-            Contains all the framework extension
+            Contains all the library extension
             </summary>
         </member>
         <member name="M:Inertia.InertiaExtensions.Shuffle``1(System.Collections.Generic.IList{``0})">
@@ -135,6 +119,13 @@
             </summary>
             <param name="text">Target string</param>
             <param name="encoding">Target <see cref="T:System.Text.Encoding"/> algorithm to use</param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.InertiaExtensions.GetLogger(System.Object)">
+            <summary>
+            Get the current logger used (<see cref="P:Inertia.BaseLogger.DefaultLogger"/>)
+            </summary>
+            <param name="obj"></param>
             <returns></returns>
         </member>
         <member name="M:Inertia.InertiaExtensions.Compress(System.Byte[],System.Boolean@)">
@@ -200,14 +191,6 @@
             </summary>
             <param name="ip">Ip to use</param>
             <param name="port">Port to use</param>
-        </member>
-        <member name="M:Inertia.Network.NetTcpClient.#ctor(System.String,System.Int32,System.Int32)">
-            <summary>
-            Instantiate a new instance of the class <see cref="T:Inertia.Network.NetTcpClient"/>
-            </summary>
-            <param name="ip">Ip to use</param>
-            <param name="port">Port to use</param>
-            <param name="bufferLength">Buffer length to use</param>
         </member>
         <member name="M:Inertia.Network.NetTcpClient.Connect">
             <summary>
@@ -468,11 +451,6 @@
             Represents a TCP connection that is connected to a <see cref="T:Inertia.Network.NetTcpServer"/>
             </summary>
         </member>
-        <member name="F:Inertia.Network.NetTcpConnection.BufferLength">
-            <summary>
-            Buffer length used for each <see cref="T:Inertia.Network.NetTcpConnection"/> instance
-            </summary>
-        </member>
         <member name="P:Inertia.Network.NetTcpConnection.IsDisposed">
             <summary>
             Return true if the current instance is disposed
@@ -536,6 +514,21 @@
         <member name="P:Inertia.Network.DefaultNetworkProtocol.Instance">
             <summary>
             Get the instance of <see cref="T:Inertia.Network.DefaultNetworkProtocol"/> used
+            </summary>
+        </member>
+        <member name="P:Inertia.Network.DefaultNetworkProtocol.MultiThreadedExecution">
+            <summary>
+            Set to True if you want the packets to be executed as multithreaded, otherwise False
+            </summary>
+        </member>
+        <member name="F:Inertia.Network.DefaultNetworkProtocol.NetworkBufferLength">
+            <summary>
+            The network buffer length used for communications
+            </summary>
+        </member>
+        <member name="P:Inertia.Network.DefaultNetworkProtocol.ProtocolVersion">
+            <summary>
+            Represent the protocol version used by the current protocol
             </summary>
         </member>
         <member name="M:Inertia.Network.DefaultNetworkProtocol.OnParsePacket(Inertia.Network.NetworkMessage)">
@@ -668,11 +661,6 @@
             Represents the class for writing and reading network data
             </summary>
         </member>
-        <member name="P:Inertia.Network.NetworkProtocol.MultiThreadedExecution">
-            <summary>
-            Set to True if you want the packets to be executed as multithreaded, otherwise False
-            </summary>
-        </member>
         <member name="M:Inertia.Network.NetworkProtocol.SetProtocol(Inertia.Network.NetworkProtocol)">
             <summary>
             Set a custom protocol instance to be used by the system
@@ -699,12 +687,16 @@
             <param name="packetId">Id of the target <see cref="T:Inertia.Network.NetworkMessage"/></param>
             <returns></returns>
         </member>
-        <member name="M:Inertia.Network.NetworkProtocol.ExecuteHooker(Inertia.Network.NetworkMessage,System.Object)">
+        <member name="M:Inertia.Network.NetworkProtocol.GetHookerRefs(Inertia.Network.NetworkMessage)">
             <summary>
-            Execute a <see cref="T:Inertia.Network.NetworkMessageHooker"/> if exist
+            Get a <see cref="T:Inertia.Internal.NetworkMessageHookerRefs"/> if exist or null
             </summary>
             <param name="message"></param>
-            <param name="networkObj"></param>
+        </member>
+        <member name="P:Inertia.Network.NetworkProtocol.ProtocolVersion">
+            <summary>
+            Represent the protocol version used by the current protocol
+            </summary>
         </member>
         <member name="M:Inertia.Network.NetworkProtocol.#ctor">
             <summary>
@@ -766,6 +758,27 @@
             Connection failed
             </summary>
         </member>
+        <member name="T:Inertia.Network.UnknownMessageException">
+            <summary>
+            Thrown when using a <see cref="T:System.Type"/> that isn't a subclass of <see cref="T:Inertia.Network.NetworkMessage"/>
+            </summary>
+        </member>
+        <member name="P:Inertia.Network.UnknownMessageException.Message">
+            <summary>
+            Message of the exception
+            </summary>
+        </member>
+        <member name="F:Inertia.Network.UnknownMessageException.PacketId">
+            <summary>
+            Unknown received MessageID
+            </summary>
+        </member>
+        <member name="M:Inertia.Network.UnknownMessageException.#ctor(System.UInt32)">
+            <summary>
+            
+            </summary>
+            <param name="messageType"></param>
+        </member>
         <member name="T:Inertia.Network.HookerInvalidTypeException">
             <summary>
             Thrown when using a <see cref="T:System.Type"/> that isn't a subclass of <see cref="T:Inertia.Network.NetworkMessage"/>
@@ -807,6 +820,39 @@
             Instantiate a new instance of the class <see cref="T:Inertia.Network.UserDatagramDataLengthLimitException"/>
             </summary>
             <param name="length"></param>
+        </member>
+        <member name="T:Inertia.Internal.NetworkMessageHookerRefs">
+            <summary>
+            MessageHookers references
+            </summary>
+        </member>
+        <member name="M:Inertia.Internal.NetworkMessageHookerRefs.CallHookerRef(Inertia.Network.NetworkMessage,Inertia.Network.NetTcpClient)">
+            <summary>
+            Invoke a MessageHooker with the specified parameters
+            </summary>
+            <param name="message"></param>
+            <param name="client"></param>
+        </member>
+        <member name="M:Inertia.Internal.NetworkMessageHookerRefs.CallHookerRef(Inertia.Network.NetworkMessage,Inertia.Network.NetUdpClient)">
+            <summary>
+            Invoke a MessageHooker with the specified parameters
+            </summary>
+            <param name="message"></param>
+            <param name="client"></param>
+        </member>
+        <member name="M:Inertia.Internal.NetworkMessageHookerRefs.CallHookerRef(Inertia.Network.NetworkMessage,Inertia.Network.NetTcpConnection)">
+            <summary>
+            Invoke a MessageHooker with the specified parameters
+            </summary>
+            <param name="message"></param>
+            <param name="connection"></param>
+        </member>
+        <member name="M:Inertia.Internal.NetworkMessageHookerRefs.CallHookerRef(Inertia.Network.NetworkMessage,Inertia.Network.NetUdpConnection)">
+            <summary>
+            Invoke a MessageHooker with the specified parameters
+            </summary>
+            <param name="message"></param>
+            <param name="connection"></param>
         </member>
         <member name="T:Inertia.Realtime.Script">
             <summary>
@@ -1797,70 +1843,70 @@
             Dispose the current instance of the class
             </summary>
         </member>
-        <member name="T:Inertia.AutoQueue">
+        <member name="T:Inertia.AutoQueueExecutor">
             <summary>
             Queue actions and execute them automatically
             </summary>
         </member>
-        <member name="P:Inertia.AutoQueue.IsDisposed">
+        <member name="P:Inertia.AutoQueueExecutor.IsDisposed">
             <summary>
-            Return true if <see cref="M:Inertia.AutoQueue.Dispose"/> was called
+            Return true if <see cref="M:Inertia.AutoQueueExecutor.Dispose"/> was called
             </summary>
         </member>
-        <member name="P:Inertia.AutoQueue.Count">
+        <member name="P:Inertia.AutoQueueExecutor.Count">
             <summary>
             Return the number of actions currently queued
             </summary>
         </member>
-        <member name="M:Inertia.AutoQueue.#ctor">
+        <member name="M:Inertia.AutoQueueExecutor.#ctor">
             <summary>
             Create a new instance
             </summary>
         </member>
-        <member name="M:Inertia.AutoQueue.Enqueue(BasicAction[])">
+        <member name="M:Inertia.AutoQueueExecutor.Enqueue(BasicAction[])">
             <summary>
             Enqueue the specified actions at the end of the queue
             </summary>
             <param name="handlers">Actions to enqueue</param>
         </member>
-        <member name="M:Inertia.AutoQueue.Dispose">
+        <member name="M:Inertia.AutoQueueExecutor.Dispose">
             <summary>
             Dispose the current instance
             </summary>
         </member>
-        <member name="T:Inertia.ManualQueue">
+        <member name="T:Inertia.ManualQueueExecutor">
             <summary>
             Queue actions and execute them manually
             </summary>
         </member>
-        <member name="P:Inertia.ManualQueue.IsDisposed">
+        <member name="P:Inertia.ManualQueueExecutor.IsDisposed">
             <summary>
-            Return true if <see cref="M:Inertia.ManualQueue.Dispose"/> was called
+            Return true if <see cref="M:Inertia.ManualQueueExecutor.Dispose"/> was called
             </summary>
         </member>
-        <member name="P:Inertia.ManualQueue.Count">
+        <member name="P:Inertia.ManualQueueExecutor.Count">
             <summary>
             Return the number of actions currently queued
             </summary>
         </member>
-        <member name="M:Inertia.ManualQueue.#ctor">
+        <member name="M:Inertia.ManualQueueExecutor.#ctor">
             <summary>
             Create a new instance
             </summary>
         </member>
-        <member name="M:Inertia.ManualQueue.Enqueue(BasicAction[])">
+        <member name="M:Inertia.ManualQueueExecutor.Enqueue(BasicAction[])">
             <summary>
             Enqueue the specified actions at the end of the queue
             </summary>
             <param name="actions">Actions to enqueue</param>
             <returns>Return the current instance</returns>
         </member>
-        <member name="M:Inertia.ManualQueue.Execute">
+        <member name="M:Inertia.ManualQueueExecutor.Execute">
             <summary>
             Execute all the actions queued and remove them from the queue
             </summary>
         </member>
-        <member name="M:Inertia.ManualQueue.Dispose">
+        <member name="M:Inertia.ManualQueueExecutor.Dispose">
             <summary>
             Dispose the current instance
             </summary>
@@ -1943,11 +1989,23 @@
             </summary>
             <param name="filePath">File path to load</param>
         </member>
+        <member name="M:Inertia.Storage.DataStorage`1.Load(System.Byte[])">
+            <summary>
+            Load the target data in the current storage
+            </summary>
+            <param name="data">Data to load</param>
+        </member>
         <member name="M:Inertia.Storage.DataStorage`1.LoadAsync(System.String)">
             <summary>
             Load asynchronously the target file in the current storage
             </summary>
             <param name="filePath">File path to load</param>
+        </member>
+        <member name="M:Inertia.Storage.DataStorage`1.LoadAsync(System.Byte[])">
+            <summary>
+            Load asynchronously the target data in the current storage
+            </summary>
+            <param name="data">Data to load</param>
         </member>
         <member name="M:Inertia.Storage.DataStorage`1.Dispose">
             <summary>
@@ -2118,11 +2176,23 @@
             </summary>
             <param name="filePath">File path to load</param>
         </member>
+        <member name="M:Inertia.Storage.FileStorage.Load(System.Byte[])">
+            <summary>
+            Load the target data in the current storage
+            </summary>
+            <param name="data">Data to load</param>
+        </member>
         <member name="M:Inertia.Storage.FileStorage.LoadAsync(System.String)">
             <summary>
             Load asynchronously the target file in the current storage
             </summary>
             <param name="filePath">File path to load</param>
+        </member>
+        <member name="M:Inertia.Storage.FileStorage.LoadAsync(System.Byte[])">
+            <summary>
+            Load asynchronously the target data in the current storage
+            </summary>
+            <param name="data">Data to load</param>
         </member>
         <member name="M:Inertia.Storage.FileStorage.Dispose">
             <summary>
@@ -2179,6 +2249,18 @@
             Load asynchronously the target file in the current storage
             </summary>
             <param name="filePath">File path to load</param>
+        </member>
+        <member name="M:Inertia.Storage.IStorage.Load(System.Byte[])">
+            <summary>
+            Load the target data in the current storage
+            </summary>
+            <param name="data">Data to load</param>
+        </member>
+        <member name="M:Inertia.Storage.IStorage.LoadAsync(System.Byte[])">
+            <summary>
+            Load asynchronously the target data in the current storage
+            </summary>
+            <param name="data">Data to load</param>
         </member>
         <member name="T:Inertia.InvalidPasswordException">
             <summary>

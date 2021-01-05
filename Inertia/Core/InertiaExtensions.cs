@@ -6,7 +6,7 @@ using Inertia.Internal;
 namespace Inertia
 {
     /// <summary>
-    /// Contains all the framework extension
+    /// Contains all the library extension
     /// </summary>
     public static class InertiaExtensions
     {
@@ -50,6 +50,16 @@ namespace Inertia
         {
             var data = encoding.GetBytes(text);
             return InertiaIO.GetSHA256(data);
+        }
+
+        /// <summary>
+        /// Get the current logger used (<see cref="BaseLogger.DefaultLogger"/>)
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public static BaseLogger GetLogger(this object obj)
+        {
+            return BaseLogger.DefaultLogger;
         }
 
         #endregion

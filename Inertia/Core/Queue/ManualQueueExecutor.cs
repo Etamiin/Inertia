@@ -9,7 +9,7 @@ namespace Inertia
     /// <summary>
     /// Queue actions and execute them manually
     /// </summary>
-    public class ManualQueue : IDisposable
+    public class ManualQueueExecutor : IDisposable
     {
         #region Events
 
@@ -35,7 +35,7 @@ namespace Inertia
         /// <summary>
         /// Create a new instance
         /// </summary>
-        public ManualQueue()
+        public ManualQueueExecutor()
         {
         }
 
@@ -46,10 +46,10 @@ namespace Inertia
         /// </summary>
         /// <param name="actions">Actions to enqueue</param>
         /// <returns>Return the current instance</returns>
-        public ManualQueue Enqueue(params BasicAction[] actions)
+        public ManualQueueExecutor Enqueue(params BasicAction[] actions)
         {
             if (IsDisposed)
-                throw new ObjectDisposedException(nameof(ManualQueue));
+                throw new ObjectDisposedException(nameof(ManualQueueExecutor));
 
             foreach (var action in actions)
             {
@@ -59,7 +59,7 @@ namespace Inertia
                     {
                         action();
                     }
-                    catch (Exception ex) { BaseLogger.DefaultLogger.Log(ex); }
+                    catch (Exception ex) { this.GetLogger().Log(ex); }
 
                     QueueExecutor -= handler;
                     Count--;
@@ -78,7 +78,7 @@ namespace Inertia
         public void Execute()
         {
             if (IsDisposed)
-                throw new ObjectDisposedException(nameof(ManualQueue));
+                throw new ObjectDisposedException(nameof(ManualQueueExecutor));
 
             lock (QueueExecutor)
                 QueueExecutor();

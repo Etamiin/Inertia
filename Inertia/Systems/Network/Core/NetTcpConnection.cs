@@ -12,15 +12,6 @@ namespace Inertia.Network
     /// </summary>
     public class NetTcpConnection : IDisposable
     {
-        #region Static variables
-
-        /// <summary>
-        /// Buffer length used for each <see cref="NetTcpConnection"/> instance
-        /// </summary>
-        public static int BufferLength = 8192;
-
-        #endregion
-
         #region Events
 
         internal event NetworkDisconnectHandler Disconnected = (reason) => { };
@@ -36,13 +27,7 @@ namespace Inertia.Network
         /// <summary>
         /// Return true if the current instance is connected
         /// </summary>
-        public bool IsConnected
-        {
-            get
-            {
-                return m_socket != null && m_socket.Connected;
-            }
-        }
+        public bool IsConnected => m_socket != null && m_socket.Connected;
 
         #endregion
 
@@ -59,7 +44,7 @@ namespace Inertia.Network
         internal NetTcpConnection(Socket socket)
         {
             m_socket = socket;
-            m_buffer = new byte[BufferLength];
+            m_buffer = new byte[DefaultNetworkProtocol.NetworkBufferLength];
             m_reader = new BasicReader();
             m_socket.BeginReceive(m_buffer, 0, m_buffer.Length, SocketFlags.None, new AsyncCallback(OnReceiveData), m_socket);
         }

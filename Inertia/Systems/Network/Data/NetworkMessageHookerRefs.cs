@@ -9,14 +9,25 @@ using Inertia.Network;
 
 namespace Inertia.Internal
 {
-    internal class NetworkMessageHookerRefs
+    /// <summary>
+    /// MessageHookers references
+    /// </summary>
+    public class NetworkMessageHookerRefs
     {
-        public event BasicAction<NetworkMessage, NetTcpClient> TcpClientHook = (msg, cl) => { };
-        public event BasicAction<NetworkMessage, NetUdpClient> UdpClientHook = (msg, cl) => { };
-        public event BasicAction<NetworkMessage, NetTcpConnection> TcpConnectionHook = (msg, conn) => { };
-        public event BasicAction<NetworkMessage, NetUdpConnection> UdpConnectionHook = (msg, conn) => { };
-    
-        public void RegisterRef(MethodInfo method, Type networkParamType)
+        internal event BasicAction<NetworkMessage, NetTcpClient> TcpClientHook = (msg, cl) => { };
+        internal event BasicAction<NetworkMessage, NetUdpClient> UdpClientHook = (msg, cl) => { };
+        internal event BasicAction<NetworkMessage, NetTcpConnection> TcpConnectionHook = (msg, conn) => { };
+        internal event BasicAction<NetworkMessage, NetUdpConnection> UdpConnectionHook = (msg, conn) => { };
+
+        #region Constructors
+
+        internal NetworkMessageHookerRefs()
+        {
+        }
+
+        #endregion
+
+        internal void RegisterRef(MethodInfo method, Type networkParamType)
         {
             if (networkParamType == typeof(NetTcpClient))
                 TcpClientHook += (msg, client) => method.Invoke(null, new object[] { msg, client });
@@ -28,19 +39,39 @@ namespace Inertia.Internal
                 UdpConnectionHook += (msg, conn) => method.Invoke(null, new object[] { msg, conn });
         }
 
-        public void CallRef(NetworkMessage message, NetTcpClient client)
+        /// <summary>
+        /// Invoke a MessageHooker with the specified parameters
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="client"></param>
+        public void CallHookerRef(NetworkMessage message, NetTcpClient client)
         {
             TcpClientHook(message, client);
         }
-        public void CallRef(NetworkMessage message, NetUdpClient client)
+        /// <summary>
+        /// Invoke a MessageHooker with the specified parameters
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="client"></param>
+        public void CallHookerRef(NetworkMessage message, NetUdpClient client)
         {
             UdpClientHook(message, client);
         }
-        public void CallRef(NetworkMessage message, NetTcpConnection connection)
+        /// <summary>
+        /// Invoke a MessageHooker with the specified parameters
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="connection"></param>
+        public void CallHookerRef(NetworkMessage message, NetTcpConnection connection)
         {
             TcpConnectionHook(message, connection);
         }
-        public void CallRef(NetworkMessage message, NetUdpConnection connection)
+        /// <summary>
+        /// Invoke a MessageHooker with the specified parameters
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="connection"></param>
+        public void CallHookerRef(NetworkMessage message, NetUdpConnection connection)
         {
             UdpConnectionHook(message, connection);
         }

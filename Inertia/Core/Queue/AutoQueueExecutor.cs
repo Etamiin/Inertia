@@ -10,7 +10,7 @@ namespace Inertia
     /// <summary>
     /// Queue actions and execute them automatically
     /// </summary>
-    public class AutoQueue : IDisposable
+    public class AutoQueueExecutor : IDisposable
     {
         #region Public variables
 
@@ -43,7 +43,7 @@ namespace Inertia
         /// <summary>
         /// Create a new instance
         /// </summary>
-        public AutoQueue()
+        public AutoQueueExecutor()
         {
             m_queue = new List<BasicAction>();;
 
@@ -64,7 +64,7 @@ namespace Inertia
         public void Enqueue(params BasicAction[] handlers)
         {
             if (IsDisposed)
-                throw new ObjectDisposedException(nameof(AutoQueue));
+                throw new ObjectDisposedException(nameof(AutoQueueExecutor));
 
             foreach (var handler in handlers)
                 m_queue.Add(handler);
@@ -97,7 +97,7 @@ namespace Inertia
                     {
                         action();
                     }
-                    catch (Exception ex) { BaseLogger.DefaultLogger.Log(ex); }
+                    catch (Exception ex) { this.GetLogger().Log(ex); }
                 }
 
                 m_queue.Clear();

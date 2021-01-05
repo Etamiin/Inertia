@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Reflection;
+using System.IO;
 
 namespace Inertia
 {
@@ -13,28 +14,63 @@ namespace Inertia
     public abstract class BaseLogger
     {
         /// <summary>
-        /// Return the specified <typeparamref name="T"/> instance
+        /// Specify max saved log count (100 by default)
         /// </summary>
-        /// <typeparam name="T">The target <see cref="BaseLogger"/> derivation class</typeparam>
-        /// <returns>The target logger instance</returns>
-        public static T GetLogger<T>() where T : BaseLogger
-        {
-            var cs = typeof(T).GetConstructors();
-
-            return (T)cs[0].Invoke(new object[] { });
-        }
-
-        #region Public variables
+        public static int MaxCacheCount { get; set; } = 100;
+        /// <summary>
+        /// Specify if the <see cref="SaveCache"/> method is auto called when max cache capacity (<see cref="MaxCacheCount"/>) is reached
+        /// </summary>
+        public static bool AutoSaveCacheOnMaxCount { get; set; } = true;
 
         /// <summary>
-        /// This is the default logger used in internal architecture for displaying logs, by default the class used is <see cref="ConsoleLogger"/>
+        /// Set the specified <see cref="BaseLogger"/> logger used as default
         /// </summary>
-        public static BaseLogger DefaultLogger
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static T SetDefaultLogger<T>() where T : BaseLogger
+        {
+            var constrs = typeof(T).GetConstructors(BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic);
+            return (T)constrs[0].Invoke(new object[] { });
+        }
+        /// <summary>
+        /// Register a new log pattern that can be used for logs
+        /// </summary>
+        /// <param name="type">Pattern type</param>
+        /// <param name="onMessage"><see cref="BasicAction"/> to execute when a new log is create</param>
+        public static void AddLoggerPattern(string type, BasicAction<string> onMessage)
+        {
+            if (m_patterns == null)
+                m_patterns = new Dictionary<string, BasicAction<string>>();
+
+            if (m_patterns.ContainsKey(type))
+                m_patterns[type] = onMessage;
+            else
+                m_patterns.Add(type, onMessage);
+        }
+        /// <summary>
+        /// Manually save cache
+        /// </summary>
+        public static void SaveCache()
+        {
+            if (m_cache == null)
+                return;
+
+            lock (m_cache)
+            {
+                var date = DateTime.Now;
+                var name = date.Day + "." + date.Month + "." + date.Year + ".log";
+
+                File.AppendAllLines(name, m_cache.ToArray());
+                m_cache.Clear();
+            }
+        }
+
+        internal static BaseLogger DefaultLogger
         {
             get
             {
                 if (m_defaultLogger == null)
-                    m_defaultLogger = GetLogger<ConsoleLogger>();
+                    m_defaultLogger = SetDefaultLogger<ConsoleLogger>();
 
                 return m_defaultLogger;
             }
@@ -43,12 +79,13 @@ namespace Inertia
                 m_defaultLogger = value;
             }
         }
-
-        #endregion
+        private static Dictionary<string, BasicAction<string>> m_patterns;
 
         #region Private variables
 
+        private static List<string> m_cache;
         private static BaseLogger m_defaultLogger;
+        private static AutoQueueExecutor m_loggerQueue;
 
         #endregion
 
@@ -59,6 +96,11 @@ namespace Inertia
         /// </summary>
         public BaseLogger()
         {
+            if (m_patterns == null)
+                m_patterns = new Dictionary<string, BasicAction<string>>();
+            if (m_loggerQueue == null)
+                m_loggerQueue = new AutoQueueExecutor();
+
             OnInitialized();
         }
 
@@ -68,53 +110,57 @@ namespace Inertia
         /// This method is called when the class is instantiated
         /// </summary>
         protected virtual void OnInitialized() { }
-        /// <summary>
-        /// This method is called each time a new log is parsed
-        /// </summary>
-        /// <param name="parsedLog">The final parsed log</param>
-        protected abstract void OnLog(string parsedLog);
 
         /// <summary>
-        /// Create a new log
+        /// Call first pattern and use it to log (if exist)
         /// </summary>
         /// <param name="log">The string content of the log</param>
         /// <param name="parameters">The parameters used to parse the string content</param>
         public void Log(object log, params object[] parameters)
         {
-            var parsedLog = log.ToString();
-
-            if (log.GetType().IsArray)
-                parsedLog = ParseArray((Array)log);
-
-            for (var i = 0; i < parameters.Length; i++)
+            if (m_patterns.Count > 0)
             {
-                var identifier = "{" + i + "}";
+                m_loggerQueue.Enqueue(() => {
+                    var cache = string.Format(log.ToString(), parameters);
 
-                if (parameters[i].GetType().IsArray) {
-                    var array = (Array)parameters[i];
-                    parsedLog = parsedLog.Replace(identifier, ParseArray(array));
-
-                    continue;
-                }
-
-                parsedLog = parsedLog.Replace(identifier, parameters[i].ToString());
+                    m_patterns.Values.ElementAt(0).Invoke(cache);
+                    AddInCache(cache);
+                });
             }
+        }
+        /// <summary>
+        /// Call specified pattern and use it to log
+        /// </summary>
+        /// <param name="patternType">Pattern's type to use <see cref="AddLoggerPattern(string, BasicAction{string})"/></param>
+        /// <param name="log">The string content of the log</param>
+        /// <param name="parameters">The parameters used to parse the string content</param>
+        public void LogPattern(string patternType, object log, params object[] parameters)
+        {
+            if (m_patterns.TryGetValue(patternType, out BasicAction<string> onMessage))
+            {
+                m_loggerQueue.Enqueue(() => {
+                    var cache = string.Format(log.ToString(), parameters);
 
-            OnLog(parsedLog);
+                    onMessage(cache);
+                    AddInCache(cache);
+                });
+            }
         }
 
-        private string ParseArray(Array array)
+        private static void AddInCache(string log)
         {
-            var parsedArray = "[";
+            if (m_cache == null)
+                m_cache = new List<string>(MaxCacheCount);
 
-            for (var j = 0; j < array.Length; j++)
+            if (m_cache.Count == m_cache.Capacity)
             {
-                parsedArray += array.GetValue(j).ToString();
-                if (j < array.Length - 1)
-                    parsedArray += ", ";
+                if (AutoSaveCacheOnMaxCount)
+                    SaveCache();
+                else
+                    m_cache.Clear();
             }
 
-            return parsedArray + "]";
+            m_cache.Add(log);
         }
     }
 }

@@ -142,6 +142,14 @@ namespace Inertia.Storage
             Deserialize(AutoCompression, File.ReadAllBytes(filePath), (progression) => LoadProgress(progression));
         }
         /// <summary>
+        /// Load the target data in the current storage
+        /// </summary>
+        /// <param name="data">Data to load</param>
+        public void Load(byte[] data)
+        {
+            Deserialize(AutoCompression, data, (progression) => LoadProgress(progression));
+        }
+        /// <summary>
         /// Load asynchronously the target file in the current storage
         /// </summary>
         /// <param name="filePath">File path to load</param>
@@ -149,7 +157,15 @@ namespace Inertia.Storage
         {
             StartAsync(() => Load(filePath), Loaded, (ex) => LoadFailed(ex));
         }
-    
+        /// <summary>
+        /// Load asynchronously the target data in the current storage
+        /// </summary>
+        /// <param name="data">Data to load</param>
+        public void LoadAsync(byte[] data)
+        {
+            StartAsync(() => Load(data), Loaded, (ex) => LoadFailed(ex));
+        }
+
         /// <summary>
         /// Dispose the current instance
         /// </summary>

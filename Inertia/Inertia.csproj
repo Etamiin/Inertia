@@ -66,6 +66,7 @@
     <Compile Include="Systems\Network\Data\Core\NetworkProtocol.cs" />
     <Compile Include="Systems\Network\Data\NetworkMessageHookerRefs.cs" />
     <Compile Include="Systems\Network\Enums\NetworkDisconnectReason.cs" />
+    <Compile Include="Systems\Network\Exceptions\UnknownMessageException.cs" />
     <Compile Include="Systems\Network\Exceptions\HookerInvalidTypeException.cs" />
     <Compile Include="Systems\Network\Exceptions\UserDatagramDataLengthLimitException.cs" />
     <Compile Include="Systems\Scripting\Core\Script.cs" />
@@ -84,8 +85,8 @@
     <Compile Include="Systems\Command\TextCommandArgs.cs" />
     <Compile Include="Systems\Command\TextCommand.cs" />
     <Compile Include="Core\Tools\Clock.cs" />
-    <Compile Include="Core\Queue\AutoQueue.cs" />
-    <Compile Include="Core\Queue\ManualQueue.cs" />
+    <Compile Include="Core\Queue\AutoQueueExecutor.cs" />
+    <Compile Include="Core\Queue\ManualQueueExecutor.cs" />
     <Compile Include="Systems\Storage\Core\DataStorage.cs" />
     <Compile Include="Systems\Storage\Core\FileStorage.cs" />
     <Compile Include="Systems\Storage\Data\FileStorageData.cs" />

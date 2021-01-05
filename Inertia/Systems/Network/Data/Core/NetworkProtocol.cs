@@ -15,14 +15,9 @@ namespace Inertia.Network
     {
         #region Static
 
-        /// <summary>
-        /// Set to True if you want the packets to be executed as multithreaded, otherwise False
-        /// </summary>
-        public static bool MultiThreadedExecution { get; set; } = true;
-        
         internal static Dictionary<uint, Type> MessageTypes;
         internal static Dictionary<Type, NetworkMessageHookerRefs> MessageHookers;
-        internal static NetworkProtocol Protocol { get; private set; } = DefaultNetworkProtocol.Instance;
+        internal static NetworkProtocol Protocol = DefaultNetworkProtocol.Instance;
         
         /// <summary>
         /// Set a custom protocol instance to be used by the system
@@ -73,33 +68,26 @@ namespace Inertia.Network
         }
 
         /// <summary>
-        /// Execute a <see cref="NetworkMessageHooker"/> if exist
+        /// Get a <see cref="NetworkMessageHookerRefs"/> if exist or null
         /// </summary>
         /// <param name="message"></param>
-        /// <param name="networkObj"></param>
-        public static bool ExecuteHooker(NetworkMessage message, object networkObj)
+        public static NetworkMessageHookerRefs GetHookerRefs(NetworkMessage message)
         {
-            if (MessageHookers.TryGetValue(message.GetType(), out NetworkMessageHookerRefs refs))
-            {
-                try
-                {
-                    if (networkObj is NetTcpClient)
-                        refs.CallRef(message, networkObj as NetTcpClient);
-                    else if (networkObj is NetUdpClient)
-                        refs.CallRef(message, networkObj as NetUdpClient);
-                    else if (networkObj is NetTcpConnection)
-                        refs.CallRef(message, networkObj as NetTcpConnection);
-                    else if (networkObj is NetUdpConnection)
-                        refs.CallRef(message, networkObj as NetUdpConnection);
-                }
-                catch { }
-            }
-
-            return false;
+            MessageHookers.TryGetValue(message.GetType(), out NetworkMessageHookerRefs refs);
+            return refs;
         }
 
         #endregion
+
+        #region Public variables
         
+        /// <summary>
+        /// Represent the protocol version used by the current protocol
+        /// </summary>
+        public abstract ushort ProtocolVersion { get; }
+
+        #endregion
+
         #region Constructors
 
         /// <summary>

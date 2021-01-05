@@ -43,18 +43,9 @@ namespace Inertia.Network
         /// </summary>
         /// <param name="ip">Ip to use</param>
         /// <param name="port">Port to use</param>
-        public NetTcpClient(string ip, int port) : this(ip, port, 8192)
+        public NetTcpClient(string ip, int port) : base(ip, port)
         {
-        }
-        /// <summary>
-        /// Instantiate a new instance of the class <see cref="NetTcpClient"/>
-        /// </summary>
-        /// <param name="ip">Ip to use</param>
-        /// <param name="port">Port to use</param>
-        /// <param name="bufferLength">Buffer length to use</param>
-        public NetTcpClient(string ip, int port, int bufferLength) : base(ip, port)
-        {
-            m_buffer = new byte[bufferLength];
+            m_buffer = new byte[DefaultNetworkProtocol.NetworkBufferLength];
             m_reader = new BasicReader();
         }
 

@@ -323,7 +323,15 @@ namespace Inertia.Storage
             LoadedPath = filePath;
             m_files.Clear();
 
-            var reader = new BasicReader(File.ReadAllBytes(filePath));
+            Load(File.ReadAllBytes(filePath));
+        }
+        /// <summary>
+        /// Load the target data in the current storage
+        /// </summary>
+        /// <param name="data">Data to load</param>
+        public void Load(byte[] data)
+        {
+            var reader = new BasicReader(data);
             var count = reader.GetInt();
             var progression = new StorageProgressionEventArgs(count);
 
@@ -337,8 +345,8 @@ namespace Inertia.Storage
 
                 reader.Position += length;
 
-                var data = new FileStorageData(this, key, compressed, realLength, length, startPosition);
-                m_files.Add(data.Key, data);
+                var storageData = new FileStorageData(this, key, compressed, realLength, length, startPosition);
+                m_files.Add(storageData.Key, storageData);
                 LoadProgress(progression.Progress());
 
                 GC.Collect();
@@ -353,6 +361,14 @@ namespace Inertia.Storage
         public void LoadAsync(string filePath)
         {
             StartAsync(() => Load(filePath), Loaded, (ex) => LoadFailed(ex));
+        }
+        /// <summary>
+        /// Load asynchronously the target data in the current storage
+        /// </summary>
+        /// <param name="data">Data to load</param>
+        public void LoadAsync(byte[] data)
+        {
+            StartAsync(() => Load(data), Loaded, (ex) => LoadFailed(ex));
         }
 
         /// <summary>

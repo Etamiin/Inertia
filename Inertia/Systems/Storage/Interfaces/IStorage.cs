@@ -33,5 +33,15 @@ namespace Inertia.Storage
         /// </summary>
         /// <param name="filePath">File path to load</param>
         void LoadAsync(string filePath);
+        /// <summary>
+        /// Load the target data in the current storage
+        /// </summary>
+        /// <param name="data">Data to load</param>
+        void Load(byte[] data);
+        /// <summary>
+        /// Load asynchronously the target data in the current storage
+        /// </summary>
+        /// <param name="data">Data to load</param>
+        void LoadAsync(byte[] data);
     }
 }

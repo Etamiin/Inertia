@@ -13,24 +13,19 @@ namespace Inertia
     {
         #region Public variables
 
-        /// <summary>
-        /// The color used for basic log
-        /// </summary>
-        public ConsoleColor baseColor;
-        /// <summary>
-        /// The color used for success log
-        /// </summary>
-        public ConsoleColor successColor;
-        /// <summary>
-        /// The color used for error log
-        /// </summary>
-        public ConsoleColor errorColor;
+
+        private ConsoleColor BaseColor;
+        private ConsoleColor SuccessColor;
+        private ConsoleColor WarnColor;
+        private ConsoleColor ErrorColor;
 
         #endregion
 
-        #region Private variables
+        #region Constructors
 
-        private ConsoleColor m_currentColor;
+        internal ConsoleLogger()
+        {
+        }
 
         #endregion
 
@@ -39,43 +34,21 @@ namespace Inertia
         /// </summary>
         protected override void OnInitialized()
         {
-            baseColor = ConsoleColor.Yellow;
-            errorColor = ConsoleColor.Red;
-            successColor = ConsoleColor.Green;
+            BaseColor = ConsoleColor.White;
+            SuccessColor = ConsoleColor.Green;
+            WarnColor = ConsoleColor.DarkYellow;
+            ErrorColor = ConsoleColor.Red;
 
-            m_currentColor = baseColor;
-        }
-        /// <summary>
-        /// Call <see cref="Console.WriteLine(string)"/> with parsed log and specific <see cref="ConsoleColor"/>
-        /// </summary>
-        /// <param name="parsedLog"></param>
-        protected override void OnLog(string parsedLog)
-        {
-            Console.ForegroundColor = m_currentColor;
-            Console.WriteLine(parsedLog);
+            AddLoggerPattern("LOG", (log) => BaseLog("LOG", log, this.BaseColor));
+            AddLoggerPattern("OK", (log) => BaseLog("OK", log, this.SuccessColor));
+            AddLoggerPattern("WARN", (log) => BaseLog("WARN", log, this.WarnColor));
+            AddLoggerPattern("ERROR", (log) => BaseLog("ERROR", log, this.ErrorColor));
         }
 
-        /// <summary>
-        /// Create an "success" log using the <see cref="successColor"/>
-        /// </summary>
-        /// <param name="log">The string content of the log</param>
-        /// <param name="parameters">The parameters used to parse the string content</param>
-        public void Success(object log, params object[] parameters)
+        private void BaseLog(string type, string log, ConsoleColor color)
         {
-            m_currentColor = successColor;
-            base.Log(log, parameters);
-            m_currentColor = baseColor;
-        }
-        /// <summary>
-        /// Create an "error" log using the <see cref="errorColor"/>
-        /// </summary>
-        /// <param name="log">The string content of the log</param>
-        /// <param name="parameters">The parameters used to parse the string content</param>
-        public void Error(object log, params object[] parameters)
-        {
-            m_currentColor = errorColor;
-            this.Log(log, parameters);
-            m_currentColor = baseColor;
+            Console.ForegroundColor = color;
+            Console.WriteLine(string.Format("[{0}]: {1}", type, log));
         }
     }
 }
