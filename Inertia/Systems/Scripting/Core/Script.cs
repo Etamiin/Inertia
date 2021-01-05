@@ -38,6 +38,7 @@ namespace Inertia.Realtime
 
         internal ScriptExecutorLayer ExecutorLayer;
         internal ScriptCollection Collection;
+        internal bool IsDisposed { get; private set; }
 
         #endregion
 
@@ -76,7 +77,7 @@ namespace Inertia.Realtime
         /// Occurs when the script initializes
         /// </summary>
         /// <param name="args">The arguments passed to the script initialization</param>
-        protected abstract void OnAwake(ScriptArgumentsCollection args);
+        protected virtual void OnAwake(ScriptArgumentsCollection args) { }
         /// <summary>
         /// Occurs when the script is updated (each frame)
         /// </summary>
@@ -98,9 +99,10 @@ namespace Inertia.Realtime
         /// </summary>
         public void Dispose()
         {
-            if (IsDestroyed)
+            if (IsDestroyed || IsDisposed)
                 return;
 
+            IsDisposed = true;
             RealtimeManager.OnScriptDestroyed(this);
         }
     }

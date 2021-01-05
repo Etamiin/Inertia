@@ -29,26 +29,7 @@ namespace Inertia
             if (Initializated)
                 return;
 
-            m_commands = new Dictionary<string, TextCommand>();
-
-            var Assemblys = AppDomain.CurrentDomain.GetAssemblies();
-            foreach (var assembly in Assemblys)
-            {
-                var types = assembly.GetTypes();
-                foreach (var type in types)
-                {
-                    if (type.IsClass)
-                    {
-                        if (type.IsSubclassOf(typeof(TextCommand)) && !type.IsAbstract)
-                        {
-                            var inertiaCommand = (TextCommand)type.GetConstructor(Type.EmptyTypes).Invoke(new object[] { });
-                            if (m_commands.ContainsKey(inertiaCommand.Name))
-                                continue;
-                            m_commands.Add(inertiaCommand.Name, inertiaCommand);
-                        }
-                    }
-                }
-            }
+            m_commands = PluginManager.LoadCommands();
         }
 
         /// <summary>

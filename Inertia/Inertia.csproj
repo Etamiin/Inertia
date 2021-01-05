@@ -47,6 +47,8 @@
   <ItemGroup>
     <Compile Include="Core\IO\Exceptions\TypeNonSerializableException.cs" />
     <Compile Include="Core\PathExtensions.cs" />
+    <Compile Include="Core\Plugins\InertiaPlugin.cs" />
+    <Compile Include="Core\Plugins\PluginManager.cs" />
     <Compile Include="Core\Tools\BaseLogger.cs" />
     <Compile Include="Core\Tools\ConsoleLogger.cs" />
     <Compile Include="InertiaDelegates.cs" />

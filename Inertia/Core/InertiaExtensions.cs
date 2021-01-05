@@ -19,15 +19,15 @@ namespace Inertia
         /// <param name="collection">List to shuffle</param>
         public static void Shuffle<T>(this IList<T> collection)
         {
-            var idStart = 0;
-            T valueSave;
+            var iStart = 0;
+            T valueSaved;
 
-            while (idStart < collection.Count - 1)
+            while (iStart < collection.Count - 1)
             {
-                int idRand = InertiaIO.m_rand.Next(idStart, collection.Count);
-                valueSave = collection[idStart];
-                collection[idStart++] = collection[idRand];
-                collection[idRand] = valueSave;
+                int iRand = InertiaIO.m_rand.Next(iStart, collection.Count);
+                valueSaved = collection[iStart];
+                collection[iStart++] = collection[iRand];
+                collection[iRand] = valueSaved;
             }
         }
 

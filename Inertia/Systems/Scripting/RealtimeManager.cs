@@ -117,7 +117,12 @@ namespace Inertia.Internal
         internal static void OnScriptPreDestroyed(Script script)
         {
             Destroyer -= script.PreDestroy;
-            script.Collection.Remove(script);
+            script.Collection.FinalRemove(script);
+        }
+        internal static void OnRegisterExtends(ScriptInTime sit)
+        {
+            if (!m_isInitialized)
+                Initialize();
         }
     }
 }

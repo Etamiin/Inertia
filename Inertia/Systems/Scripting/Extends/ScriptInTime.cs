@@ -34,7 +34,8 @@ namespace Inertia.Realtime
             m_time = time;
             Permanent = permanent;
 
-            RealtimeManager.ScriptInTimeUpdate  += Update;
+            RealtimeManager.ScriptInTimeUpdate += Update;
+            RealtimeManager.OnRegisterExtends(this);
         }
 
         private void Update()

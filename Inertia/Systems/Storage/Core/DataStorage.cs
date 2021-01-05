@@ -127,7 +127,7 @@ namespace Inertia.Storage
         /// <param name="fileName">Target file name</param>
         public void SaveAsync(string folderPath, string fileName)
         {
-            StartAsync(() => Save(folderPath, fileName), Saved, (ex) => SaveFailed(ex));
+            DoJobAsync(() => Save(folderPath, fileName), Saved, (ex) => SaveFailed(ex));
         }
         /// <summary>
         /// Load the target file in the current storage
@@ -155,7 +155,7 @@ namespace Inertia.Storage
         /// <param name="filePath">File path to load</param>
         public void LoadAsync(string filePath)
         {
-            StartAsync(() => Load(filePath), Loaded, (ex) => LoadFailed(ex));
+            DoJobAsync(() => Load(filePath), Loaded, (ex) => LoadFailed(ex));
         }
         /// <summary>
         /// Load asynchronously the target data in the current storage
@@ -163,7 +163,7 @@ namespace Inertia.Storage
         /// <param name="data">Data to load</param>
         public void LoadAsync(byte[] data)
         {
-            StartAsync(() => Load(data), Loaded, (ex) => LoadFailed(ex));
+            DoJobAsync(() => Load(data), Loaded, (ex) => LoadFailed(ex));
         }
 
         /// <summary>
@@ -180,7 +180,7 @@ namespace Inertia.Storage
             LoadFailed = null;
         }
 
-        private void StartAsync(BasicAction asyncAction, BasicAction successCallback, BasicAction<Exception> failedCallback)
+        private void DoJobAsync(BasicAction asyncAction, BasicAction successCallback, BasicAction<Exception> failedCallback)
         {
             Task.Factory.StartNew(() => {
                 try

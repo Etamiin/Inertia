@@ -74,15 +74,6 @@ namespace Inertia
         }
 
         /// <summary>
-        /// Get the SHA256 key representation of the specified string data
-        /// </summary>
-        /// <param name="content">Target string data</param>
-        /// <returns>The SHA256 representation</returns>
-        public static string GetSHA256(string content)
-        {
-            return GetSHA256(Encoding.UTF8.GetBytes(content));
-        }
-        /// <summary>
         /// Get the SHA256 key representation of the specified byte array data
         /// </summary>
         /// <param name="data">Target byte array data</param>
@@ -139,12 +130,12 @@ namespace Inertia
         /// <returns>Compressed byte array</returns>
         public static byte[] Compress(byte[] data, out bool compressed)
         {
-            using (var cms = new MemoryStream())
+            using (var ms = new MemoryStream())
             {
-                using (var gzs = new BufferedStream(new GZipStream(cms, CompressionMode.Compress)))
-                    gzs.Write(data, 0, data.Length);
+                using (var gzip = new BufferedStream(new GZipStream(ms, CompressionMode.Compress)))
+                    gzip.Write(data, 0, data.Length);
 
-                var compressedData = cms.ToArray();
+                var compressedData = ms.ToArray();
 
                 compressed = compressedData.Length < data.Length;
                 return compressedData;
@@ -159,12 +150,12 @@ namespace Inertia
         {
             using (var cms = new MemoryStream(compressedData))
             {
-                using (var dms = new MemoryStream())
+                using (var ms = new MemoryStream())
                 {
                     using (var gzs = new BufferedStream(new GZipStream(cms, CompressionMode.Decompress)))
-                        gzs.CopyTo(dms);
+                        gzs.CopyTo(ms);
 
-                    return dms.ToArray();
+                    return ms.ToArray();
                 }
             }
         }

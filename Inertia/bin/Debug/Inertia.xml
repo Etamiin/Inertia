@@ -25,6 +25,38 @@
             </summary>
             <param name="value">The value that caused the exception</param>
         </member>
+        <member name="T:Inertia.InertiaPlugin">
+            <summary>
+            Represent a plugin
+            </summary>
+        </member>
+        <member name="M:Inertia.InertiaPlugin.OnInitialize">
+            <summary>
+            Initializaiton method for the plugin
+            </summary>
+        </member>
+        <member name="M:Inertia.InertiaPlugin.OnExecute">
+            <summary>
+            Execution method for the plugin (after all plugins are initialized)
+            </summary>
+        </member>
+        <member name="T:Inertia.PluginManager">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Inertia.PluginManager.ReloadPlugins">
+            <summary>
+            Reload all the plugins in memory
+            </summary>
+        </member>
+        <member name="M:Inertia.PluginManager.GetPlugin``1">
+            <summary>
+            Return the specified Type of <see cref="T:Inertia.InertiaPlugin"/>
+            </summary>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+        </member>
         <member name="T:Inertia.BaseLogger">
             <summary>
             Represent the default class for displaying logs
@@ -1151,13 +1183,6 @@
             </summary>
             <param name="path">Path of the target file</param>
             <param name="data">The byte array to add</param>
-        </member>
-        <member name="M:Inertia.InertiaIO.GetSHA256(System.String)">
-            <summary>
-            Get the SHA256 key representation of the specified string data
-            </summary>
-            <param name="content">Target string data</param>
-            <returns>The SHA256 representation</returns>
         </member>
         <member name="M:Inertia.InertiaIO.GetSHA256(System.Byte[])">
             <summary>

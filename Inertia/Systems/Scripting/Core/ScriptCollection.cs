@@ -39,6 +39,9 @@ namespace Inertia.Realtime
         /// </summary>
         public ScriptCollection()
         {
+            if (!PluginManager.PluginsLoaded)
+                PluginManager.ReloadPlugins();
+
             m_scripts = new List<Script>();
         }
 
@@ -70,14 +73,13 @@ namespace Inertia.Realtime
         {
             lock (m_scripts)
             {
-                for (var i = 0; i < m_scripts.Count; i++)
+                try
                 {
-                    if (m_scripts[i].GetType() == typeof(T))
-                    {
-                        m_scripts.RemoveAt(i);
-                        break;
-                    }
+                    var script = m_scripts.Find((s) => s.GetType() == typeof(T) && !s.IsDisposed);
+                    if (script != null)
+                        script.Dispose();
                 }
+                catch (Exception ex) { this.GetLogger().Log("Failed to remove Script({0}): {1}", typeof(T).FullName, ex); }
             }
         }
         /// <summary>
@@ -87,7 +89,18 @@ namespace Inertia.Realtime
         public void RemoveAll<T>() where T : Script
         {
             lock (m_scripts)
-                m_scripts.RemoveAll((script) => script.GetType() == typeof(T));
+            {
+                try
+                {
+                    var scripts = m_scripts.FindAll((s) => s.GetType() == typeof(T) && !s.IsDisposed);
+                    foreach (var script in scripts)
+                    {
+                        if (script != null)
+                            script.Dispose();
+                    }
+                }
+                catch (Exception ex) { this.GetLogger().Log("Failed to remove Scripts({0}): {1}", typeof(T).FullName, ex); }
+            }
         }
 
         /// <summary>
@@ -124,7 +137,7 @@ namespace Inertia.Realtime
             return result.ToArray();
         }
 
-        internal void Remove(Script script)
+        internal void FinalRemove(Script script)
         {
             m_scripts.Remove(script);
         }
