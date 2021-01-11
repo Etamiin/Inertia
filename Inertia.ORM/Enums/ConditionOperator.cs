@@ -46,6 +46,10 @@ namespace Inertia.ORM
         /// <summary>
         /// "IN" operator
         /// </summary>
-        In
+        In,
+        /// <summary>
+        /// "LIKE" operator
+        /// </summary>
+        Like
     }
 }

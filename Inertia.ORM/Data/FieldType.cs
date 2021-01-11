@@ -53,11 +53,11 @@ namespace Inertia.Internal
 
         #endregion
 
-        #region Public variables
+        #region Internal variables
 
-        public readonly TypeCode Code;
-        public readonly string SqlType;
-        public readonly bool Unsigned;
+        internal readonly TypeCode Code;
+        internal readonly string SqlType;
+        internal readonly bool Unsigned;
 
         #endregion
 
@@ -65,9 +65,9 @@ namespace Inertia.Internal
 
         public FieldType(string type, bool unsigned, TypeCode code)
         {
-            Code = code;
             SqlType = type;
             Unsigned = unsigned;
+            Code = code;
         }
 
         #endregion

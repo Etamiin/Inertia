@@ -41,7 +41,7 @@ namespace Inertia.ORM
 
         private string GetMessage()
         {
-            return "Can't use table '" + m_table.Name + "' no fields founded or modified";
+            return "Can't use table '" + m_table.TableName + "' no fields founded or modified";
         }
     }
 }

@@ -20,7 +20,7 @@ namespace Inertia.ORM
         /// <summary>
         /// Get the name of the table
         /// </summary>
-        public abstract string Name { get; }
+        public abstract string TableName { get; }
         /// <summary>
         /// Get the <see cref="Database"/> attached
         /// </summary>
@@ -30,142 +30,100 @@ namespace Inertia.ORM
 
         #region Internal variables
 
+        [IgnoreField]
         internal bool IgnoreCreation;
+        [IgnoreField]
+        internal FieldInfo[] Fields;
 
         #endregion
 
         #region Constructors
 
         /// <summary>
-        /// Instantiate a new instance of the class <see cref="Table"/>
+        /// Instantiate a new instance
         /// </summary>
         public Table()
-        {
-            LoadInstance();
-        }
-        
-        #endregion
-
-        /// <summary>
-        /// Insert the current instance values in the database
-        /// </summary>
-        public void Insert(BasicAction<long> onInserted = null)
-        {
-            SqlManager.AsyncOperation(Database, (db) => {
-                return ExecuteQuery(QueryType.Insert, null, null, null, "Executing insertion query failed: {0}");
-            }, (success, result) => {
-                onInserted?.Invoke((long)result);
-            });
-        }
-        /// <summary>
-        /// Set the current instance values by the selected row based on the specified values
-        /// </summary>
-        /// <param name="onSelected">Callback called when selelct query is executed</param>
-        /// <param name="columns">Columns to select</param>
-        public void Select(BasicAction onSelected = null, params string[] columns)
-        {
-            SqlManager.AsyncOperation(Database, (db) => {
-                using (var condition = new ConditionBuilder(Database).SetLimit(1))
-                {
-                    return ExecuteQuery(QueryType.Select, condition, columns, (reader) => {
-                        while (reader.Read())
-                        {
-                            for (var i = 0; i < reader.FieldCount; i++)
-                            {
-                                var field = GetType().GetField(reader.GetName(i));
-                                if (field != null)
-                                {
-                                    var value = reader.GetValue(i);
-                                    if (value.GetType() == typeof(DBNull))
-                                        value = null;
-                                    
-                                    if (field.FieldType == typeof(bool))
-                                        value = reader.GetBoolean(i);
-
-                                    field.SetValue(this, value);
-                                }
-                            }
-                        }
-                    }, "Executing select query failed: {0}");
-                }
-            }, (success, obj) => {
-                onSelected?.Invoke();
-            });
-        }
-
-        internal void LoadInstance()
         {
             var attachment = GetType().GetCustomAttribute<DatabaseAttach>();
             if (attachment == null)
                 return;
 
             IgnoreCreation = GetType().GetCustomAttribute<IgnoreTableCreation>() != null;
-            Database = Database.GetDatabase(attachment.DatabaseType);
+            Database = SqlManager.GetDatabase(attachment.DatabaseType);
 
             if (Database == null)
                 throw new InvalidDatabaseAttachException(attachment.DatabaseType);
-        }
-        internal void TreatFields(BasicAction<FieldInfo, int, int> act)
-        {
-            var fields = GetType().GetFields();
-            if (fields.Length == 0)
+
+            var fields = GetType().GetFields().ToList();
+            if (fields.Count == 0)
                 throw new NoFieldsException(this);
 
-            for (var i = 0; i < fields.Length; i++)
-            {
-                if (fields[i].IsStatic)
-                    continue;
-                var ignore = fields[i].GetCustomAttribute<IgnoreField>() != null;
-                if (ignore)
-                    continue;
+            fields.RemoveAll((field) =>
+                field.IsStatic ||
+                field.GetCustomAttribute<IgnoreField>() != null ||
+                FieldType.GetFieldType(field.FieldType).Code == TypeCode.Object);
 
-                var type = FieldType.GetFieldType(fields[i].FieldType);
-                if (type.Code == TypeCode.Object)
-                    continue;
-
-                act(fields[i], i, fields.Length);
-            }
+            Fields = fields.ToArray();
         }
-        internal void TreatDefaultFields(BasicAction<FieldInfo, int, int, object> act, bool withBooleans = false)
+
+        #endregion
+
+        /// <summary>
+        /// Create the current <see cref="Table"/> in the attached <see cref="Inertia.ORM.Database"/>
+        /// </summary>
+        public bool Create()
         {
-            var default_value = OrmHelper.InstantiateObject(GetType());
-
-            TreatFields((field, index, length) => {
-                var fieldValue = field.GetValue(this);
-                var defaultFieldValue = field.GetValue(default_value);
-
-                if (fieldValue != null && !fieldValue.Equals(field.GetValue(default_value)) ||
-                    field.FieldType == typeof(bool) && withBooleans)
-                    act(field, index, length, fieldValue);
-            });
+            return SqlQuery<Table>
+                .CreateTable(this)
+                .Execute();
         }
-        internal long ExecuteQuery(QueryType queryType, ConditionBuilder condition, object data, BasicAction<MySqlDataReader> onReader, string errorMessage)
+        /// <summary>
+        /// Create the current <see cref="Table"/> instance asynchronously in the attached <see cref="Inertia.ORM.Database"/>
+        /// </summary>
+        public void CreateAsync(BasicAction<bool> callback = null)
         {
-            var insertedId = (long)0;
+            SqlQuery<Table>
+                .CreateTable(this)
+                .ExecuteAsync((success, result) => callback?.Invoke(success));
+        }
 
-            try
-            {
-                var builder = new QueryBuilder(this, queryType, condition, data);
+        /// <summary>
+        /// Delete the current <see cref="Table"/> instance in the attached <see cref="Inertia.ORM.Database"/>
+        /// </summary>
+        public bool Delete()
+        {
+            return SqlQuery<Table>
+                .DeleteTable(this)
+                .Execute();
+        }
+        /// <summary>
+        /// Delete the current <see cref="Table"/> instance asynchronously in the attached <see cref="Inertia.ORM.Database"/>
+        /// </summary>
+        public void DeleteAsync(BasicAction<bool> callback = null)
+        {
+            SqlQuery<Table>
+                .DeleteTable(this)
+                .ExecuteAsync((success, result) => callback?.Invoke(success));
+        }
 
-                builder.Command.CommandText = builder.GetQuery();
-
-                if (onReader != null)
-                {
-                    using (var reader = builder.Command.ExecuteReader())
-                        onReader(reader);
-                }
-                else
-                    builder.Command.ExecuteNonQuery();
-
-                insertedId = builder.Command.LastInsertedId;
-                builder.Dispose();
-            }
-            catch (Exception ex)
-            {
-                BaseLogger.DefaultLogger.Log(errorMessage, ex);
-            }
-
-            return insertedId;
+        /// <summary>
+        /// Insert a new record of type <see cref="Table"/> in the <see cref="Inertia.ORM.Database"/>
+        /// </summary>
+        public bool Insert()
+        {
+            return SqlQuery<Table>
+                .Insert(this)
+                .Execute();
+        }
+        /// <summary>
+        /// Insert a new record of type <see cref="Table"/> asynchronously in the <see cref="Inertia.ORM.Database"/>
+        /// </summary>
+        /// <param name="callback"></param>
+        public void InsertAsync(BasicAction<bool> callback = null)
+        {
+            SqlQuery<Table>
+                .Insert(this)
+                .ExecuteAsync((success, result) => callback?.Invoke(success));
         }
     }
 }

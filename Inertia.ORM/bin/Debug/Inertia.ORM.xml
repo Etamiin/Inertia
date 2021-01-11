@@ -66,6 +66,22 @@
             </summary>
             <param name="autoIncrement">Set the auto increment state of the primary key field</param>
         </member>
+        <member name="T:Inertia.ORM.NotNull">
+            <summary>
+            Add a "NOT NULL" statement to the field
+            </summary>
+        </member>
+        <member name="F:Inertia.ORM.NotNull.Unique">
+            <summary>
+            Unique statement
+            </summary>
+        </member>
+        <member name="M:Inertia.ORM.NotNull.#ctor(System.Boolean)">
+            <summary>
+            Instantiate a new instance of the class <see cref="T:Inertia.ORM.NotNull"/>
+            </summary>
+            <param name="unique">Add unique statement to the field ?</param>
+        </member>
         <member name="T:Inertia.ORM.VarChar">
             <summary>
             Represent a varchar field in a table
@@ -86,39 +102,6 @@
             <summary>
             Represent the database class
             </summary>
-        </member>
-        <member name="M:Inertia.ORM.Database.CreateAllTables">
-            <summary>
-            Create all tables for each <see cref="T:Inertia.ORM.Database"/> class
-            </summary>
-        </member>
-        <member name="M:Inertia.ORM.Database.GetDatabase(System.String)">
-            <summary>
-            Get a <see cref="T:Inertia.ORM.Database"/> class instance based on the name
-            </summary>
-            <param name="name">Name of the <see cref="T:Inertia.ORM.Database"/></param>
-            <returns>Finded instance or null</returns>
-        </member>
-        <member name="M:Inertia.ORM.Database.GetDatabase``1">
-            <summary>
-            Get a <see cref="T:Inertia.ORM.Database"/> class instance based on the <see cref="T:System.Type"/>
-            </summary>
-            <typeparam name="T"><see cref="T:System.Type"/> of the target <see cref="T:Inertia.ORM.Database"/></typeparam>
-            <returns><typeparamref name="T"/> instance or null</returns>
-        </member>
-        <member name="M:Inertia.ORM.Database.GetDatabase(System.Type)">
-            <summary>
-            Get a <see cref="T:Inertia.ORM.Database"/> class instance based on the <see cref="T:System.Type"/>
-            </summary>
-            <typeparam name="T"><see cref="T:System.Type"/> of the target <see cref="T:Inertia.ORM.Database"/></typeparam>
-            <returns><typeparamref name="T"/> instance or null</returns>
-        </member>
-        <member name="M:Inertia.ORM.Database.Use``1(BasicAction{``0})">
-            <summary>
-            Get the specified <typeparamref name="T"/> instance and execute <paramref name="usage"/> action
-            </summary>
-            <typeparam name="T"><see cref="T:System.Type"/> of <see cref="T:Inertia.ORM.Database"/> to get</typeparam>
-            <param name="usage">Action to execute</param>
         </member>
         <member name="P:Inertia.ORM.Database.Name">
             <summary>
@@ -152,90 +135,19 @@
         </member>
         <member name="M:Inertia.ORM.Database.OnCreated">
             <summary>
-            
+            Happens one time after the initialization (after creating <see cref="T:Inertia.ORM.Table"/>)
             </summary>
         </member>
-        <member name="M:Inertia.ORM.Database.CreateTables">
+        <member name="M:Inertia.ORM.Database.GetTable``1">
+            <summary>
+            Get a <see cref="T:Inertia.ORM.Table"/> instance based on the <see cref="T:System.Type"/>
+            </summary>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.Database.CreateAllTables">
             <summary>
             Create all tables of the current <see cref="T:Inertia.ORM.Database"/>
-            </summary>
-        </member>
-        <member name="M:Inertia.ORM.Database.CreateTable``1">
-            <summary>
-            Create specified <typeparamref name="T"/> table of the current <see cref="T:Inertia.ORM.Database"/>
-            </summary>
-            <typeparam name="T"></typeparam>
-        </member>
-        <member name="M:Inertia.ORM.Database.DropTable``1">
-            <summary>
-            Delete specified <typeparamref name="T"/> table of the current <see cref="T:Inertia.ORM.Database"/>
-            </summary>
-            <typeparam name="T"></typeparam>
-        </member>
-        <member name="M:Inertia.ORM.Database.DeleteAll``1(BasicAction)">
-            <summary>
-            Delete all rows in the specified <typeparamref name="T"/> table
-            </summary>
-            <param name="onDeleted">Callback to call when delete query is executed</param>
-            <typeparam name="T"><see cref="T:System.Type"/> of the table</typeparam>
-        </member>
-        <member name="M:Inertia.ORM.Database.Delete``1(Inertia.ORM.ConditionBuilder,BasicAction)">
-            <summary>
-            Delete all rows based on the specified <see cref="T:Inertia.ORM.ConditionBuilder"/> in specified <typeparamref name="T"/> table
-            </summary>
-            <param name="condition"><see cref="T:Inertia.ORM.ConditionBuilder"/> condition of the deletion</param>
-            <param name="onDeleted">Callback to call when delete query is executed</param>
-            <typeparam name="T"><see cref="T:System.Type"/> of the table</typeparam>
-        </member>
-        <member name="M:Inertia.ORM.Database.Select``1(Inertia.ORM.ConditionBuilder,BasicAction{``0},System.String[])">
-            <summary>
-            Select all values based on the specified <see cref="T:Inertia.ORM.ConditionBuilder"/> in the specified <typeparamref name="T"/> table
-            </summary>
-            <param name="condition"><see cref="T:Inertia.ORM.ConditionBuilder"/> for the selection</param>
-            <param name="onSelected">Callback to call when select query is executed</param>
-            <param name="columns">Columns to select</param>
-            <typeparam name="T"><see cref="T:System.Type"/> of the table</typeparam>
-            <returns><typeparamref name="T"/> array</returns>
-        </member>
-        <member name="M:Inertia.ORM.Database.SelectAll``1(BasicAction{``0[]},System.String[])">
-            <summary>
-            Select specified columns of each rows in the specified <typeparamref name="T"/> table
-            </summary>
-            <param name="columns">Columns to select</param>
-            <param name="onSelected">Callback to call when select query is executed</param>
-            <typeparam name="T"><see cref="T:System.Type"/> of the table</typeparam>
-            <returns><typeparamref name="T"/> array</returns>
-        </member>
-        <member name="M:Inertia.ORM.Database.Count``1(Inertia.ORM.ConditionBuilder,BasicAction{System.Int64},System.String)">
-            <summary>
-            Get the number of rows based on the specified <see cref="T:Inertia.ORM.ConditionBuilder"/> in the specified <typeparamref name="T"/> table
-            </summary>
-            <param name="condition"><see cref="T:Inertia.ORM.ConditionBuilder" /> to use</param>
-            <param name="onCounted">Callback to call when count query is executed</param>
-            <param name="columnName">Column name to focus on (or all in not specified)</param>
-            <typeparam name="T"><see cref="T:System.Type"/> of the table</typeparam>
-            <returns>The number of rows</returns>
-        </member>
-        <member name="M:Inertia.ORM.Database.Exist``1(Inertia.ORM.ConditionBuilder,BasicAction{System.Boolean})">
-            <summary>
-            Return true if a value based on the specified <see cref="T:Inertia.ORM.ConditionBuilder"/> in the <typeparamref name="T"/> table exist
-            </summary>
-            <param name="condition"><see cref="T:Inertia.ORM.ConditionBuilder"/> to use</param>
-            <param name="onChecked">Callback to call when query is executed</param>
-            <typeparam name="T"><see cref="T:System.Type"/> of the table</typeparam>
-            <returns>True if exist</returns>
-        </member>
-        <member name="M:Inertia.ORM.Database.Update``1(Inertia.ORM.ConditionBuilder,``0,BasicAction)">
-            <summary>
-            Update rows based on the specified <see cref="T:Inertia.ORM.ConditionBuilder"/> by the specified <typeparamref name="T"/> values
-            </summary>
-            <param name="condition">Conditions for update</param>
-            <param name="onUpdated">Callback to call when query update is executed</param>
-            <param name="reference">Reference instance</param>
-        </member>
-        <member name="M:Inertia.ORM.Database.UpdateAll``1(BasicAction)">
-            <summary>
-            Update all rows in the database by the current instance values
             </summary>
         </member>
         <member name="T:Inertia.ORM.Table">
@@ -243,7 +155,7 @@
             Represent the table class
             </summary>
         </member>
-        <member name="P:Inertia.ORM.Table.Name">
+        <member name="P:Inertia.ORM.Table.TableName">
             <summary>
             Get the name of the table
             </summary>
@@ -255,83 +167,39 @@
         </member>
         <member name="M:Inertia.ORM.Table.#ctor">
             <summary>
-            Instantiate a new instance of the class <see cref="T:Inertia.ORM.Table"/>
+            Instantiate a new instance
             </summary>
         </member>
-        <member name="M:Inertia.ORM.Table.Insert(BasicAction{System.Int64})">
+        <member name="M:Inertia.ORM.Table.Create">
             <summary>
-            Insert the current instance values in the database
+            Create the current <see cref="T:Inertia.ORM.Table"/> in the attached <see cref="T:Inertia.ORM.Database"/>
             </summary>
         </member>
-        <member name="M:Inertia.ORM.Table.Select(BasicAction,System.String[])">
+        <member name="M:Inertia.ORM.Table.CreateAsync(BasicAction{System.Boolean})">
             <summary>
-            Set the current instance values by the selected row based on the specified values
-            </summary>
-            <param name="onSelected">Callback called when selelct query is executed</param>
-            <param name="columns">Columns to select</param>
-        </member>
-        <member name="T:Inertia.ORM.ConditionBuilder">
-            <summary>
-            Represent the condition query builder
+            Create the current <see cref="T:Inertia.ORM.Table"/> instance asynchronously in the attached <see cref="T:Inertia.ORM.Database"/>
             </summary>
         </member>
-        <member name="M:Inertia.ORM.ConditionBuilder.#ctor(Inertia.ORM.Database)">
+        <member name="M:Inertia.ORM.Table.Delete">
             <summary>
-            Instantiate a new instance of the class <see cref="T:Inertia.ORM.ConditionBuilder"/>
-            </summary>
-            <param name="db"><see cref="T:Inertia.ORM.Database"/> attached to the <see cref="T:Inertia.ORM.ConditionBuilder"/></param>
-        </member>
-        <member name="M:Inertia.ORM.ConditionBuilder.#ctor(Inertia.ORM.Table)">
-            <summary>
-            Instantiate a new instance of the class <see cref="T:Inertia.ORM.ConditionBuilder"/>
-            </summary>
-            <param name="table"><see cref="T:Inertia.ORM.Table"/> attached to the <see cref="T:Inertia.ORM.ConditionBuilder"/></param>
-        </member>
-        <member name="M:Inertia.ORM.ConditionBuilder.Clear">
-            <summary>
-            Clear the current instance
+            Delete the current <see cref="T:Inertia.ORM.Table"/> instance in the attached <see cref="T:Inertia.ORM.Database"/>
             </summary>
         </member>
-        <member name="M:Inertia.ORM.ConditionBuilder.OpenBrackets(Inertia.ORM.ConditionType)">
+        <member name="M:Inertia.ORM.Table.DeleteAsync(BasicAction{System.Boolean})">
             <summary>
-            Open brackets in the condition query
-            </summary>
-            <param name="type">Additional <see cref="T:Inertia.ORM.ConditionType"/> if allowed</param>
-            <returns>The current instance</returns>
-        </member>
-        <member name="M:Inertia.ORM.ConditionBuilder.CloseBrackets">
-            <summary>
-            Close brackets in the condition query
-            </summary>
-            <returns>The current instance</returns>
-        </member>
-        <member name="M:Inertia.ORM.ConditionBuilder.AddCondition(System.String,System.Object,Inertia.ORM.ConditionOperator,Inertia.ORM.ConditionType)">
-            <summary>
-            Add condition to the query
-            </summary>
-            <param name="fieldName">Field name</param>
-            <param name="value">Value of the condition</param>
-            <param name="conditionOperator"><see cref="T:Inertia.ORM.ConditionOperator"/> for the condition</param>
-            <param name="type">Additional <see cref="T:Inertia.ORM.ConditionType"/> to add if allowed</param>
-            <returns>The current instance</returns>
-        </member>
-        <member name="M:Inertia.ORM.ConditionBuilder.SetLimit(System.Int32)">
-            <summary>
-            Set the "LIMIT" state of the query
-            </summary>
-            <param name="limit"></param>
-            <returns>The current instance</returns>
-        </member>
-        <member name="M:Inertia.ORM.ConditionBuilder.Dispose">
-            <summary>
-            Dispose the current instance
+            Delete the current <see cref="T:Inertia.ORM.Table"/> instance asynchronously in the attached <see cref="T:Inertia.ORM.Database"/>
             </summary>
         </member>
-        <member name="M:Inertia.ORM.ConditionBuilder.ToString">
+        <member name="M:Inertia.ORM.Table.Insert">
             <summary>
-            Return the condition query as string
+            Insert a new record of type <see cref="T:Inertia.ORM.Table"/> in the <see cref="T:Inertia.ORM.Database"/>
             </summary>
-            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.Table.InsertAsync(BasicAction{System.Boolean})">
+            <summary>
+            Insert a new record of type <see cref="T:Inertia.ORM.Table"/> asynchronously in the <see cref="T:Inertia.ORM.Database"/>
+            </summary>
+            <param name="callback"></param>
         </member>
         <member name="T:Inertia.ORM.ConditionOperator">
             <summary>
@@ -383,6 +251,11 @@
             "IN" operator
             </summary>
         </member>
+        <member name="F:Inertia.ORM.ConditionOperator.Like">
+            <summary>
+            "LIKE" operator
+            </summary>
+        </member>
         <member name="T:Inertia.ORM.ConditionType">
             <summary>
             Conditional type (AND, OR)
@@ -419,6 +292,27 @@
             </summary>
             <param name="databaseType">Type of the database to attach</param>
         </member>
+        <member name="T:Inertia.ORM.DatabaseConnectionFailedException">
+            <summary>
+            Throw when failed to connect to a <see cref="P:Inertia.ORM.DatabaseConnectionFailedException.Database"/>
+            </summary>
+        </member>
+        <member name="P:Inertia.ORM.DatabaseConnectionFailedException.Message">
+            <summary>
+            Message of the exception
+            </summary>
+        </member>
+        <member name="P:Inertia.ORM.DatabaseConnectionFailedException.Database">
+            <summary>
+            Database that throwed the exception
+            </summary>
+        </member>
+        <member name="M:Inertia.ORM.DatabaseConnectionFailedException.#ctor(Inertia.ORM.Database)">
+            <summary>
+            Instantiante a new instance of the class <see cref="T:Inertia.ORM.DatabaseConnectionFailedException"/>
+            </summary>
+            <param name="database"></param>
+        </member>
         <member name="T:Inertia.ORM.NoFieldsException">
             <summary>
             Throw when a <see cref="T:Inertia.ORM.Table"/> class don't have any fields
@@ -437,24 +331,55 @@
         </member>
         <member name="T:Inertia.ORM.SqlManager">
             <summary>
-            Static class allowing several operations
+            Main class for ORM access
             </summary>
         </member>
-        <member name="M:Inertia.ORM.SqlManager.AsyncOperation``1(BasicReturnAction{``0,System.Object},BasicAction{System.Boolean,System.Object})">
+        <member name="M:Inertia.ORM.SqlManager.ManualTablesGeneration">
             <summary>
-            Execute an operation asynchronously on a <see cref="T:Inertia.ORM.Database"/>
+            Generate all <see cref="T:Inertia.ORM.Table"/> in <see cref="T:Inertia.ORM.Database"/>
             </summary>
-            <typeparam name="T">Database where to execute the operation</typeparam>
-            <param name="operation">Operation to execute</param>
-            <param name="onExecuted">Callback called when operation ended with a <see cref="T:System.Boolean"/> parameter (true is success)</param>
         </member>
-        <member name="M:Inertia.ORM.SqlManager.AsyncOperation(Inertia.ORM.Database,BasicReturnAction{Inertia.ORM.Database,System.Object},BasicAction{System.Boolean,System.Object})">
+        <member name="M:Inertia.ORM.SqlManager.GetDatabase(System.String)">
             <summary>
-            Execute an operation asynchronously on a <see cref="T:Inertia.ORM.Database"/>
+            Get a <see cref="T:Inertia.ORM.Database"/> instance based on the name
             </summary>
-            <param name="database">Database where to execute the operation</param>
-            <param name="operation">Operation to execute</param>
-            <param name="onExecuted">Callback called when operation ended with a <see cref="T:System.Boolean"/> parameter (true is success)</param>
+            <param name="name">Name of the <see cref="T:Inertia.ORM.Database"/></param>
+            <returns>Finded instance or null</returns>
+        </member>
+        <member name="M:Inertia.ORM.SqlManager.GetDatabase``1">
+            <summary>
+            Get a <see cref="T:Inertia.ORM.Database"/> instance based on the <see cref="T:System.Type"/>
+            </summary>
+            <typeparam name="T"><see cref="T:System.Type"/> of the target <see cref="T:Inertia.ORM.Database"/></typeparam>
+            <returns><typeparamref name="T"/> instance or null</returns>
+        </member>
+        <member name="M:Inertia.ORM.SqlManager.GetDatabase(System.Type)">
+            <summary>
+            Get a <see cref="T:Inertia.ORM.Database"/> instance based on the <see cref="T:System.Type"/>
+            </summary>
+            <typeparam name="T"><see cref="T:System.Type"/> of the target <see cref="T:Inertia.ORM.Database"/></typeparam>
+            <returns><typeparamref name="T"/> instance or null</returns>
+        </member>
+        <member name="M:Inertia.ORM.SqlManager.GetTable``1">
+            <summary>
+            Get a <see cref="T:Inertia.ORM.Table"/> instance based on the <see cref="T:System.Type"/>
+            </summary>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.SqlManager.UseDb``1(BasicAction{``0})">
+            <summary>
+            Get the specified <typeparamref name="T"/> instance and execute <paramref name="usage"/> action
+            </summary>
+            <typeparam name="T"><see cref="T:System.Type"/> of <see cref="T:Inertia.ORM.Database"/> to get</typeparam>
+            <param name="usage">Action to execute</param>
+        </member>
+        <member name="M:Inertia.ORM.SqlManager.UseTable``1(BasicAction{``0})">
+            <summary>
+            Get the specified <typeparamref name="T"/> instance and execute usage action
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="usage"></param>
         </member>
     </members>
 </doc>

@@ -6,15 +6,15 @@ using System.Threading.Tasks;
 
 namespace Inertia.Internal
 {
-    internal enum QueryType
+    internal enum QueryType : byte
     {
-        Delete,
-        DeleteAll,
-        Insert,
-        Select,
-        Update,
-        CreateTable,
-        DropTable,
-        Count
+        CreateTable = 1,
+        DeleteTable = 2,
+        Insert = 3,
+        Update = 4,
+        Select = 5,
+        Delete = 6,
+        Truncate = 7,
+        Count = 8
     }
 }

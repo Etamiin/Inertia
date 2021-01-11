@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // l'ensemble d'attributs suivant. Changez les valeurs de ces attributs pour modifier les informations
 // associées à un assembly.
 [assembly: AssemblyTitle("Inertia.ORM")]
-[assembly: AssemblyDescription("C# ORM for MySql")]
+[assembly: AssemblyDescription("C# MySql ORM")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Etamiin (A.Bourahla)")]
 [assembly: AssemblyProduct("Inertia.ORM")]
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // Vous pouvez spécifier toutes les valeurs ou indiquer les numéros de build et de révision par défaut
 // en utilisant '*', comme indiqué ci-dessous :
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("2020.1.9.170")]
-[assembly: AssemblyFileVersion("2020.1.9.170")]
+[assembly: AssemblyVersion("2021.1.11.2217")]
+[assembly: AssemblyFileVersion("2021.1.11.2217")]
