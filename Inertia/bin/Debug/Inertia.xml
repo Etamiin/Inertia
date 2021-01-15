@@ -191,22 +191,6 @@
             <param name="key">Target string key for encryption</param>
             <returns>Decrypted byte array</returns>
         </member>
-        <member name="T:Inertia.Network.NetworkMessageHooker">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="F:Inertia.Network.NetworkMessageHooker.MessageType">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="M:Inertia.Network.NetworkMessageHooker.#ctor(System.Type)">
-            <summary>
-            
-            </summary>
-            <param name="messageType"></param>
-        </member>
         <member name="T:Inertia.Network.NetTcpClient">
             <summary>
             Represent the TCP client
@@ -563,11 +547,11 @@
             Represent the protocol version used by the current protocol
             </summary>
         </member>
-        <member name="M:Inertia.Network.DefaultNetworkProtocol.OnParsePacket(Inertia.Network.NetworkMessage)">
+        <member name="M:Inertia.Network.DefaultNetworkProtocol.OnParseMessage(Inertia.Network.NetworkMessage)">
             <summary>
             Happens when parsing a <see cref="T:Inertia.Network.NetworkMessage"/> instance
             </summary>
-            <param name="packet">Packet to parse</param>
+            <param name="message">Packet to parse</param>
             <returns>Parsed packet to byte array</returns>
         </member>
         <member name="M:Inertia.Network.DefaultNetworkProtocol.OnReceiveData(Inertia.Network.NetTcpClient,Inertia.BasicReader)">
@@ -721,9 +705,37 @@
         </member>
         <member name="M:Inertia.Network.NetworkProtocol.GetHookerRefs(Inertia.Network.NetworkMessage)">
             <summary>
-            Get a <see cref="T:Inertia.Internal.NetworkMessageHookerRefs"/> if exist or null
+            Get a <see cref="T:Inertia.Network.NetworkMessageHookerRefs"/> if exist or null
             </summary>
             <param name="message"></param>
+        </member>
+        <member name="M:Inertia.Network.NetworkProtocol.CallHookerRef(Inertia.Network.NetworkMessage,Inertia.Network.NetTcpClient)">
+            <summary>
+            Invoke a MessageHooker with the specified parameters
+            </summary>
+            <param name="message"></param>
+            <param name="client"></param>
+        </member>
+        <member name="M:Inertia.Network.NetworkProtocol.CallHookerRef(Inertia.Network.NetworkMessage,Inertia.Network.NetUdpClient)">
+            <summary>
+            Invoke a MessageHooker with the specified parameters
+            </summary>
+            <param name="message"></param>
+            <param name="client"></param>
+        </member>
+        <member name="M:Inertia.Network.NetworkProtocol.CallHookerRef(Inertia.Network.NetworkMessage,Inertia.Network.NetTcpConnection)">
+            <summary>
+            Invoke a MessageHooker with the specified parameters
+            </summary>
+            <param name="message"></param>
+            <param name="connection"></param>
+        </member>
+        <member name="M:Inertia.Network.NetworkProtocol.CallHookerRef(Inertia.Network.NetworkMessage,Inertia.Network.NetUdpConnection)">
+            <summary>
+            Invoke a MessageHooker with the specified parameters
+            </summary>
+            <param name="message"></param>
+            <param name="connection"></param>
         </member>
         <member name="P:Inertia.Network.NetworkProtocol.ProtocolVersion">
             <summary>
@@ -735,7 +747,7 @@
             
             </summary>
         </member>
-        <member name="M:Inertia.Network.NetworkProtocol.OnParsePacket(Inertia.Network.NetworkMessage)">
+        <member name="M:Inertia.Network.NetworkProtocol.OnParseMessage(Inertia.Network.NetworkMessage)">
             <summary>
             Happens when parsing a <see cref="T:Inertia.Network.NetworkMessage"/> instance
             </summary>
@@ -769,6 +781,39 @@
             </summary>
             <param name="connection">The connection that received the data</param>
             <param name="reader">The data in a <see cref="T:Inertia.BasicReader"/> instance</param>
+        </member>
+        <member name="T:Inertia.Network.NetworkMessageHookerRefs">
+            <summary>
+            MessageHookers references
+            </summary>
+        </member>
+        <member name="M:Inertia.Network.NetworkMessageHookerRefs.CallHookerRef(Inertia.Network.NetworkMessage,Inertia.Network.NetTcpClient)">
+            <summary>
+            Invoke a MessageHooker with the specified parameters
+            </summary>
+            <param name="message"></param>
+            <param name="client"></param>
+        </member>
+        <member name="M:Inertia.Network.NetworkMessageHookerRefs.CallHookerRef(Inertia.Network.NetworkMessage,Inertia.Network.NetUdpClient)">
+            <summary>
+            Invoke a MessageHooker with the specified parameters
+            </summary>
+            <param name="message"></param>
+            <param name="client"></param>
+        </member>
+        <member name="M:Inertia.Network.NetworkMessageHookerRefs.CallHookerRef(Inertia.Network.NetworkMessage,Inertia.Network.NetTcpConnection)">
+            <summary>
+            Invoke a MessageHooker with the specified parameters
+            </summary>
+            <param name="message"></param>
+            <param name="connection"></param>
+        </member>
+        <member name="M:Inertia.Network.NetworkMessageHookerRefs.CallHookerRef(Inertia.Network.NetworkMessage,Inertia.Network.NetUdpConnection)">
+            <summary>
+            Invoke a MessageHooker with the specified parameters
+            </summary>
+            <param name="message"></param>
+            <param name="connection"></param>
         </member>
         <member name="T:Inertia.Network.NetworkDisconnectReason">
             <summary>
@@ -811,27 +856,6 @@
             </summary>
             <param name="messageType"></param>
         </member>
-        <member name="T:Inertia.Network.HookerInvalidTypeException">
-            <summary>
-            Thrown when using a <see cref="T:System.Type"/> that isn't a subclass of <see cref="T:Inertia.Network.NetworkMessage"/>
-            </summary>
-        </member>
-        <member name="P:Inertia.Network.HookerInvalidTypeException.Message">
-            <summary>
-            Message of the exception
-            </summary>
-        </member>
-        <member name="F:Inertia.Network.HookerInvalidTypeException.SpecifiedType">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="M:Inertia.Network.HookerInvalidTypeException.#ctor(System.Type)">
-            <summary>
-            
-            </summary>
-            <param name="messageType"></param>
-        </member>
         <member name="T:Inertia.Network.UserDatagramDataLengthLimitException">
             <summary>
             Thrown when sending more than <see cref="F:System.UInt16.MaxValue"/> bytes from UDP protocol
@@ -853,39 +877,6 @@
             </summary>
             <param name="length"></param>
         </member>
-        <member name="T:Inertia.Internal.NetworkMessageHookerRefs">
-            <summary>
-            MessageHookers references
-            </summary>
-        </member>
-        <member name="M:Inertia.Internal.NetworkMessageHookerRefs.CallHookerRef(Inertia.Network.NetworkMessage,Inertia.Network.NetTcpClient)">
-            <summary>
-            Invoke a MessageHooker with the specified parameters
-            </summary>
-            <param name="message"></param>
-            <param name="client"></param>
-        </member>
-        <member name="M:Inertia.Internal.NetworkMessageHookerRefs.CallHookerRef(Inertia.Network.NetworkMessage,Inertia.Network.NetUdpClient)">
-            <summary>
-            Invoke a MessageHooker with the specified parameters
-            </summary>
-            <param name="message"></param>
-            <param name="client"></param>
-        </member>
-        <member name="M:Inertia.Internal.NetworkMessageHookerRefs.CallHookerRef(Inertia.Network.NetworkMessage,Inertia.Network.NetTcpConnection)">
-            <summary>
-            Invoke a MessageHooker with the specified parameters
-            </summary>
-            <param name="message"></param>
-            <param name="connection"></param>
-        </member>
-        <member name="M:Inertia.Internal.NetworkMessageHookerRefs.CallHookerRef(Inertia.Network.NetworkMessage,Inertia.Network.NetUdpConnection)">
-            <summary>
-            Invoke a MessageHooker with the specified parameters
-            </summary>
-            <param name="message"></param>
-            <param name="connection"></param>
-        </member>
         <member name="T:Inertia.Realtime.Script">
             <summary>
             Execute realtime code
@@ -899,6 +890,11 @@
         <member name="P:Inertia.Realtime.Script.Time">
             <summary>
             Returns the time elapsed from the process start time
+            </summary>
+        </member>
+        <member name="F:Inertia.Realtime.Script.MaxExecutionPerSecond">
+            <summary>
+            Get or set the maximum execution per second for scripting system
             </summary>
         </member>
         <member name="P:Inertia.Realtime.Script.IsDestroyed">

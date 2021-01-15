@@ -97,7 +97,7 @@ namespace Inertia.Network
         /// <param name="packet">Packet to send</param>
         public void Send(NetworkMessage packet)
         {
-            Send(NetworkProtocol.Protocol.OnParsePacket(packet));
+            Send(NetworkProtocol.Protocol.OnParseMessage(packet));
         }
 
         /// <summary>

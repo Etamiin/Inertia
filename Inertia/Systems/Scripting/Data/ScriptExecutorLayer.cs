@@ -23,7 +23,7 @@ namespace Inertia.Internal
         {
             get
             {
-                return Count >= RealtimeManager.ExecutorScriptLimit;
+                return Count >= RealtimeManager.MaxExecutorScriptCount;
             }
         }
 

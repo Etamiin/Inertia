@@ -23,6 +23,11 @@ namespace Inertia.Realtime
         /// </summary>
         public static float Time { get; internal set; }
 
+        /// <summary>
+        /// Get or set the maximum execution per second for scripting system
+        /// </summary>
+        public static int MaxExecutionPerSecond = 335;
+
         #endregion
 
         #region Public variables

@@ -17,7 +17,7 @@ namespace Inertia.Network
 
         internal static Dictionary<uint, Type> MessageTypes;
         internal static Dictionary<Type, NetworkMessageHookerRefs> MessageHookers;
-        internal static NetworkProtocol Protocol = DefaultNetworkProtocol.Instance;
+        internal static NetworkProtocol Protocol;
         
         /// <summary>
         /// Set a custom protocol instance to be used by the system
@@ -77,10 +77,55 @@ namespace Inertia.Network
             return refs;
         }
 
+        /// <summary>
+        /// Invoke a MessageHooker with the specified parameters
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="client"></param>
+        public static void CallHookerRef(NetworkMessage message, NetTcpClient client)
+        {
+            var refs = GetHookerRefs(message);
+            if (refs != null)
+                refs.CallHookerRef(message, client);
+        }
+        /// <summary>
+        /// Invoke a MessageHooker with the specified parameters
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="client"></param>
+        public static void CallHookerRef(NetworkMessage message, NetUdpClient client)
+        {
+            var refs = GetHookerRefs(message);
+            if (refs != null)
+                refs.CallHookerRef(message, client);
+        }
+        /// <summary>
+        /// Invoke a MessageHooker with the specified parameters
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="connection"></param>
+        public static void CallHookerRef(NetworkMessage message, NetTcpConnection connection)
+        {
+            var refs = GetHookerRefs(message);
+            if (refs != null)
+                refs.CallHookerRef(message, connection);
+        }
+        /// <summary>
+        /// Invoke a MessageHooker with the specified parameters
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="connection"></param>
+        public static void CallHookerRef(NetworkMessage message, NetUdpConnection connection)
+        {
+            var refs = GetHookerRefs(message);
+            if (refs != null)
+                refs.CallHookerRef(message, connection);
+        }
+
         #endregion
 
         #region Public variables
-        
+
         /// <summary>
         /// Represent the protocol version used by the current protocol
         /// </summary>
@@ -95,7 +140,11 @@ namespace Inertia.Network
         /// </summary>
         public NetworkProtocol()
         {
+            if (MessageTypes != null && MessageHookers != null)
+                return;
+
             PluginManager.LoadNetworkMessages(out MessageTypes, out MessageHookers);
+            Protocol = DefaultNetworkProtocol.Instance;
         }
 
         #endregion
@@ -105,9 +154,9 @@ namespace Inertia.Network
         /// </summary>
         /// <param name="packet">Packet to parse</param>
         /// <returns>Parsed packet to byte array</returns>
-        public virtual byte[] OnParsePacket(NetworkMessage packet)
+        public virtual byte[] OnParseMessage(NetworkMessage packet)
         {
-            return DefaultNetworkProtocol.Instance.OnParsePacket(packet);
+            return DefaultNetworkProtocol.Instance.OnParseMessage(packet);
         }
 
         /// <summary>

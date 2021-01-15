@@ -145,21 +145,19 @@ namespace Inertia
 
                     foreach (var smethod in sMethods)
                     {
-                        var attr = smethod.GetCustomAttribute<NetworkMessageHooker>();
-                        if (attr != null)
+                        var ps = smethod.GetParameters();
+                        if (ps.Length < 2)
+                            continue;
+
+                        if (ps[0].ParameterType.IsSubclassOf(typeof(NetworkMessage)) &&
+                           (ps[1].ParameterType.IsSubclassOf(typeof(NetClient)) || ps[1].ParameterType == typeof(NetTcpConnection) || ps[1].ParameterType == typeof(NetUdpConnection)))
                         {
-                            var ps = smethod.GetParameters();
-                            if (ps.Length < 2)
-                                continue;
+                            var msgType = ps[0].ParameterType;
 
-                            if (ps[0].ParameterType.IsSubclassOf(typeof(NetworkMessage)) &&
-                               (ps[1].ParameterType.IsSubclassOf(typeof(NetClient)) || ps[1].ParameterType == typeof(NetTcpConnection) || ps[1].ParameterType == typeof(NetUdpConnection)))
-                            {
-                                if (!messageHookers.ContainsKey(attr.MessageType))
-                                    messageHookers.Add(attr.MessageType, new NetworkMessageHookerRefs());
+                            if (!messageHookers.ContainsKey(msgType))
+                                messageHookers.Add(msgType, new NetworkMessageHookerRefs());
 
-                                messageHookers[attr.MessageType].RegisterRef(smethod, ps[1].ParameterType);
-                            }
+                            messageHookers[msgType].RegisterRef(smethod, ps[1].ParameterType);
                         }
                     }
                 }

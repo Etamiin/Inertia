@@ -19,7 +19,7 @@ namespace Inertia.Internal
 
         #region Internal variables
 
-        internal const int ExecutorScriptLimit = 335;
+        internal const int MaxExecutorScriptCount = 335;
 
         #endregion
 
@@ -28,7 +28,6 @@ namespace Inertia.Internal
         private static bool m_isInitialized;
         private static ScriptExecutorLayer m_currentLayer;
         private static List<ScriptExecutorLayer> m_executorLayers;
-        private const int m_executionLimit = 315;
 
         #endregion
 
@@ -44,14 +43,16 @@ namespace Inertia.Internal
         }
         private static void ExecuteLogic()
         {
-            var targetMsUpdate = (int)Math.Round(1f / m_executionLimit * 1000);
+            if (Script.MaxExecutionPerSecond > 350)
+                Script.MaxExecutionPerSecond = 350;
+
+            var targetMsUpdate = (int)Math.Round(1000f / Script.MaxExecutionPerSecond);
             var clock = new Clock();
 
             Task.Factory.StartNew(() => { 
                 while (true)
                 {
                     var currentMsUpdate = (int)clock.GetElapsedMilliseconds();
-
                     if (currentMsUpdate < targetMsUpdate)
                     {
                         Thread.Sleep(targetMsUpdate - currentMsUpdate);

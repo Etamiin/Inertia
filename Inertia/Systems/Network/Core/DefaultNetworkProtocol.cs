@@ -69,16 +69,16 @@ namespace Inertia.Network
         /// <summary>
         /// Happens when parsing a <see cref="NetworkMessage"/> instance
         /// </summary>
-        /// <param name="packet">Packet to parse</param>
+        /// <param name="message">Packet to parse</param>
         /// <returns>Parsed packet to byte array</returns>
-        public override byte[] OnParsePacket(NetworkMessage packet)
+        public override byte[] OnParseMessage(NetworkMessage message)
         {
             using (var packetWriter = new BasicWriter())
             {
                 using (var coreWriter = new BasicWriter())
                 {
-                    coreWriter.SetUInt(packet.Id);
-                    packet.OnSerialize(coreWriter);
+                    coreWriter.SetUInt(message.Id);
+                    message.OnSerialize(coreWriter);
 
                     packetWriter
                         .SetUInt((uint)coreWriter.TotalLength)
@@ -96,7 +96,7 @@ namespace Inertia.Network
         /// <param name="reader">The data in a <see cref="BasicReader"/> instance</param>
         public override void OnReceiveData(NetTcpClient client, BasicReader reader)
         {
-            ParseMessages(reader, (packet) => GetHookerRefs(packet)?.CallHookerRef(packet, client));
+            ParseMessages(reader, (message) => GetHookerRefs(message)?.CallHookerRef(message, client));
         }
         /// <summary>
         /// Happens when receiving data from a <see cref="NetUdpClient"/>
@@ -105,7 +105,7 @@ namespace Inertia.Network
         /// <param name="reader">The data in a <see cref="BasicReader"/> instance</param>
         public override void OnReceiveData(NetUdpClient client, BasicReader reader)
         {
-            ParseMessages(reader, (packet) => GetHookerRefs(packet)?.CallHookerRef(packet, client));
+            ParseMessages(reader, (message) => GetHookerRefs(message)?.CallHookerRef(message, client));
         }
         /// <summary>
         /// Happens when receiving data from a <see cref="NetTcpConnection"/>
@@ -114,7 +114,7 @@ namespace Inertia.Network
         /// <param name="reader">The data in a <see cref="BasicReader"/> instance</param>
         public override void OnReceiveData(NetTcpConnection connection, BasicReader reader)
         {
-            ParseMessages(reader, (packet) => GetHookerRefs(packet)?.CallHookerRef(packet, connection));
+            ParseMessages(reader, (message) => GetHookerRefs(message)?.CallHookerRef(message, connection));
         }
         /// <summary>
         /// Happens when receiving data from a <see cref="NetUdpConnection"/>
@@ -123,10 +123,10 @@ namespace Inertia.Network
         /// <param name="reader">The data in a <see cref="BasicReader"/> instance</param>
         public override void OnReceiveData(NetUdpConnection connection, BasicReader reader)
         {
-            ParseMessages(reader, (packet) => GetHookerRefs(packet)?.CallHookerRef(packet, connection));
+            ParseMessages(reader, (message) => GetHookerRefs(message)?.CallHookerRef(message, connection));
         }
 
-        private void ParseMessages(BasicReader reader, BasicAction<NetworkMessage> onPacketParsed)
+        private void ParseMessages(BasicReader reader, BasicAction<NetworkMessage> onMessageParsed)
         {
             while (reader.UnreadedLength > 0)
             {
@@ -140,17 +140,17 @@ namespace Inertia.Network
                 {
                     using (var core = new BasicReader(reader.GetBytes(size)))
                     {
-                        var packetId = core.GetUInt();
-                        if (!MessageTypes.ContainsKey(packetId))
-                            throw new UnknownMessageException(packetId);
+                        var messageId = core.GetUInt();
+                        if (!MessageTypes.ContainsKey(messageId))
+                            throw new UnknownMessageException(messageId);
 
-                        var packet = CreateInstance(MessageTypes[packetId]);
-                        packet.OnDeserialize(core);
+                        var message = CreateInstance(MessageTypes[messageId]);
+                        message.OnDeserialize(core);
 
                         if (MultiThreadedExecution)
-                            onPacketParsed(packet);
+                            onMessageParsed(message);
                         else
-                            m_queue.Enqueue(() => onPacketParsed(packet));
+                            m_queue.Enqueue(() => onMessageParsed(message));
                     }
                 }
                 catch (Exception ex) { this.GetLogger().Log(ex); }
