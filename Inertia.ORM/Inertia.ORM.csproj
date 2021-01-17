@@ -61,7 +61,7 @@
     <Compile Include="Core\Table.cs" />
     <Compile Include="Data\FieldType.cs" />
     <Compile Include="Data\SqlCondition.cs" />
-    <Compile Include="Data\SqlQuery.cs" />
+    <Compile Include="Core\SqlQuery.cs" />
     <Compile Include="Enums\ConditionOperator.cs" />
     <Compile Include="Enums\ConditionType.cs" />
     <Compile Include="Exceptions\InvalidDatabaseAttachException.cs" />

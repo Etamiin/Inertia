@@ -22,4 +22,3 @@ D:\VisualStudio Projects\InertiaLib\Inertia\bin\Debug\Inertia.pdb
 D:\VisualStudio Projects\InertiaLib\Inertia\obj\Debug\Inertia.csproj.CoreCompileInputs.cache
 D:\VisualStudio Projects\InertiaLib\Inertia\obj\Debug\Inertia.dll
 D:\VisualStudio Projects\InertiaLib\Inertia\obj\Debug\Inertia.pdb
-D:\VisualStudio Projects\InertiaLib\Inertia\obj\Debug\Inertia.csprojAssemblyReference.cache

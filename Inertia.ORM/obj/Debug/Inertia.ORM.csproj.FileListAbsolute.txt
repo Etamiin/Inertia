@@ -15,7 +15,6 @@ C:\Users\abdel\Desktop\projetsPerso\Inertia\InertiaLib\Inertia.ORM\obj\Debug\Ine
 C:\Users\abdel\Desktop\projetsPerso\Inertia\InertiaLib\Inertia.ORM\obj\Debug\Inertia.ORM.csproj.CopyComplete
 C:\Users\abdel\Desktop\projetsPerso\Inertia\InertiaLib\Inertia.ORM\obj\Debug\Inertia.ORM.dll
 C:\Users\abdel\Desktop\projetsPerso\Inertia\InertiaLib\Inertia.ORM\obj\Debug\Inertia.ORM.pdb
-D:\VisualStudio Projects\InertiaLib\Inertia.ORM\obj\Debug\Inertia.ORM.csprojAssemblyReference.cache
 D:\VisualStudio Projects\InertiaLib\Inertia.ORM\obj\Debug\Inertia.ORM.csproj.CoreCompileInputs.cache
 D:\VisualStudio Projects\InertiaLib\Inertia.ORM\bin\Debug\Inertia.ORM.xml
 D:\VisualStudio Projects\InertiaLib\Inertia.ORM\bin\Debug\Inertia.ORM.dll
@@ -27,3 +26,4 @@ D:\VisualStudio Projects\InertiaLib\Inertia.ORM\bin\Debug\Inertia.xml
 D:\VisualStudio Projects\InertiaLib\Inertia.ORM\obj\Debug\Inertia.ORM.csproj.CopyComplete
 D:\VisualStudio Projects\InertiaLib\Inertia.ORM\obj\Debug\Inertia.ORM.dll
 D:\VisualStudio Projects\InertiaLib\Inertia.ORM\obj\Debug\Inertia.ORM.pdb
+D:\VisualStudio Projects\InertiaLib\Inertia.ORM\obj\Debug\Inertia.ORM.csprojAssemblyReference.cache

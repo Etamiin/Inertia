@@ -105,9 +105,10 @@ namespace Inertia.Web
             if (!baseUri.EndsWith("/"))
                 baseUri += "/";
 
-            m_client = new WebClient();
             m_files = new List<WebProgressFile>();
-            
+            m_client = new WebClient();
+            m_client.Proxy = null;
+
             m_client.DownloadProgressChanged += Client_DownloadProgressChanged;
             m_client.DownloadFileCompleted += Client_DownloadFileCompleted;
 

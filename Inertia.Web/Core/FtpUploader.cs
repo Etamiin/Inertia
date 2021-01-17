@@ -21,6 +21,10 @@ namespace Inertia.Web
         /// </summary>
         public event BasicAction QueueUploaded = () => { };
         /// <summary>
+        /// Occurs when a file is added to the queue
+        /// </summary>
+        public event BasicAction<string> FileQueued = (path) => { };
+        /// <summary>
         /// Occurs when a file start to be uploaded
         /// </summary>
         public event UploadFileUpdateHandler FileUploadStarted = (file) => { };
@@ -83,7 +87,7 @@ namespace Inertia.Web
         #region Private variables
 
         private SftpClient m_client;
-        private List<WebProgressFile> m_files;
+        private Dictionary<string, WebProgressFile> m_files;
         private int m_attempts;
 
         #endregion
@@ -94,13 +98,15 @@ namespace Inertia.Web
         /// Instantiate a new instance of the class <see cref="FtpUploader"/>
         /// </summary>
         /// <param name="credentials">Credentials to use for uploading data</param>
-        public FtpUploader(FtpCredential credentials)
+        /// <param name="bufferSize">Buffer size of the uploader</param>
+        public FtpUploader(FtpCredential credentials, uint bufferSize = 8192)
         {
             Credentials = credentials;
             m_client = new SftpClient(Credentials.Host, credentials.Port, credentials.Username, credentials.Password);
-            m_files = new List<WebProgressFile>();
-        }
+            m_files = new Dictionary<string, WebProgressFile>();
 
+            m_client.BufferSize = bufferSize;
+        }
         #endregion
 
         /// <summary>
@@ -127,7 +133,8 @@ namespace Inertia.Web
             if (!File.Exists(path))
                 throw new FileNotFoundException();
 
-            m_files.Add(new WebProgressFile(Credentials.Host, path, ftpDestinationFolder, true));
+            m_files.Add(path, new WebProgressFile(Credentials.Host, path, ftpDestinationFolder, true));
+            FileQueued(path);
         }
         /// <summary>
         /// Enqueue all the files in the specified folder path
@@ -152,6 +159,16 @@ namespace Inertia.Web
         }
 
         /// <summary>
+        /// Remove the specified file from the queue
+        /// </summary>
+        /// <param name="path"></param>
+        public void RemoveFile(string path)
+        {
+            if (m_files.ContainsKey(path))
+                m_files.Remove(path);
+        }
+
+        /// <summary>
         /// Start the upload of the queue
         /// </summary>
         public void UploadQueue()
@@ -161,6 +178,9 @@ namespace Inertia.Web
 
             if (IsBusy)
                 throw new WebModuleBusyException();
+
+            if (QueuedCount == 0)
+                return;
 
             m_client.Connect();
             UploadNext();
@@ -198,9 +218,10 @@ namespace Inertia.Web
             if (IsDisposed)
                 throw new ObjectDisposedException(nameof(FtpUploader));
 
-            FileUploadStarted(m_files[0]);
+            var element = m_files.ElementAt(0).Value;
+            FileUploadStarted(element);
 
-            var folderPath = m_files[0].DestinationPath.Remove(m_files[0].DestinationPath.Length - 1, 1);
+            var folderPath = element.DestinationPath.Remove(element.DestinationPath.Length - 1, 1);
 
             if (!string.IsNullOrEmpty(folderPath))
             {
@@ -212,10 +233,7 @@ namespace Inertia.Web
                     path += paths[i];
 
                     if (!m_client.Exists(path))
-                    {
-                        Console.WriteLine(path);
                         m_client.CreateDirectory(path);
-                    }
 
                     path += "/";
                 }
@@ -223,23 +241,23 @@ namespace Inertia.Web
 
             try
             {
-                using (var stream = File.Open(m_files[0].Path, FileMode.Open))
+                using (var stream = File.Open(element.Path, FileMode.Open))
                 {
-                    m_client.UploadFile(stream, m_files[0].DestinationPath + m_files[0].Name, true, (current) => {
-                        m_files[0].Progress((ulong)stream.Length, current);
-                        FileUploadProgress(m_files[0]);
+                    m_client.UploadFile(stream, element.DestinationPath + element.Name, true, (current) => {
+                        element.Progress((ulong)stream.Length, current);
+                        FileUploadProgress(element);
                     });
                 }
 
-                FileUploaded(m_files[0]);
+                FileUploaded(element);
 
                 m_attempts = 0;
-                m_files.RemoveAt(0);
+                m_files.Remove(element.Path);
             }
             catch (Exception ex) {
                 if (++m_attempts == MaxAttempts)
                 {
-                    FileUploadFailed(m_files[0], ex);
+                    FileUploadFailed(element, ex);
                     if (StopOnMaxAttempts)
                         return;
                 }

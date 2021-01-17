@@ -677,6 +677,12 @@
             Represents the class for writing and reading network data
             </summary>
         </member>
+        <member name="M:Inertia.Network.NetworkProtocol.GetProtocol">
+            <summary>
+            Get the curent <see cref="T:Inertia.Network.NetworkProtocol"/> instance used
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:Inertia.Network.NetworkProtocol.SetProtocol(Inertia.Network.NetworkProtocol)">
             <summary>
             Set a custom protocol instance to be used by the system

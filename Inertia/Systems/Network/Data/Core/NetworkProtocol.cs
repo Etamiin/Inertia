@@ -17,15 +17,27 @@ namespace Inertia.Network
 
         internal static Dictionary<uint, Type> MessageTypes;
         internal static Dictionary<Type, NetworkMessageHookerRefs> MessageHookers;
-        internal static NetworkProtocol Protocol;
         
+        private static NetworkProtocol m_protocol;
+        
+        /// <summary>
+        /// Get the curent <see cref="NetworkProtocol"/> instance used
+        /// </summary>
+        /// <returns></returns>
+        public static NetworkProtocol GetProtocol()
+        {
+            if (m_protocol == null)
+                m_protocol = DefaultNetworkProtocol.Instance;
+
+            return m_protocol;
+        }
         /// <summary>
         /// Set a custom protocol instance to be used by the system
         /// </summary>
         /// <param name="protocol"><see cref="NetworkProtocol"/> instance to use</param>
         public static void SetProtocol(NetworkProtocol protocol)
         {
-            Protocol = protocol;
+            m_protocol = protocol;
         }
         /// <summary>
         /// Create an instance of the specified Type if it's an <see cref="NetworkMessage"/>
@@ -144,7 +156,6 @@ namespace Inertia.Network
                 return;
 
             PluginManager.LoadNetworkMessages(out MessageTypes, out MessageHookers);
-            Protocol = DefaultNetworkProtocol.Instance;
         }
 
         #endregion

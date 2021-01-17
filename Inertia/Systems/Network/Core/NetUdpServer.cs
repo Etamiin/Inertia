@@ -129,7 +129,7 @@ namespace Inertia.Network
             if (connection.IsDisposed)
                 throw new ObjectDisposedException(nameof(NetUdpConnection));
 
-            SendTo(connection.EndPoint, NetworkProtocol.Protocol.OnParseMessage(packet));
+            SendTo(connection.EndPoint, NetworkProtocol.GetProtocol().OnParseMessage(packet));
         }
 
         /// <summary>
@@ -173,7 +173,7 @@ namespace Inertia.Network
                     ConnectionAdded(connection);
                 }
 
-                NetworkProtocol.Protocol.OnReceiveData(m_connections[endPoint], new BasicReader(data));
+                NetworkProtocol.GetProtocol().OnReceiveData(m_connections[endPoint], new BasicReader(data));
             }
             catch (Exception ex) 
             {

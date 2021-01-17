@@ -21,6 +21,11 @@ namespace Inertia.ORM
             m_builder = new StringBuilder();
         }
 
+        public SqlQuery<T> BackToQuery()
+        {
+            return m_query;
+        }
+
         public SqlCondition<T> BeginBrackets(ConditionType type = ConditionType.And)
         {
             if (m_builder.Length > 0)
@@ -179,7 +184,7 @@ namespace Inertia.ORM
             if (m_inBrackets)
                 EndBrackets();
 
-            return "WHERE BINARY " +
+            return (m_builder.Length > 0 ? "WHERE "  : string.Empty) +
                 m_builder.ToString() +
                 (m_orderBuilder != null ? m_orderBuilder.ToString() : string.Empty) +
                 (m_limit > 0 ? " LIMIT " + m_limit : string.Empty);

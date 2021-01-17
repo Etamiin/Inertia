@@ -15,6 +15,7 @@ namespace Inertia.Internal
         Select = 5,
         Delete = 6,
         Truncate = 7,
-        Count = 8
+        Count = 8,
+        Exist = 9
     }
 }

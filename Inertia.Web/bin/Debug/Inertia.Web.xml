@@ -59,11 +59,12 @@
             Get the number of files queued
             </summary>
         </member>
-        <member name="M:Inertia.Web.FtpDownloader.#ctor(Inertia.Web.FtpCredential)">
+        <member name="M:Inertia.Web.FtpDownloader.#ctor(Inertia.Web.FtpCredential,System.UInt32)">
             <summary>
             Instantiate a new instance of the class <see cref="T:Inertia.Web.WebDownloader"/>
             </summary>
             <param name="credentials">Credentials to use</param>
+            <param name="bufferSize">Buffer size of the downloader</param>
         </member>
         <member name="M:Inertia.Web.FtpDownloader.Enqueue(System.String,System.String[])">
             <summary>
@@ -95,6 +96,11 @@
         <member name="E:Inertia.Web.FtpUploader.QueueUploaded">
             <summary>
             Occurs when the current queue is completely uploaded
+            </summary>
+        </member>
+        <member name="E:Inertia.Web.FtpUploader.FileQueued">
+            <summary>
+            Occurs when a file is added to the queue
             </summary>
         </member>
         <member name="E:Inertia.Web.FtpUploader.FileUploadStarted">
@@ -147,11 +153,12 @@
             Get the number of files in the queue
             </summary>
         </member>
-        <member name="M:Inertia.Web.FtpUploader.#ctor(Inertia.Web.FtpCredential)">
+        <member name="M:Inertia.Web.FtpUploader.#ctor(Inertia.Web.FtpCredential,System.UInt32)">
             <summary>
             Instantiate a new instance of the class <see cref="T:Inertia.Web.FtpUploader"/>
             </summary>
             <param name="credentials">Credentials to use for uploading data</param>
+            <param name="bufferSize">Buffer size of the uploader</param>
         </member>
         <member name="M:Inertia.Web.FtpUploader.EnqueueFile(System.String)">
             <summary>
@@ -180,6 +187,12 @@
             <param name="folderPath">Folder where to get the files</param>
             <param name="ftpDestinationFolder">Ftp folder destination uri</param>
             <param name="inheritance">True if sub folders need to be added</param>
+        </member>
+        <member name="M:Inertia.Web.FtpUploader.RemoveFile(System.String)">
+            <summary>
+            Remove the specified file from the queue
+            </summary>
+            <param name="path"></param>
         </member>
         <member name="M:Inertia.Web.FtpUploader.UploadQueue">
             <summary>

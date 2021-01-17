@@ -90,11 +90,14 @@ namespace Inertia.Web
         /// Instantiate a new instance of the class <see cref="WebDownloader"/>
         /// </summary>
         /// <param name="credentials">Credentials to use</param>
-        public FtpDownloader(FtpCredential credentials)
+        /// <param name="bufferSize">Buffer size of the downloader</param>
+        public FtpDownloader(FtpCredential credentials, uint bufferSize = 8192)
         {
             m_credentials = credentials;
             m_client = new SftpClient(credentials.Host, credentials.Port, credentials.Username, credentials.Password);
             m_files = new List<WebProgressFile>();
+
+            m_client.BufferSize = bufferSize;
         }
 
         #endregion

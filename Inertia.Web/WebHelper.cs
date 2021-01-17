@@ -32,7 +32,7 @@ namespace Inertia.Web
             }
             catch (Exception ex)
             {
-                BaseLogger.DefaultLogger.Log("GetRequest exception:: " + ex);
+                ex.GetLogger().Log("GetRequest exception:: " + ex);
                 return string.Empty;
             }
         }
@@ -58,7 +58,7 @@ namespace Inertia.Web
             }
             catch (Exception ex)
             {
-                BaseLogger.DefaultLogger.Log("GetRequestData exception:: " + ex);
+                ex.GetLogger().Log("GetRequestData exception:: " + ex);
                 return new byte[] { };
             }
         }
@@ -115,7 +115,7 @@ namespace Inertia.Web
             }
             catch (Exception ex)
             {
-                BaseLogger.DefaultLogger.Log("PostRequest exception:: " + ex);
+                ex.GetLogger().Log("PostRequest exception:: " + ex);
                 return string.Empty;
             }
         }
@@ -154,7 +154,7 @@ namespace Inertia.Web
             }
             catch (Exception ex)
             {
-                BaseLogger.DefaultLogger.Log("PostRequestData exception:: " + ex);
+                ex.GetLogger().Log("PostRequestData exception:: " + ex);
                 return new byte[] { };
             }
         }

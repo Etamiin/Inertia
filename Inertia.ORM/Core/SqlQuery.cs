@@ -25,7 +25,7 @@ namespace Inertia.ORM
             return new SqlQuery<T>(table, QueryType.Insert);
         }
         
-        public static SqlQuery<T> Update(T table, params string[] columnsToUpdate)
+        public static SqlQuery<T> BeginUpdate(T table, params string[] columnsToUpdate)
         {
             var query = new SqlQuery<T>(table, QueryType.Update)
             {
@@ -47,7 +47,7 @@ namespace Inertia.ORM
 
             return query;
         }
-        public static SqlQuery<T> DeleteRecords()
+        public static SqlQuery<T> BeginDeleteRecords()
         {
             var table = SqlManager.GetTable<T>();
             if (table == null)
@@ -64,7 +64,7 @@ namespace Inertia.ORM
             var query = new SqlQuery<T>(table, QueryType.Truncate);
             return query.Execute();
         }
-        public static SqlQuery<T> BeginCount(string column, bool distinct = false)
+        public static SqlQuery<T> BeginCount(string column = "*", bool distinct = false)
         {
             var table = SqlManager.GetTable<T>();
             if (table == null)
@@ -75,6 +75,17 @@ namespace Inertia.ORM
                 m_selectedColumns = new string[] { column },
                 m_countDistinct = distinct
             };
+
+            return query;
+        }
+        public static SqlQuery<T> BeginExist()
+        {
+            var table = SqlManager.GetTable<T>();
+            if (table == null)
+                return null;
+
+            var query = new SqlQuery<T>(table, QueryType.Exist);
+            query.OnCondition().Limit(1);
 
             return query;
         }
@@ -94,9 +105,11 @@ namespace Inertia.ORM
             Type = queryType;
         }
 
-        public SqlCondition<T> CreateCondition()
+        public SqlCondition<T> OnCondition()
         {
-            m_condition = new SqlCondition<T>(this);
+            if (m_condition == null)
+                m_condition = new SqlCondition<T>(this);
+
             return m_condition;
         }
         public void AssignCondition(SqlCondition<T> condition)
@@ -137,7 +150,7 @@ namespace Inertia.ORM
                 return new T[] { };
 
             Command.CommandText = GetQuery();
-
+            
             var records = new List<T>();
             OnSqlReader((reader) => records.Add(Select(reader)));
 
@@ -149,14 +162,16 @@ namespace Inertia.ORM
         {
             var count = 0L;
 
-            if (Type == QueryType.Count) {
+            if (Type == QueryType.Count || Type == QueryType.Exist) {
                 Command.CommandText = GetQuery();
-
-                Console.WriteLine(Command.CommandText);
                 OnSqlReader((reader) => count = (long)reader.GetValue(0));
             }
 
             return count;
+        }
+        public bool Exist()
+        {
+            return Count() > 0;
         }
         public long Average()
         {
@@ -310,13 +325,12 @@ namespace Inertia.ORM
                         continue;
 
                     builder.Append(m_selectedColumns[i]);
-
                     if (i < m_selectedColumns.Length - 1)
                         builder.Append(",");
                 }
             }
             else
-                builder.Append("* ");
+                builder.Append("*");
 
             builder.Append(" FROM `" + Table.TableName + "`");
 
@@ -336,13 +350,12 @@ namespace Inertia.ORM
             if (m_countDistinct)
                 builder.Append("DISTINCT ");
 
-            if (m_selectedColumns.Length > 0)
-                builder.Append(m_selectedColumns[0]);
-            else
+            if (m_selectedColumns == null || m_selectedColumns.Length == 0 || string.IsNullOrEmpty(m_selectedColumns[0]))
                 builder.Append("*");
+            else
+                builder.Append(m_selectedColumns[0]);
 
             builder.Append(") FROM `" + Table.TableName + "`");
-
             return builder.ToString();
         }
 
@@ -400,6 +413,7 @@ namespace Inertia.ORM
                 case QueryType.Truncate:
                     return GetTruncateQuery();
                 case QueryType.Count:
+                case QueryType.Exist:
                     query =  GetCountQuery();
                     break;
             }

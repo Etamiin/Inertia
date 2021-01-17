@@ -88,7 +88,7 @@ namespace Inertia.Network
         /// <param name="packet">Packet to send</param>
         public void Send(NetworkMessage packet)
         {
-            Send(NetworkProtocol.Protocol.OnParseMessage(packet));
+            Send(NetworkProtocol.GetProtocol().OnParseMessage(packet));
         }
 
         internal void OnConnected()

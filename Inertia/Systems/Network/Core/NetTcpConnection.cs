@@ -97,7 +97,7 @@ namespace Inertia.Network
         /// <param name="packet">Packet to send</param>
         public void Send(NetworkMessage packet)
         {
-            Send(NetworkProtocol.Protocol.OnParseMessage(packet));
+            Send(NetworkProtocol.GetProtocol().OnParseMessage(packet));
         }
 
         /// <summary>
@@ -123,7 +123,7 @@ namespace Inertia.Network
                 var data = new byte[received];
                 Array.Copy(m_buffer, data, received);
 
-                NetworkProtocol.Protocol.OnReceiveData(this, m_reader.Fill(data));
+                NetworkProtocol.GetProtocol().OnReceiveData(this, m_reader.Fill(data));
             }
             catch (Exception e)
             {
