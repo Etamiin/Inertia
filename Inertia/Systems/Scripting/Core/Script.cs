@@ -26,7 +26,8 @@ namespace Inertia.Realtime
         /// <summary>
         /// Get or set the maximum execution per second for scripting system
         /// </summary>
-        public static int MaxExecutionPerSecond = 335;
+        public static int MaxExecutionPerSecond = FixedMaxExecutionPerSecond;
+        internal const int FixedMaxExecutionPerSecond = 160;
 
         #endregion
 
@@ -86,7 +87,7 @@ namespace Inertia.Realtime
         /// <summary>
         /// Occurs when the script is updated (each frame)
         /// </summary>
-        protected abstract void OnUpdate();
+        protected virtual void OnUpdate() { }
         /// <summary>
         /// Occurs before the script is destroyed
         /// </summary>

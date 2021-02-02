@@ -43,8 +43,8 @@ namespace Inertia.Internal
         }
         private static void ExecuteLogic()
         {
-            if (Script.MaxExecutionPerSecond > 350)
-                Script.MaxExecutionPerSecond = 350;
+            if (Script.MaxExecutionPerSecond > Script.FixedMaxExecutionPerSecond)
+                Script.MaxExecutionPerSecond = Script.FixedMaxExecutionPerSecond;
 
             var targetMsUpdate = (int)Math.Round(1000f / Script.MaxExecutionPerSecond);
             var clock = new Clock();
@@ -53,6 +53,7 @@ namespace Inertia.Internal
                 while (true)
                 {
                     var currentMsUpdate = (int)clock.GetElapsedMilliseconds();
+
                     if (currentMsUpdate < targetMsUpdate)
                     {
                         Thread.Sleep(targetMsUpdate - currentMsUpdate);
