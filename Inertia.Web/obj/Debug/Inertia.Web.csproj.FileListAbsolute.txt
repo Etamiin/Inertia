@@ -19,8 +19,8 @@ D:\VisualStudio Projects\InertiaLib\Inertia.Web\bin\Debug\Renci.SshNet.dll
 D:\VisualStudio Projects\InertiaLib\Inertia.Web\bin\Debug\Inertia.pdb
 D:\VisualStudio Projects\InertiaLib\Inertia.Web\bin\Debug\Inertia.xml
 D:\VisualStudio Projects\InertiaLib\Inertia.Web\bin\Debug\Renci.SshNet.xml
-D:\VisualStudio Projects\InertiaLib\Inertia.Web\obj\Debug\Inertia.Web.csprojAssemblyReference.cache
 D:\VisualStudio Projects\InertiaLib\Inertia.Web\obj\Debug\Inertia.Web.csproj.CoreCompileInputs.cache
 D:\VisualStudio Projects\InertiaLib\Inertia.Web\obj\Debug\Inertia.Web.csproj.CopyComplete
 D:\VisualStudio Projects\InertiaLib\Inertia.Web\obj\Debug\Inertia.Web.dll
 D:\VisualStudio Projects\InertiaLib\Inertia.Web\obj\Debug\Inertia.Web.pdb
+D:\VisualStudio Projects\InertiaLib\Inertia.Web\obj\Debug\Inertia.Web.csprojAssemblyReference.cache

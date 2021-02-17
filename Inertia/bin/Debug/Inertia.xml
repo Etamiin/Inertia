@@ -1784,6 +1784,13 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:Inertia.TextCommandArgs.ResetArg(System.Int32,System.String)">
+            <summary>
+            Reset the value of the argument at the specified index
+            </summary>
+            <param name="index">Index of the argument</param>
+            <param name="value">New value of the argument</param>
+        </member>
         <member name="M:Inertia.TextCommandArgs.ToString">
             <summary>
             Get the base command line

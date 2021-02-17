@@ -121,7 +121,7 @@ namespace Inertia
             if (m_patterns.Count > 0)
             {
                 m_loggerQueue.Enqueue(() => {
-                    var cache = string.Format(log.ToString(), parameters);
+                    var cache = string.Format(log == null ? "NULL" : log.ToString(), parameters);
 
                     m_patterns.Values.ElementAt(0).Invoke(cache);
                     AddInCache(cache);

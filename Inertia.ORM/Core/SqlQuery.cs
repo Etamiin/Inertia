@@ -27,6 +27,9 @@ namespace Inertia.ORM
         
         public static SqlQuery<T> BeginUpdate(T table, params string[] columnsToUpdate)
         {
+            if (columnsToUpdate == null)
+                columnsToUpdate = new string[0];
+
             var query = new SqlQuery<T>(table, QueryType.Update)
             {
                 m_selectedColumns = columnsToUpdate
@@ -39,6 +42,9 @@ namespace Inertia.ORM
             var table = SqlManager.GetTable<T>();
             if (table == null)
                 return null;
+
+            if (columnsToSelect == null)
+                columnsToSelect = new string[0];
 
             var query = new SqlQuery<T>(table, QueryType.Select)
             {
@@ -54,15 +60,6 @@ namespace Inertia.ORM
                 return null;
 
             return new SqlQuery<T>(table, QueryType.Delete);
-        }
-        public static bool TruncateTable()
-        {
-            var table = SqlManager.GetTable<T>();
-            if (table == null)
-                return false;
-
-            var query = new SqlQuery<T>(table, QueryType.Truncate);
-            return query.Execute();
         }
         public static SqlQuery<T> BeginCount(string column = "*", bool distinct = false)
         {
@@ -90,6 +87,64 @@ namespace Inertia.ORM
             return query;
         }
 
+        public static bool Update(T table, params string[] columnsToUpdate)
+        {
+            return BeginUpdate(table, columnsToUpdate).Execute();
+        }
+        public static bool Update(T table, string[] columnsToUpdate = null, params BasicCondition[] conditions)
+        {
+            return BeginUpdate(table, columnsToUpdate).OnCondition(conditions).BackToQuery().Execute();
+        }
+        public static T Select(params string[] columnsToSelect)
+        {
+            return BeginSelect(columnsToSelect).EndSelect();
+        }
+        public static T Select(string[] columnsToSelect = null, params BasicCondition[] conditions)
+        {
+            return BeginSelect(columnsToSelect).OnCondition(conditions).BackToQuery().EndSelect();
+        }
+        public static T[] SelectAll(params string[] columnsToSelect)
+        {
+            return BeginSelect(columnsToSelect).EndSelectAll();
+        }
+        public static T[] SelectAll(string[] columnsToSelect = null, params BasicCondition[] conditions)
+        {
+            return BeginSelect(columnsToSelect).OnCondition(conditions).BackToQuery().EndSelectAll();
+        }
+        public static bool DeleteAllRecords()
+        {
+            return BeginDeleteRecords().Execute();
+        }
+        public static bool DeleteRecords(params BasicCondition[] conditions)
+        {
+            return BeginDeleteRecords().OnCondition(conditions).BackToQuery().Execute();
+        }
+        public static bool TruncateTable()
+        {
+            var table = SqlManager.GetTable<T>();
+            if (table == null)
+                return false;
+
+            var query = new SqlQuery<T>(table, QueryType.Truncate);
+            return query.Execute();
+        }
+        public static long Count(string column = "*", bool distinct = false)
+        {
+            return BeginCount(column, distinct).EndCount();
+        }
+        public static long Count(string column = "*", bool distinct = false, params BasicCondition[] conditions)
+        {
+            return BeginCount(column, distinct).OnCondition(conditions).BackToQuery().EndCount();
+        }
+        public static bool Exist()
+        {
+            return BeginExist().EndExist();
+        }
+        public static bool Exist(params BasicCondition[] conditions)
+        {
+            return BeginExist().OnCondition(conditions).BackToQuery().EndExist();
+        }
+
         internal T Table;
         internal MySqlCommand Command;
         internal QueryType Type;
@@ -112,6 +167,19 @@ namespace Inertia.ORM
 
             return m_condition;
         }
+        public SqlCondition<T> OnCondition(params BasicCondition[] conditions)
+        {
+            var condition = OnCondition();
+            foreach (var basicCondition in conditions)
+            {
+                if (!basicCondition.IsPatternCondition)
+                    condition.Add(basicCondition.FieldName, basicCondition.FieldValue, basicCondition.Operator, basicCondition.Type);
+                else
+                    condition.AddPattern(basicCondition.Pattern, basicCondition.Type);
+            }
+
+            return condition;
+        }
         public void AssignCondition(SqlCondition<T> condition)
         {
             if (condition == null)
@@ -133,7 +201,7 @@ namespace Inertia.ORM
             SqlManager.ExecuteQueryAsync(this, callback);
         }
 
-        public T Select()
+        public T EndSelect()
         {
             T instance = null;
 
@@ -144,7 +212,7 @@ namespace Inertia.ORM
 
             return instance;
         }
-        public T[] SelectAll()
+        public T[] EndSelectAll()
         {
             if (Type != QueryType.Select)
                 return new T[] { };
@@ -158,7 +226,7 @@ namespace Inertia.ORM
         }
 
         //Check for update -- 
-        public long Count()
+        public long EndCount()
         {
             var count = 0L;
 
@@ -169,9 +237,9 @@ namespace Inertia.ORM
 
             return count;
         }
-        public bool Exist()
+        public bool EndExist()
         {
-            return Count() > 0;
+            return EndCount() > 0;
         }
         public long Average()
         {
@@ -268,7 +336,7 @@ namespace Inertia.ORM
                 Command.Parameters.AddWithValue("@" + field.Name, field.GetValue(Table));
             }
 
-            builder.Append(" (" + fields + ") VALUES (" + fields.Replace(",", ",@") + ")");
+            builder.Append(" (" + fields + ") VALUES (@" + fields.Replace(",", ",@") + ")");
 
             return builder.ToString();
         }
@@ -382,7 +450,7 @@ namespace Inertia.ORM
         }
 
         internal void OnSqlReader(BasicAction<MySqlDataReader> onReader)
-        {
+        { 
             using (var reader = Command.ExecuteReader())
             {
                 while (reader.Read())

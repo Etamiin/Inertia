@@ -68,15 +68,13 @@ namespace Inertia.ORM
             {
                 var conn = new MySqlConnection("server=" + Host + ";uid=" + User + ";pwd=" + Password + ";database=" + Name + ";port=" + Port);
                 conn.Open();
-
+                
                 return conn;
             }
             catch
             {
                 throw new DatabaseConnectionFailedException(this);
             }
-
-            return null;
         }
         internal MySqlCommand CreateCommand()
         {
@@ -105,9 +103,9 @@ namespace Inertia.ORM
         /// </summary>
         public void CreateAllTables()
         {
-            var tables = SqlManager.GetTableFromDatabase(this);
+            var tables = SqlManager.GetTablesFromDatabase(this);
             foreach (var table in tables)
-                SqlQuery<Table>.CreateTable(table);
+                table.Create();
         }
     }
 }

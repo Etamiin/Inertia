@@ -14,16 +14,18 @@ namespace Inertia.Web
     public static class WebHelper
     {
         /// <summary>
-        /// Execute a HTTP GET request and return the string response
+        /// Execute a HTTP GET request with specified parameters and return the string response
         /// </summary>
         /// <param name="uriRequest">Uri to request</param>
+        /// <param name="parameters">Parameters to apply to the request</param>
         /// <returns></returns>
-        public static string GetRequest(Uri uriRequest)
+        public static string GetRequest(Uri uriRequest, RequestParameters parameters = null)
         {
             try
             {
                 var request = (HttpWebRequest)WebRequest.Create(uriRequest);
-                request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+                if (parameters != null)
+                    parameters.ApplyToRequest(request);
 
                 using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
                 using (Stream stream = response.GetResponseStream())
@@ -37,16 +39,30 @@ namespace Inertia.Web
             }
         }
         /// <summary>
+        /// Execute a HTTP GET asynchronously request
+        /// </summary>
+        /// <param name="uriRequest">Uri to request</param>
+        /// <param name="callback">Action to execute when receiving response</param>
+        /// <param name="parameters">Parameters to apply to the request</param>
+        /// <returns></returns>
+        public static void GetRequestAsync(Uri uriRequest, BasicAction<string> callback, RequestParameters parameters = null)
+        {
+            Task.Factory.StartNew(() => callback(GetRequest(uriRequest, parameters)));
+        }
+        /// <summary>
         /// Execute a HTTP GET request and return the byte[] data response
         /// </summary>
         /// <param name="uriRequest">Uri to request</param>
+        /// <param name="parameters">Parameters to apply to the request</param>
         /// <returns></returns>
-        public static byte[] GetRequestData(Uri uriRequest)
+        public static byte[] GetRequestData(Uri uriRequest, RequestParameters parameters = null)
         {
             try
             {
                 var request = (HttpWebRequest)WebRequest.Create(uriRequest);
-                request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+                if (parameters != null)
+                    parameters.ApplyToRequest(request);
+
                 using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
                 using (Stream stream = response.GetResponseStream())
                 {
@@ -67,18 +83,9 @@ namespace Inertia.Web
         /// </summary>
         /// <param name="uriRequest">Uri to request</param>
         /// <param name="callback">Action to execute when receiving response</param>
+        /// <param name="parameters">Parameters to apply to the request</param>
         /// <returns></returns>
-        public static void GetRequestAsync(Uri uriRequest, BasicAction<string> callback)
-        {
-            Task.Factory.StartNew(() => callback(GetRequest(uriRequest)));
-        }
-        /// <summary>
-        /// Execute a HTTP GET asynchronously request
-        /// </summary>
-        /// <param name="uriRequest">Uri to request</param>
-        /// <param name="callback">Action to execute when receiving response</param>
-        /// <returns></returns>
-        public static void GetRequestDataAsync(Uri uriRequest, BasicAction<byte[]> callback)
+        public static void GetRequestDataAsync(Uri uriRequest, BasicAction<byte[]> callback, RequestParameters parameters = null)
         {
             Task.Factory.StartNew(() => callback(GetRequestData(uriRequest)));
         }
@@ -87,25 +94,39 @@ namespace Inertia.Web
         /// Execute a HTTP POST request and return the string response
         /// </summary>
         /// <param name="uriRequest">Uri to request</param>
-        /// <param name="data">Data to post</param>
-        /// <param name="contentType">Content-Type of the request</param>
+        /// <param name="parameters">Parameters to apply to the request</param>
         /// <returns></returns>
-        public static string PostRequest(Uri uriRequest, string data, string contentType = "text/html")
+        public static string PostRequest(Uri uriRequest, RequestParameters parameters = null)
+        {
+            return PostRequest(uriRequest, data: "", parameters);
+        }
+        /// <summary>
+        /// Execute a HTTP POST request and return the string response
+        /// </summary>
+        /// <param name="uriRequest">Uri to request</param>
+        /// <param name="data">Data to post</param>
+        /// <param name="parameters">Parameters to apply to the request</param>
+        /// <returns></returns>
+        public static string PostRequest(Uri uriRequest, string data, RequestParameters parameters = null)
         {
             try
             {
                 var body = Encoding.ASCII.GetBytes(data);
 
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uriRequest);
-                request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
-                request.ContentLength = body.Length;
-                request.ContentType = contentType;
                 request.Method = "POST";
 
-                using (var requestBody = request.GetRequestStream())
+                if (!string.IsNullOrEmpty(data))
                 {
-                    requestBody.Write(body, 0, body.Length);
+                    parameters.SetContentLength(body.LongLength);
+
+                    using (var requestBody = request.GetRequestStream())
+                        requestBody.Write(body, 0, body.Length);
                 }
+
+                if (parameters != null)
+                    parameters.ApplyToRequest(request);
+
                 using (var response = (HttpWebResponse)request.GetResponse())
                 using (var stream = response.GetResponseStream())
                 using (var reader = new StreamReader(stream))
@@ -124,19 +145,20 @@ namespace Inertia.Web
         /// </summary>
         /// <param name="uriRequest">Uri to request</param>
         /// <param name="data">Data to post</param>
-        /// <param name="contentType">Content-Type of the request</param>
+        /// <param name="parameters">Parameters to apply to the request</param>
         /// <returns></returns>
-        public static byte[] PostRequestData(Uri uriRequest, string data, string contentType = "text/html")
+        public static byte[] PostRequestData(Uri uriRequest, string data, RequestParameters parameters = null)
         {
             try
             {
                 byte[] dataBytes = Encoding.UTF8.GetBytes(data);
 
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uriRequest);
-                request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
                 request.ContentLength = dataBytes.Length;
-                request.ContentType = contentType;
                 request.Method = "POST";
+
+                if (parameters != null)
+                    parameters.ApplyToRequest(request);
 
                 using (Stream requestBody = request.GetRequestStream())
                 {
@@ -164,11 +186,11 @@ namespace Inertia.Web
         /// <param name="uriRequest">Uri to request</param>
         /// <param name="data">Data to post</param>
         /// <param name="callback">Action to execute when receiving response</param>
-        /// <param name="contentType">Content-Type of the request</param>
+        /// <param name="parameters">Parameters to apply to the request</param>
         /// <returns></returns>
-        public static void PostRequestAsync(Uri uriRequest, string data, BasicAction<string> callback, string contentType = "text/html")
+        public static void PostRequestAsync(Uri uriRequest, string data, BasicAction<string> callback, RequestParameters parameters = null)
         {
-            Task.Factory.StartNew(() => callback(PostRequest(uriRequest, data, contentType)));
+            Task.Factory.StartNew(() => callback(PostRequest(uriRequest, data, parameters)));
         }
         /// <summary>
         /// Execute a HTTP POST asynchronously request
@@ -176,12 +198,11 @@ namespace Inertia.Web
         /// <param name="uriRequest">Uri to request</param>
         /// <param name="data">Data to post</param>
         /// <param name="callback">Action to execute when receiving response</param>
-        /// <param name="contentType">Content-Type of the request</param>
+        /// <param name="parameters">Parameters to apply to the request</param>
         /// <returns></returns>
-        public static void PostRequestDataAsync(Uri uriRequest, string data, BasicAction<byte[]> callback, string contentType = "text/html")
+        public static void PostRequestDataAsync(Uri uriRequest, string data, BasicAction<byte[]> callback, RequestParameters parameters = null)
         {
-            Task.Factory.StartNew(() => callback(PostRequestData(uriRequest, data, contentType)));
+            Task.Factory.StartNew(() => callback(PostRequestData(uriRequest, data, parameters)));
         }
-
     }
 }

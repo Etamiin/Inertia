@@ -38,7 +38,7 @@ namespace Inertia.ORM
             else
                 return constructor.Invoke(new object[] { });
         }
-        internal static Table[] GetTableFromDatabase(Database database)
+        internal static Table[] GetTablesFromDatabase(Database database)
         {
             var tables = new List<Table>();
 

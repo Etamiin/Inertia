@@ -1,14 +1,13 @@
-# Inertia MultiTasks library for C#.NET
+# Inertia library for C#.NET
 
 ### Features
 
 * **Complete Networking system (TCP and UDP)**
 * **Complete ORM for MySql**
-* **Web extensions and helpers**
-* Realtime scripting system
+* **Realtime scripting system**
+* Web extensions and helpers
 * .IO extensions and helpers
 * Logger system for custom loggers
-* Customized plugins for Inertia
 
 ## Documentation
 

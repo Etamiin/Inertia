@@ -97,7 +97,7 @@ namespace Inertia
                     {
                         action();
                     }
-                    catch (Exception ex) { this.GetLogger().Log(ex); }
+                    catch { }
                 }
 
                 m_queue.Clear();

@@ -59,6 +59,7 @@
     <Compile Include="Attributes\VarChar.cs" />
     <Compile Include="Core\Database.cs" />
     <Compile Include="Core\Table.cs" />
+    <Compile Include="Data\BasicCondition.cs" />
     <Compile Include="Data\FieldType.cs" />
     <Compile Include="Data\SqlCondition.cs" />
     <Compile Include="Core\SqlQuery.cs" />

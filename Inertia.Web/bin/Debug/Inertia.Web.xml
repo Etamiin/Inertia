@@ -416,72 +416,84 @@
             Offers multiple utilities functions for web networking
             </summary>
         </member>
-        <member name="M:Inertia.Web.WebHelper.GetRequest(System.Uri)">
+        <member name="M:Inertia.Web.WebHelper.GetRequest(System.Uri,Inertia.Web.RequestParameters)">
             <summary>
-            Execute a HTTP GET request and return the string response
+            Execute a HTTP GET request with specified parameters and return the string response
             </summary>
             <param name="uriRequest">Uri to request</param>
+            <param name="parameters">Parameters to apply to the request</param>
             <returns></returns>
         </member>
-        <member name="M:Inertia.Web.WebHelper.GetRequestData(System.Uri)">
+        <member name="M:Inertia.Web.WebHelper.GetRequestAsync(System.Uri,BasicAction{System.String},Inertia.Web.RequestParameters)">
+            <summary>
+            Execute a HTTP GET asynchronously request
+            </summary>
+            <param name="uriRequest">Uri to request</param>
+            <param name="callback">Action to execute when receiving response</param>
+            <param name="parameters">Parameters to apply to the request</param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.Web.WebHelper.GetRequestData(System.Uri,Inertia.Web.RequestParameters)">
             <summary>
             Execute a HTTP GET request and return the byte[] data response
             </summary>
             <param name="uriRequest">Uri to request</param>
+            <param name="parameters">Parameters to apply to the request</param>
             <returns></returns>
         </member>
-        <member name="M:Inertia.Web.WebHelper.GetRequestAsync(System.Uri,BasicAction{System.String})">
+        <member name="M:Inertia.Web.WebHelper.GetRequestDataAsync(System.Uri,BasicAction{System.Byte[]},Inertia.Web.RequestParameters)">
             <summary>
             Execute a HTTP GET asynchronously request
             </summary>
             <param name="uriRequest">Uri to request</param>
             <param name="callback">Action to execute when receiving response</param>
+            <param name="parameters">Parameters to apply to the request</param>
             <returns></returns>
         </member>
-        <member name="M:Inertia.Web.WebHelper.GetRequestDataAsync(System.Uri,BasicAction{System.Byte[]})">
+        <member name="M:Inertia.Web.WebHelper.PostRequest(System.Uri,Inertia.Web.RequestParameters)">
             <summary>
-            Execute a HTTP GET asynchronously request
+            Execute a HTTP POST request and return the string response
             </summary>
             <param name="uriRequest">Uri to request</param>
-            <param name="callback">Action to execute when receiving response</param>
+            <param name="parameters">Parameters to apply to the request</param>
             <returns></returns>
         </member>
-        <member name="M:Inertia.Web.WebHelper.PostRequest(System.Uri,System.String,System.String)">
+        <member name="M:Inertia.Web.WebHelper.PostRequest(System.Uri,System.String,Inertia.Web.RequestParameters)">
             <summary>
             Execute a HTTP POST request and return the string response
             </summary>
             <param name="uriRequest">Uri to request</param>
             <param name="data">Data to post</param>
-            <param name="contentType">Content-Type of the request</param>
+            <param name="parameters">Parameters to apply to the request</param>
             <returns></returns>
         </member>
-        <member name="M:Inertia.Web.WebHelper.PostRequestData(System.Uri,System.String,System.String)">
+        <member name="M:Inertia.Web.WebHelper.PostRequestData(System.Uri,System.String,Inertia.Web.RequestParameters)">
             <summary>
             Execute a HTTP POST request and return the byte[] data response
             </summary>
             <param name="uriRequest">Uri to request</param>
             <param name="data">Data to post</param>
-            <param name="contentType">Content-Type of the request</param>
+            <param name="parameters">Parameters to apply to the request</param>
             <returns></returns>
         </member>
-        <member name="M:Inertia.Web.WebHelper.PostRequestAsync(System.Uri,System.String,BasicAction{System.String},System.String)">
+        <member name="M:Inertia.Web.WebHelper.PostRequestAsync(System.Uri,System.String,BasicAction{System.String},Inertia.Web.RequestParameters)">
             <summary>
             Execute a HTTP POST asynchronously request
             </summary>
             <param name="uriRequest">Uri to request</param>
             <param name="data">Data to post</param>
             <param name="callback">Action to execute when receiving response</param>
-            <param name="contentType">Content-Type of the request</param>
+            <param name="parameters">Parameters to apply to the request</param>
             <returns></returns>
         </member>
-        <member name="M:Inertia.Web.WebHelper.PostRequestDataAsync(System.Uri,System.String,BasicAction{System.Byte[]},System.String)">
+        <member name="M:Inertia.Web.WebHelper.PostRequestDataAsync(System.Uri,System.String,BasicAction{System.Byte[]},Inertia.Web.RequestParameters)">
             <summary>
             Execute a HTTP POST asynchronously request
             </summary>
             <param name="uriRequest">Uri to request</param>
             <param name="data">Data to post</param>
             <param name="callback">Action to execute when receiving response</param>
-            <param name="contentType">Content-Type of the request</param>
+            <param name="parameters">Parameters to apply to the request</param>
             <returns></returns>
         </member>
         <member name="T:DownloadUpdateHandler">

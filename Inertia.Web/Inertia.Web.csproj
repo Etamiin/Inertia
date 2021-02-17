@@ -52,7 +52,9 @@
     <Compile Include="Core\FtpDownloader.cs" />
     <Compile Include="Core\FtpUploader.cs" />
     <Compile Include="Core\WebDownloader.cs" />
+    <Compile Include="Data\Enums\CoreRequestHeaders.cs" />
     <Compile Include="Data\FtpCredentials.cs" />
+    <Compile Include="Data\RequestParameters.cs" />
     <Compile Include="Data\WebProgressFile.cs" />
     <Compile Include="Exceptions\EnqueueInvalidInformationsException.cs" />
     <Compile Include="Exceptions\WebModuleBusyException.cs" />

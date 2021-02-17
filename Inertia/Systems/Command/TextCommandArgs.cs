@@ -210,6 +210,18 @@ namespace Inertia
         {
             return CombineArguments(0, Count);
         }
+        /// <summary>
+        /// Reset the value of the argument at the specified index
+        /// </summary>
+        /// <param name="index">Index of the argument</param>
+        /// <param name="value">New value of the argument</param>
+        public void ResetArg(int index, string value)
+        {
+            if (index < 0 || index >= m_arguments.Length)
+                return;
+
+            m_arguments[index] = value;
+        }
 
         /// <summary>
         /// Get the base command line
