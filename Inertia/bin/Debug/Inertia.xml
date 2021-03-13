@@ -126,71 +126,6 @@
             Initialize the current instance of <see cref="T:Inertia.ConsoleLogger"/>
             </summary>
         </member>
-        <member name="T:Inertia.InertiaExtensions">
-            <summary>
-            Contains all the library extension
-            </summary>
-        </member>
-        <member name="M:Inertia.InertiaExtensions.Shuffle``1(System.Collections.Generic.IList{``0})">
-            <summary>
-            Shuffle the list
-            </summary>
-            <typeparam name="T">Type of element</typeparam>
-            <param name="collection">List to shuffle</param>
-        </member>
-        <member name="M:Inertia.InertiaExtensions.GetSHA256(System.String)">
-            <summary>
-            Get the SHA256 key representation of the specified string 
-            </summary>
-            <param name="text">Target string</param>
-            <returns></returns>
-        </member>
-        <member name="M:Inertia.InertiaExtensions.GetSHA256(System.String,System.Text.Encoding)">
-            <summary>
-            Get the SHA256 key representation of the specified string
-            </summary>
-            <param name="text">Target string</param>
-            <param name="encoding">Target <see cref="T:System.Text.Encoding"/> algorithm to use</param>
-            <returns></returns>
-        </member>
-        <member name="M:Inertia.InertiaExtensions.GetLogger(System.Object)">
-            <summary>
-            Get the current logger used (<see cref="P:Inertia.BaseLogger.DefaultLogger"/>)
-            </summary>
-            <param name="obj"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Inertia.InertiaExtensions.Compress(System.Byte[],System.Boolean@)">
-            <summary>
-            Compress the specified byte array and return the compressed one
-            </summary>
-            <param name="data">Target byte array to compress</param>
-            <param name="compressed">Return true if the returned data is lower in length than the non-compressed data</param>
-            <returns>Compressed byte array</returns>
-        </member>
-        <member name="M:Inertia.InertiaExtensions.Decompress(System.Byte[])">
-            <summary>
-            Decompress the specified byte array and return the decompressed one
-            </summary>
-            <param name="compressedData">Target byte array to decompress</param>
-            <returns>Decompressed byte array</returns>
-        </member>
-        <member name="M:Inertia.InertiaExtensions.EncryptWithString(System.Byte[],System.String)">
-            <summary>
-            Encrypt the target byte array with the specified string key
-            </summary>
-            <param name="data">Target byte array to encrypt</param>
-            <param name="key">Target string key for encryption</param>
-            <returns>Encrypted byte array</returns>
-        </member>
-        <member name="M:Inertia.InertiaExtensions.DecryptWithString(System.Byte[],System.String)">
-            <summary>
-            Encrypt the target byte array with the specified string key
-            </summary>
-            <param name="encryptedData">Target byte array to encrypt</param>
-            <param name="key">Target string key for encryption</param>
-            <returns>Decrypted byte array</returns>
-        </member>
         <member name="T:Inertia.Network.NetTcpClient">
             <summary>
             Represent the TCP client
@@ -1416,6 +1351,32 @@
             </summary>
             <returns>Return a DateTime instance</returns>
         </member>
+        <member name="M:Inertia.BasicReader.DeserializeObject(Inertia.ISerializableObject)">
+            <summary>
+            Deserializa the specified <see cref="T:Inertia.ISerializableObject"/> object with the custom serialization method
+            </summary>
+            <param name="instance">Instance where to deserialize data</param>
+            <returns>Return a <see cref="T:Inertia.ISerializableObject"/></returns>
+        </member>
+        <member name="M:Inertia.BasicReader.DeserializeObject``1">
+            <summary>
+            Create an instance and return it after deserialization
+            </summary>
+            <returns>Return a <see cref="T:Inertia.ISerializableObject"/></returns>
+        </member>
+        <member name="M:Inertia.BasicReader.DeserializeObjects(System.Collections.Generic.IEnumerable{Inertia.ISerializableObject})">
+            <summary>
+            Deserializa the specified <see cref="T:Inertia.ISerializableObject"/> objects with the custom serialization method
+            </summary>
+            <param name="instances">Instances where to deserialize data</param>
+            <returns>Return a <see cref="T:Inertia.ISerializableObject"/> <see cref="T:System.Collections.IEnumerable"/> object</returns>
+        </member>
+        <member name="M:Inertia.BasicReader.DeserializeObjects``1(System.Int32)">
+            <summary>
+            Create instances and return them after deserialization
+            </summary>
+            <returns>Return a <see cref="T:Inertia.ISerializableObject"/></returns>
+        </member>
         <member name="M:Inertia.BasicReader.GetObject``1">
             <summary>
             Read the specified <typeparamref name="T"/> in the stream (only if the type has a <see cref="T:System.SerializableAttribute"/>)
@@ -1615,6 +1576,20 @@
             Write the specified value in the stream (without size)
             </summary>
             <param name="value">Target value to write</param>
+            <returns>Return the current instance</returns>
+        </member>
+        <member name="M:Inertia.BasicWriter.SetSerializableObject(Inertia.ISerializableObject)">
+            <summary>
+            Write customized serializable object in the stream
+            </summary>
+            <param name="obj"><see cref="T:Inertia.ISerializableObject"/> to serialize</param>
+            <returns>Return the current instance</returns>
+        </member>
+        <member name="M:Inertia.BasicWriter.SetSerializableObjects(System.Collections.Generic.IEnumerable{Inertia.ISerializableObject})">
+            <summary>
+            Write customized serializable objects in the stream
+            </summary>
+            <param name="objs"><see cref="T:Inertia.ISerializableObject"/> array to serialize</param>
             <returns>Return the current instance</returns>
         </member>
         <member name="M:Inertia.BasicWriter.SetObject``1(``0)">
@@ -2413,6 +2388,71 @@
             Network user datagram added handler
             </summary>
             <param name="connection"></param>
+        </member>
+        <member name="T:InertiaExtensions">
+            <summary>
+            Contains all the library extension
+            </summary>
+        </member>
+        <member name="M:InertiaExtensions.Shuffle``1(System.Collections.Generic.IList{``0})">
+            <summary>
+            Shuffle the list
+            </summary>
+            <typeparam name="T">Type of element</typeparam>
+            <param name="collection">List to shuffle</param>
+        </member>
+        <member name="M:InertiaExtensions.GetSHA256(System.String)">
+            <summary>
+            Get the SHA256 key representation of the specified string 
+            </summary>
+            <param name="text">Target string</param>
+            <returns></returns>
+        </member>
+        <member name="M:InertiaExtensions.GetSHA256(System.String,System.Text.Encoding)">
+            <summary>
+            Get the SHA256 key representation of the specified string
+            </summary>
+            <param name="text">Target string</param>
+            <param name="encoding">Target <see cref="T:System.Text.Encoding"/> algorithm to use</param>
+            <returns></returns>
+        </member>
+        <member name="M:InertiaExtensions.GetLogger(System.Object)">
+            <summary>
+            Get the current logger used (<see cref="P:Inertia.BaseLogger.DefaultLogger"/>)
+            </summary>
+            <param name="obj"></param>
+            <returns></returns>
+        </member>
+        <member name="M:InertiaExtensions.Compress(System.Byte[],System.Boolean@)">
+            <summary>
+            Compress the specified byte array and return the compressed one
+            </summary>
+            <param name="data">Target byte array to compress</param>
+            <param name="compressed">Return true if the returned data is lower in length than the non-compressed data</param>
+            <returns>Compressed byte array</returns>
+        </member>
+        <member name="M:InertiaExtensions.Decompress(System.Byte[])">
+            <summary>
+            Decompress the specified byte array and return the decompressed one
+            </summary>
+            <param name="compressedData">Target byte array to decompress</param>
+            <returns>Decompressed byte array</returns>
+        </member>
+        <member name="M:InertiaExtensions.EncryptWithString(System.Byte[],System.String)">
+            <summary>
+            Encrypt the target byte array with the specified string key
+            </summary>
+            <param name="data">Target byte array to encrypt</param>
+            <param name="key">Target string key for encryption</param>
+            <returns>Encrypted byte array</returns>
+        </member>
+        <member name="M:InertiaExtensions.DecryptWithString(System.Byte[],System.String)">
+            <summary>
+            Encrypt the target byte array with the specified string key
+            </summary>
+            <param name="encryptedData">Target byte array to encrypt</param>
+            <param name="key">Target string key for encryption</param>
+            <returns>Decrypted byte array</returns>
         </member>
     </members>
 </doc>

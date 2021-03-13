@@ -27,3 +27,13 @@ D:\VisualStudio Projects\InertiaLib\Inertia.ORM\obj\Debug\Inertia.ORM.csproj.Cop
 D:\VisualStudio Projects\InertiaLib\Inertia.ORM\obj\Debug\Inertia.ORM.dll
 D:\VisualStudio Projects\InertiaLib\Inertia.ORM\obj\Debug\Inertia.ORM.pdb
 D:\VisualStudio Projects\InertiaLib\Inertia.ORM\obj\Debug\Inertia.ORM.csprojAssemblyReference.cache
+D:\VS Projects\InertiaLib\Inertia.ORM\bin\Debug\Inertia.ORM.xml
+D:\VS Projects\InertiaLib\Inertia.ORM\bin\Debug\Inertia.ORM.dll
+D:\VS Projects\InertiaLib\Inertia.ORM\bin\Debug\Inertia.ORM.pdb
+D:\VS Projects\InertiaLib\Inertia.ORM\bin\Debug\Inertia.dll
+D:\VS Projects\InertiaLib\Inertia.ORM\bin\Debug\Inertia.pdb
+D:\VS Projects\InertiaLib\Inertia.ORM\bin\Debug\Inertia.xml
+D:\VS Projects\InertiaLib\Inertia.ORM\obj\Debug\Inertia.ORM.csproj.CoreCompileInputs.cache
+D:\VS Projects\InertiaLib\Inertia.ORM\obj\Debug\Inertia.ORM.csproj.CopyComplete
+D:\VS Projects\InertiaLib\Inertia.ORM\obj\Debug\Inertia.ORM.dll
+D:\VS Projects\InertiaLib\Inertia.ORM\obj\Debug\Inertia.ORM.pdb

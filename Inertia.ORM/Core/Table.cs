@@ -49,7 +49,7 @@ namespace Inertia.ORM
                 return;
 
             IgnoreCreation = GetType().GetCustomAttribute<IgnoreTableCreation>() != null;
-            Database = SqlManager.GetDatabase(attachment.DatabaseType);
+            Database = attachment.GetDatabase();
 
             if (Database == null)
                 throw new InvalidDatabaseAttachException(attachment.DatabaseType);
@@ -114,6 +114,15 @@ namespace Inertia.ORM
             return SqlQuery<Table>
                 .Insert(this)
                 .Execute();
+        }
+        /// <summary>
+        /// Insert a new record of type <see cref="Table"/> in the <see cref="Inertia.ORM.Database"/>
+        /// </summary>
+        public bool Insert(out long lastInsertedId)
+        {
+            return SqlQuery<Table>
+                .Insert(this)
+                .Execute(out lastInsertedId);
         }
         /// <summary>
         /// Insert a new record of type <see cref="Table"/> asynchronously in the <see cref="Inertia.ORM.Database"/>

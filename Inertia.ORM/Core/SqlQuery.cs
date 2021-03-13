@@ -14,7 +14,7 @@ namespace Inertia.ORM
     {
         internal static SqlQuery<T> CreateTable(T table)
         {
-            return new SqlQuery<T>(table, QueryType.CreateTable); ;
+            return new SqlQuery<T>(table, QueryType.CreateTable);
         }
         internal static SqlQuery<T> DeleteTable(T table)
         {
@@ -196,7 +196,11 @@ namespace Inertia.ORM
         {
             return SqlManager.ExecuteQuery(this, out _);
         }
-        public void ExecuteAsync(BasicAction<bool, int> callback)
+        public bool Execute(out long lastInsertedId)
+        {
+            return SqlManager.ExecuteQuery(this, out lastInsertedId);
+        }
+        public void ExecuteAsync(BasicAction<bool, long> callback)
         {
             SqlManager.ExecuteQueryAsync(this, callback);
         }
@@ -266,7 +270,6 @@ namespace Inertia.ORM
             //TODO
             return 0;
         }
-
         //--
 
         private string GetCreateTableQuery()
@@ -456,6 +459,9 @@ namespace Inertia.ORM
                 while (reader.Read())
                     onReader(reader);
             }
+
+            Command.Connection.Close();
+            Command.Dispose();
         }
         internal string GetQuery()
         {

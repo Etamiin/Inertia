@@ -15,9 +15,13 @@ namespace Inertia.ORM
         #region Public variables
 
         /// <summary>
-        /// Database name attached to
+        /// Database type attached to
         /// </summary>
         public readonly Type DatabaseType;
+        /// <summary>
+        /// Database name attached to
+        /// </summary>
+        public readonly string DatabaseName;
 
         #endregion
 
@@ -34,7 +38,23 @@ namespace Inertia.ORM
 
             DatabaseType = databaseType;
         }
+        /// <summary>
+        /// Instantiate a new instance of the class <see cref="DatabaseAttach"/>
+        /// </summary>
+        /// <param name="databaseName">Database name to attach</param>
+        public DatabaseAttach(string databaseName)
+        {
+            DatabaseName = databaseName;
+        }
         
         #endregion
+    
+        internal Database GetDatabase()
+        {
+            if (DatabaseType != null)
+                return SqlManager.GetDatabase(DatabaseType);
+            else
+                return SqlManager.GetDatabase(DatabaseName);
+        }
     }
 }

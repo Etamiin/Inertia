@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 
@@ -402,6 +403,71 @@ namespace Inertia
             return new DateTime(GetLong());
         }
         /// <summary>
+        /// Deserializa the specified <see cref="ISerializableObject"/> object with the custom serialization method
+        /// </summary>
+        /// <param name="instance">Instance where to deserialize data</param>
+        /// <returns>Return a <see cref="ISerializableObject"/></returns>
+        public ISerializableObject DeserializeObject(ISerializableObject instance)
+        {
+            instance.Deserialize(this);
+            return instance;
+        }
+        /// <summary>
+        /// Create an instance and return it after deserialization
+        /// </summary>
+        /// <returns>Return a <see cref="ISerializableObject"/></returns>
+        public T DeserializeObject<T>() where T : ISerializableObject
+        {
+            try
+            {
+                var parameters = typeof(T)
+                    .GetConstructors()[0].GetParameters()
+                    .Select(p => (object)null)
+                    .ToArray();
+                var instance = (T)Activator.CreateInstance(typeof(T), parameters);
+                if (instance != null)
+                {
+                    instance.Deserialize(this);
+                    return instance;
+                }
+            }
+            catch { }
+
+            return default(T);
+        }
+        /// <summary>
+        /// Deserializa the specified <see cref="ISerializableObject"/> objects with the custom serialization method
+        /// </summary>
+        /// <param name="instances">Instances where to deserialize data</param>
+        /// <returns>Return a <see cref="ISerializableObject"/> <see cref="IEnumerable"/> object</returns>
+        public IEnumerable<ISerializableObject> DeserializeObjects(IEnumerable<ISerializableObject> instances)
+        {
+            foreach (var instance in instances)
+                instance.Deserialize(this);
+
+            return instances;
+        }
+        /// <summary>
+        /// Create instances and return them after deserialization
+        /// </summary>
+        /// <returns>Return a <see cref="ISerializableObject"/></returns>
+        public IEnumerable<T> DeserializeObjects<T>(int count) where T : ISerializableObject
+        {
+            var instances = new T[count];
+            for (var i = 0; i < instances.Length; i++)
+            {
+                var parameters = typeof(T)
+                    .GetConstructors()[0].GetParameters()
+                    .Select(p => (object)null)
+                    .ToArray();
+
+                instances[i] = (T)Activator.CreateInstance(typeof(T), parameters);
+                instances[i].Deserialize(this);
+            }
+
+            return instances;
+        }
+        /// <summary>
         /// Read the specified <typeparamref name="T"/> in the stream (only if the type has a <see cref="SerializableAttribute"/>)
         /// </summary>
         /// <typeparam name="T">Target type to deserialize</typeparam>
@@ -423,7 +489,6 @@ namespace Inertia
 
             return binaryFormatter.Deserialize(m_reader.BaseStream);
         }
-
         /// <summary>
         /// Read the specified <see cref="Type"/> and return it (if it's readable, or null)
         /// </summary>

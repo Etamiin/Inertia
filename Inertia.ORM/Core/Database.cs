@@ -15,28 +15,59 @@ namespace Inertia.ORM
     /// </summary>
     public abstract class Database
     {
+        /// <summary>
+        /// Create a <see cref="RuntimeDatabase"/> with specified informations
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="host"></param>
+        /// <param name="user"></param>
+        /// <param name="password"></param>
+        /// <param name="onCreated"></param>
+        /// <param name="port"></param>
+        /// <param name="autoGenerate"></param>
+        /// <returns></returns>
+        public static Database Create(string name, string host, string user, string password, BasicAction onCreated, int port = 3306, bool autoGenerate = false)
+        {
+            var db = new RuntimeDatabase()
+            {
+                Name = name,
+                Host = host,
+                User = user,
+                Password = password,
+                Port = port,
+                AutoCreateTables = autoGenerate
+            };
+
+            SqlManager.RegisterCustomDatabase(db);
+            if (db.AutoCreateTables)
+                db.CreateAllTables();
+
+            onCreated?.Invoke();
+            return db;
+        }
+
         #region Public variables
 
         /// <summary>
         /// Get the name of the database
         /// </summary>
-        public abstract string Name { get; }
+        public abstract string Name { get; set; }
         /// <summary>
         /// Get the host ip of the database
         /// </summary>
-        public abstract string Host { get; }
+        public abstract string Host { get; set; }
         /// <summary>
         /// Get the username to use for the connection
         /// </summary>
-        public abstract string User { get; }
+        public abstract string User { get; set; }
         /// <summary>
         /// Get the password to use for the connection
         /// </summary>
-        public abstract string Password { get; }
+        public abstract string Password { get; set; }
         /// <summary>
         /// Get the port to use for the connection
         /// </summary>
-        public virtual int Port { get => 3306; }
+        public virtual int Port { get; set; } = 3306;
 
         #endregion
 
@@ -68,7 +99,7 @@ namespace Inertia.ORM
             {
                 var conn = new MySqlConnection("server=" + Host + ";uid=" + User + ";pwd=" + Password + ";database=" + Name + ";port=" + Port);
                 conn.Open();
-                
+
                 return conn;
             }
             catch

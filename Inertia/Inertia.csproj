@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Inertia</RootNamespace>
     <AssemblyName>Inertia</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
     <TargetFrameworkProfile />
@@ -46,6 +46,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\IO\Exceptions\TypeNonSerializableException.cs" />
+    <Compile Include="Core\IO\Interfaces\ISerializableData.cs" />
+    <Compile Include="Core\IO\Interfaces\ISerializableObject.cs" />
     <Compile Include="Core\PathExtensions.cs" />
     <Compile Include="Core\Plugins\InertiaPlugin.cs" />
     <Compile Include="Core\Plugins\PluginManager.cs" />

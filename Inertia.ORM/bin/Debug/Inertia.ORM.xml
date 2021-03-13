@@ -21,6 +21,11 @@
         </member>
         <member name="F:Inertia.ORM.DatabaseAttach.DatabaseType">
             <summary>
+            Database type attached to
+            </summary>
+        </member>
+        <member name="F:Inertia.ORM.DatabaseAttach.DatabaseName">
+            <summary>
             Database name attached to
             </summary>
         </member>
@@ -29,6 +34,22 @@
             Instantiate a new instance of the class <see cref="T:Inertia.ORM.DatabaseAttach"/>
             </summary>
             <param name="databaseType">Database type to attach</param>
+        </member>
+        <member name="M:Inertia.ORM.DatabaseAttach.#ctor(System.String)">
+            <summary>
+            Instantiate a new instance of the class <see cref="T:Inertia.ORM.DatabaseAttach"/>
+            </summary>
+            <param name="databaseName">Database name to attach</param>
+        </member>
+        <member name="T:Inertia.ORM.IgnoreDatabase">
+            <summary>
+            Define for a <see cref="T:Inertia.ORM.Database"/> that is ignored at the initialization
+            </summary>
+        </member>
+        <member name="M:Inertia.ORM.IgnoreDatabase.#ctor">
+            <summary>
+            Instantiate a new instance of the class <see cref="T:Inertia.ORM.IgnoreDatabase"/>
+            </summary>
         </member>
         <member name="T:Inertia.ORM.IgnoreField">
             <summary>
@@ -102,6 +123,19 @@
             <summary>
             Represent the database class
             </summary>
+        </member>
+        <member name="M:Inertia.ORM.Database.Create(System.String,System.String,System.String,System.String,BasicAction,System.Int32,System.Boolean)">
+            <summary>
+            Create a <see cref="T:Inertia.ORM.RuntimeDatabase"/> with specified informations
+            </summary>
+            <param name="name"></param>
+            <param name="host"></param>
+            <param name="user"></param>
+            <param name="password"></param>
+            <param name="onCreated"></param>
+            <param name="port"></param>
+            <param name="autoGenerate"></param>
+            <returns></returns>
         </member>
         <member name="P:Inertia.ORM.Database.Name">
             <summary>
@@ -191,6 +225,11 @@
             </summary>
         </member>
         <member name="M:Inertia.ORM.Table.Insert">
+            <summary>
+            Insert a new record of type <see cref="T:Inertia.ORM.Table"/> in the <see cref="T:Inertia.ORM.Database"/>
+            </summary>
+        </member>
+        <member name="M:Inertia.ORM.Table.Insert(System.Int64@)">
             <summary>
             Insert a new record of type <see cref="T:Inertia.ORM.Table"/> in the <see cref="T:Inertia.ORM.Database"/>
             </summary>

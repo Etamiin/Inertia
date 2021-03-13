@@ -26,7 +26,7 @@ namespace Inertia.ORM
         public BasicCondition(string pattern, ConditionType type = ConditionType.And)
         {
             Pattern = pattern;
-            Type = type;
+            Type = type;           
         }
     }
 }

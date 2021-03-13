@@ -151,19 +151,17 @@ namespace Inertia.Web
         {
             try
             {
-                byte[] dataBytes = Encoding.UTF8.GetBytes(data);
+                var dataBytes = Encoding.UTF8.GetBytes(data);
 
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uriRequest);
-                request.ContentLength = dataBytes.Length;
+                var request = (HttpWebRequest)WebRequest.Create(uriRequest);
                 request.Method = "POST";
+                request.ContentLength = dataBytes.Length;
 
                 if (parameters != null)
                     parameters.ApplyToRequest(request);
 
                 using (Stream requestBody = request.GetRequestStream())
-                {
                     requestBody.Write(dataBytes, 0, dataBytes.Length);
-                }
 
                 using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
                 using (Stream stream = response.GetResponseStream())
@@ -174,10 +172,17 @@ namespace Inertia.Web
                     return ms.ToArray();
                 }
             }
-            catch (Exception ex)
+            catch (WebException ex)
             {
-                ex.GetLogger().Log("PostRequestData exception:: " + ex);
-                return new byte[] { };
+                if (ex.Response != null && ex.Response.ResponseUri != uriRequest)
+                {
+                    return PostRequestData(ex.Response.ResponseUri, data, parameters);
+                }
+                else
+                {
+                    ex.GetLogger().Log("PostRequestData exception:: " + ex);
+                    return new byte[] { };
+                }
             }
         }
         /// <summary>

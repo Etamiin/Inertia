@@ -141,7 +141,6 @@ namespace Inertia.Network
                 throw new ObjectDisposedException(nameof(NetUdpServer));
 
             Close();
-            m_client?.Dispose();
             m_client = null;
             IsDisposed = true;
         }

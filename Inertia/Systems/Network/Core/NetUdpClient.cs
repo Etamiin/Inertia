@@ -22,7 +22,7 @@ namespace Inertia.Network
         {
             get
             {
-                return m_client?.Client == null ? false : m_client.Client.Connected;
+                return (m_client?.Client) != null && m_client.Client.Connected;
             }
         }
 
@@ -117,7 +117,6 @@ namespace Inertia.Network
                 throw new ObjectDisposedException(nameof(NetUdpClient));
 
             Disconnect(NetworkDisconnectReason.ManuallyDisconnect);
-            m_client?.Dispose();
             m_client = null;
             IsDisposed = true;
         }

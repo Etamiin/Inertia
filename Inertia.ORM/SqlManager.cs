@@ -17,6 +17,7 @@ namespace Inertia.ORM
         private static AutoQueueExecutor m_queue;
         private static Dictionary<string, Database> m_databases;
         private static Dictionary<Type, Table> m_tables;
+        private static List<Type> m_unloadedTables;
         private static Random m_random;
         private readonly static char[] m_chars = new char[] { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
 
@@ -75,27 +76,52 @@ namespace Inertia.ORM
                 db.Value.CreateAllTables();
         }
 
-        internal static bool ExecuteQuery<T>(SqlQuery<T> query, out int result) where T : Table
+        internal static void RegisterCustomDatabase(Database database)
         {
-            result = -1;
+            if (m_databases == null)
+                LoadDatabases();
+
+            if (!m_databases.ContainsKey(database.Name))
+            {
+                m_databases.Add(database.Name, database);
+
+                foreach (var tableType in m_unloadedTables)
+                {
+                    var table = (Table)CreateInstance(tableType);
+                    if (table != null && table.Database != null)
+                        m_tables.Add(tableType, table);
+                }
+
+                m_unloadedTables.RemoveAll((t) => m_tables.ContainsKey(t));
+            }
+        }
+        internal static bool ExecuteQuery<T>(SqlQuery<T> query, out long lastInsertedId) where T : Table
+        {
+            lastInsertedId = -1;
 
             try
             {
                 query.Command.CommandText = query.GetQuery();
-                result = query.Command.ExecuteNonQuery();
+                query.Command.ExecuteNonQuery();
+
+                lastInsertedId = query.Command.LastInsertedId;
+
+                query.Command.Connection.Close();
+                query.Command.Dispose();
 
                 return true;
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 query.GetLogger().Log(ex.Message);
                 return false;
             }
         }
-        internal static void ExecuteQueryAsync<T>(SqlQuery<T> query, BasicAction<bool, int> callback) where T : Table
+        internal static void ExecuteQueryAsync<T>(SqlQuery<T> query, BasicAction<bool, long> callback) where T : Table
         {
             m_queue.Enqueue(() => {
-                var success = ExecuteQuery(query, out int result);
-                callback(success, result);
+                var success = ExecuteQuery(query, out long lastInsertedId);
+                callback(success, lastInsertedId);
             });
         }
 
@@ -182,54 +208,63 @@ namespace Inertia.ORM
 
         private static void LoadDatabases()
         {
-            if (m_queue == null)
-                m_queue = new AutoQueueExecutor();
-
-            m_databases = new Dictionary<string, Database>();
-            m_tables = new Dictionary<Type, Table>();
-
-            var tables = new List<Type>();
-            var assemblys = AppDomain.CurrentDomain.GetAssemblies();
-            foreach (var assembly in assemblys)
+            try
             {
-                var types = assembly.GetTypes();
-                foreach (var type in types)
-                {
-                    if (type.IsAbstract)
-                        continue;
+                if (m_queue == null)
+                    m_queue = new AutoQueueExecutor();
 
-                    if (type.IsClass)
+                m_databases = new Dictionary<string, Database>();
+                m_tables = new Dictionary<Type, Table>();
+                m_unloadedTables = new List<Type>();
+
+                var assemblys = AppDomain.CurrentDomain.GetAssemblies();
+                foreach (var assembly in assemblys)
+                {
+                    var types = assembly.GetTypes();
+                    foreach (var type in types)
                     {
-                        if (type.IsSubclassOf(typeof(Database)))
+                        if (type.IsAbstract)
+                            continue;
+
+                        if (type.IsClass)
                         {
-                            var autoCreateAttr = type.GetCustomAttribute<AutoGenerateTables>();
-                            var database = (Database)CreateInstance(type);
-                            if (database != null && !m_databases.ContainsKey(database.Name))
+                            if (type.IsSubclassOf(typeof(Database)))
                             {
-                                database.AutoCreateTables = autoCreateAttr != null;
-                                m_databases.Add(database.Name, database);
+                                if (type.GetCustomAttribute<IgnoreDatabase>() != null)
+                                    continue;
+
+                                var autoCreateAttr = type.GetCustomAttribute<AutoGenerateTables>();
+                                var database = (Database)CreateInstance(type);
+                                if (database != null && !string.IsNullOrEmpty(database.Name) && !m_databases.ContainsKey(database.Name))
+                                {
+                                    database.AutoCreateTables = autoCreateAttr != null;
+                                    m_databases.Add(database.Name, database);
+                                }
                             }
+                            else if (type.IsSubclassOf(typeof(Table)))
+                                m_unloadedTables.Add(type);
                         }
-                        else if (type.IsSubclassOf(typeof(Table)))
-                            tables.Add(type);
                     }
                 }
-            }
 
-            foreach (var tableType in tables)
-            {
-                var table = (Table)CreateInstance(tableType);
-                if (table != null && table.Database != null)
-                    m_tables.Add(tableType, table);
-            }
+                foreach (var tableType in m_unloadedTables)
+                {
+                    var table = (Table)CreateInstance(tableType);
+                    if (table != null && table.Database != null)
+                        m_tables.Add(tableType, table);
+                }
 
-            foreach (var db in m_databases.Values)
-            {
-                if (db.AutoCreateTables)
-                    db.CreateAllTables();
+                m_unloadedTables.RemoveAll((t) => m_tables.ContainsKey(t));
 
-                db.OnCreated();
+                foreach (var db in m_databases.Values)
+                {
+                    if (db.AutoCreateTables)
+                        db.CreateAllTables();
+
+                    db.OnCreated();
+                }
             }
+            catch (Exception ex) { ex.GetLogger().Log("Loading databases failed: " + ex); }
         }
     }
 }

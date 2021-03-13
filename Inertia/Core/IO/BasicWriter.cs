@@ -309,6 +309,28 @@ namespace Inertia
             return SetLong(value.Ticks);
         }
         /// <summary>
+        /// Write customized serializable object in the stream
+        /// </summary>
+        /// <param name="obj"><see cref="ISerializableObject"/> to serialize</param>
+        /// <returns>Return the current instance</returns>
+        public BasicWriter SetSerializableObject(ISerializableObject obj)
+        {
+            obj.Serialize(this);
+            return this;
+        }
+        /// <summary>
+        /// Write customized serializable objects in the stream
+        /// </summary>
+        /// <param name="objs"><see cref="ISerializableObject"/> array to serialize</param>
+        /// <returns>Return the current instance</returns>
+        public BasicWriter SetSerializableObjects(IEnumerable<ISerializableObject> objs)
+        {
+            foreach (var obj in objs)
+                obj.Serialize(this);
+
+            return this;
+        }
+        /// <summary>
         /// Write the specified serializable value in the stream
         /// </summary>
         /// <typeparam name="T">The type of object to serialize</typeparam>
@@ -327,7 +349,6 @@ namespace Inertia
             binaryFormatter.Serialize(m_writer.BaseStream, value);
             return this;
         }
-        
         /// <summary>
         /// Automatically write the specified value in the stream (if serializable)
         /// </summary>
