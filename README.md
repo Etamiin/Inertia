@@ -12,7 +12,7 @@
 ### Install & Clone
 ```csharp
 //NuGet install package
-Install-Package Inertia -Version 2021.3.17.444
+Install-Package Inertia -Version 2021.3.17.4443
 Install-Package Inertia.ORM -Version 2021.3.17.444
 Install-Package Inertia.Web -Version 2021.3.17.444
 
