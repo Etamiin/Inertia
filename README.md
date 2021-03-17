@@ -2,8 +2,8 @@
 
 ### .Net Framework
 [![NuGet](https://img.shields.io/badge/NuGet-Inertia-green.svg)](https://www.nuget.org/packages/Inertia/)
-![NuGet](https://img.shields.io/badge/NuGet-Inertia.ORM-black.svg)
-![NuGet](https://img.shields.io/badge/NuGet-Inertia.Web-black.svg)
+[![NuGet](https://img.shields.io/badge/NuGet-Inertia.ORM-green.svg)](https://www.nuget.org/packages/Inertia.ORM/)
+[![NuGet](https://img.shields.io/badge/NuGet-Inertia.Web-green.svg)](https://www.nuget.org/packages/Inertia.Web/)
 ### .Net Core
 ![NuGet](https://img.shields.io/badge/NuGet-InertiaCore-black.svg)
 ![NuGet](https://img.shields.io/badge/NuGet-InertiaCore.ORM-black.svg)
@@ -13,12 +13,14 @@
 ```csharp
 //NuGet install package
 Install-Package Inertia -Version 2021.3.17.444
+Install-Package Inertia.ORM -Version 2021.3.17.444
+Install-Package Inertia.Web -Version 2021.3.17.444
 
 //Git clone repo
 git clone https://github.com/Etamiin/Inertia.git
 ```
 
-> Currently only Inertia is published on NuGet yet
+> Inertia .NET Core versions arn't published on NuGet yet.
 
 > Get last release in [Releases](https://github.com/Etamiin/Inertia/releases)
 
@@ -29,5 +31,5 @@ git clone https://github.com/Etamiin/Inertia.git
 * [ ] Web examples
 * [ ] IO examples
 * [x] [Scripting examples](https://github.com/Etamiin/Inertia/tree/master/Examples/Realtime)
-* [x] [Logger examples](https://github.com/Etamiin/Inertia/tree/master/Examples/Logger)
+* [ ] Logger examples
 * [ ] Plugin examples
