@@ -19,6 +19,7 @@ git clone https://github.com/Etamiin/Inertia.git
 ```
 
 > Currently only Inertia is published on NuGet yet
+
 > Get last release in [Releases](https://github.com/Etamiin/Inertia/releases)
 
 ## [Usage Examples](https://github.com/Etamiin/Inertia/tree/master/Examples)
