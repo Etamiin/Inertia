@@ -1,19 +1,27 @@
-# Inertia library for C#.NET
+## Inertia library for C#.NET
 
-### Features
+### .Net Framework
+[![NuGet](https://img.shields.io/badge/NuGet-Inertia-green.svg)](https://www.nuget.org/packages/Inertia/)
+![NuGet](https://img.shields.io/badge/NuGet-Inertia.ORM-black.svg)
+![NuGet](https://img.shields.io/badge/NuGet-Inertia.Web-black.svg)
+### .Net Core
+![NuGet](https://img.shields.io/badge/NuGet-InertiaCore-black.svg)
+![NuGet](https://img.shields.io/badge/NuGet-InertiaCore.ORM-black.svg)
+![NuGet](https://img.shields.io/badge/NuGet-InertiaCore.Web-black.svg)
 
-* **Complete Networking system (TCP and UDP)**
-* **Complete ORM for MySql**
-* **Realtime scripting system**
-* Web extensions and helpers
-* .IO extensions and helpers
-* Logger system for custom loggers
+### Install & Clone
+```csharp
+//NuGet install package
+Install-Package Inertia -Version 2021.3.17.444
 
-## Documentation
+//Git clone repo
+git clone https://github.com/Etamiin/Inertia.git
+```
 
-*not available*
+> Currently only Inertia is published on NuGet yet
+> Get last release in [Releases](https://github.com/Etamiin/Inertia/releases)
 
-## [Examples](https://github.com/Etamiin/Inertia/tree/master/Examples)
+## [Usage Examples](https://github.com/Etamiin/Inertia/tree/master/Examples)
 
 * [x] [Networking examples](https://github.com/Etamiin/Inertia/tree/master/Examples/Networking)
 * [ ] ORM examples
@@ -22,9 +30,3 @@
 * [x] [Scripting examples](https://github.com/Etamiin/Inertia/tree/master/Examples/Realtime)
 * [x] [Logger examples](https://github.com/Etamiin/Inertia/tree/master/Examples/Logger)
 * [ ] Plugin examples
-
-```
-git clone https://github.com/Etamiin/Inertia.git
-```
-
-> Get last release in [Releases](https://github.com/Etamiin/Inertia/releases)

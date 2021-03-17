@@ -1,0 +1,8 @@
+D:\VS Projects\InertiaLib\InertiaCore\bin\Debug\netcoreapp3.1\InertiaCore.deps.json
+D:\VS Projects\InertiaLib\InertiaCore\bin\Debug\netcoreapp3.1\InertiaCore.dll
+D:\VS Projects\InertiaLib\InertiaCore\bin\Debug\netcoreapp3.1\InertiaCore.pdb
+D:\VS Projects\InertiaLib\InertiaCore\obj\Debug\netcoreapp3.1\InertiaCore.AssemblyInfoInputs.cache
+D:\VS Projects\InertiaLib\InertiaCore\obj\Debug\netcoreapp3.1\InertiaCore.AssemblyInfo.cs
+D:\VS Projects\InertiaLib\InertiaCore\obj\Debug\netcoreapp3.1\InertiaCore.csproj.CoreCompileInputs.cache
+D:\VS Projects\InertiaLib\InertiaCore\obj\Debug\netcoreapp3.1\InertiaCore.dll
+D:\VS Projects\InertiaLib\InertiaCore\obj\Debug\netcoreapp3.1\InertiaCore.pdb

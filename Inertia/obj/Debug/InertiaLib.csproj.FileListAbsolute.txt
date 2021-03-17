@@ -1,8 +1,0 @@
-C:\Users\Emma\Desktop\etam1\InertiaLib\InertiaLib\bin\Debug\InertiaLib.dll
-C:\Users\Emma\Desktop\etam1\InertiaLib\InertiaLib\bin\Debug\InertiaLib.pdb
-C:\Users\Emma\Desktop\etam1\InertiaLib\InertiaLib\obj\Debug\InertiaLib.dll
-C:\Users\Emma\Desktop\etam1\InertiaLib\InertiaLib\obj\Debug\InertiaLib.pdb
-C:\Users\abdel\Desktop\InertiaLib\InertiaLib\bin\Debug\InertiaLib.dll
-C:\Users\abdel\Desktop\InertiaLib\InertiaLib\bin\Debug\InertiaLib.pdb
-C:\Users\abdel\Desktop\InertiaLib\InertiaLib\obj\Debug\InertiaLib.dll
-C:\Users\abdel\Desktop\InertiaLib\InertiaLib\obj\Debug\InertiaLib.pdb

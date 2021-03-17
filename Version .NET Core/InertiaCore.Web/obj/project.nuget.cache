@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "XAx7BevwDRqV5pKgCoG4Q9gUN4hR7+A7CeN2prI2kxZqoGhn28mBRU7Cqg+MSKtzImj4cjdTyCWV8dzdLAMdIQ==",
+  "success": true,
+  "projectFilePath": "D:\\VS Projects\\InertiaLib\\InertiaCore.Web\\InertiaCore.Web.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\abdel\\.nuget\\packages\\ssh.net\\2020.0.1\\ssh.net.2020.0.1.nupkg.sha512",
+    "C:\\Users\\abdel\\.nuget\\packages\\sshnet.security.cryptography\\1.3.0\\sshnet.security.cryptography.1.3.0.nupkg.sha512"
+  ],
+  "logs": []
+}

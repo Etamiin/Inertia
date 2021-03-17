@@ -1,0 +1,38 @@
+C:\Users\abdel\Desktop\projetsPerso\Inertia\InertiaLib\Inertia.Web\bin\Debug\Inertia.Web.xml
+C:\Users\abdel\Desktop\projetsPerso\Inertia\InertiaLib\Inertia.Web\bin\Debug\Inertia.Web.dll
+C:\Users\abdel\Desktop\projetsPerso\Inertia\InertiaLib\Inertia.Web\bin\Debug\Inertia.Web.pdb
+C:\Users\abdel\Desktop\projetsPerso\Inertia\InertiaLib\Inertia.Web\bin\Debug\Inertia.dll
+C:\Users\abdel\Desktop\projetsPerso\Inertia\InertiaLib\Inertia.Web\bin\Debug\Renci.SshNet.dll
+C:\Users\abdel\Desktop\projetsPerso\Inertia\InertiaLib\Inertia.Web\bin\Debug\Inertia.pdb
+C:\Users\abdel\Desktop\projetsPerso\Inertia\InertiaLib\Inertia.Web\bin\Debug\Inertia.xml
+C:\Users\abdel\Desktop\projetsPerso\Inertia\InertiaLib\Inertia.Web\bin\Debug\Renci.SshNet.xml
+C:\Users\abdel\Desktop\projetsPerso\Inertia\InertiaLib\Inertia.Web\obj\Debug\Inertia.Web.csproj.CopyComplete
+C:\Users\abdel\Desktop\projetsPerso\Inertia\InertiaLib\Inertia.Web\obj\Debug\Inertia.Web.dll
+C:\Users\abdel\Desktop\projetsPerso\Inertia\InertiaLib\Inertia.Web\obj\Debug\Inertia.Web.pdb
+C:\Users\abdel\Desktop\projetsPerso\Inertia\InertiaLib\Inertia.Web\obj\Debug\Inertia.Web.csproj.CoreCompileInputs.cache
+C:\Users\abdel\Desktop\projetsPerso\Inertia\InertiaLib\Inertia.Web\obj\Debug\Inertia.Web.csprojAssemblyReference.cache
+D:\VisualStudio Projects\InertiaLib\Inertia.Web\bin\Debug\Inertia.Web.xml
+D:\VisualStudio Projects\InertiaLib\Inertia.Web\bin\Debug\Inertia.Web.dll
+D:\VisualStudio Projects\InertiaLib\Inertia.Web\bin\Debug\Inertia.Web.pdb
+D:\VisualStudio Projects\InertiaLib\Inertia.Web\bin\Debug\Inertia.dll
+D:\VisualStudio Projects\InertiaLib\Inertia.Web\bin\Debug\Renci.SshNet.dll
+D:\VisualStudio Projects\InertiaLib\Inertia.Web\bin\Debug\Inertia.pdb
+D:\VisualStudio Projects\InertiaLib\Inertia.Web\bin\Debug\Inertia.xml
+D:\VisualStudio Projects\InertiaLib\Inertia.Web\bin\Debug\Renci.SshNet.xml
+D:\VisualStudio Projects\InertiaLib\Inertia.Web\obj\Debug\Inertia.Web.csproj.CoreCompileInputs.cache
+D:\VisualStudio Projects\InertiaLib\Inertia.Web\obj\Debug\Inertia.Web.csproj.CopyComplete
+D:\VisualStudio Projects\InertiaLib\Inertia.Web\obj\Debug\Inertia.Web.dll
+D:\VisualStudio Projects\InertiaLib\Inertia.Web\obj\Debug\Inertia.Web.pdb
+D:\VS Projects\InertiaLib\Inertia.Web\bin\Debug\Inertia.Web.xml
+D:\VS Projects\InertiaLib\Inertia.Web\bin\Debug\Inertia.Web.dll
+D:\VS Projects\InertiaLib\Inertia.Web\bin\Debug\Inertia.Web.pdb
+D:\VS Projects\InertiaLib\Inertia.Web\bin\Debug\Inertia.dll
+D:\VS Projects\InertiaLib\Inertia.Web\bin\Debug\Renci.SshNet.dll
+D:\VS Projects\InertiaLib\Inertia.Web\bin\Debug\Inertia.pdb
+D:\VS Projects\InertiaLib\Inertia.Web\bin\Debug\Inertia.xml
+D:\VS Projects\InertiaLib\Inertia.Web\bin\Debug\Renci.SshNet.xml
+D:\VS Projects\InertiaLib\Inertia.Web\obj\Debug\Inertia.Web.csproj.CoreCompileInputs.cache
+D:\VS Projects\InertiaLib\Inertia.Web\obj\Debug\Inertia.Web.csproj.CopyComplete
+D:\VS Projects\InertiaLib\Inertia.Web\obj\Debug\Inertia.Web.dll
+D:\VS Projects\InertiaLib\Inertia.Web\obj\Debug\Inertia.Web.pdb
+D:\VS Projects\InertiaLib\Inertia.Web\obj\Debug\Inertia.Web.csprojAssemblyReference.cache
