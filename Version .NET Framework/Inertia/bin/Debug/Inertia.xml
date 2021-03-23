@@ -186,6 +186,11 @@
             
             </summary>
         </member>
+        <member name="M:Inertia.LoaderManager.ReloadAll">
+            <summary>
+            Reload-all, not thread safe
+            </summary>
+        </member>
         <member name="M:Inertia.LoaderManager.ReloadPlugins(System.Boolean)">
             <summary>
             Reload all the plugins in memory

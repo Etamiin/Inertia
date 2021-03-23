@@ -34,10 +34,16 @@ namespace Inertia
         {
             get
             {
+                if (_writer == null)
+                    return 0;
+
                 return _writer.BaseStream.Position;
             }
             set
             {
+                if (_writer == null)
+                    return;
+
                 _writer.BaseStream.Position = value;
             }
         }
@@ -90,8 +96,9 @@ namespace Inertia
         {
             if (IsDisposed)
                 throw new ObjectDisposedException(nameof(BasicWriter));
+            if (_writer != null)
+                _writer.Dispose();
 
-            _writer.Dispose();
             _writer = new BinaryWriter(new MemoryStream(), _encoding);
         }
 
@@ -368,7 +375,7 @@ namespace Inertia
         /// <returns></returns>
         public byte[] ToArray()
         {
-            if (IsDisposed)
+            if (IsDisposed || _writer == null)
                 throw new ObjectDisposedException(nameof(BasicWriter));
 
             var data = ((MemoryStream)_writer.BaseStream).ToArray();

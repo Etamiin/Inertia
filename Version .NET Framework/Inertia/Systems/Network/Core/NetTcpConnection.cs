@@ -89,7 +89,7 @@ namespace Inertia.Network
             if (!IsConnected)
                 return;
 
-            m_socket.Send(data);
+            try { m_socket.Send(data); } catch { }
         }
         /// <summary>
         /// Send a <see cref="NetworkMessage"/>instance to the current TCP connection

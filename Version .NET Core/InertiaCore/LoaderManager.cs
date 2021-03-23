@@ -23,13 +23,38 @@ namespace Inertia
         private static bool _commandsLoaded => Commands != null;
         private static bool _networkLoaded => NetworkMessageTypes != null;
 
-        internal static void LoadIfNotLoaded()
+        /// <summary>
+        /// Reload-all, not thread safe
+        /// </summary>
+        public static void ReloadAll()
         {
+            if (Commands != null)
+            {
+                Commands.Clear();
+                Commands = null;
+            }
+            if (NetworkMessageTypes != null)
+            {
+                NetworkMessageTypes.Clear();
+                NetworkMessageTypes = null;
+            }
+            if (NetworkMessageHookers != null)
+            {
+                NetworkMessageHookers.Clear();
+                NetworkMessageHookers = null;
+            }
+            if (_plugins != null)
+            {
+                _plugins.Clear();
+                _plugins = null;
+            }
+
+            ReloadPlugins(false);
+
             if (!_commandsLoaded)
                 LoadCommands();
             if (!_networkLoaded)
                 LoadNetworkMessages();
-            ReloadPlugins(false);
         }
 
         /// <summary>
@@ -44,6 +69,9 @@ namespace Inertia
                 _plugins = new List<IInertiaPlugin>();
             else
                 _plugins.Clear();
+
+            if (!Directory.Exists("Plugins"))
+                return;
 
             var files = InertiaIO.GetFilesPathFromDirectory("Plugins", false);
             foreach (var file in files)

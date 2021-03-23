@@ -58,7 +58,7 @@ namespace Inertia
             }
             set
             {
-                if (value < 0 || value > _reader.BaseStream.Length)
+                if (_reader == null || value < 0 || value > _reader.BaseStream.Length)
                     return;
 
                 _reader.BaseStream.Position = value;

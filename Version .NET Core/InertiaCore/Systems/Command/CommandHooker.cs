@@ -17,7 +17,7 @@ namespace Inertia
         /// <returns></returns>
         public static TextCommand[] GetAllCommands()
         {
-            LoaderManager.LoadIfNotLoaded();
+            LoaderManager.ReloadAll();
 
             var cmds = new TextCommand[0];
             lock (LoaderManager.Commands)
@@ -32,7 +32,7 @@ namespace Inertia
         /// <returns></returns>
         public static TextCommand GetCommandByName(string commandName)
         {
-            LoaderManager.LoadIfNotLoaded();
+            LoaderManager.ReloadAll();
             LoaderManager.Commands.TryGetValue(commandName, out TextCommand command);
 
             return command;

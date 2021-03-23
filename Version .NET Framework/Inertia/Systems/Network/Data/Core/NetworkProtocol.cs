@@ -142,7 +142,7 @@ namespace Inertia.Network
         /// </summary>
         public NetworkProtocol()
         {
-            LoaderManager.LoadIfNotLoaded();
+            LoaderManager.ReloadAll();
         }
 
         /// <summary>

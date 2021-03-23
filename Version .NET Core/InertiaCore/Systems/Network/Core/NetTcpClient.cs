@@ -107,10 +107,13 @@ namespace Inertia.Network
         /// <param name="data">Byte array to send</param>
         public override void Send(byte[] data)
         {
+            if (IsDisposed)
+                throw new NotImplementedException(nameof(NetTcpClient));
+
             if (!IsConnected)
                 return;
 
-            m_socket.Send(data);
+            try { m_socket.Send(data); } catch { }
         }
 
         /// <summary>
