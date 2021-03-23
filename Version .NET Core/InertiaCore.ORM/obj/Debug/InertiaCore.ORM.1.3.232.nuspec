@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>InertiaCore.ORM</id>
+    <version>1.3.232</version>
+    <authors>Etamiin (A.B)</authors>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="expression">MIT</license>
+    <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
+    <icon>inertia_logo.png</icon>
+    <description>Inertia provide ORM Database (MySql) features</description>
+    <tags>ORM MySql SQL Database</tags>
+    <dependencies>
+      <group targetFramework=".NETCoreApp3.1">
+        <dependency id="InertiaCore" version="1.3.232" exclude="Build,Analyzers" />
+        <dependency id="MySql.Data" version="8.0.23" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="D:\VS Projects\InertiaLib\InertiaCore.ORM\bin\Debug\netcoreapp3.1\InertiaCore.ORM.dll" target="lib\netcoreapp3.1\InertiaCore.ORM.dll" />
+    <file src="C:\Users\abdel\Desktop\Inertia NuGet package\Inertia\bin\Debug\inertia_logo.png" target="inertia_logo.png" />
+  </files>
+</package>

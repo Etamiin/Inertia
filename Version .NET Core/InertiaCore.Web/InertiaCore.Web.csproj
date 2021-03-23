@@ -1,8 +1,16 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+
+    <PackageId>InertiaCore.Web</PackageId>
+    <Description>Inertia provide Web features</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageIcon>inertia_logo.png</PackageIcon>
+    <PackageTags>Web SFtp HTTP</PackageTags>
+    <Version>1.3.232</Version>
+    <Authors>Etamiin (A.B)</Authors>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,4 +21,8 @@
     <ProjectReference Include="..\InertiaCore\InertiaCore.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="C:\Users\abdel\Desktop\Inertia NuGet package\Inertia\bin\Debug\inertia_logo.png" Pack="true" PackagePath=""/>
+  </ItemGroup>
+  
 </Project>

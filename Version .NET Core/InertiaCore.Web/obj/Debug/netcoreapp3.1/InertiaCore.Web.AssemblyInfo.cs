@@ -11,13 +11,14 @@
 using System;
 using System.Reflection;
 
-[assembly: System.Reflection.AssemblyCompanyAttribute("InertiaCore.Web")]
+[assembly: System.Reflection.AssemblyCompanyAttribute("Etamiin (A.B)")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
-[assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyDescriptionAttribute("Inertia provide Web features")]
+[assembly: System.Reflection.AssemblyFileVersionAttribute("1.3.232.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.3.232")]
 [assembly: System.Reflection.AssemblyProductAttribute("InertiaCore.Web")]
 [assembly: System.Reflection.AssemblyTitleAttribute("InertiaCore.Web")]
-[assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
+[assembly: System.Reflection.AssemblyVersionAttribute("1.3.232.0")]
 
 // Généré par la classe MSBuild WriteCodeFragment.
 
