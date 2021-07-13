@@ -1,0 +1,11 @@
+C:\Users\abdel\source\repos\InertiaExamples\InertiaExamples\bin\Debug\InertiaExamples.exe.config
+C:\Users\abdel\source\repos\InertiaExamples\InertiaExamples\bin\Debug\InertiaExamples.exe
+C:\Users\abdel\source\repos\InertiaExamples\InertiaExamples\bin\Debug\InertiaExamples.pdb
+C:\Users\abdel\source\repos\InertiaExamples\InertiaExamples\bin\Debug\Inertia.dll
+C:\Users\abdel\source\repos\InertiaExamples\InertiaExamples\bin\Debug\Inertia.pdb
+C:\Users\abdel\source\repos\InertiaExamples\InertiaExamples\bin\Debug\Inertia.xml
+C:\Users\abdel\source\repos\InertiaExamples\InertiaExamples\obj\Debug\InertiaExamples.csprojAssemblyReference.cache
+C:\Users\abdel\source\repos\InertiaExamples\InertiaExamples\obj\Debug\InertiaExamples.csproj.CoreCompileInputs.cache
+C:\Users\abdel\source\repos\InertiaExamples\InertiaExamples\obj\Debug\InertiaExamples.csproj.CopyComplete
+C:\Users\abdel\source\repos\InertiaExamples\InertiaExamples\obj\Debug\InertiaExamples.exe
+C:\Users\abdel\source\repos\InertiaExamples\InertiaExamples\obj\Debug\InertiaExamples.pdb
