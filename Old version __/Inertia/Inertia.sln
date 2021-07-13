@@ -1,0 +1,55 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31129.286
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inertia", "Version .NET Framework\Inertia\Inertia.csproj", "{C1A6CE71-9FA3-4F2D-AF55-04188A041995}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inertia.ORM", "Version .NET Framework\Inertia.ORM\Inertia.ORM.csproj", "{46D66FDA-33C9-4BBC-8D2C-9B13B3E7CF48}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inertia.Web", "Version .NET Framework\Inertia.Web\Inertia.Web.csproj", "{65413496-C725-4F82-92B1-15D51F4EC04D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InertiaCore", "Version .NET Core\InertiaCore\InertiaCore.csproj", "{7650C2D1-096F-4E92-913C-CC000E1296CC}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InertiaCore.ORM", "Version .NET Core\InertiaCore.ORM\InertiaCore.ORM.csproj", "{75FE9087-AA0F-4609-B594-CADBE627DB54}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InertiaCore.Web", "Version .NET Core\InertiaCore.Web\InertiaCore.Web.csproj", "{A74E3ED4-A0B4-415B-B137-5C6C61167AF7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C1A6CE71-9FA3-4F2D-AF55-04188A041995}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C1A6CE71-9FA3-4F2D-AF55-04188A041995}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C1A6CE71-9FA3-4F2D-AF55-04188A041995}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C1A6CE71-9FA3-4F2D-AF55-04188A041995}.Release|Any CPU.Build.0 = Release|Any CPU
+		{46D66FDA-33C9-4BBC-8D2C-9B13B3E7CF48}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{46D66FDA-33C9-4BBC-8D2C-9B13B3E7CF48}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{46D66FDA-33C9-4BBC-8D2C-9B13B3E7CF48}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{46D66FDA-33C9-4BBC-8D2C-9B13B3E7CF48}.Release|Any CPU.Build.0 = Release|Any CPU
+		{65413496-C725-4F82-92B1-15D51F4EC04D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{65413496-C725-4F82-92B1-15D51F4EC04D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{65413496-C725-4F82-92B1-15D51F4EC04D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{65413496-C725-4F82-92B1-15D51F4EC04D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7650C2D1-096F-4E92-913C-CC000E1296CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7650C2D1-096F-4E92-913C-CC000E1296CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7650C2D1-096F-4E92-913C-CC000E1296CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7650C2D1-096F-4E92-913C-CC000E1296CC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{75FE9087-AA0F-4609-B594-CADBE627DB54}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{75FE9087-AA0F-4609-B594-CADBE627DB54}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{75FE9087-AA0F-4609-B594-CADBE627DB54}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{75FE9087-AA0F-4609-B594-CADBE627DB54}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A74E3ED4-A0B4-415B-B137-5C6C61167AF7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A74E3ED4-A0B4-415B-B137-5C6C61167AF7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A74E3ED4-A0B4-415B-B137-5C6C61167AF7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A74E3ED4-A0B4-415B-B137-5C6C61167AF7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D67DF456-0D2C-4447-A178-251D1E014D5E}
+	EndGlobalSection
+EndGlobal
