@@ -16,7 +16,7 @@ namespace Inertia.Network
         public event NetworkUdpConnectionAddedHandler ConnectionAdded = (connection) => { };
 
         /// <summary>
-        /// Return true if <see cref="Start"/> was called successfully.
+        /// Returns true if <see cref="Start"/> was called successfully.
         /// </summary>
         public bool IsInitialized
         {

@@ -257,7 +257,7 @@
         </member>
         <member name="P:Inertia.Network.UdpServerEntity.IsInitialized">
             <summary>
-            Return true if <see cref="M:Inertia.Network.UdpServerEntity.Start"/> was called successfully.
+            Returns true if <see cref="M:Inertia.Network.UdpServerEntity.Start"/> was called successfully.
             </summary>
         </member>
         <member name="M:Inertia.Network.UdpServerEntity.#ctor(System.String,System.Int32)">

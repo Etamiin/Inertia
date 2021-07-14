@@ -6,7 +6,7 @@ namespace Inertia.Network
     /// <summary>
     ///
     /// </summary>
-    public class TcpConnectionEntity : NetworkConnectionEntity
+    public sealed class TcpConnectionEntity : NetworkConnectionEntity
     {
         internal event NetworkDisconnectHandler Disconnected = (reason) => { };
 

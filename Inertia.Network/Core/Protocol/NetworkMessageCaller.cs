@@ -11,7 +11,7 @@ namespace Inertia.Network
     /// <summary>
     ///
     /// </summary>
-    public class NetworkMessageCaller
+    public sealed class NetworkMessageCaller
     {
         private event BasicAction<NetworkMessage, TcpClientEntity> OnTcpClient = (msg, cl) => { };
         private event BasicAction<NetworkMessage, UdpClientEntity> OnUdpClient = (msg, cl) => { };

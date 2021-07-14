@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // Les informations générales relatives à un assembly dépendent de
 // l'ensemble d'attributs suivant. Changez les valeurs de ces attributs pour modifier les informations
 // associées à un assembly.
-[assembly: AssemblyTitle("Inertia.Network")]
+[assembly: AssemblyTitle("Inertia.Runtime")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("owA!studio")]
-[assembly: AssemblyProduct("Inertia.Network")]
+[assembly: AssemblyProduct("Inertia.Runtime")]
 [assembly: AssemblyCopyright("Copyright ©  2021")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // Le GUID suivant est pour l'ID de la typelib si ce projet est exposé à COM
-[assembly: Guid("68811fe4-a94e-4376-8fb9-edf0e99a368b")]
+[assembly: Guid("c5761d50-c1fc-457e-99ea-11337972e00d")]
 
 // Les informations de version pour un assembly se composent des quatre valeurs suivantes :
 //

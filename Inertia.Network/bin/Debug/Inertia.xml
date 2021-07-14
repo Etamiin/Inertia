@@ -129,12 +129,6 @@
             
              </summary>
         </member>
-        <member name="M:Inertia.TextCommandArgs.Dispose(System.Boolean)">
-            <summary>
-            
-            </summary>
-            <param name="disposing"></param>
-        </member>
         <member name="T:Inertia.BasicReader">
              <summary>
             
@@ -319,19 +313,19 @@
             <summary>
             Read DateTime in the stream and change the position
             </summary>
-            <returns>Return a <see cref="T:System.DateTime"/> instance</returns>
+            <returns>Returns a <see cref="T:System.DateTime"/> instance</returns>
         </member>
         <member name="M:Inertia.BasicReader.TryDeserializeObject``1">
             <summary>
             Create an instance of <typeparamref name="T"/> and return it after deserialization
             </summary>
-            <returns>Return a <see cref="T:Inertia.ISerializableObject"/></returns>
+            <returns>Returns a <see cref="T:Inertia.ISerializableObject"/></returns>
         </member>
         <member name="M:Inertia.BasicReader.TryDeserializeData``1">
             <summary>
             Create an instance of <typeparamref name="T"/> and return it after deserialization
             </summary>
-            <returns>Return a <see cref="T:Inertia.ISerializableData"/></returns>
+            <returns>Returns a <see cref="T:Inertia.ISerializableData"/></returns>
         </member>
         <member name="M:Inertia.BasicReader.GetObject``1">
             <summary>
@@ -669,7 +663,7 @@
             Compress and return the specified data.
             </summary>
             <param name="data"></param>
-            <param name="hasBetterSize">Return true if the returned data is lower in length than the non-compressed data</param>
+            <param name="hasBetterSize">Returns true if the returned data is lower in length than the non-compressed data</param>
             <returns></returns>
         </member>
         <member name="M:Inertia.IOHelper.GzipDecompress(System.Byte[])">
@@ -792,12 +786,6 @@
             
             </summary>
         </member>
-        <member name="M:Inertia.AutoQueueExecutor.Dispose(System.Boolean)">
-            <summary>
-            
-            </summary>
-            <param name="disposing"></param>
-        </member>
         <member name="T:Inertia.ManualQueueExecutor">
              <summary>
             
@@ -835,12 +823,6 @@
             
              </summary>
         </member>
-        <member name="M:Inertia.ManualQueueExecutor.Dispose(System.Boolean)">
-            <summary>
-            
-            </summary>
-            <param name="disposing"></param>
-        </member>
         <member name="T:Inertia.Clock">
             <summary>
             
@@ -869,7 +851,7 @@
             <summary>
             Reset the clock's time
             </summary>
-            <returns>Return the current instance</returns>
+            <returns>Returns the current instance</returns>
         </member>
         <member name="M:Inertia.Clock.GetElapsedMilliseconds">
             <summary>
@@ -1178,7 +1160,7 @@
             Compress and return the specified data.
             </summary>
             <param name="data"></param>
-            <param name="hasBetterSize">Return true if the returned data is lower in length than the non-compressed data</param>
+            <param name="hasBetterSize">Returns true if the returned data is lower in length than the non-compressed data</param>
             <returns></returns>
         </member>
         <member name="M:Extensions.GzipDecompress(System.Byte[])">

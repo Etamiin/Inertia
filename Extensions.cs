@@ -52,7 +52,7 @@ public static partial class Extensions
     /// Compress and return the specified data.
     /// </summary>
     /// <param name="data"></param>
-    /// <param name="hasBetterSize">Return true if the returned data is lower in length than the non-compressed data</param>
+    /// <param name="hasBetterSize">Returns true if the returned data is lower in length than the non-compressed data</param>
     /// <returns></returns>
     public static byte[] GzipCompress(this byte[] data, out bool hasBetterSize)
     {

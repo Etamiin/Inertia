@@ -5,7 +5,7 @@ namespace Inertia.Network
     /// <summary>
     ///
     /// </summary>
-    public class UdpConnectionEntity : NetworkConnectionEntity
+    public sealed class UdpConnectionEntity : NetworkConnectionEntity
     {
         internal IPEndPoint EndPoint { get; set; }
 

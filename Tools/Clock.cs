@@ -5,7 +5,7 @@ namespace Inertia
     /// <summary>
     /// 
     /// </summary>
-    public class Clock
+    public sealed class Clock
     {
         /// <summary>
         /// Automatically creates an instance of the class <see cref="Clock"/> and returns in milliseconds the execution time of the indicated code
@@ -45,7 +45,7 @@ namespace Inertia
         /// <summary>
         /// Reset the clock's time
         /// </summary>
-        /// <returns>Return the current instance</returns>
+        /// <returns>Returns the current instance</returns>
         public Clock Reset()
         {
             _startTime = DateTime.Now;

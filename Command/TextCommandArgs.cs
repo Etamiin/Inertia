@@ -6,7 +6,7 @@ namespace Inertia
     /// <summary>
     /// Provides methods for accessing arguments when running a <see cref="TextCommand"/>
     /// </summary>
-    public class TextCommandArgs : IDisposable
+    public sealed class TextCommandArgs : IDisposable
     {
         /// <summary>
         /// Returns the name of the command executed.
@@ -172,14 +172,6 @@ namespace Inertia
         ///
         /// </summary>
         public void Dispose()
-        {
-            Dispose(true);
-        }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="disposing"></param>
-        protected virtual void Dispose(bool disposing)
         {
             if (m_disposed)
                 return;

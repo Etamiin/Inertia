@@ -8,7 +8,7 @@ namespace Inertia
     /// <summary>
     ///
     /// </summary>
-    public class AutoQueueExecutor : IDisposable
+    public sealed class AutoQueueExecutor : IDisposable
     {
         /// <summary>
         /// Returns true if the current instance is disposed.
@@ -55,22 +55,10 @@ namespace Inertia
         /// </summary>
         public void Dispose()
         {
-            IsDisposed = true;
-            _queue.Clear();
-        }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="disposing"></param>
-        protected virtual void Dispose(bool disposing)
-        {
             if (IsDisposed)
                 return;
 
-            if (disposing)
-            {
-                _queue.Clear();
-            }
+            _queue.Clear();
 
             IsDisposed = true;
         }

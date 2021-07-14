@@ -8,7 +8,7 @@ namespace Inertia
     /// <summary>
     /// Contains the parameters of an HTTP request
     /// </summary>
-    public class RequestParameters
+    public sealed class RequestParameters
     {
         private Dictionary<CoreRequestHeaders, string> _coreHeaders;
         private Dictionary<string, string> _headers;

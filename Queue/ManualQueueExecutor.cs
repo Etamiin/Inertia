@@ -5,7 +5,7 @@ namespace Inertia
     /// <summary>
     ///
     /// </summary>
-    public class ManualQueueExecutor : IDisposable
+    public sealed class ManualQueueExecutor : IDisposable
     {
         private event BasicAction QueueExecutor = () => { };
 
@@ -69,21 +69,10 @@ namespace Inertia
         /// </summary>
         public void Dispose()
         {
-            Dispose(true);
-        }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="disposing"></param>
-        protected virtual void Dispose(bool disposing)
-        {
             if (IsDisposed)
                 return;
 
-            if (disposing)
-            {
-                QueueExecutor = null;
-            }
+            QueueExecutor = null;
 
             IsDisposed = true;
         }

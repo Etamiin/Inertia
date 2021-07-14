@@ -5,7 +5,7 @@ namespace Inertia.Network
     /// <summary>
     /// Represents the default network protocol used by network entities.
     /// </summary>
-    public class DefaultNetworkProtocol : NetworkProtocol
+    public sealed class DefaultNetworkProtocol : NetworkProtocol
     {
         /// <summary>
         /// 

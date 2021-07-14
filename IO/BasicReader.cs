@@ -351,7 +351,7 @@ namespace Inertia
         /// <summary>
         /// Read DateTime in the stream and change the position
         /// </summary>
-        /// <returns>Return a <see cref="DateTime"/> instance</returns>
+        /// <returns>Returns a <see cref="DateTime"/> instance</returns>
         public DateTime GetDateTime()
         {
             return new DateTime(GetLong());
@@ -359,7 +359,7 @@ namespace Inertia
         /// <summary>
         /// Create an instance of <typeparamref name="T"/> and return it after deserialization
         /// </summary>
-        /// <returns>Return a <see cref="ISerializableObject"/></returns>
+        /// <returns>Returns a <see cref="ISerializableObject"/></returns>
         public T TryDeserializeObject<T>() where T : ISerializableObject
         {
             try
@@ -382,7 +382,7 @@ namespace Inertia
         /// <summary>
         /// Create an instance of <typeparamref name="T"/> and return it after deserialization
         /// </summary>
-        /// <returns>Return a <see cref="ISerializableData"/></returns>
+        /// <returns>Returns a <see cref="ISerializableData"/></returns>
         public T TryDeserializeData<T>() where T : ISerializableData
         {
             try
