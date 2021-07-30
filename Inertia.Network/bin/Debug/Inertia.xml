@@ -728,33 +728,6 @@
             
             </summary>
         </member>
-        <member name="M:Inertia.LoaderManager.LoadPlugins">
-             <summary>
-            
-             </summary>
-        </member>
-        <member name="M:Inertia.LoaderManager.GetPlugin``1">
-            <summary>
-            Returns the specified <see cref="T:Inertia.IInertiaPlugin"/> loaded instance.
-            </summary>
-            <typeparam name="T"></typeparam>
-            <returns></returns>
-        </member>
-        <member name="T:Inertia.IInertiaPlugin">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="M:Inertia.IInertiaPlugin.OnInitialize">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="M:Inertia.IInertiaPlugin.OnExecute">
-            <summary>
-            
-            </summary>
-        </member>
         <member name="T:Inertia.AutoQueueExecutor">
              <summary>
             

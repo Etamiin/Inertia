@@ -104,7 +104,7 @@ namespace Inertia.Runtime
             Destroyer -= script.PreDestroy;
             script.InCollection.FinalizeRemove(script);
         }
-        internal static void OnRegisterExtends(ScriptInTime sit)
+        internal static void OnRegisterExtends(ExecuteScriptIn sit)
         {
             if (!m_isInitialized)
                 Initialize();

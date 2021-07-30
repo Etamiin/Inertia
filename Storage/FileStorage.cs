@@ -6,7 +6,7 @@ using System.IO;
 
 namespace Inertia
 {
-    //TODO: V2
+    //TODO: Work on new version
     [Obsolete]
     public class FileStorage : ISerializableObject
     {

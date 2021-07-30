@@ -47,7 +47,9 @@
   <ItemGroup>
     <Compile Include="Data\ScriptArgumentsCollection.cs" />
     <Compile Include="Data\ScriptExecutorLayer.cs" />
-    <Compile Include="Tools\ScriptInTime.cs" />
+    <Compile Include="LoaderManager.cs" />
+    <Compile Include="Plugin\IInertiaPlugin.cs" />
+    <Compile Include="Tools\ExecuteScriptIn.cs" />
     <Compile Include="RuntimeManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Core\Script.cs" />

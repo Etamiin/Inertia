@@ -69,10 +69,14 @@ namespace Inertia
                     return ms.ToArray();
                 }
             }
-            catch
+            catch (WebException ex)
             {
-                return new byte[0];
+                //redirect
+                if (ex.Response != null && ex.Response.ResponseUri != uriRequest)
+                    return GetRequestData(ex.Response.ResponseUri, parameters);
             }
+
+            return new byte[0];
         }
         /// <summary>
         /// Execute a HTTP GET request asynchronously.
@@ -149,12 +153,15 @@ namespace Inertia
             {
                 var dataBytes = Encoding.UTF8.GetBytes(data);
                 var request = (HttpWebRequest)WebRequest.Create(uriRequest);
-
                 request.Method = "POST";
-                request.ContentLength = dataBytes.Length;
 
-                if (parameters != null)
-                    parameters.ApplyToRequest(request);
+                if (parameters == null)
+                {
+                    parameters = new RequestParameters();
+                    parameters.SetContentLength(dataBytes.Length);
+                }
+
+                parameters.ApplyToRequest(request);
 
                 using (Stream requestBody = request.GetRequestStream())
                     requestBody.Write(dataBytes, 0, dataBytes.Length);
@@ -170,10 +177,12 @@ namespace Inertia
             }
             catch (WebException ex)
             {
+                //redirect
                 if (ex.Response != null && ex.Response.ResponseUri != uriRequest)
                     return PostRequestData(ex.Response.ResponseUri, data, parameters);
-                else return new byte[0];
             }
+
+            return new byte[0];
         }
         /// <summary>
         /// Execute a HTTP POST request asynchronously.

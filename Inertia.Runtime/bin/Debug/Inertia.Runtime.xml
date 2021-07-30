@@ -51,19 +51,51 @@
             
              </summary>
         </member>
-        <member name="T:Inertia.Runtime.ScriptInTime">
+        <member name="T:Inertia.Runtime.LoaderManager">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Inertia.Runtime.LoaderManager.LoadPlugins">
              <summary>
             
              </summary>
         </member>
-        <member name="P:Inertia.Runtime.ScriptInTime.Permanent">
+        <member name="M:Inertia.Runtime.LoaderManager.GetPlugin``1">
+            <summary>
+            Returns the specified <see cref="T:Inertia.Runtime.IInertiaPlugin"/> loaded instance.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="T:Inertia.Runtime.IInertiaPlugin">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Inertia.Runtime.IInertiaPlugin.OnInitialize">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Inertia.Runtime.IInertiaPlugin.OnExecute">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:Inertia.Runtime.ExecuteScriptIn">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:Inertia.Runtime.ExecuteScriptIn.Permanent">
             <summary>
             Returns true if the current instance run permanently.
             </summary>
         </member>
-        <member name="M:Inertia.Runtime.ScriptInTime.#ctor(System.Single,BasicAction{Inertia.Runtime.ScriptInTime},System.Boolean)">
+        <member name="M:Inertia.Runtime.ExecuteScriptIn.#ctor(System.Single,BasicAction{Inertia.Runtime.ExecuteScriptIn},System.Boolean)">
             <summary>
-            Instantiate a new instance of the class <see cref="T:Inertia.Runtime.ScriptInTime"/>
+            Instantiate a new instance of the class <see cref="T:Inertia.Runtime.ExecuteScriptIn"/>
             </summary>
             <param name="time">Time between each execution</param>
             <param name="action">Action to execute</param>

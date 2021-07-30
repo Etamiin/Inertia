@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 
 namespace Inertia
 {
@@ -32,7 +33,7 @@ namespace Inertia
             return clock.GetElapsedSeconds();
         }
 
-        private DateTime _startTime;
+        private Stopwatch _cw;
 
         /// <summary>
         /// Initialize a new instance of the class <see cref="Clock"/>
@@ -48,7 +49,9 @@ namespace Inertia
         /// <returns>Returns the current instance</returns>
         public Clock Reset()
         {
-            _startTime = DateTime.Now;
+            if (_cw == null) _cw = new Stopwatch();
+
+            _cw.Restart();
             return this;
         }
 
@@ -56,16 +59,15 @@ namespace Inertia
         /// Returns in milliseconds the execution time since the last reset
         /// </summary>
         /// <returns></returns>
-        public double GetElapsedMilliseconds()
+        public long GetElapsedMilliseconds()
         {
-            var time = _startTime - DateTime.Now;
-            return Math.Abs(time.TotalMilliseconds);
+            return _cw.ElapsedMilliseconds;
         }
         /// <summary>
         /// Returns in milliseconds the execution time since the last reset and then reset the clock
         /// </summary>
         /// <returns></returns>
-        public double GetElapsedMillisecondsAndReset()
+        public long GetElapsedMillisecondsAndReset()
         {
             var ms = GetElapsedMilliseconds();
             Reset();
@@ -79,7 +81,7 @@ namespace Inertia
         /// <returns></returns>
         public double GetElapsedSeconds()
         {
-            return GetElapsedMilliseconds() / 1000;
+            return GetElapsedMilliseconds() / 1000d;
         }
         /// <summary>
         /// Returns in seconds the execution time since the last reset and then reset the clock
@@ -87,7 +89,7 @@ namespace Inertia
         /// <returns></returns>
         public double GetElapsedSecondsAndReset()
         {
-            return GetElapsedMillisecondsAndReset() / 1000;
+            return GetElapsedMillisecondsAndReset() / 1000d;
         }
     }
 }
