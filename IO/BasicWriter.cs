@@ -81,12 +81,7 @@ namespace Inertia
         public BasicWriter(Encoding encoding)
         {
             _encoding = encoding;
-            _writer = new BinaryWriter(new MemoryStream(), encoding);
-
-            if (_typageDefinitions != null)
-                return;
-
-            
+            _writer = new BinaryWriter(new MemoryStream(), encoding);       
         }
 
         /// <summary>
@@ -138,7 +133,8 @@ namespace Inertia
         /// <returns>Returns the current instance</returns>
         public BasicWriter SetString(string value)
         {
-            return SetBytes(_encoding.GetBytes(value));
+            if (string.IsNullOrEmpty(value)) return SetBytes(new byte[] { });
+            else return SetBytes(_encoding.GetBytes(value));
         }
         /// <summary>
         /// Write the specified value in the stream

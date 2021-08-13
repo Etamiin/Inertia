@@ -12,6 +12,10 @@ namespace Inertia.ORM
         /// 
         /// </summary>
         public readonly string DatabaseName;
+        /// <summary>
+        /// 
+        /// </summary>
+        public readonly Type DatabaseType;
 
         /// <summary>
         /// Instantiate a new instance of the class <see cref="AttachTo"/>
@@ -20,6 +24,14 @@ namespace Inertia.ORM
         public AttachTo(string databaseName)
         {
             DatabaseName = databaseName;
+        }
+        /// <summary>
+        /// Instantiate a new instance of the class <see cref="AttachTo"/>
+        /// <param name="databaseType"></param>
+        /// </summary>
+        public AttachTo(Type databaseType)
+        {
+            DatabaseType = databaseType;
         }
     }
 }

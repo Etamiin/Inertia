@@ -11,6 +11,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inertia.Runtime", "Inertia.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inertia.ORM", "Inertia.ORM\Inertia.ORM.csproj", "{D5C9811A-B507-4FF7-B8CB-A061CD24C83C}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".NET Core 3.1", ".NET Core 3.1", "{995BBA1E-BDCA-44DE-B0CD-4F98A0876649}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inertia", ".NET Core 3.1\Inertia\Inertia.csproj", "{67CE7EB4-B9F5-4FF0-98DD-FC286E4D0D05}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inertia.ORM", ".NET Core 3.1\Inertia.ORM\Inertia.ORM.csproj", "{6541822D-517A-472B-BCAD-D98DEF8147B7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,9 +39,21 @@ Global
 		{D5C9811A-B507-4FF7-B8CB-A061CD24C83C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D5C9811A-B507-4FF7-B8CB-A061CD24C83C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D5C9811A-B507-4FF7-B8CB-A061CD24C83C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{67CE7EB4-B9F5-4FF0-98DD-FC286E4D0D05}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{67CE7EB4-B9F5-4FF0-98DD-FC286E4D0D05}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{67CE7EB4-B9F5-4FF0-98DD-FC286E4D0D05}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{67CE7EB4-B9F5-4FF0-98DD-FC286E4D0D05}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6541822D-517A-472B-BCAD-D98DEF8147B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6541822D-517A-472B-BCAD-D98DEF8147B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6541822D-517A-472B-BCAD-D98DEF8147B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6541822D-517A-472B-BCAD-D98DEF8147B7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{67CE7EB4-B9F5-4FF0-98DD-FC286E4D0D05} = {995BBA1E-BDCA-44DE-B0CD-4F98A0876649}
+		{6541822D-517A-472B-BCAD-D98DEF8147B7} = {995BBA1E-BDCA-44DE-B0CD-4F98A0876649}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A870FAC4-EEF9-43D7-A155-67F25FD80CCC}

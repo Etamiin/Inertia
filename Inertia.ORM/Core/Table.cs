@@ -25,8 +25,18 @@ namespace Inertia.ORM
             var attachTo = GetType().GetCustomAttribute<AttachTo>();
             if (attachTo == null) return;
 
-            Database = SqlManager.TrySearchDatabase(attachTo.DatabaseName);
-            if (Database == null)
+            if (!string.IsNullOrEmpty(attachTo.DatabaseName))
+            {
+                if (SqlManager.TrySearchDatabase(attachTo.DatabaseName, out Database db))
+                    this.Database = db;
+            }
+            else if (attachTo.DatabaseType != null)
+            {
+                if (SqlManager.TrySearchDatabase(attachTo.DatabaseType, out Database db))
+                    this.Database = db;
+            }
+
+            if (this.Database == null)
                 throw new ArgumentNullException($"The database '{ attachTo.DatabaseName }' isn't registered");
         }
 
@@ -36,13 +46,16 @@ namespace Inertia.ORM
         /// <returns></returns>
         public long Insert()
         {
-            using (var cmd = Database.CreateCommand())
-            {
+            long id = 0;
+
+            Database.ExecuteCommand((cmd) => {
                 cmd.SetQuery(QueryBuilder.GetInsertQuery(this, cmd));
                 cmd.ExecuteNonQuery();
 
-                return cmd.LastInsertedId;
-            }
+                id = cmd.LastInsertedId;
+            });
+
+            return id;
         }
         /// <summary>
         /// Update all elements in the <see cref="Database"/> with current instance's values using the specified <see cref="SqlCondition"/>
@@ -52,11 +65,14 @@ namespace Inertia.ORM
         /// <returns></returns>
         public bool Update(SqlCondition condition, params string[] columnsToUpdate)
         {
-            using (var cmd = Database.CreateCommand())
-            {
+            var updated = false;
+
+            Database.ExecuteCommand((cmd) => {
                 cmd.SetQuery(QueryBuilder.GetUpdateQuery(this, cmd, condition, columnsToUpdate), condition);
-                return cmd.ExecuteNonQuery() > 0;
-            }
+                updated = cmd.ExecuteNonQuery() > 0;
+            });
+
+            return updated;
         }
 
         internal static FieldInfo[] GetFields<T>() where T : Table
