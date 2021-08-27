@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <Authors>Etamiin</Authors>
+    <Company />
+    <Product />
+    <AssemblyVersion>2.108.27.1515</AssemblyVersion>
+    <FileVersion>2.108.27.1515</FileVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\Inertia.ORM.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MySql.Data" Version="6.9.12" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Inertia\Inertia.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,52 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v3.1",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v3.1": {
+      "Inertia.ORM/1.0.0": {
+        "dependencies": {
+          "Inertia": "1.0.0",
+          "MySql.Data": "6.9.12"
+        },
+        "runtime": {
+          "Inertia.ORM.dll": {}
+        }
+      },
+      "MySql.Data/6.9.12": {
+        "runtime": {
+          "lib/net45/MySql.Data.dll": {
+            "assemblyVersion": "6.9.12.0",
+            "fileVersion": "6.9.12.0"
+          }
+        }
+      },
+      "Inertia/1.0.0": {
+        "runtime": {
+          "Inertia.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Inertia.ORM/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "MySql.Data/6.9.12": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-f3IlXzYso8DlQ8lGs9GYEXT/FGv4C/6tZtmTbgLaeNVGmWoGjf+5mO+H8hvRMQY++Fh3SWNEZyHxSrW2J1fUOw==",
+      "path": "mysql.data/6.9.12",
+      "hashPath": "mysql.data.6.9.12.nupkg.sha512"
+    },
+    "Inertia/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
