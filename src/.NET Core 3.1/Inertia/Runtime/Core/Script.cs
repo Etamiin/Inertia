@@ -7,17 +7,10 @@ namespace Inertia.Runtime
     /// </summary>
     public abstract class Script : IDisposable
     {
-        internal const int FixedMaxExecutionPerSecond = 160;
-
         /// <summary>
         /// Returns the time elapsed since the last execution frame. 
         /// </summary>
         public static float DeltaTime { get; internal set; }
-
-        /// <summary>
-        /// Set or Get the maximum number of executions per second (max: <see cref="FixedMaxExecutionPerSecond"/>).
-        /// </summary>
-        public static int MaxExecutionPerSecond = FixedMaxExecutionPerSecond;
 
         /// <summary>
         /// Returns true is the current instance is destroyed.

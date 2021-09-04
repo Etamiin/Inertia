@@ -8,7 +8,7 @@ namespace Inertia.Network
     /// <summary>
     ///
     /// </summary>
-    public class TcpServerEntity : NetworkServerEntity, IDisposable
+    public sealed class TcpServerEntity : NetworkServerEntity, IDisposable
     {
         /// <summary>
         /// Occurs when a new client is connected.

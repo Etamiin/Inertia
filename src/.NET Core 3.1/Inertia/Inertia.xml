@@ -818,11 +818,6 @@
             Returns the time elapsed since the last execution frame. 
             </summary>
         </member>
-        <member name="F:Inertia.Runtime.Script.MaxExecutionPerSecond">
-            <summary>
-            Set or Get the maximum number of executions per second (max: <see cref="F:Inertia.Runtime.Script.FixedMaxExecutionPerSecond"/>).
-            </summary>
-        </member>
         <member name="P:Inertia.Runtime.Script.IsDestroyed">
             <summary>
             Returns true is the current instance is destroyed.

@@ -51,7 +51,7 @@ namespace Inertia.Network
                             continue;
 
                         if (ps[0].ParameterType.IsSubclassOf(typeof(NetworkMessage)) &&
-                           (ps[1].ParameterType.IsSubclassOf(typeof(NetworkClientEntity)) || ps[1].ParameterType == typeof(TcpConnectionEntity) || ps[1].ParameterType == typeof(UdpConnectionEntity)))
+                           (ps[1].ParameterType.IsSubclassOf(typeof(NetworkClientEntity)) || ps[1].ParameterType.IsSubclassOf(typeof(NetworkConnectionEntity))))
                         {
                             var msgType = ps[0].ParameterType;
 

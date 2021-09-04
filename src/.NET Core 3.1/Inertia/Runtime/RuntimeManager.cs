@@ -26,20 +26,15 @@ namespace Inertia.Runtime
         }
         private static void ExecuteLogic()
         {
-            if (Script.MaxExecutionPerSecond > Script.FixedMaxExecutionPerSecond)
-                Script.MaxExecutionPerSecond = Script.FixedMaxExecutionPerSecond;
-
-            var targetMsUpdate = (int)Math.Round(1000f / Script.MaxExecutionPerSecond);
             var clock = new Clock();
 
             Task.Factory.StartNew(() => {
                 while (true)
                 {
                     var currentMsUpdate = clock.GetElapsedMilliseconds();
-
-                    if (currentMsUpdate < targetMsUpdate)
+                    if (currentMsUpdate == 0)
                     {
-                        Thread.Sleep(targetMsUpdate - (int)currentMsUpdate);
+                        Thread.Sleep(10);
                         currentMsUpdate = clock.GetElapsedMilliseconds();
                     }
 
@@ -48,9 +43,10 @@ namespace Inertia.Runtime
 
                     try
                     {
-                        ScriptInTimeUpdate();
-                        ScriptExecutorLayer[] executors = null;
+                        lock (ScriptInTimeUpdate)
+                            ScriptInTimeUpdate();
 
+                        ScriptExecutorLayer[] executors = null;
                         lock (m_executorLayers)
                             executors = m_executorLayers.ToArray();
                         

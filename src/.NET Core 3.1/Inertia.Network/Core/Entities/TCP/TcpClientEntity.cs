@@ -7,7 +7,7 @@ namespace Inertia.Network
     /// <summary>
     ///
     /// </summary>
-    public class TcpClientEntity : NetworkClientEntity, IDisposable
+    public sealed class TcpClientEntity : NetworkClientEntity, IDisposable
     {
         private byte[] m_buffer;
         private Socket m_socket;
