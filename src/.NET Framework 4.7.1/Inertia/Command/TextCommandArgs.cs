@@ -128,7 +128,7 @@ namespace Inertia
         /// <returns></returns>
         public string CombineArguments(int startIndex)
         {
-            return CombineArguments(startIndex, Count - startIndex);
+            return CombineArguments(startIndex, Count);
         }
         /// <summary>
         /// Combines all arguments of the executed command from the specified index to the specified length.
@@ -157,6 +157,23 @@ namespace Inertia
         public string CombineAllArguments()
         {
             return CombineArguments(0, Count);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public object[] GetAllArguments(int startIndex = 0)
+        {
+            var args = new object[Count - startIndex];
+            if (args.Length == 0) return args;
+
+            for (var i = 0; i < args.Length; i++)
+            {
+                args[i] = m_arguments[i + startIndex];
+            }
+
+            return args;
         }
 
         /// <summary>
