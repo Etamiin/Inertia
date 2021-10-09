@@ -21,18 +21,18 @@ namespace Inertia.Runtime
         internal ScriptCollection InCollection;
         internal bool IsDisposed { get; private set; }
 
-        private bool m_canUpdate;
+        private bool _canUpdate;
 
         internal void Awake(object[] args)
         {
             RuntimeManager.OnScriptCreated(this);
             OnAwake(new ScriptArgumentsCollection(args));
 
-            m_canUpdate = true;
+            _canUpdate = true;
         }
         internal void Update()
         {
-            if (!m_canUpdate)
+            if (!_canUpdate)
                 return;
 
             OnUpdate();

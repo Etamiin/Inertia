@@ -118,6 +118,12 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:Inertia.TextCommandArgs.GetAllArguments(System.Int32)">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:Inertia.TextCommandArgs.ToString">
             <summary>
             Returns the command line executed.
@@ -985,6 +991,30 @@
             <summary>
             Returns true if the current instance run permanently.
             </summary>
+        </member>
+        <member name="M:Inertia.Runtime.Run.Delayed(System.Single,BasicAction{Inertia.Runtime.Run.ExecuteScriptIn},System.Boolean)">
+            <summary>
+            
+            </summary>
+            <param name="delayInSeconds"></param>
+            <param name="callback"></param>
+            <param name="permanent"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.Runtime.Run.Delayed(System.Single,BasicAction{Inertia.Runtime.Run.ExecuteScriptIn},System.Single)">
+            <summary>
+            
+            </summary>
+            <param name="delayInSeconds"></param>
+            <param name="callback"></param>
+            <param name="runningTime"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.Runtime.Run.ToNextFrame(BasicAction)">
+            <summary>
+            
+            </summary>
+            <param name="callback"></param>
         </member>
         <member name="T:Inertia.Clock">
             <summary>

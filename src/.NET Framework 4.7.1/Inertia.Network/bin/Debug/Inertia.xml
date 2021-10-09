@@ -118,6 +118,12 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:Inertia.TextCommandArgs.GetAllArguments(System.Int32)">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:Inertia.TextCommandArgs.ToString">
             <summary>
             Returns the command line executed.

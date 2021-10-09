@@ -18,7 +18,7 @@ namespace Inertia.Runtime
         {
             get
             {
-                return m_arguments.Length;
+                return _arguments.Length;
             }
         }
         /// <summary>
@@ -26,11 +26,11 @@ namespace Inertia.Runtime
         /// </summary>
         public int Position { get; set; }
 
-        private object[] m_arguments;
+        private object[] _arguments;
 
         internal ScriptArgumentsCollection(object[] args)
         {
-            m_arguments = args;
+            _arguments = args;
         }
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace Inertia.Runtime
         {
             get
             {
-                return m_arguments[index];
+                return _arguments[index];
             }
         }
 
@@ -80,7 +80,7 @@ namespace Inertia.Runtime
             if (IsDisposed)
                 return;
 
-            m_arguments = null;
+            _arguments = null;
 
             IsDisposed = true;
         }

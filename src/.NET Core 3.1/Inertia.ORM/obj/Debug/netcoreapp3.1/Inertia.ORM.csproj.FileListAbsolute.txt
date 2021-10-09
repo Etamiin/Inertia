@@ -31,3 +31,4 @@ C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\bin
 C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\bin\Debug\netcoreapp3.1\runtimes\win\lib\netcoreapp3.0\System.Drawing.Common.dll
 C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\bin\Debug\netcoreapp3.1\runtimes\win\lib\netstandard2.0\System.Security.Cryptography.ProtectedData.dll
 C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\bin\Debug\netcoreapp3.1\runtimes\win\lib\netcoreapp3.0\System.Windows.Extensions.dll
+C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\obj\Debug\netcoreapp3.1\Inertia.ORM.GeneratedMSBuildEditorConfig.editorconfig

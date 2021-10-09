@@ -10,17 +10,15 @@ namespace Inertia.Runtime
         internal static event BasicAction ScriptInTimeUpdate = () => { };
         private static event BasicAction Destroyer = () => { };
 
-        private static bool m_isInitialized;
-        private static ScriptExecutorLayer m_currentLayer;
-        private static List<ScriptExecutorLayer> m_executorLayers;
+        private static bool _isInitialized;
+        private static ScriptExecutorLayer _loopExecutor;
 
         private static void Initialize()
         {
-            if (m_isInitialized)
-                return;
+            if (_isInitialized) return;
 
-            m_executorLayers = new List<ScriptExecutorLayer>();
-            m_isInitialized = true;
+            _loopExecutor = new ScriptExecutorLayer();
+            _isInitialized = true;
 
             ExecuteLogic();
         }
@@ -31,27 +29,22 @@ namespace Inertia.Runtime
             Task.Factory.StartNew(() => {
                 while (true)
                 {
-                    var currentMsUpdate = clock.GetElapsedMilliseconds();
+                    var currentMsUpdate = clock.GetElapsedSeconds();
                     if (currentMsUpdate == 0)
                     {
-                        Thread.Sleep(10);
-                        currentMsUpdate = clock.GetElapsedMilliseconds();
+                        Thread.Sleep(1);
+                        currentMsUpdate = clock.GetElapsedSeconds();
                     }
 
-                    Script.DeltaTime = currentMsUpdate / 1000f;
+                    Script.DeltaTime = (float)currentMsUpdate;
                     clock.Reset();
-
+                    
                     try
                     {
                         lock (ScriptInTimeUpdate)
                             ScriptInTimeUpdate();
 
-                        ScriptExecutorLayer[] executors = null;
-                        lock (m_executorLayers)
-                            executors = m_executorLayers.ToArray();
-                        
-                        foreach (var executor in executors)
-                            executor.Execute();
+                        _loopExecutor.Execute();
 
                         lock (Destroyer)
                             Destroyer?.Invoke();
@@ -63,34 +56,17 @@ namespace Inertia.Runtime
 
         internal static void OnScriptCreated(Script script)
         {
-            if (!m_isInitialized)
+            if (!_isInitialized)
                 Initialize();
 
-            if (m_currentLayer == null || m_currentLayer.IsDisposed || m_currentLayer.LimitAchieved)
-            {
-                m_currentLayer = new ScriptExecutorLayer();
-                m_executorLayers.Add(m_currentLayer);
-            }
-
-            m_currentLayer.Join(script);
+            _loopExecutor.Join(script);
         }
         internal static void OnScriptDestroyed(Script script)
         {
-            if (!m_isInitialized)
+            if (!_isInitialized)
                 Initialize();
 
-            var executorLayer = script.AttachedLayer;
-
-            executorLayer.Leave(script);
-            lock (m_executorLayers)
-            {
-                if (executorLayer.Count == 0)
-                {
-                    executorLayer.Dispose();
-                    m_executorLayers.Remove(executorLayer);
-                }
-            }
-
+            script.AttachedLayer.Leave(script);
             Destroyer += script.PreDestroy;
         }
         internal static void OnScriptPreDestroyed(Script script)
@@ -100,7 +76,7 @@ namespace Inertia.Runtime
         }
         internal static void OnRegisterExtends()
         {
-            if (!m_isInitialized)
+            if (!_isInitialized)
                 Initialize();
         }
     }
