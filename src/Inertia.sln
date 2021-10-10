@@ -19,8 +19,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inertia.Network", ".NET Fra
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inertia.ORM", ".NET Framework 4.7.1\Inertia.ORM\Inertia.ORM.csproj", "{D5C9811A-B507-4FF7-B8CB-A061CD24C83C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inertia.ConsoleToolKit", ".NET Core 3.1\Inertia.ConsoleToolKit\Inertia.ConsoleToolKit.csproj", "{748563F9-2D83-4C4D-A0D3-9B5FEDC98B07}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,10 +49,6 @@ Global
 		{D5C9811A-B507-4FF7-B8CB-A061CD24C83C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D5C9811A-B507-4FF7-B8CB-A061CD24C83C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D5C9811A-B507-4FF7-B8CB-A061CD24C83C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{748563F9-2D83-4C4D-A0D3-9B5FEDC98B07}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{748563F9-2D83-4C4D-A0D3-9B5FEDC98B07}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{748563F9-2D83-4C4D-A0D3-9B5FEDC98B07}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{748563F9-2D83-4C4D-A0D3-9B5FEDC98B07}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -66,7 +60,6 @@ Global
 		{445EE1E5-7BE7-47D4-A6FD-B2DFF62F118A} = {79F872E3-A3B9-46EB-886F-A7B67655A5A2}
 		{68811FE4-A94E-4376-8FB9-EDF0E99A368B} = {79F872E3-A3B9-46EB-886F-A7B67655A5A2}
 		{D5C9811A-B507-4FF7-B8CB-A061CD24C83C} = {79F872E3-A3B9-46EB-886F-A7B67655A5A2}
-		{748563F9-2D83-4C4D-A0D3-9B5FEDC98B07} = {995BBA1E-BDCA-44DE-B0CD-4F98A0876649}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A870FAC4-EEF9-43D7-A155-67F25FD80CCC}
