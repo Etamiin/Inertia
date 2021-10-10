@@ -4,6 +4,9 @@ using System.Text;
 
 namespace Inertia.Runtime
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public static partial class Run
     {
         /// <summary>
@@ -16,13 +19,13 @@ namespace Inertia.Runtime
             /// </summary>
             public bool Permanent { get; set; }
 
-            private BasicAction<ExecuteScriptIn> m_action;
-            private float m_time, m_currentTime, m_totalTime;
+            private BasicAction<ExecuteScriptIn> _action;
+            private float _time, _currentTime, _totalTime;
 
             internal ExecuteScriptIn(float time, BasicAction<ExecuteScriptIn> action, bool permanent = false)
             {
-                m_action = action;
-                m_time = time;
+                _action = action;
+                _time = time;
                 Permanent = permanent;
 
                 RuntimeManager.ScriptInTimeUpdate += Update;
@@ -30,23 +33,23 @@ namespace Inertia.Runtime
             }
             internal ExecuteScriptIn(float time, BasicAction<ExecuteScriptIn> action, float totalTime) : this(time, action, false)
             {
-                m_totalTime = totalTime;
+                _totalTime = totalTime;
             }
 
             private void Update()
             {
-                m_currentTime += Script.DeltaTime;
+                _currentTime += Script.DeltaTime;
 
-                if (m_currentTime >= m_time)
+                if (_currentTime >= _time)
                 {
-                    m_currentTime -= m_time;
-                    m_action(this);
+                    _currentTime -= _time;
+                    _action(this);
 
                     if (!Permanent)
                     {
-                        if (m_totalTime > m_time)
+                        if (_totalTime > _time)
                         {
-                            m_totalTime -= m_time;
+                            _totalTime -= _time;
                             return;
                         }
 
@@ -74,15 +77,41 @@ namespace Inertia.Runtime
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public static void Update()
+        {
+            RuntimeManager.IsManuallyRunned = true;
+            RuntimeManager.ExecuteCycle(null);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="delayInSeconds"></param>
+        /// <param name="callback"></param>
+        /// <param name="permanent"></param>
+        /// <returns></returns>
         public static ExecuteScriptIn Delayed(float delayInSeconds, BasicAction<ExecuteScriptIn> callback, bool permanent = false)
         {
             return new ExecuteScriptIn(delayInSeconds, callback, permanent);
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="delayInSeconds"></param>
+        /// <param name="callback"></param>
+        /// <param name="runningTime"></param>
+        /// <returns></returns>
         public static ExecuteScriptIn Delayed(float delayInSeconds, BasicAction<ExecuteScriptIn> callback, float runningTime)
         {
             return new ExecuteScriptIn(delayInSeconds, callback, runningTime);
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="callback"></param>
         public static void ToNextFrame(BasicAction callback)
         {
             new NextFrameExecution(callback);

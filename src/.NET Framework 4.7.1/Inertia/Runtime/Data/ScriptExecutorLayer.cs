@@ -2,17 +2,9 @@
 {
     internal sealed class ScriptExecutorLayer
     {
-        public event BasicAction Executor = () => { };
+        internal event BasicAction Executor = () => { };
 
-        internal int Count { get; private set; }
         internal bool IsDisposed { get; private set; }
-        internal bool LimitAchieved
-        {
-            get
-            {
-                return Count >= byte.MaxValue;
-            }
-        }
 
         internal void Join(Script script)
         {
@@ -22,7 +14,6 @@
             script.AttachedLayer = this;
 
             Executor += script.Update;
-            Count++;
         }
         internal void Leave(Script script)
         {
@@ -32,7 +23,6 @@
             script.AttachedLayer = null;
 
             Executor -= script.Update;
-            Count--;
         }
 
         internal void Execute()
@@ -43,7 +33,6 @@
             lock (Executor)
                 Executor?.Invoke();
         }
-
         internal void Dispose()
         {
             if (IsDisposed)

@@ -4,6 +4,9 @@ using System.Text;
 
 namespace Inertia.Runtime
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public static partial class Run
     {
         /// <summary>
@@ -72,6 +75,15 @@ namespace Inertia.Runtime
                 _action?.Invoke();
                 RuntimeManager.ScriptInTimeUpdate -= Execute;
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public static void Update()
+        {
+            RuntimeManager.IsManuallyRunned = true;
+            RuntimeManager.ExecuteCycle(null);
         }
 
         /// <summary>

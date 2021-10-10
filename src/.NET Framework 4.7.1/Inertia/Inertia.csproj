@@ -60,8 +60,8 @@
     <Compile Include="Runtime\Data\ScriptArgumentsCollection.cs" />
     <Compile Include="Runtime\Data\ScriptExecutorLayer.cs" />
     <Compile Include="Runtime\Plugin\IInertiaPlugin.cs" />
+    <Compile Include="Runtime\Run.cs" />
     <Compile Include="Runtime\RuntimeManager.cs" />
-    <Compile Include="Runtime\Tools\Run.cs" />
     <Compile Include="Storage\FileStorage.cs" />
     <Compile Include="Storage\FileStoragePack.cs" />
     <Compile Include="Storage\InFileStorageElement.cs" />

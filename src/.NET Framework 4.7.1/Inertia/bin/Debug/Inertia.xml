@@ -915,6 +915,11 @@
             
             </summary>
         </member>
+        <member name="T:Inertia.Runtime.Run">
+            <summary>
+            
+            </summary>
+        </member>
         <member name="T:Inertia.Runtime.Run.ExecuteScriptIn">
              <summary>
             
@@ -924,6 +929,35 @@
             <summary>
             Returns true if the current instance run permanently.
             </summary>
+        </member>
+        <member name="M:Inertia.Runtime.Run.Update">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Inertia.Runtime.Run.Delayed(System.Single,BasicAction{Inertia.Runtime.Run.ExecuteScriptIn},System.Boolean)">
+            <summary>
+            
+            </summary>
+            <param name="delayInSeconds"></param>
+            <param name="callback"></param>
+            <param name="permanent"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.Runtime.Run.Delayed(System.Single,BasicAction{Inertia.Runtime.Run.ExecuteScriptIn},System.Single)">
+            <summary>
+            
+            </summary>
+            <param name="delayInSeconds"></param>
+            <param name="callback"></param>
+            <param name="runningTime"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.Runtime.Run.ToNextFrame(BasicAction)">
+            <summary>
+            
+            </summary>
+            <param name="callback"></param>
         </member>
         <member name="T:Inertia.AutoQueueExecutor">
              <summary>
