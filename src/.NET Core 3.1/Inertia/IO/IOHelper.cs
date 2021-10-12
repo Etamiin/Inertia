@@ -23,7 +23,9 @@ namespace Inertia
         public static string[] GetFilesFromDirectory(string path, bool includeSubFolders)
         {
             if (!Directory.Exists(path))
+            {
                 throw new DirectoryNotFoundException();
+            }
 
             path = path.ConventionFolderPath();
 
@@ -36,13 +38,17 @@ namespace Inertia
             {
                 var files = Directory.GetFiles(currentFolder);
                 foreach (var file in files)
+                {
                     result.Add(file);
+                }
 
                 if (includeSubFolders)
                 {
                     var directories = Directory.GetDirectories(currentFolder);
                     foreach (var dir in directories)
+                    {
                         FindPaths(dir);
+                    }
                 }
             }
         }
@@ -54,7 +60,9 @@ namespace Inertia
         public static void AppendAllBytes(string filePath, byte[] data)
         {
             using (var stream = new FileStream(filePath, FileMode.Append))
+            {
                 stream.Write(data, 0, data.Length);
+            }
         }
 
         /// <summary>
@@ -70,7 +78,10 @@ namespace Inertia
                 var sha256Bytes = sha256.ComputeHash(data);
                 var sBuilder = new StringBuilder();
                 foreach (var byteVal in sha256Bytes)
+                {
                     sBuilder.Append(byteVal.ToString("x2"));
+                }
+
                 result = sBuilder.ToString();
             }
 
@@ -96,7 +107,9 @@ namespace Inertia
 
                     var data = new byte[length];
                     for (int x = 0; x < data.Length; x++)
+                    {
                         data[x] = (byte)stream.ReadByte();
+                    }
 
                     totalLength += length;
                     sha256 += GetSHA256(data);
@@ -117,7 +130,9 @@ namespace Inertia
             using (var ms = new MemoryStream())
             {
                 using (var gzip = new BufferedStream(new GZipStream(ms, CompressionMode.Compress)))
+                {
                     gzip.Write(data, 0, data.Length);
+                }
 
                 var compressedData = ms.ToArray();
 
@@ -137,7 +152,9 @@ namespace Inertia
                 using (var ms = new MemoryStream())
                 {
                     using (var gzs = new BufferedStream(new GZipStream(cms, CompressionMode.Decompress)))
+                    {
                         gzs.CopyTo(ms);
+                    }
 
                     return ms.ToArray();
                 }

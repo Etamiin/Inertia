@@ -16,49 +16,55 @@ namespace Inertia.Network
 
         internal static void DefaultLoadNetwork()
         {
-            if (_networkLoaded)
-                return;
-
-            NetworkMessageTypes = new Dictionary<uint, Type>();
-            NetworkMessageHookers = new Dictionary<Type, NetworkMessageCaller>();
-
-            var assemblys = AppDomain.CurrentDomain.GetAssemblies();
-            foreach (var assembly in assemblys)
+            if (!_networkLoaded)
             {
-                var types = assembly.GetTypes();
-                foreach (var type in types)
+                NetworkMessageTypes = new Dictionary<uint, Type>();
+                NetworkMessageHookers = new Dictionary<Type, NetworkMessageCaller>();
+
+                var assemblys = AppDomain.CurrentDomain.GetAssemblies();
+                foreach (var assembly in assemblys)
                 {
-                    if (type.IsClass && type.IsSubclassOf(typeof(NetworkMessage)))
+                    var types = assembly.GetTypes();
+                    foreach (var type in types)
                     {
-                        if (type.IsAbstract)
-                            continue;
-
-                        var message = NetworkProtocol.CreateMessage(type);
-                        if (NetworkMessageTypes.ContainsKey(message.MessageId))
-                            continue;
-
-                        NetworkMessageTypes.Add(message.MessageId, type);
-                    }
-
-                    var sMethods = type.GetMethods(BindingFlags.Static | BindingFlags.Public);
-                    if (sMethods.Length == 0)
-                        continue;
-
-                    foreach (var smethod in sMethods)
-                    {
-                        var ps = smethod.GetParameters();
-                        if (ps.Length < 2)
-                            continue;
-
-                        if (ps[0].ParameterType.IsSubclassOf(typeof(NetworkMessage)) &&
-                           (ps[1].ParameterType.IsSubclassOf(typeof(NetworkClientEntity)) || ps[1].ParameterType.IsSubclassOf(typeof(NetworkConnectionEntity))))
+                        if (type.IsClass && type.IsSubclassOf(typeof(NetworkMessage)))
                         {
-                            var msgType = ps[0].ParameterType;
+                            if (type.IsAbstract)
+                            {
+                                continue;
+                            }
+                            else
+                            {
+                                var message = NetworkProtocol.CreateMessage(type);
 
-                            if (!NetworkMessageHookers.ContainsKey(msgType))
-                                NetworkMessageHookers.Add(msgType, new NetworkMessageCaller());
+                                if (!NetworkMessageTypes.ContainsKey(message.MessageId))
+                                {
+                                    NetworkMessageTypes.Add(message.MessageId, type);
 
-                            NetworkMessageHookers[msgType].RegisterReference(smethod, ps[1].ParameterType);
+                                    var sMethods = type.GetMethods(BindingFlags.Static | BindingFlags.Public);
+                                    if (sMethods.Length > 0)
+                                    {
+                                        foreach (var smethod in sMethods)
+                                        {
+                                            var ps = smethod.GetParameters();
+                                            if (ps.Length >= 2)
+                                            {
+                                                if (ps[0].ParameterType.IsSubclassOf(typeof(NetworkMessage)) && (ps[1].ParameterType.IsSubclassOf(typeof(NetworkClientEntity)) || ps[1].ParameterType.IsSubclassOf(typeof(NetworkConnectionEntity))))
+                                                {
+                                                    var msgType = ps[0].ParameterType;
+
+                                                    if (!NetworkMessageHookers.ContainsKey(msgType))
+                                                    {
+                                                        NetworkMessageHookers.Add(msgType, new NetworkMessageCaller());
+                                                    }
+
+                                                    NetworkMessageHookers[msgType].RegisterReference(smethod, ps[1].ParameterType);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }

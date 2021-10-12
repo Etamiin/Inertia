@@ -36,10 +36,10 @@ namespace Inertia.Network
         /// <param name="disposing"></param>
         protected virtual void Dispose(bool disposing)
         {
-            if (IsDisposed)
-                return;
-
-            IsDisposed = true;
+            if (!IsDisposed)
+            {
+                IsDisposed = true;
+            }
         }
     }
 }

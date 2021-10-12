@@ -17,8 +17,7 @@ namespace Inertia.Runtime
         /// </summary>
         public bool IsDestroyed { get; private set; }
 
-        internal ScriptExecutorLayer AttachedLayer;
-        internal ScriptCollection InCollection;
+        internal ScriptCollection Parent;
         internal bool IsDisposed { get; private set; }
 
         private bool _canUpdate;
@@ -32,20 +31,20 @@ namespace Inertia.Runtime
         }
         internal void Update()
         {
-            if (!_canUpdate)
-                return;
-
-            OnUpdate();
+            if (_canUpdate)
+            {
+                OnUpdate();
+            }
         }
         internal void PreDestroy()
         {
-            if (IsDestroyed)
-                return;
+            if (!IsDestroyed)
+            {
+                IsDestroyed = true;
 
-            IsDestroyed = true;
-
-            OnDestroy();
-            RuntimeManager.OnScriptPreDestroyed(this);
+                OnDestroy();
+                RuntimeManager.OnScriptPreDestroyed(this);
+            }
         }
 
         /// <summary>
@@ -67,7 +66,7 @@ namespace Inertia.Runtime
         /// </summary>
         public void Destroy()
         {
-            Dispose();
+            Dispose(true);
         }
         /// <summary>
         ///
@@ -82,11 +81,11 @@ namespace Inertia.Runtime
         /// <param name="disposing"></param>
         protected virtual void Dispose(bool disposing)
         {
-            if (IsDestroyed || IsDisposed)
-                return;
-
-            RuntimeManager.OnScriptDestroyed(this);
-            IsDisposed = true;
+            if (!IsDestroyed && !IsDisposed)
+            {
+                RuntimeManager.OnScriptDestroyed(this);
+                IsDisposed = true;
+            }
         }
     }
 }

@@ -18,7 +18,9 @@ namespace Inertia
 
             var cmds = new TextCommand[0];
             lock (LoaderManager.Commands)
+            {
                 cmds = LoaderManager.Commands.Values.ToArray();
+            }
 
             return cmds;
         }
@@ -41,7 +43,7 @@ namespace Inertia
         /// <param name="commandLine"></param>
         /// <param name="dataCollection">The list of objects to be associated with the command</param>
         /// <returns></returns>
-        public static TextCommandArgs TryExecuteTextCommand(string commandLine, params object[] dataCollection)
+        public static bool TryExecuteCommandLine(string commandLine, params object[] dataCollection)
         {
             var args = commandLine.Split(' ');
             var others = new string[args.Length - 1];
@@ -49,27 +51,17 @@ namespace Inertia
 
             return TryExecuteCommandByName(commandLine, args[0], dataCollection, others);
         }
-        /// <summary>
-        /// Executes a <see cref="TextCommand"/> associated with the specified name.
-        /// </summary>
-        /// <param name="commandName"></param>
-        /// <param name="dataCollection">The list of objects to be associated with the command</param>
-        /// <param name="arguments"></param>
-        /// <returns></returns>
-        public static TextCommandArgs TryExecuteCommandByName(string commandName, object[] dataCollection, params string[] arguments)
-        {
-            return TryExecuteCommandByName(string.Empty, commandName, dataCollection, arguments);
-        }
-
-        private static TextCommandArgs TryExecuteCommandByName(string commandLine, string commandName, object[] dataCollection = null, params string[] arguments)
+        
+        private static bool TryExecuteCommandByName(string commandLine, string commandName, object[] dataCollection = null, params string[] arguments)
         {
             var command = GetCommandByName(commandName);
-            if (command == null) return null;
+            if (command != null)
+            {
+                command.Execute(new TextCommandArgs(commandLine, commandName, arguments, dataCollection));
+                return true;
+            }
 
-            var args = new TextCommandArgs(commandLine, commandName, arguments, dataCollection);
-            command.Execute(args);
-
-            return args;
+            return false;
         }
     }
 }

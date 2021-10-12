@@ -25,13 +25,21 @@ namespace Inertia.Network
         internal void RegisterReference(MethodInfo method, Type networkParamType)
         {
             if (networkParamType == typeof(TcpClientEntity))
+            {
                 OnTcpClient += (msg, client) => method.Invoke(null, new object[] { msg, client });
+            }
             else if (networkParamType == typeof(UdpClientEntity))
+            {
                 OnUdpClient += (msg, client) => method.Invoke(null, new object[] { msg, client });
+            }
             else if (networkParamType == typeof(TcpConnectionEntity))
+            {
                 OnTcpConnection += (msg, conn) => method.Invoke(null, new object[] { msg, conn });
+            }
             else if (networkParamType == typeof(UdpConnectionEntity))
+            {
                 OnUdpConnection += (msg, conn) => method.Invoke(null, new object[] { msg, conn });
+            }
         }
 
         /// <summary>

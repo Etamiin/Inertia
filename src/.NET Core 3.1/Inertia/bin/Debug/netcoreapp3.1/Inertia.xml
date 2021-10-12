@@ -22,21 +22,12 @@
             <param name="commandName"></param>
             <returns></returns>
         </member>
-        <member name="M:Inertia.CommandHooker.TryExecuteTextCommand(System.String,System.Object[])">
+        <member name="M:Inertia.CommandHooker.TryExecuteCommandLine(System.String,System.Object[])">
             <summary>
             Executes a command line and returns the associated <see cref="T:Inertia.TextCommandArgs"/> instance.
             </summary>
             <param name="commandLine"></param>
             <param name="dataCollection">The list of objects to be associated with the command</param>
-            <returns></returns>
-        </member>
-        <member name="M:Inertia.CommandHooker.TryExecuteCommandByName(System.String,System.Object[],System.String[])">
-            <summary>
-            Executes a <see cref="T:Inertia.TextCommand"/> associated with the specified name.
-            </summary>
-            <param name="commandName"></param>
-            <param name="dataCollection">The list of objects to be associated with the command</param>
-            <param name="arguments"></param>
             <returns></returns>
         </member>
         <member name="T:Inertia.TextCommand">
@@ -746,74 +737,6 @@
             <typeparam name="T"></typeparam>
             <returns></returns>
         </member>
-        <member name="T:Inertia.AutoQueueExecutor">
-             <summary>
-            
-             </summary>
-        </member>
-        <member name="P:Inertia.AutoQueueExecutor.IsDisposed">
-            <summary>
-            Returns true if the current instance is disposed.
-            </summary>
-        </member>
-        <member name="P:Inertia.AutoQueueExecutor.Count">
-            <summary>
-            Returns the number of actions currently queued.
-            </summary>
-        </member>
-        <member name="M:Inertia.AutoQueueExecutor.#ctor">
-            <summary>
-            Initialize a new instance of the class <see cref="T:Inertia.AutoQueueExecutor"/>
-            </summary>
-        </member>
-        <member name="M:Inertia.AutoQueueExecutor.Enqueue(BasicAction[])">
-            <summary>
-            Enqueue the specified actions at the end of the queue.
-            </summary>
-            <param name="actions"></param>
-        </member>
-        <member name="M:Inertia.AutoQueueExecutor.Dispose">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="T:Inertia.ManualQueueExecutor">
-             <summary>
-            
-             </summary>
-        </member>
-        <member name="P:Inertia.ManualQueueExecutor.IsDisposed">
-            <summary>
-            Returns true if the current instance is disposed.
-            </summary>
-        </member>
-        <member name="P:Inertia.ManualQueueExecutor.Count">
-            <summary>
-            Returns the number of actions currently queued.
-            </summary>
-        </member>
-        <member name="M:Inertia.ManualQueueExecutor.#ctor">
-            <summary>
-            Initialize a new instance of the class <see cref="T:Inertia.ManualQueueExecutor"/>
-            </summary>
-        </member>
-        <member name="M:Inertia.ManualQueueExecutor.Enqueue(BasicAction[])">
-            <summary>
-            Enqueue the specified actions at the end of the queue.
-            </summary>
-            <param name="actions"></param>
-            <returns>Returns the current instance</returns>
-        </member>
-        <member name="M:Inertia.ManualQueueExecutor.Execute">
-            <summary>
-            Execute all the actions queued and remove them from the queue.
-            </summary>
-        </member>
-        <member name="M:Inertia.ManualQueueExecutor.Dispose">
-             <summary>
-            
-             </summary>
-        </member>
         <member name="T:Inertia.Runtime.Script">
              <summary>
             
@@ -994,12 +917,22 @@
         </member>
         <member name="P:Inertia.Runtime.Run.ExecuteScriptIn.Permanent">
             <summary>
-            Returns true if the current instance run permanently.
+            Returns true if the current script run permanently.
+            </summary>
+        </member>
+        <member name="P:Inertia.Runtime.Run.ExecuteScriptIn.IsRunning">
+            <summary>
+            Returns true if the current script is running.
+            </summary>
+        </member>
+        <member name="M:Inertia.Runtime.Run.ExecuteScriptIn.Stop">
+            <summary>
+            Stop the current script
             </summary>
         </member>
         <member name="M:Inertia.Runtime.Run.Update">
             <summary>
-            
+            Execute the Runtime cycle manually.
             </summary>
         </member>
         <member name="M:Inertia.Runtime.Run.Delayed(System.Single,BasicAction{Inertia.Runtime.Run.ExecuteScriptIn},System.Boolean)">
@@ -1079,6 +1012,74 @@
             Returns in seconds the execution time since the last reset and then reset the clock
             </summary>
             <returns></returns>
+        </member>
+        <member name="T:Inertia.AutoQueueExecutor">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:Inertia.AutoQueueExecutor.IsDisposed">
+            <summary>
+            Returns true if the current instance is disposed.
+            </summary>
+        </member>
+        <member name="P:Inertia.AutoQueueExecutor.Count">
+            <summary>
+            Returns the number of actions currently queued.
+            </summary>
+        </member>
+        <member name="M:Inertia.AutoQueueExecutor.#ctor">
+            <summary>
+            Initialize a new instance of the class <see cref="T:Inertia.AutoQueueExecutor"/>
+            </summary>
+        </member>
+        <member name="M:Inertia.AutoQueueExecutor.Enqueue(BasicAction[])">
+            <summary>
+            Enqueue the specified actions at the end of the queue.
+            </summary>
+            <param name="actions"></param>
+        </member>
+        <member name="M:Inertia.AutoQueueExecutor.Dispose">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:Inertia.ManualQueueExecutor">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:Inertia.ManualQueueExecutor.IsDisposed">
+            <summary>
+            Returns true if the current instance is disposed.
+            </summary>
+        </member>
+        <member name="P:Inertia.ManualQueueExecutor.Count">
+            <summary>
+            Returns the number of actions currently queued.
+            </summary>
+        </member>
+        <member name="M:Inertia.ManualQueueExecutor.#ctor">
+            <summary>
+            Initialize a new instance of the class <see cref="T:Inertia.ManualQueueExecutor"/>
+            </summary>
+        </member>
+        <member name="M:Inertia.ManualQueueExecutor.Enqueue(BasicAction[])">
+            <summary>
+            Enqueue the specified actions at the end of the queue.
+            </summary>
+            <param name="actions"></param>
+            <returns>Returns the current instance</returns>
+        </member>
+        <member name="M:Inertia.ManualQueueExecutor.Execute">
+            <summary>
+            Execute all the actions queued and remove them from the queue.
+            </summary>
+        </member>
+        <member name="M:Inertia.ManualQueueExecutor.Dispose">
+             <summary>
+            
+             </summary>
         </member>
         <member name="T:Inertia.CoreRequestHeaders">
             <summary>
@@ -1341,7 +1342,7 @@
             Shuffle the specified <see cref="T:System.Collections.Generic.IList`1"/> object
             </summary>
             <typeparam name="T"></typeparam>
-            <param name="collectionToShuffle"></param>
+            <param name="collection"></param>
         </member>
         <member name="M:Extensions.GetSHA256(System.String)">
             <summary>
@@ -1391,18 +1392,98 @@
         </member>
         <member name="M:Extensions.CreateFlag(System.Boolean[])">
             <summary>
-            
+            Create a byte flag containing specified boolean values
             </summary>
             <param name="values"></param>
             <returns></returns>
+            <exception cref="T:Inertia.BoolFlagTooLargeException"></exception>
         </member>
         <member name="M:Extensions.GetBits(System.Byte,System.Int32)">
             <summary>
-            
+            Read boolean values from a byte flag
             </summary>
             <param name="flag"></param>
             <param name="length"></param>
             <returns></returns>
+        </member>
+        <member name="T:Log">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Log.UseAsyncQueue">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Log.DefaultColor">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Log.WarnColor">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Log.ErrorColor">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Log.DefaultTitle">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Log.WarnTitle">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Log.ErrorTitle">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Log.Line(System.Object)">
+            <summary>
+            
+            </summary>
+            <param name="content"></param>
+        </member>
+        <member name="M:Log.Line(System.String,System.Object[])">
+            <summary>
+            
+            </summary>
+            <param name="content"></param>
+            <param name="args"></param>
+        </member>
+        <member name="M:Log.Warn(System.Object)">
+            <summary>
+            
+            </summary>
+            <param name="content"></param>
+        </member>
+        <member name="M:Log.Warn(System.String,System.Object[])">
+            <summary>
+            
+            </summary>
+            <param name="content"></param>
+            <param name="args"></param>
+        </member>
+        <member name="M:Log.Error(System.Object)">
+            <summary>
+            
+            </summary>
+            <param name="content"></param>
+        </member>
+        <member name="M:Log.Error(System.String,System.Object[])">
+            <summary>
+            
+            </summary>
+            <param name="content"></param>
+            <param name="args"></param>
         </member>
     </members>
 </doc>

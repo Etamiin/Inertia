@@ -46,7 +46,7 @@ namespace Inertia.Runtime
 
             var s = (Script)typeof(T).GetConstructor(Type.EmptyTypes).Invoke(new object[] { });
 
-            s.InCollection = this;
+            s.Parent = this;
             s.Awake(args);
 
             lock (_scripts)
@@ -141,7 +141,7 @@ namespace Inertia.Runtime
         internal void FinalizeRemove(Script script)
         {
             _scripts.Remove(script);
-            script.InCollection = null;
+            script.Parent = null;
         }
 
         /// <summary>

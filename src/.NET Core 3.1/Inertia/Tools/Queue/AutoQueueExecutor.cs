@@ -22,7 +22,9 @@ namespace Inertia
             get
             {
                 lock (_queue)
+                {
                     return _queue.Count;
+                }
             }
         }
 
@@ -44,10 +46,14 @@ namespace Inertia
         public void Enqueue(params BasicAction[] actions)
         {
             if (IsDisposed)
+            {
                 throw new ObjectDisposedException(nameof(AutoQueueExecutor));
+            }
 
             foreach (var action in actions)
+            {
                 _queue.Add(action);
+            }
         }
 
         /// <summary>
@@ -55,12 +61,11 @@ namespace Inertia
         /// </summary>
         public void Dispose()
         {
-            if (IsDisposed)
-                return;
-
-            _queue.Clear();
-
-            IsDisposed = true;
+            if (!IsDisposed)
+            {
+                _queue.Clear();
+                IsDisposed = true;
+            }
         }
 
         private async void Execute()

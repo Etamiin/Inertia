@@ -1,7 +1,9 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 namespace Inertia
 {
+    [Obsolete]
     internal class FileStoragePack
     {
         internal readonly string BaseDirectory;

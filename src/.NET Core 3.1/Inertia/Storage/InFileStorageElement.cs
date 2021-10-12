@@ -1,7 +1,9 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 namespace Inertia
 {
+    [Obsolete]
     public class InFileStorageElement
     {
         public string Name { get; set; }

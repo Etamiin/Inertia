@@ -22,9 +22,9 @@ namespace Inertia.Network
         /// </summary>
         public bool IsDisposed { get; protected private set; }
 
-        protected private string m_targetIp;
-        protected private int m_targetPort;
-        protected private bool m_closed;
+        protected private string _targetIp;
+        protected private int _targetPort;
+        protected private bool _closeNotified;
 
         /// <summary>
         /// Instantiate a new instance of the class <see cref="NetworkServerEntity"/>
@@ -33,8 +33,8 @@ namespace Inertia.Network
         /// <param name="port"></param>
         public NetworkServerEntity(string ip, int port)
         {
-            m_targetIp = ip.Replace("localhost", "127.0.0.1");
-            m_targetPort = port;
+            _targetIp = ip.Replace("localhost", "127.0.0.1");
+            _targetPort = port;
 
             DefaultNetworkProtocol.Initialize();
         }
@@ -70,16 +70,16 @@ namespace Inertia.Network
         /// <param name="disposing"></param>
         protected virtual void Dispose(bool disposing)
         {
-            if (IsDisposed)
-                return;
-
-            if (disposing)
+            if (!IsDisposed)
             {
-                Started = null;
-                Closed = null;
-            }
+                if (disposing)
+                {
+                    Started = null;
+                    Closed = null;
+                }
 
-            IsDisposed = true;
+                IsDisposed = true;
+            }
         }
 
         internal void OnStarted()

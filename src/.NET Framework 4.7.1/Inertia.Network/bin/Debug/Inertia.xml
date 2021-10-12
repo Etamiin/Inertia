@@ -22,21 +22,12 @@
             <param name="commandName"></param>
             <returns></returns>
         </member>
-        <member name="M:Inertia.CommandHooker.TryExecuteTextCommand(System.String,System.Object[])">
+        <member name="M:Inertia.CommandHooker.TryExecuteCommandLine(System.String,System.Object[])">
             <summary>
             Executes a command line and returns the associated <see cref="T:Inertia.TextCommandArgs"/> instance.
             </summary>
             <param name="commandLine"></param>
             <param name="dataCollection">The list of objects to be associated with the command</param>
-            <returns></returns>
-        </member>
-        <member name="M:Inertia.CommandHooker.TryExecuteCommandByName(System.String,System.Object[],System.String[])">
-            <summary>
-            Executes a <see cref="T:Inertia.TextCommand"/> associated with the specified name.
-            </summary>
-            <param name="commandName"></param>
-            <param name="dataCollection">The list of objects to be associated with the command</param>
-            <param name="arguments"></param>
             <returns></returns>
         </member>
         <member name="T:Inertia.TextCommand">
@@ -629,6 +620,40 @@
             </summary>
             <param name="type"></param>
         </member>
+        <member name="T:Inertia.ISerializableData">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Inertia.ISerializableData.Serialize">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ISerializableData.Deserialize(System.Byte[])">
+            <summary>
+            
+            </summary>
+            <param name="data"></param>
+        </member>
+        <member name="T:Inertia.ISerializableObject">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Inertia.ISerializableObject.Serialize(Inertia.BasicWriter)">
+            <summary>
+            
+            </summary>
+            <param name="writer"></param>
+        </member>
+        <member name="M:Inertia.ISerializableObject.Deserialize(Inertia.BasicReader)">
+            <summary>
+            
+            </summary>
+            <param name="reader"></param>
+        </member>
         <member name="T:Inertia.IOHelper">
             <summary>
             
@@ -695,50 +720,15 @@
             <param name="key"></param>
             <returns></returns>
         </member>
-        <member name="T:Inertia.ISerializableData">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="M:Inertia.ISerializableData.Serialize">
-            <summary>
-            
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:Inertia.ISerializableData.Deserialize(System.Byte[])">
-            <summary>
-            
-            </summary>
-            <param name="data"></param>
-        </member>
-        <member name="T:Inertia.ISerializableObject">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="M:Inertia.ISerializableObject.Serialize(Inertia.BasicWriter)">
-            <summary>
-            
-            </summary>
-            <param name="writer"></param>
-        </member>
-        <member name="M:Inertia.ISerializableObject.Deserialize(Inertia.BasicReader)">
-            <summary>
-            
-            </summary>
-            <param name="reader"></param>
-        </member>
         <member name="T:Inertia.LoaderManager">
             <summary>
             
             </summary>
         </member>
         <member name="M:Inertia.LoaderManager.LoadPlugins">
-            <summary>
+             <summary>
             
-            </summary>
-            <returns></returns>
+             </summary>
         </member>
         <member name="M:Inertia.LoaderManager.TryGetPlugin``1(``0@)">
             <summary>
@@ -915,6 +905,11 @@
             
             </summary>
         </member>
+        <member name="T:Inertia.Runtime.Run">
+            <summary>
+            
+            </summary>
+        </member>
         <member name="T:Inertia.Runtime.Run.ExecuteScriptIn">
              <summary>
             
@@ -922,8 +917,101 @@
         </member>
         <member name="P:Inertia.Runtime.Run.ExecuteScriptIn.Permanent">
             <summary>
-            Returns true if the current instance run permanently.
+            Returns true if the current script run permanently.
             </summary>
+        </member>
+        <member name="P:Inertia.Runtime.Run.ExecuteScriptIn.IsRunning">
+            <summary>
+            Returns true if the current script is running.
+            </summary>
+        </member>
+        <member name="M:Inertia.Runtime.Run.ExecuteScriptIn.Stop">
+            <summary>
+            Stop the current script
+            </summary>
+        </member>
+        <member name="M:Inertia.Runtime.Run.Update">
+            <summary>
+            Execute the Runtime cycle manually.
+            </summary>
+        </member>
+        <member name="M:Inertia.Runtime.Run.Delayed(System.Single,BasicAction{Inertia.Runtime.Run.ExecuteScriptIn},System.Boolean)">
+            <summary>
+            
+            </summary>
+            <param name="delayInSeconds"></param>
+            <param name="callback"></param>
+            <param name="permanent"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.Runtime.Run.Delayed(System.Single,BasicAction{Inertia.Runtime.Run.ExecuteScriptIn},System.Single)">
+            <summary>
+            
+            </summary>
+            <param name="delayInSeconds"></param>
+            <param name="callback"></param>
+            <param name="runningTime"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.Runtime.Run.ToNextFrame(BasicAction)">
+            <summary>
+            
+            </summary>
+            <param name="callback"></param>
+        </member>
+        <member name="T:Inertia.Clock">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Inertia.Clock.GetElapsedMilliseconds(BasicAction)">
+            <summary>
+            Automatically creates an instance of the class <see cref="T:Inertia.Clock"/> and returns in milliseconds the execution time of the indicated code
+            </summary>
+            <param name="handler">The code to execute</param>
+            <returns>Time elapsed in milliseconds</returns>
+        </member>
+        <member name="M:Inertia.Clock.GetElapsedSeconds(BasicAction)">
+            <summary>
+            Automatically creates an instance of the class <see cref="T:Inertia.Clock"/> and returns in seconds the execution time of the indicated code
+            </summary>
+            <param name="handler">The code to execute</param>
+            <returns>Time elapsed in seconds</returns>
+        </member>
+        <member name="M:Inertia.Clock.#ctor">
+            <summary>
+            Initialize a new instance of the class <see cref="T:Inertia.Clock"/>
+            </summary>
+        </member>
+        <member name="M:Inertia.Clock.Reset">
+            <summary>
+            Reset the clock's time
+            </summary>
+            <returns>Returns the current instance</returns>
+        </member>
+        <member name="M:Inertia.Clock.GetElapsedMilliseconds">
+            <summary>
+            Returns in milliseconds the execution time since the last reset
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.Clock.GetElapsedMillisecondsAndReset">
+            <summary>
+            Returns in milliseconds the execution time since the last reset and then reset the clock
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.Clock.GetElapsedSeconds">
+            <summary>
+            Returns in seconds the execution time since the last reset
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.Clock.GetElapsedSecondsAndReset">
+            <summary>
+            Returns in seconds the execution time since the last reset and then reset the clock
+            </summary>
+            <returns></returns>
         </member>
         <member name="T:Inertia.AutoQueueExecutor">
              <summary>
@@ -992,60 +1080,6 @@
              <summary>
             
              </summary>
-        </member>
-        <member name="T:Inertia.Clock">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="M:Inertia.Clock.GetElapsedMilliseconds(BasicAction)">
-            <summary>
-            Automatically creates an instance of the class <see cref="T:Inertia.Clock"/> and returns in milliseconds the execution time of the indicated code
-            </summary>
-            <param name="handler">The code to execute</param>
-            <returns>Time elapsed in milliseconds</returns>
-        </member>
-        <member name="M:Inertia.Clock.GetElapsedSeconds(BasicAction)">
-            <summary>
-            Automatically creates an instance of the class <see cref="T:Inertia.Clock"/> and returns in seconds the execution time of the indicated code
-            </summary>
-            <param name="handler">The code to execute</param>
-            <returns>Time elapsed in seconds</returns>
-        </member>
-        <member name="M:Inertia.Clock.#ctor">
-            <summary>
-            Initialize a new instance of the class <see cref="T:Inertia.Clock"/>
-            </summary>
-        </member>
-        <member name="M:Inertia.Clock.Reset">
-            <summary>
-            Reset the clock's time
-            </summary>
-            <returns>Returns the current instance</returns>
-        </member>
-        <member name="M:Inertia.Clock.GetElapsedMilliseconds">
-            <summary>
-            Returns in milliseconds the execution time since the last reset
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:Inertia.Clock.GetElapsedMillisecondsAndReset">
-            <summary>
-            Returns in milliseconds the execution time since the last reset and then reset the clock
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:Inertia.Clock.GetElapsedSeconds">
-            <summary>
-            Returns in seconds the execution time since the last reset
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:Inertia.Clock.GetElapsedSecondsAndReset">
-            <summary>
-            Returns in seconds the execution time since the last reset and then reset the clock
-            </summary>
-            <returns></returns>
         </member>
         <member name="T:Inertia.CoreRequestHeaders">
             <summary>
@@ -1116,20 +1150,6 @@
             </summary>
             <param name="header"></param>
             <param name="value"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Inertia.RequestParameters.RemoveHeader(System.String)">
-            <summary>
-            
-            </summary>
-            <param name="name"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Inertia.RequestParameters.RemoveCoreHeader(Inertia.CoreRequestHeaders)">
-            <summary>
-            
-            </summary>
-            <param name="header"></param>
             <returns></returns>
         </member>
         <member name="M:Inertia.RequestParameters.SetAutomaticDecompression(System.Net.DecompressionMethods)">
@@ -1322,7 +1342,7 @@
             Shuffle the specified <see cref="T:System.Collections.Generic.IList`1"/> object
             </summary>
             <typeparam name="T"></typeparam>
-            <param name="collectionToShuffle"></param>
+            <param name="collection"></param>
         </member>
         <member name="M:Extensions.GetSHA256(System.String)">
             <summary>
@@ -1372,18 +1392,98 @@
         </member>
         <member name="M:Extensions.CreateFlag(System.Boolean[])">
             <summary>
-            
+            Create a byte flag containing specified boolean values
             </summary>
             <param name="values"></param>
             <returns></returns>
+            <exception cref="T:Inertia.BoolFlagTooLargeException"></exception>
         </member>
         <member name="M:Extensions.GetBits(System.Byte,System.Int32)">
             <summary>
-            
+            Read boolean values from a byte flag
             </summary>
             <param name="flag"></param>
             <param name="length"></param>
             <returns></returns>
+        </member>
+        <member name="T:Log">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Log.UseAsyncQueue">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Log.DefaultColor">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Log.WarnColor">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Log.ErrorColor">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Log.DefaultTitle">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Log.WarnTitle">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Log.ErrorTitle">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Log.Line(System.Object)">
+            <summary>
+            
+            </summary>
+            <param name="content"></param>
+        </member>
+        <member name="M:Log.Line(System.String,System.Object[])">
+            <summary>
+            
+            </summary>
+            <param name="content"></param>
+            <param name="args"></param>
+        </member>
+        <member name="M:Log.Warn(System.Object)">
+            <summary>
+            
+            </summary>
+            <param name="content"></param>
+        </member>
+        <member name="M:Log.Warn(System.String,System.Object[])">
+            <summary>
+            
+            </summary>
+            <param name="content"></param>
+            <param name="args"></param>
+        </member>
+        <member name="M:Log.Error(System.Object)">
+            <summary>
+            
+            </summary>
+            <param name="content"></param>
+        </member>
+        <member name="M:Log.Error(System.String,System.Object[])">
+            <summary>
+            
+            </summary>
+            <param name="content"></param>
+            <param name="args"></param>
         </member>
     </members>
 </doc>

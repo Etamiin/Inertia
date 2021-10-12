@@ -23,10 +23,12 @@ namespace Inertia
         {
             get
             {
-                if (_reader == null)
-                    return 0;
+                if (_reader != null)
+                {
+                    return _reader.BaseStream.Length;
+                }
 
-                return _reader.BaseStream.Length;
+                return 0;
             }
         }
         /// <summary>
@@ -36,10 +38,12 @@ namespace Inertia
         {
             get
             {
-                if (_reader == null)
-                    return 0;
+                if (_reader != null)
+                {
+                    return TotalLength - Position;
+                }
 
-                return TotalLength - Position;
+                return 0;
             }
         }
         /// <summary>
@@ -49,15 +53,18 @@ namespace Inertia
         {
             get
             {
-                if (_reader == null)
-                    return 0;
-
-                return _reader.BaseStream.Position;
+                if (_reader != null)
+                {
+                    return _reader.BaseStream.Position;
+                }
+                return 0;
             }
             set
             {
                 if (_reader == null || value < 0 || value > _reader.BaseStream.Length)
+                {
                     return;
+                }
 
                 _reader.BaseStream.Position = value;
             }
@@ -103,14 +110,11 @@ namespace Inertia
         /// </summary>
         public void Clear()
         {
-            if (IsDisposed)
-                return;
-
-            if (_reader == null)
-                return;
-
-            _reader.Dispose();
-            _reader = new BinaryReader(new MemoryStream(), _encoding);
+            if (!IsDisposed && _reader != null)
+            {
+                _reader.Dispose();
+                _reader = new BinaryReader(new MemoryStream(), _encoding);
+            }
         }
 
         /// <summary>
@@ -132,13 +136,14 @@ namespace Inertia
         public BasicReader Fill(byte[] data, long startIndex)
         {
             if (IsDisposed)
+            {
                 throw new ObjectDisposedException(nameof(BasicReader));
+            }
 
             var oldPosition = Position;
 
             Position = startIndex;
             _reader.BaseStream.Write(data, 0, data.Length);
-
             Position = oldPosition;
 
             return this;
@@ -169,9 +174,13 @@ namespace Inertia
         public bool GetBool()
         {
             if (IsUpdatable(sizeof(bool)))
+            {
                 return _reader.ReadBoolean();
-
-            return default;
+            }
+            else
+            {
+                return default;
+            }
         }
         /// <summary>
         /// Read a bool flag based on specified length
@@ -190,8 +199,14 @@ namespace Inertia
         public string GetString()
         {
             var b = GetBytes();
-            if (b.Length == 0) return string.Empty;
-            else return _encoding.GetString(b);
+            if (b.Length > 0)
+            {
+                return _encoding.GetString(b);
+            }
+            else
+            {
+                return string.Empty;
+            }
         }
         /// <summary>
         /// Read a <see cref="byte"/> value in the stream and change the position
@@ -200,9 +215,13 @@ namespace Inertia
         public byte GetByte()
         {
             if (IsUpdatable(sizeof(byte)))
+            {
                 return _reader.ReadByte();
-
-            return default;
+            }
+            else
+            {
+                return default;
+            }            
         }
         /// <summary>
         /// Read a <see cref="sbyte"/> value in the stream and change the position
@@ -211,9 +230,13 @@ namespace Inertia
         public sbyte GetSByte()
         {
             if (IsUpdatable(sizeof(sbyte)))
+            {
                 return _reader.ReadSByte();
-
-            return default;
+            }
+            else
+            {
+                return default;
+            }
         }
         /// <summary>
         /// Read a <see cref="char"/> value in the stream and change the position
@@ -222,8 +245,13 @@ namespace Inertia
         public char GetChar()
         {
             if (IsUpdatable(sizeof(char)))
+            {
                 return _reader.ReadChar();
-            return default;
+            }
+            else
+            {
+                return default;
+            }
         }
         /// <summary>
         /// Read a <see cref="float"/> value in the stream and change the position
@@ -232,9 +260,13 @@ namespace Inertia
         public float GetFloat()
         {
             if (IsUpdatable(sizeof(float)))
+            {
                 return _reader.ReadSingle();
-
-            return default;
+            }
+            else
+            {
+                return default;
+            }
         }
         /// <summary>
         /// Read a <see cref="double"/> value in the stream and change the position
@@ -243,9 +275,13 @@ namespace Inertia
         public double GetDouble()
         {
             if (IsUpdatable(sizeof(double)))
+            {
                 return _reader.ReadDouble();
-
-            return default;
+            }
+            else
+            {
+                return default;
+            }
         }
         /// <summary>
         /// Read a <see cref="decimal"/> value in the stream and change the position
@@ -254,9 +290,13 @@ namespace Inertia
         public decimal GetDecimal()
         {
             if (IsUpdatable(sizeof(decimal)))
+            {
                 return _reader.ReadDecimal();
-
-            return default;
+            }
+            else
+            {
+                return default;
+            }
         }
         /// <summary>
         /// Read a <see cref="short"/> value in the stream and change the position
@@ -265,9 +305,13 @@ namespace Inertia
         public short GetShort()
         {
             if (IsUpdatable(sizeof(short)))
+            {
                 return _reader.ReadInt16();
-
-            return default;
+            }
+            else
+            {
+                return default;
+            }
         }
         /// <summary>
         /// Read a <see cref="ushort"/> value in the stream and change the position
@@ -276,9 +320,13 @@ namespace Inertia
         public ushort GetUShort()
         {
             if (IsUpdatable(sizeof(ushort)))
+            {
                 return _reader.ReadUInt16();
-
-            return default;
+            }
+            else
+            {
+                return default;
+            }
         }
         /// <summary>
         /// Read a <see cref="int"/> value in the stream and change the position
@@ -287,9 +335,13 @@ namespace Inertia
         public int GetInt()
         {
             if (IsUpdatable(sizeof(int)))
+            {
                 return _reader.ReadInt32();
-
-            return default;
+            }
+            else
+            {
+                return default;
+            }
         }
         /// <summary>
         /// Read a <see cref="uint"/> value in the stream and change the position
@@ -298,9 +350,13 @@ namespace Inertia
         public uint GetUInt()
         {
             if (IsUpdatable(sizeof(uint)))
+            {
                 return _reader.ReadUInt32();
-
-            return default;
+            }
+            else
+            {
+                return default;
+            }            
         }
         /// <summary>
         /// Read a <see cref="long"/> value in the stream and change the position
@@ -309,9 +365,13 @@ namespace Inertia
         public long GetLong()
         {
             if (IsUpdatable(sizeof(long)))
+            {
                 return _reader.ReadInt64();
-
-            return default;
+            }
+            else
+            {
+                return default;
+            }            
         }
         /// <summary>
         /// Read a <see cref="ulong"/> value in the stream and change the position
@@ -320,9 +380,13 @@ namespace Inertia
         public ulong GetULong()
         {
             if (IsUpdatable(sizeof(ulong)))
+            {
                 return _reader.ReadUInt64();
-
-            return default;
+            }
+            else
+            {
+                return default;
+            }            
         }
         /// <summary>
         /// Read a byte array (with an <see cref="long"/> length header) in the stream and change the position
@@ -335,8 +399,10 @@ namespace Inertia
                 var length = GetLong();
                 return GetBytes(length);
             }
-
-            return new byte[] { };
+            else
+            {
+                return new byte[0];
+            }
         }
         /// <summary>
         /// Read specified number of <see cref="byte"/> in the stream and change the position
@@ -346,9 +412,13 @@ namespace Inertia
         public byte[] GetBytes(long length)
         {
             if (IsUpdatable(length))
+            {
                 return _reader.ReadBytes((int)length);
-
-            return new byte[] { };
+            }
+            else
+            {
+                return new byte[0];
+            }
         }
         /// <summary>
         /// Read DateTime in the stream and change the position
@@ -440,22 +510,25 @@ namespace Inertia
         /// <param name="disposing"></param>
         protected virtual void Dispose(bool disposing)
         {
-            if (IsDisposed)
-                return;
-
-            if (disposing)
+            if (!IsDisposed && disposing)
             {
-                _reader.Close();
-                _reader.Dispose();
-            }
+                if (disposing)
+                {
+                    _reader.Close();
+                    _reader.Dispose();
+                }
 
-            IsDisposed = true;
+                IsDisposed = true;
+            }
         }
 
         private bool IsUpdatable(long length)
         {
             if (IsDisposed)
+            {
                 throw new ObjectDisposedException(nameof(BasicReader));
+            }
+
             return UnreadedLength >= length;
         }
     }

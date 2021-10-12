@@ -11,8 +11,6 @@ namespace Inertia.Network
     /// </summary>
     public class UserDatagramDataLengthLimitException : Exception
     {
-        #region Public variables
-
         /// <summary>
         /// Message of the exception
         /// </summary>
@@ -22,10 +20,6 @@ namespace Inertia.Network
         /// </summary>
         public readonly int Length;
 
-        #endregion
-
-        #region Constructors
-
         /// <summary>
         /// Instantiate a new instance of the class <see cref="UserDatagramDataLengthLimitException"/>
         /// </summary>
@@ -34,8 +28,6 @@ namespace Inertia.Network
         {
             Length = length;
         }
-
-        #endregion
 
         private string GetMessage()
         {

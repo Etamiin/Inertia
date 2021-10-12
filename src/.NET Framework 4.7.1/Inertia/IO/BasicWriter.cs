@@ -51,17 +51,21 @@ namespace Inertia
         {
             get
             {
-                if (_writer == null)
-                    return 0;
-
-                return _writer.BaseStream.Position;
+                if (_writer != null)
+                {
+                    return _writer.BaseStream.Position;
+                }
+                else
+                { 
+                    return 0; 
+                }
             }
             set
             {
-                if (_writer == null)
-                    return;
-
-                _writer.BaseStream.Position = value;
+                if (_writer != null)
+                {
+                    _writer.BaseStream.Position = value;
+                }                
             }
         }
 
@@ -81,7 +85,7 @@ namespace Inertia
         public BasicWriter(Encoding encoding)
         {
             _encoding = encoding;
-            _writer = new BinaryWriter(new MemoryStream(), encoding);       
+            _writer = new BinaryWriter(new MemoryStream(), encoding);            
         }
 
         /// <summary>
@@ -90,9 +94,14 @@ namespace Inertia
         public void Clear()
         {
             if (IsDisposed)
+            {
                 throw new ObjectDisposedException(nameof(BasicWriter));
+            }
+
             if (_writer != null)
+            {
                 _writer.Dispose();
+            }
 
             _writer = new BinaryWriter(new MemoryStream(), _encoding);
         }
@@ -133,8 +142,14 @@ namespace Inertia
         /// <returns>Returns the current instance</returns>
         public BasicWriter SetString(string value)
         {
-            if (string.IsNullOrEmpty(value)) return SetBytes(new byte[] { });
-            else return SetBytes(_encoding.GetBytes(value));
+            if (string.IsNullOrEmpty(value))
+            {
+                return SetBytes(new byte[] { });
+            }
+            else
+            {
+                return SetBytes(_encoding.GetBytes(value));
+            }
         }
         /// <summary>
         /// Write the specified value in the stream
@@ -314,7 +329,9 @@ namespace Inertia
         public BasicWriter SetObject<T>(T value)
         {
             if (!value.GetType().IsSerializable)
+            {
                 throw new TypeNonSerializableException(typeof(T));
+            }
 
             var binaryFormatter = new BinaryFormatter()
             {
@@ -333,9 +350,13 @@ namespace Inertia
         {
             var objType = value.GetType();
             if (_typageDefinitions.ContainsKey(objType))
+            {
                 _typageDefinitions[objType](this, value);
+            }
             else
+            {
                 SetObject(value);
+            }
 
             return this;
         }
@@ -347,7 +368,9 @@ namespace Inertia
         public BasicWriter SetValues(params object[] values)
         {
             foreach (var obj in values)
+            {
                 SetValue(obj);
+            }
 
             return this;
         }
@@ -358,11 +381,14 @@ namespace Inertia
         /// <returns></returns>
         public byte[] ToArray()
         {
-            if (IsDisposed || _writer == null)
+            if (!IsDisposed && _writer != null)
+            {
+                return ((MemoryStream)_writer.BaseStream).ToArray();
+            }
+            else
+            {
                 throw new ObjectDisposedException(nameof(BasicWriter));
-
-            var data = ((MemoryStream)_writer.BaseStream).ToArray();
-            return data;
+            }
         }
         /// <summary>
         /// Export all writed data as byte array and clear the current instance's data
@@ -400,17 +426,17 @@ namespace Inertia
         /// <param name="disposing"></param>
         protected virtual void Dispose(bool disposing)
         {
-            if (IsDisposed)
-                return;
-
-            if (disposing)
+            if (!IsDisposed && disposing)
             {
-                _writer.Flush();
-                _writer.Close();
-                _writer.Dispose();
-            }
+                if (disposing)
+                {
+                    _writer.Flush();
+                    _writer.Close();
+                    _writer.Dispose();
+                }
 
-            IsDisposed = true;
+                IsDisposed = true;
+            }
         }
     }
 }

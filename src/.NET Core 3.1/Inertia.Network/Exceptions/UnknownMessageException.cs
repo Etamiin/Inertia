@@ -11,8 +11,6 @@ namespace Inertia.Network
     /// </summary>
     public class UnknownMessageException : Exception
     {
-        #region Public variables
-
         /// <summary>
         /// Message of the exception
         /// </summary>
@@ -22,10 +20,6 @@ namespace Inertia.Network
         /// </summary>
         public readonly uint PacketId;
 
-        #endregion
-
-        #region Constructors
-
         /// <summary>
         /// 
         /// </summary>
@@ -34,8 +28,6 @@ namespace Inertia.Network
         {
             PacketId = packetId;
         }
-
-        #endregion
 
         private string GetMessage()
         {

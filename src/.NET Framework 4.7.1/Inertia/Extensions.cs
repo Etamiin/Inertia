@@ -12,18 +12,18 @@ public static partial class Extensions
     /// Shuffle the specified <see cref="IList{T}"/> object
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    /// <param name="collectionToShuffle"></param>
-    public static void Shuffle<T>(this IList<T> collectionToShuffle)
+    /// <param name="collection"></param>
+    public static void Shuffle<T>(this IList<T> collection)
     {
         var iStart = 0;
-        T valueSaved;
+        T savedValue;
 
-        while (iStart < collectionToShuffle.Count - 1)
+        while (iStart < collection.Count - 1)
         {
-            int iRand = IOHelper.Randomizer.Next(iStart, collectionToShuffle.Count);
-            valueSaved = collectionToShuffle[iStart];
-            collectionToShuffle[iStart++] = collectionToShuffle[iRand];
-            collectionToShuffle[iRand] = valueSaved;
+            int iRand = IOHelper.Randomizer.Next(iStart, collection.Count);
+            savedValue = collection[iStart];
+            collection[iStart++] = collection[iRand];
+            collection[iRand] = savedValue;
         }
     }
 
@@ -44,8 +44,7 @@ public static partial class Extensions
     /// <returns></returns>
     public static string GetSHA256(this string text, Encoding encoding)
     {
-        var data = encoding.GetBytes(text);
-        return IOHelper.GetSHA256(data);
+        return IOHelper.GetSHA256(encoding.GetBytes(text));
     }
 
     /// <summary>
@@ -90,23 +89,28 @@ public static partial class Extensions
     }
 
     /// <summary>
-    /// 
+    /// Create a byte flag containing specified boolean values
     /// </summary>
     /// <param name="values"></param>
     /// <returns></returns>
+    /// <exception cref="BoolFlagTooLargeException"></exception>
     public static byte CreateFlag(this bool[] values)
     {
         if (values.Length > 8)
+        {
             throw new BoolFlagTooLargeException();
+        }
 
         var flag = (byte)0;
         for (var i = 0; i < values.Length; i++)
+        {
             flag = values[i] ? (byte)(flag | (1 << i)) : (byte)(flag & 255 - (1 << i));
+        }
 
         return flag;
     }
     /// <summary>
-    /// 
+    /// Read boolean values from a byte flag
     /// </summary>
     /// <param name="flag"></param>
     /// <param name="length"></param>
@@ -115,7 +119,9 @@ public static partial class Extensions
     {
         var flags = new bool[length];
         for (var i = 0; i < length; i++)
+        {
             flags[i] = (flag & (byte)(1 << i)) != 0;
+        }
 
         return flags;
     }
@@ -134,7 +140,9 @@ public static partial class Extensions
         }
 
         if (!folderPath.EndsWith(@"\"))
+        {
             folderPath += @"\";
+        }
 
         return folderPath;
     }

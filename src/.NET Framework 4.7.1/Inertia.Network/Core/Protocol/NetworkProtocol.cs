@@ -54,14 +54,18 @@ namespace Inertia.Network
         public static NetworkMessage CreateMessage(Type messageType)
         {
             if (messageType.IsAbstract || !messageType.IsSubclassOf(typeof(NetworkMessage)))
+            {
                 return null;
+            }
 
             var constr = messageType.GetConstructors()[0];
             var parameters = constr.GetParameters();
             var objs = new object[parameters.Length];
 
             for (var i = 0; i < parameters.Length; i++)
+            {
                 objs[i] = null;
+            }
 
             return (NetworkMessage)constr.Invoke(objs);
         }
@@ -72,10 +76,12 @@ namespace Inertia.Network
         /// <returns></returns>
         public static NetworkMessage CreateMessage(uint messageId)
         {
-            if (!MessageTypes.ContainsKey(messageId))
-                return null;
+            if (MessageTypes.ContainsKey(messageId))
+            {
+                return CreateMessage(MessageTypes[messageId]);
+            }
 
-            return CreateMessage(MessageTypes[messageId]);
+            return null;            
         }
 
         /// <summary>

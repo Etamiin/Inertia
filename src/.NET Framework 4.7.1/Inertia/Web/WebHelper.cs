@@ -23,16 +23,20 @@ namespace Inertia
             {
                 var request = (HttpWebRequest)WebRequest.Create(uriRequest);
                 if (parameters != null)
+                {
                     parameters.ApplyToRequest(request);
+                }
 
                 using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
                 using (Stream stream = response.GetResponseStream())
                 using (StreamReader reader = new StreamReader(stream))
+                {
                     return reader.ReadToEnd();
+                }
             }
             catch (Exception ex)
             {
-                return $"Request Error: { ex }";
+                return $"Request Error: { ex.Message }";
             }
         }
         /// <summary>
@@ -58,7 +62,9 @@ namespace Inertia
             {
                 var request = (HttpWebRequest)WebRequest.Create(uriRequest);
                 if (parameters != null)
+                {
                     parameters.ApplyToRequest(request);
+                }
 
                 using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
                 using (Stream stream = response.GetResponseStream())
@@ -73,7 +79,9 @@ namespace Inertia
             {
                 //redirect
                 if (ex.Response != null && ex.Response.ResponseUri != uriRequest)
+                {
                     return GetRequestData(ex.Response.ResponseUri, parameters);
+                }
             }
 
             return new byte[0];
@@ -116,14 +124,18 @@ namespace Inertia
                 request.Method = "POST";
 
                 if (parameters == null)
+                {
                     parameters = new RequestParameters();
+                }
 
                 if (!string.IsNullOrEmpty(data))
                 {
                     parameters.SetContentLength(body.LongLength);
 
                     using (var requestBody = request.GetRequestStream())
+                    {
                         requestBody.Write(body, 0, body.Length);
+                    }
                 }
 
                 parameters.ApplyToRequest(request);
@@ -164,7 +176,9 @@ namespace Inertia
                 parameters.ApplyToRequest(request);
 
                 using (Stream requestBody = request.GetRequestStream())
+                {
                     requestBody.Write(dataBytes, 0, dataBytes.Length);
+                }
 
                 using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
                 using (Stream stream = response.GetResponseStream())
@@ -179,7 +193,9 @@ namespace Inertia
             {
                 //redirect
                 if (ex.Response != null && ex.Response.ResponseUri != uriRequest)
+                {
                     return PostRequestData(ex.Response.ResponseUri, data, parameters);
+                }
             }
 
             return new byte[0];

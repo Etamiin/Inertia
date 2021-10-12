@@ -49,7 +49,10 @@ namespace Inertia
         /// <returns>Returns the current instance</returns>
         public Clock Reset()
         {
-            if (_cw == null) _cw = new Stopwatch();
+            if (_cw == null)
+            {
+                _cw = new Stopwatch();
+            }
 
             _cw.Restart();
             return this;

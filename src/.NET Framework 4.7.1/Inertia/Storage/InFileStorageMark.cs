@@ -1,5 +1,8 @@
-﻿namespace Inertia
+﻿using System;
+
+namespace Inertia
 {
+    [Obsolete]
     internal class InFileStorageMark
     {
         internal readonly string Name;

@@ -54,10 +54,14 @@ namespace Inertia.Runtime
         /// <returns></returns>
         public T GetArgumentAt<T>(int index)
         {
-            if (index < 0 || index >= Count)
+            if (index >= 0 && index < Count)
+            {
+                return (T)this[index];
+            }
+            else
+            {
                 throw new IndexOutOfRangeException();
-
-            return (T)this[index];
+            }
         }
         /// <summary>
         /// Returns the next argument based on <see cref="Position"/> field casted to <typeparamref name="T"/>.
@@ -66,10 +70,14 @@ namespace Inertia.Runtime
         /// <returns></returns>
         public T GetNextArgument<T>()
         {
-            if (Position < 0 || Position >= Count)
+            if (Position >= 0 && Position < Count)
+            {
+                return (T)this[Position++];
+            }
+            else
+            {
                 throw new IndexOutOfRangeException();
-
-            return (T)this[Position++];
+            }
         }
 
         /// <summary>
@@ -77,12 +85,11 @@ namespace Inertia.Runtime
         /// </summary>
         public void Dispose()
         {
-            if (IsDisposed)
-                return;
-
-            _arguments = null;
-
-            IsDisposed = true;
+            if (!IsDisposed)
+            {
+                _arguments = null;
+                IsDisposed = true;
+            }
         }
     }
 }

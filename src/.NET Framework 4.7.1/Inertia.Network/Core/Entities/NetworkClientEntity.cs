@@ -22,9 +22,9 @@ namespace Inertia.Network
         /// </summary>
         public bool IsDisposed { get; protected private set; }
 
-        protected private readonly string m_targetIp;
-        protected private readonly int m_targetPort;
-        protected private bool m_disconnected;
+        protected private readonly string _targetIp;
+        protected private readonly int _targetPort;
+        protected private bool _disconnectNotified;
 
         /// <summary>
         /// Instantiate a new instance of the class <see cref="NetworkClientEntity"/>.
@@ -33,8 +33,8 @@ namespace Inertia.Network
         /// <param name="port"></param>
         public NetworkClientEntity(string ip, int port)
         {
-            m_targetIp = ip.Replace("localhost", "127.0.0.1");
-            m_targetPort = port;
+            _targetIp = ip.Replace("localhost", "127.0.0.1");
+            _targetPort = port;
 
             DefaultNetworkProtocol.Initialize();
         }
@@ -88,16 +88,16 @@ namespace Inertia.Network
         /// <param name="disposing"></param>
         protected virtual void Dispose(bool disposing)
         {
-            if (IsDisposed)
-                return;
-
-            if (disposing)
+            if (!IsDisposed)
             {
-                Connected = null;
-                Disconnected = null;
-            }
+                if (disposing)
+                {
+                    Connected = null;
+                    Disconnected = null;
+                }
 
-            IsDisposed = true;
+                IsDisposed = true;
+            }
         }
 
         internal void OnConnected()

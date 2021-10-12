@@ -36,9 +36,13 @@ namespace Inertia
         public RequestParameters AddHeader(string name, string value)
         {
             if (_headers.ContainsKey(name))
+            {
                 _headers[name] = value;
+            }
             else
+            {
                 _headers.Add(name, value);
+            }
 
             return this;
         }
@@ -51,9 +55,13 @@ namespace Inertia
         public RequestParameters SetCoreHeader(CoreRequestHeaders header, string value)
         {
             if (_coreHeaders.ContainsKey(header))
+            {
                 _coreHeaders[header] = value;
+            }
             else
+            {
                 _coreHeaders.Add(header, value);
+            }
 
             return this;
         }
@@ -115,22 +123,36 @@ namespace Inertia
             {
                 var property = request.GetType().GetProperty(coreHeader.Key.ToString());
                 if (property != null)
+                {
                     property.SetValue(request, coreHeader.Value);
+                }
             }
 
             if (_contentLength != -1)
+            {
                 request.ContentLength = _contentLength;
+            }
             if (_date != new DateTime())
+            {
                 request.Date = _date;
+            }
             if (_modifiedSince != new DateTime())
+            {
                 request.IfModifiedSince = _modifiedSince;
+            }
             if (_proxy != null)
+            {
                 request.Proxy = _proxy;
+            }
             if (_decompressionMethod != DecompressionMethods.None)
+            {
                 request.AutomaticDecompression = _decompressionMethod;
+            }
 
             foreach (var header in _headers)
+            {
                 request.Headers.Add(header.Key + ": " + header.Value);
+            }
         }
     }
 }

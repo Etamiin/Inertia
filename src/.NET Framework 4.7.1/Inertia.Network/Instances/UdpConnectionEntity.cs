@@ -9,11 +9,11 @@ namespace Inertia.Network
     {
         internal IPEndPoint EndPoint { get; set; }
 
-        private UdpServerEntity m_server;
+        private UdpServerEntity _server;
 
         internal UdpConnectionEntity(UdpServerEntity server, IPEndPoint endPoint)
         {
-            m_server = server;
+            _server = server;
             EndPoint = endPoint;
         }
 
@@ -23,7 +23,7 @@ namespace Inertia.Network
         /// <param name="data"></param>
         public override void Send(byte[] data)
         {
-            m_server.SendTo(this, data);
+            _server.SendTo(this, data);
         }
         /// <summary>
         /// Sends the specified <see cref="NetworkMessage"/> through the current connection.
@@ -31,7 +31,7 @@ namespace Inertia.Network
         /// <param name="message"></param>
         public override void Send(NetworkMessage message)
         {
-            m_server.SendTo(this, message);
+            _server.SendTo(this, message);
         }
 
         /// <summary>
@@ -45,7 +45,7 @@ namespace Inertia.Network
             if (disposing)
             {
                 EndPoint = null;
-                m_server = null;
+                _server = null;
             }
         }
     }

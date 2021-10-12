@@ -19,7 +19,7 @@ namespace Inertia
         {
             get
             {
-                return m_arguments.Length;
+                return _arguments.Length;
             }
         }
         /// <summary>
@@ -29,15 +29,15 @@ namespace Inertia
         {
             get
             {
-                return m_dataArguments.Length;
+                return _dataArguments.Length;
             }
         }
 
-        private bool m_disposed;
-        private string m_line;
-        private string[] m_arguments;
-        private object[] m_dataArguments;
-        private int m_position;
+        private bool _disposed;
+        private string _line;
+        private string[] _arguments;
+        private object[] _dataArguments;
+        private int _position;
 
         internal TextCommandArgs(string line, string name, string[] args, object[] dataCollection)
         {
@@ -48,10 +48,14 @@ namespace Inertia
             for (var i = 0; i < args.Length; i++)
             {
                 if (!inSentence && string.IsNullOrEmpty(args[i]))
+                {
                     continue;
+                }
 
                 if (args[i].StartsWith($"{ '"' }".ToString()))
+                {
                     inSentence = true;
+                }
 
                 if (args[i].EndsWith($"{ '"' }"))
                 {
@@ -64,16 +68,20 @@ namespace Inertia
                 else
                 {
                     if (inSentence)
+                    {
                         sentence += args[i] + " ";
+                    }
                     else
+                    {
                         arguments.Add(args[i]);
+                    }
                 }
             }
 
             Name = name;
-            m_arguments = arguments.ToArray();
-            m_dataArguments = dataCollection ?? (new object[] { });
-            m_line = line;
+            _arguments = arguments.ToArray();
+            _dataArguments = dataCollection ?? (new object[] { });
+            _line = line;
         }
 
         /// <summary>
@@ -85,7 +93,7 @@ namespace Inertia
         {
             get
             {
-                return m_arguments[index];
+                return _arguments[index];
             }
         }
 
@@ -97,11 +105,13 @@ namespace Inertia
         /// <returns>The data object as <typeparamref name="T"/></returns>
         public T GetDataAt<T>(int index)
         {
-            if (index < 0 || index >= m_dataArguments.Length)
-                return default(T);
+            if (index >= 0 || index < _dataArguments.Length)
+            {
+                var data = _dataArguments[index];
+                return data != null ? (T)data : default(T);
+            }
 
-            var data = m_dataArguments[index];
-            return data != null ? (T)data : default(T);
+            return default(T);
         }
 
         /// <summary>
@@ -111,14 +121,14 @@ namespace Inertia
         /// <returns></returns>
         public bool GetNextArgument(out string argument)
         {
-            if (m_position < 0 || m_position >= Count)
+            if (_position >= 0 || _position < Count)
             {
-                argument = string.Empty;
-                return false;
+                argument = this[_position++];
+                return true;
             }
 
-            argument = this[m_position++];
-            return true;
+            argument = string.Empty;
+            return false;
         }
 
         /// <summary>
@@ -141,11 +151,17 @@ namespace Inertia
             var combined = string.Empty;
             for (var i = startIndex; i < length; i++)
             {
-                if (i >= m_arguments.Length)
+                if (i >= _arguments.Length)
+                {
                     throw new IndexOutOfRangeException();
+                }
 
-                if (i > startIndex) combined += " ";
-                combined += m_arguments[i];
+                if (i > startIndex)
+                {
+                    combined += " ";
+                }
+
+                combined += _arguments[i];
             }
 
             return combined;
@@ -166,11 +182,12 @@ namespace Inertia
         public object[] GetAllArguments(int startIndex = 0)
         {
             var args = new object[Count - startIndex];
-            if (args.Length == 0) return args;
-
-            for (var i = 0; i < args.Length; i++)
+            if (args.Length > 0)
             {
-                args[i] = m_arguments[i + startIndex];
+                for (var i = 0; i < args.Length; i++)
+                {
+                    args[i] = _arguments[i + startIndex];
+                }
             }
 
             return args;
@@ -182,7 +199,7 @@ namespace Inertia
         /// <returns></returns>
         public override string ToString()
         {
-            return m_line;
+            return _line;
         }
 
         /// <summary>
@@ -190,10 +207,10 @@ namespace Inertia
         /// </summary>
         public void Dispose()
         {
-            if (m_disposed)
-                return;
-
-            m_disposed = true;
+            if (!_disposed)
+            {
+                _disposed = true;
+            }
         }
     }
 }

@@ -9,37 +9,43 @@ namespace Inertia.Runtime
     {
         internal static bool IsManuallyRunned { get; set; } = false;
 
-        internal static event BasicAction ScriptInTimeUpdate = () => { };
-        private static event BasicAction Destroyer = () => { };
+        internal static event BasicAction UpdatingSiT = () => { };
+        private static event BasicAction Updating = () => { };
+        private static event BasicAction Destroying = () => { };
 
         private static bool _isInitialized;
-        private static ScriptExecutorLayer _loopExecutor;
 
         internal static void OnRegisterExtends()
         {
             if (!_isInitialized)
+            {
                 Initialize();
+            }
         }
 
         internal static void OnScriptCreated(Script script)
         {
             if (!_isInitialized)
+            {
                 Initialize();
+            }
 
-            _loopExecutor.Join(script);
+            Updating += script.Update;
         }
         internal static void OnScriptDestroyed(Script script)
         {
             if (!_isInitialized)
+            {
                 Initialize();
+            }
 
-            script.AttachedLayer.Leave(script);
-            Destroyer += script.PreDestroy;
+            Updating -= script.Update;
+            Destroying += script.PreDestroy;
         }
         internal static void OnScriptPreDestroyed(Script script)
         {
-            Destroyer -= script.PreDestroy;
-            script.InCollection.FinalizeRemove(script);
+            Destroying -= script.PreDestroy;
+            script.Parent.FinalizeRemove(script);
         }
 
         internal static void ExecuteCycle(Clock clock)
@@ -59,35 +65,37 @@ namespace Inertia.Runtime
 
             try
             {
-                lock (ScriptInTimeUpdate)
-                    ScriptInTimeUpdate();
-
-                _loopExecutor.Execute();
-
-                lock (Destroyer)
-                    Destroyer?.Invoke();
+                lock (UpdatingSiT)
+                {
+                    UpdatingSiT();
+                }
+                lock (Updating)
+                {
+                    Updating();
+                }
+                lock (Destroying)
+                {
+                    Destroying();
+                }
             }
             catch { }
         }
 
         private static void Initialize()
         {
-            if (_isInitialized) return;
-
-            _loopExecutor = new ScriptExecutorLayer();
-            _isInitialized = true;
-
-            ExecuteLogic();
+            if (!_isInitialized)
+            {
+                _isInitialized = true;
+                ExecuteLogic();
+            }
         }
         private static void ExecuteLogic()
         {
             var clock = new Clock();
 
             Task.Factory.StartNew(() => {
-                while (true)
+                while (!IsManuallyRunned)
                 {
-                    if (IsManuallyRunned) break;
-
                     ExecuteCycle(clock);
                 }
             });

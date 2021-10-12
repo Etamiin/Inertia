@@ -7,7 +7,7 @@ namespace Inertia
     /// </summary>
     public sealed class ManualQueueExecutor : IDisposable
     {
-        private event BasicAction QueueExecutor = () => { };
+        private event BasicAction Executing = () => { };
 
         /// <summary>
         /// Returns true if the current instance is disposed.
@@ -33,20 +33,24 @@ namespace Inertia
         public ManualQueueExecutor Enqueue(params BasicAction[] actions)
         {
             if (IsDisposed)
-                throw new ObjectDisposedException(nameof(ManualQueueExecutor));
-
-            foreach (var action in actions)
             {
+                throw new ObjectDisposedException(nameof(ManualQueueExecutor));
+            }
+
+            for (var i = 0; i < actions.Length; i++)
+            {
+                var action = actions[i];
+
+                Executing += handler;
+                Count++;
+
                 void handler()
                 {
                     action();
 
-                    QueueExecutor -= handler;
+                    Executing -= handler;
                     Count--;
                 }
-
-                QueueExecutor += handler;
-                Count++;
             }
 
             return this;
@@ -58,10 +62,14 @@ namespace Inertia
         public void Execute()
         {
             if (IsDisposed)
+            {
                 throw new ObjectDisposedException(nameof(ManualQueueExecutor));
+            }
 
-            lock (QueueExecutor)
-                QueueExecutor();
+            lock (Executing)
+            {
+                Executing();
+            }
         }
 
         /// <summary>
@@ -69,12 +77,11 @@ namespace Inertia
         /// </summary>
         public void Dispose()
         {
-            if (IsDisposed)
-                return;
-
-            QueueExecutor = null;
-
-            IsDisposed = true;
+            if (!IsDisposed)
+            {
+                Executing = null;
+                IsDisposed = true;
+            }
         }
     }
 }

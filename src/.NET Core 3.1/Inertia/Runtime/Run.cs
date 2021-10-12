@@ -15,9 +15,13 @@ namespace Inertia.Runtime
         public sealed class ExecuteScriptIn
         {
             /// <summary>
-            /// Returns true if the current instance run permanently.
+            /// Returns true if the current script run permanently.
             /// </summary>
             public bool Permanent { get; set; }
+            /// <summary>
+            /// Returns true if the current script is running.
+            /// </summary>
+            public bool IsRunning { get; set; }
 
             private BasicAction<ExecuteScriptIn> _action;
             private float _time, _currentTime, _totalTime;
@@ -28,12 +32,26 @@ namespace Inertia.Runtime
                 _time = time;
                 Permanent = permanent;
 
-                RuntimeManager.ScriptInTimeUpdate += Update;
+                RuntimeManager.UpdatingSiT += Update;
                 RuntimeManager.OnRegisterExtends();
+
+                IsRunning = true;
             }
             internal ExecuteScriptIn(float time, BasicAction<ExecuteScriptIn> action, float totalTime) : this(time, action, false)
             {
                 _totalTime = totalTime;
+            }
+
+            /// <summary>
+            /// Stop the current script
+            /// </summary>
+            public void Stop()
+            {
+                if (IsRunning)
+                {
+                    RuntimeManager.UpdatingSiT -= Update;
+                    IsRunning = false;
+                }
             }
 
             private void Update()
@@ -53,7 +71,7 @@ namespace Inertia.Runtime
                             return;
                         }
 
-                        RuntimeManager.ScriptInTimeUpdate -= Update;
+                        Stop();
                     }
                 }
             }
@@ -64,21 +82,24 @@ namespace Inertia.Runtime
 
             internal NextFrameExecution(BasicAction action)
             {
-                _action = action;
+                if (action != null)
+                {
+                    _action = action;
 
-                RuntimeManager.ScriptInTimeUpdate += Execute;
-                RuntimeManager.OnRegisterExtends();
+                    RuntimeManager.UpdatingSiT += Execute;
+                    RuntimeManager.OnRegisterExtends();
+                }
             }
 
             private void Execute()
             {
                 _action?.Invoke();
-                RuntimeManager.ScriptInTimeUpdate -= Execute;
+                RuntimeManager.UpdatingSiT -= Execute;
             }
         }
 
         /// <summary>
-        /// 
+        /// Execute the Runtime cycle manually.
         /// </summary>
         public static void Update()
         {

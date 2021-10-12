@@ -14,10 +14,10 @@ namespace Inertia.Network
 
         internal static void Initialize()
         {
-            if (Instance != null)
-                return;
-
-            new DefaultNetworkProtocol();
+            if (Instance == null)
+            {
+                new DefaultNetworkProtocol();
+            }
         }
 
         /// <summary>
@@ -25,15 +25,17 @@ namespace Inertia.Network
         /// </summary>
         public override ushort ProtocolVersion => 1;
 
-        private readonly AutoQueueExecutor m_queue;
+        private readonly AutoQueueExecutor _queue;
 
         internal DefaultNetworkProtocol()
         {
             Instance = this;
-            m_queue = new AutoQueueExecutor();
+            _queue = new AutoQueueExecutor();
 
             if (GetProtocol() == null)
+            {
                 SetProtocol(this);
+            }
         }
 
         /// <summary>
@@ -103,20 +105,28 @@ namespace Inertia.Network
                 var msgSize = reader.GetLong();
 
                 if (reader.UnreadedLength < msgSize)
+                {
                     break;
+                }
 
                 try
                 {
                     var message = CreateMessage(msgId);
                     if (message == null)
+                    {
                         throw new UnknownMessageException(msgId);
+                    }
 
                     message.OnDeserialize(reader);
 
                     if (MultiThreadedExecution)
+                    {
                         onMessageParsed(message);
+                    }
                     else
-                        m_queue.Enqueue(() => onMessageParsed(message));
+                    {
+                        _queue.Enqueue(() => onMessageParsed(message));
+                    }
                 }
                 catch (Exception ex)
                 {

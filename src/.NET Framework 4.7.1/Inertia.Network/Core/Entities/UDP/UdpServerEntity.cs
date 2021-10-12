@@ -22,12 +22,12 @@ namespace Inertia.Network
         {
             get
             {
-                return m_client != null;
+                return _client != null;
             }
         }
 
-        private UdpClient m_client;
-        private Dictionary<IPEndPoint, UdpConnectionEntity> m_connections;
+        private UdpClient _client;
+        private Dictionary<IPEndPoint, UdpConnectionEntity> _connections;
 
         /// <summary>
         /// Instantiate a new instance of the class <see cref="UdpServerEntity"/>
@@ -44,22 +44,25 @@ namespace Inertia.Network
         public override void Start()
         {
             if (IsDisposed)
+            {
                 throw new ObjectDisposedException(nameof(UdpServerEntity));
-            if (IsInitialized)
-                return;
-
-            try
-            {
-                m_closed = false;
-                m_connections = new Dictionary<IPEndPoint, UdpConnectionEntity>();
-                m_client = new UdpClient(new IPEndPoint(IPAddress.Parse(m_targetIp), m_targetPort));
-                m_client.BeginReceive(new AsyncCallback(OnReceiveData), m_client);
-
-                OnStarted();
             }
-            catch
+
+            if (!IsInitialized)
             {
-                Close(NetworkDisconnectReason.ConnectionFailed);
+                try
+                {
+                    _closeNotified = false;
+                    _connections = new Dictionary<IPEndPoint, UdpConnectionEntity>();
+                    _client = new UdpClient(new IPEndPoint(IPAddress.Parse(_targetIp), _targetPort));
+                    _client.BeginReceive(new AsyncCallback(OnReceiveData), _client);
+
+                    OnStarted();
+                }
+                catch
+                {
+                    Close(NetworkDisconnectReason.ConnectionFailed);
+                }
             }
         }
         /// <summary>
@@ -69,22 +72,24 @@ namespace Inertia.Network
         public override void Close(NetworkDisconnectReason reason = NetworkDisconnectReason.Manual)
         {
             if (IsDisposed)
-                throw new ObjectDisposedException(nameof(UdpServerEntity));
-
-            if (!IsInitialized && m_closed)
-                return;
-
-            try
             {
-                m_client.Close();
+                throw new ObjectDisposedException(nameof(UdpServerEntity));
             }
-            catch { }
 
-            m_connections.Clear();
-            m_connections = null;
-            m_closed = true;
+            if (IsInitialized || !_closeNotified)
+            {
+                try
+                {
+                    _client.Close();
+                }
+                catch { }
 
-            OnClosed(reason);
+                _connections.Clear();
+                _connections = null;
+                _closeNotified = true;
+
+                OnClosed(reason);
+            }
         }
 
         /// <summary>
@@ -95,7 +100,9 @@ namespace Inertia.Network
         public void SendTo(UdpConnectionEntity connection, byte[] data)
         {
             if (connection.IsDisposed)
+            {
                 throw new ObjectDisposedException(nameof(UdpConnectionEntity));
+            }
 
             SendTo(connection.EndPoint, data);
         }
@@ -107,7 +114,9 @@ namespace Inertia.Network
         public void SendTo(UdpConnectionEntity connection, NetworkMessage message)
         {
             if (connection.IsDisposed)
+            {
                 throw new ObjectDisposedException(nameof(UdpConnectionEntity));
+            }
 
             SendTo(connection.EndPoint, NetworkProtocol.GetProtocol().OnParseMessage(message));
         }
@@ -122,7 +131,7 @@ namespace Inertia.Network
             {
                 Close();
                 ConnectionAdded = null;
-                m_client?.Dispose();
+                _client?.Dispose();
             }
 
             base.Dispose(disposing);
@@ -131,14 +140,19 @@ namespace Inertia.Network
         private void SendTo(IPEndPoint endPoint, byte[] data)
         {
             if (IsDisposed)
+            {
                 throw new ObjectDisposedException(nameof(UdpServerEntity));
-            if (!IsInitialized)
-                return;
+            }
 
-            if (data.Length > ushort.MaxValue)
-                throw new UserDatagramDataLengthLimitException(data.Length);
+            if (IsInitialized)
+            {
+                if (data.Length > ushort.MaxValue)
+                {
+                    throw new UserDatagramDataLengthLimitException(data.Length);
+                }
 
-            try { m_client.Send(data, data.Length, endPoint); } catch { }
+                try { _client.Send(data, data.Length, endPoint); } catch { }
+            }
         }
         private void OnReceiveData(IAsyncResult iar)
         {
@@ -147,15 +161,15 @@ namespace Inertia.Network
                 IPEndPoint endPoint = null;
                 var data = ((UdpClient)iar.AsyncState).EndReceive(iar, ref endPoint);
 
-                if (!m_connections.ContainsKey(endPoint))
+                if (!_connections.ContainsKey(endPoint))
                 {
                     var connection = new UdpConnectionEntity(this, endPoint);
-                    m_connections.Add(endPoint, connection);
+                    _connections.Add(endPoint, connection);
 
                     ConnectionAdded(connection);
                 }
 
-                NetworkProtocol.GetProtocol().OnReceiveData(m_connections[endPoint], new BasicReader(data));
+                NetworkProtocol.GetProtocol().OnReceiveData(_connections[endPoint], new BasicReader(data));
             }
             catch (Exception ex)
             {
@@ -164,7 +178,9 @@ namespace Inertia.Network
             }
 
             if (IsInitialized)
-                m_client.BeginReceive(new AsyncCallback(OnReceiveData), m_client);
+            {
+                _client.BeginReceive(new AsyncCallback(OnReceiveData), _client);
+            }
         }
     }
 }
