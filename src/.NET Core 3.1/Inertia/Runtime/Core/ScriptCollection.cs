@@ -86,16 +86,12 @@ namespace Inertia.Runtime
 
             lock (_scripts)
             {
-                try
+                var scripts = _scripts.FindAll((s) => s.GetType() == typeof(T) && !s.IsDisposed);
+                foreach (var script in scripts)
                 {
-                    var scripts = _scripts.FindAll((s) => s.GetType() == typeof(T) && !s.IsDisposed);
-                    foreach (var script in scripts)
-                    {
-                        if (script != null)
-                            script.Dispose();
-                    }
+                    if (script != null)
+                        script.Dispose();
                 }
-                catch { }
             }
         }
 
@@ -152,14 +148,13 @@ namespace Inertia.Runtime
             if (IsDisposed)
                 return;
 
-            Script[] scripts;
             lock (_scripts)
-                scripts = _scripts.ToArray();
+            {
+                foreach (var script in _scripts)
+                    script.Dispose();
 
-            foreach (var script in _scripts)
-                script.Dispose();
-
-            _scripts.Clear();
+                _scripts.Clear();
+            }
 
             IsDisposed = true;
         }

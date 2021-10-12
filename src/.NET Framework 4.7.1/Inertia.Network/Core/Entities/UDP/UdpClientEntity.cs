@@ -57,11 +57,12 @@ namespace Inertia.Network
                 }
             }
         }
+
         /// <summary>
         /// Terminate the connection with the indicated reason.
         /// </summary>
         /// <param name="reason"></param>
-        public override void Disconnect(NetworkDisconnectReason reason = NetworkDisconnectReason.Manual)
+        public override void Disconnect(NetworkDisconnectReason reason)
         {
             if (IsDisposed)
             {
@@ -70,11 +71,7 @@ namespace Inertia.Network
 
             if (IsConnected() || !_disconnectNotified)
             {
-                try
-                {
-                    _client.Close();
-                }
-                catch { }
+                _client?.Close();
 
                 _disconnectNotified = true;
                 OnDisconnected(reason);
@@ -98,7 +95,7 @@ namespace Inertia.Network
                     throw new UserDatagramDataLengthLimitException(data.Length);
                 }
 
-                try { _client.SendAsync(data, data.Length); } catch { }
+                _client?.SendAsync(data, data.Length);
             }
         }
 

@@ -62,11 +62,12 @@ namespace Inertia.Network
                 }
             }
         }
+
         /// <summary>
         /// Terminate the connection with the indicated reason.
         /// </summary>
         /// <param name="reason"></param>
-        public override void Disconnect(NetworkDisconnectReason reason = NetworkDisconnectReason.Manual)
+        public override void Disconnect(NetworkDisconnectReason reason)
         {
             if (IsDisposed)
             {
@@ -75,13 +76,8 @@ namespace Inertia.Network
 
             if (IsConnected() || !_disconnectNotified)
             {
-                try
-                {
-                    _socket.Shutdown(SocketShutdown.Both);
-                    _socket.Disconnect(false);
-                    _socket.Close();
-                }
-                catch { }
+                _socket?.Shutdown(SocketShutdown.Both);
+                _socket?.Disconnect(false);
 
                 _reader.Clear();
                 _disconnectNotified = true;
@@ -101,7 +97,7 @@ namespace Inertia.Network
 
             if (!_disconnectNotified)
             {
-                try { _socket.Send(data); } catch { }
+                _socket?.Send(data);
             }
         }
 

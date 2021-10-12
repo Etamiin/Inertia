@@ -63,22 +63,18 @@ namespace Inertia.Runtime
                 clock.Reset();
             }
 
-            try
+            lock (UpdatingSiT)
             {
-                lock (UpdatingSiT)
-                {
-                    UpdatingSiT();
-                }
-                lock (Updating)
-                {
-                    Updating();
-                }
-                lock (Destroying)
-                {
-                    Destroying();
-                }
+                UpdatingSiT?.Invoke();
             }
-            catch { }
+            lock (Updating)
+            {
+                Updating?.Invoke();
+            }
+            lock (Destroying)
+            {
+                Destroying?.Invoke();
+            }
         }
 
         private static void Initialize()

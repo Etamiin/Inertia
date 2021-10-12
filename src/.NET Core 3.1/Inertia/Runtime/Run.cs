@@ -7,7 +7,7 @@ namespace Inertia.Runtime
     /// <summary>
     /// 
     /// </summary>
-    public static partial class Run
+    public static class Run
     {
         /// <summary>
         ///

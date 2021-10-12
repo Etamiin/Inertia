@@ -60,7 +60,7 @@ namespace Inertia.Runtime
             }
             else
             {
-                throw new IndexOutOfRangeException();
+                throw new ArgumentNullException();
             }
         }
         /// <summary>
@@ -76,7 +76,7 @@ namespace Inertia.Runtime
             }
             else
             {
-                throw new IndexOutOfRangeException();
+                throw new ArgumentNullException();
             }
         }
 

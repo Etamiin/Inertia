@@ -80,14 +80,8 @@ namespace Inertia
 
                 lock (_queue)
                 {
-                    try
-                    {
-                        var action = _queue.Dequeue();
-                        action.Invoke();
-                    }
-                    catch (Exception)
-                    {
-                    }
+                    var action = _queue.Dequeue();
+                    action?.Invoke();
                 }
             }
         }

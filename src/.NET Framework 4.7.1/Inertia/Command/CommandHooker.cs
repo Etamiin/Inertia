@@ -16,13 +16,10 @@ namespace Inertia
         {
             LoaderManager.DefaultLoadCommands();
 
-            var cmds = new TextCommand[0];
             lock (LoaderManager.Commands)
             {
-                cmds = LoaderManager.Commands.Values.ToArray();
+                return LoaderManager.Commands.Values.ToArray();
             }
-
-            return cmds;
         }
         /// <summary>
         /// Returns the <see cref="TextCommand"/> associated with the specified name.

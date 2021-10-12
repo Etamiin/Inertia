@@ -49,6 +49,9 @@
     <Compile Include="Core\Entities\TCP\TcpServerEntity.cs" />
     <Compile Include="Core\Entities\UDP\UdpClientEntity.cs" />
     <Compile Include="Core\Entities\UDP\UdpServerEntity.cs" />
+    <Compile Include="Core\Instances\DefaultNetworkProtocol.cs" />
+    <Compile Include="Core\Instances\TcpConnectionEntity.cs" />
+    <Compile Include="Core\Instances\UdpConnectionEntity.cs" />
     <Compile Include="Core\Protocol\NetworkMessage.cs" />
     <Compile Include="Core\Protocol\NetworkMessageCaller.cs" />
     <Compile Include="Core\Protocol\NetworkProtocol.cs" />
@@ -57,9 +60,6 @@
     <Compile Include="Exceptions\DefaultProtocolFailedParseNetworkMessageException.cs" />
     <Compile Include="Exceptions\UnknownMessageException.cs" />
     <Compile Include="Exceptions\UserDatagramDataLengthLimitException.cs" />
-    <Compile Include="Instances\DefaultNetworkProtocol.cs" />
-    <Compile Include="Instances\TcpConnectionEntity.cs" />
-    <Compile Include="Instances\UdpConnectionEntity.cs" />
     <Compile Include="LoaderManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

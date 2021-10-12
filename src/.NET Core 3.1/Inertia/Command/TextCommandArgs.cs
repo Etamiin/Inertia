@@ -154,7 +154,7 @@ namespace Inertia
             {
                 if (i >= _arguments.Length)
                 {
-                    throw new IndexOutOfRangeException();
+                    throw new ArgumentNullException();
                 }
 
                 if (i > startIndex)

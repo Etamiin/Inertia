@@ -61,6 +61,7 @@ namespace Inertia.Network
                 }
             }
         }
+
         /// <summary>
         /// Close the server with the specified reason.
         /// </summary>
@@ -74,13 +75,8 @@ namespace Inertia.Network
 
             if (IsRunning() || !_closeNotified)
             {
-                try
-                {
-                    _socket.Close();
-                    _socket.Dispose();
-                    _socket = null;
-                }
-                catch { }
+                _socket?.Shutdown(SocketShutdown.Both);
+                _socket?.Disconnect(false);
 
                 TcpConnectionEntity[] connections;
                 lock (_connections)
@@ -142,7 +138,7 @@ namespace Inertia.Network
                             _connections.Remove(connection);
                         }
 
-                        ClientDisconnected(connection, reason);
+                        ClientDisconnected?.Invoke(connection, reason);
                     };
 
                     lock (_connections)
@@ -150,7 +146,7 @@ namespace Inertia.Network
                         _connections.Add(connection);
                     }
 
-                    ClientConnected(connection);
+                    ClientConnected?.Invoke(connection);
                 }
                 catch { }
 

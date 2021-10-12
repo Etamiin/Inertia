@@ -78,14 +78,9 @@ namespace Inertia.Network
 
             if (IsInitialized || !_closeNotified)
             {
-                try
-                {
-                    _client.Close();
-                }
-                catch { }
+                _client?.Close();
 
                 _connections.Clear();
-                _connections = null;
                 _closeNotified = true;
 
                 OnClosed(reason);
@@ -151,7 +146,7 @@ namespace Inertia.Network
                     throw new UserDatagramDataLengthLimitException(data.Length);
                 }
 
-                try { _client.Send(data, data.Length, endPoint); } catch { }
+                _client?.Send(data, data.Length, endPoint);
             }
         }
         private void OnReceiveData(IAsyncResult iar)
@@ -166,7 +161,7 @@ namespace Inertia.Network
                     var connection = new UdpConnectionEntity(this, endPoint);
                     _connections.Add(endPoint, connection);
 
-                    ConnectionAdded(connection);
+                    ConnectionAdded?.Invoke(connection);
                 }
 
                 NetworkProtocol.GetProtocol().OnReceiveData(_connections[endPoint], new BasicReader(data));

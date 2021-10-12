@@ -44,7 +44,7 @@ namespace Inertia.Network
         /// </summary>
         public void StartAsync()
         {
-            Task.Factory.StartNew(() => Start());
+            Task.Factory.StartNew(Start);
         }
         /// <summary>
         /// Close the server.

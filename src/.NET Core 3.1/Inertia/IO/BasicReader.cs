@@ -434,20 +434,16 @@ namespace Inertia
         /// <returns>Returns a <see cref="ISerializableObject"/></returns>
         public T TryDeserializeObject<T>() where T : ISerializableObject
         {
-            try
+            var parameters = typeof(T)
+                .GetConstructors()[0].GetParameters()
+                .Select(p => (object)null)
+                .ToArray();
+            var instance = (T)Activator.CreateInstance(typeof(T), parameters);
+            if (instance != null)
             {
-                var parameters = typeof(T)
-                    .GetConstructors()[0].GetParameters()
-                    .Select(p => (object)null)
-                    .ToArray();
-                var instance = (T)Activator.CreateInstance(typeof(T), parameters);
-                if (instance != null)
-                {
-                    instance.Deserialize(this);
-                    return instance;
-                }
+                instance.Deserialize(this);
+                return instance;
             }
-            catch { }
 
             return default(T);
         }
@@ -457,20 +453,16 @@ namespace Inertia
         /// <returns>Returns a <see cref="ISerializableData"/></returns>
         public T TryDeserializeData<T>() where T : ISerializableData
         {
-            try
+            var parameters = typeof(T)
+                .GetConstructors()[0].GetParameters()
+                .Select(p => (object)null)
+                .ToArray();
+            var instance = (T)Activator.CreateInstance(typeof(T), parameters);
+            if (instance != null)
             {
-                var parameters = typeof(T)
-                    .GetConstructors()[0].GetParameters()
-                    .Select(p => (object)null)
-                    .ToArray();
-                var instance = (T)Activator.CreateInstance(typeof(T), parameters);
-                if (instance != null)
-                {
-                    instance.Deserialize(GetBytes());
-                    return instance;
-                }
+                instance.Deserialize(GetBytes());
+                return instance;
             }
-            catch { }
 
             return default(T);
         }
@@ -489,12 +481,10 @@ namespace Inertia
         /// <returns>Deserialized object</returns>
         public object GetObject()
         {
-            var binaryFormatter = new BinaryFormatter()
+            return new BinaryFormatter
             {
                 TypeFormat = System.Runtime.Serialization.Formatters.FormatterTypeStyle.TypesWhenNeeded
-            };
-
-            return binaryFormatter.Deserialize(_reader.BaseStream);
+            }.Deserialize(_reader.BaseStream);
         }
 
         /// <summary>

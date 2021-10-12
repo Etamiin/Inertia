@@ -10,7 +10,7 @@ namespace Inertia
     /// <summary>
     /// 
     /// </summary>
-    public static partial class LoaderManager
+    public static class LoaderManager
     {
         internal static Dictionary<string, TextCommand> Commands;
 
@@ -38,20 +38,16 @@ namespace Inertia
                 {
                     var pluginAssembly = Assembly.Load(File.ReadAllBytes(file));
 
-                    try
+                    foreach (var type in pluginAssembly.GetExportedTypes())
                     {
-                        foreach (var type in pluginAssembly.GetExportedTypes())
+                        if (type.GetInterface(nameof(IInertiaPlugin)) != null)
                         {
-                            if (type.GetInterface(nameof(IInertiaPlugin)) != null)
-                            {
-                                var instance = (IInertiaPlugin)Activator.CreateInstance(type);
-                                instance.OnInitialize();
+                            var instance = (IInertiaPlugin)Activator.CreateInstance(type);
+                            instance.OnInitialize();
 
-                                _plugins.Add(instance);
-                            }
+                            _plugins.Add(instance);
                         }
                     }
-                    catch { }
                 }                
             }
 

@@ -40,6 +40,14 @@ namespace Inertia.Network
         }
 
         /// <summary>
+        /// Terminate the connection with the indicated reason.
+        /// </summary>
+        public void Disconnect()
+        {
+            Disconnect(NetworkDisconnectReason.Manual);
+        }
+
+        /// <summary>
         /// Returns true if the connection is active otherwise false.
         /// </summary>
         /// <returns></returns>
@@ -102,11 +110,11 @@ namespace Inertia.Network
 
         internal void OnConnected()
         {
-            Connected();
+            Connected?.Invoke();
         }
         internal void OnDisconnected(NetworkDisconnectReason reason)
         {
-            Disconnected(reason);
+            Disconnected?.Invoke(reason);
         }
     }
 }

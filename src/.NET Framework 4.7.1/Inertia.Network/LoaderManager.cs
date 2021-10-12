@@ -7,7 +7,7 @@ namespace Inertia.Network
     /// <summary>
     /// 
     /// </summary>
-    public static partial class LoaderManager
+    public static class LoaderManager
     {
         internal static Dictionary<uint, Type> NetworkMessageTypes;
         internal static Dictionary<Type, NetworkMessageCaller> NetworkMessageHookers;
@@ -29,11 +29,7 @@ namespace Inertia.Network
                     {
                         if (type.IsClass && type.IsSubclassOf(typeof(NetworkMessage)))
                         {
-                            if (type.IsAbstract)
-                            {
-                                continue;
-                            }
-                            else
+                            if (!type.IsAbstract)
                             {
                                 var message = NetworkProtocol.CreateMessage(type);
 

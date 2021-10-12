@@ -6,7 +6,7 @@ using Inertia;
 /// <summary>
 /// 
 /// </summary>
-public static partial class Extensions
+public static class Extensions
 {
     /// <summary>
     /// Shuffle the specified <see cref="IList{T}"/> object

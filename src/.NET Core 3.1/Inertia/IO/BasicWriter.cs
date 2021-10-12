@@ -11,7 +11,7 @@ namespace Inertia
     /// </summary>
     public class BasicWriter : IDisposable
     {
-        private static Dictionary<Type, BasicAction<BasicWriter, object>> _typageDefinitions = new Dictionary<Type, BasicAction<BasicWriter, object>>()
+        private static Dictionary<Type, BasicAction<BasicWriter, object>> _typageDefinitions = new Dictionary<Type, BasicAction<BasicWriter, object>>
         {
             { typeof(bool), (writer, value) => writer.SetBool((bool)value) },
             { typeof(string), (writer, value) => writer.SetString((string)value) },

@@ -31,6 +31,11 @@
             <param name="ip"></param>
             <param name="port"></param>
         </member>
+        <member name="M:Inertia.Network.NetworkClientEntity.Disconnect">
+            <summary>
+            Terminate the connection with the indicated reason.
+            </summary>
+        </member>
         <member name="M:Inertia.Network.NetworkClientEntity.IsConnected">
             <summary>
             Returns true if the connection is active otherwise false.
@@ -348,6 +353,119 @@
             </summary>
             <param name="disposing"></param>
         </member>
+        <member name="T:Inertia.Network.DefaultNetworkProtocol">
+            <summary>
+            Represents the default network protocol used by network entities.
+            </summary>
+        </member>
+        <member name="P:Inertia.Network.DefaultNetworkProtocol.Instance">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Inertia.Network.DefaultNetworkProtocol.ProtocolVersion">
+            <summary>
+            Specify the version of the network protocol that can be used.
+            </summary>
+        </member>
+        <member name="M:Inertia.Network.DefaultNetworkProtocol.OnParseMessage(Inertia.Network.NetworkMessage)">
+            <summary>
+            Occurs when a <see cref="T:Inertia.Network.NetworkMessage"/> is requested to be written before being sent.
+            </summary>
+            <param name="message"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.Network.DefaultNetworkProtocol.OnReceiveData(Inertia.Network.TcpClientEntity,Inertia.BasicReader)">
+            <summary>
+            Occurs when data is received from a <see cref="T:Inertia.Network.TcpClientEntity"/>.
+            </summary>
+            <param name="client"></param>
+            <param name="reader"></param>
+        </member>
+        <member name="M:Inertia.Network.DefaultNetworkProtocol.OnReceiveData(Inertia.Network.UdpClientEntity,Inertia.BasicReader)">
+            <summary>
+            Occurs when data is received from a <see cref="T:Inertia.Network.UdpClientEntity"/>.
+            </summary>
+            <param name="client"></param>
+            <param name="reader"></param>
+        </member>
+        <member name="M:Inertia.Network.DefaultNetworkProtocol.OnReceiveData(Inertia.Network.TcpConnectionEntity,Inertia.BasicReader)">
+            <summary>
+            Occurs when data is received from a <see cref="T:Inertia.Network.TcpConnectionEntity"/>.
+            </summary>
+            <param name="connection"></param>
+            <param name="reader"></param>
+        </member>
+        <member name="M:Inertia.Network.DefaultNetworkProtocol.OnReceiveData(Inertia.Network.UdpConnectionEntity,Inertia.BasicReader)">
+            <summary>
+            Occurs when data is received from a <see cref="T:Inertia.Network.UdpConnectionEntity"/>.
+            </summary>
+            <param name="connection"></param>
+            <param name="reader"></param>
+        </member>
+        <member name="T:Inertia.Network.TcpConnectionEntity">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:Inertia.Network.TcpConnectionEntity.IsConnected">
+            <summary>
+            Returns true if the connection is active otherwise false.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.Network.TcpConnectionEntity.Send(System.Byte[])">
+            <summary>
+            Sends the specified data through the current connection.
+            </summary>
+            <param name="data"></param>
+        </member>
+        <member name="M:Inertia.Network.TcpConnectionEntity.Send(Inertia.Network.NetworkMessage)">
+            <summary>
+            Sends the specified <see cref="T:Inertia.Network.NetworkMessage"/> through the current connection.
+            </summary>
+            <param name="message"></param>
+        </member>
+        <member name="M:Inertia.Network.TcpConnectionEntity.Disconnect">
+            <summary>
+            Terminate the connection with the indicated reason.
+            </summary>
+        </member>
+        <member name="M:Inertia.Network.TcpConnectionEntity.Disconnect(Inertia.Network.NetworkDisconnectReason)">
+            <summary>
+            Terminate the connection with the indicated reason.
+            </summary>
+            <param name="reason"></param>
+        </member>
+        <member name="M:Inertia.Network.TcpConnectionEntity.Dispose(System.Boolean)">
+            <summary>
+            
+            </summary>
+            <param name="disposing"></param>
+        </member>
+        <member name="T:Inertia.Network.UdpConnectionEntity">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="M:Inertia.Network.UdpConnectionEntity.Send(System.Byte[])">
+            <summary>
+            Sends the specified data through the current connection.
+            </summary>
+            <param name="data"></param>
+        </member>
+        <member name="M:Inertia.Network.UdpConnectionEntity.Send(Inertia.Network.NetworkMessage)">
+            <summary>
+            Sends the specified <see cref="T:Inertia.Network.NetworkMessage"/> through the current connection.
+            </summary>
+            <param name="message"></param>
+        </member>
+        <member name="M:Inertia.Network.UdpConnectionEntity.Dispose(System.Boolean)">
+            <summary>
+            
+            </summary>
+            <param name="disposing"></param>
+        </member>
         <member name="T:Inertia.Network.NetworkMessage">
             <summary>
             
@@ -578,114 +696,6 @@
             Instantiate a new instance of the class <see cref="T:Inertia.Network.UserDatagramDataLengthLimitException"/>
             </summary>
             <param name="length"></param>
-        </member>
-        <member name="T:Inertia.Network.DefaultNetworkProtocol">
-            <summary>
-            Represents the default network protocol used by network entities.
-            </summary>
-        </member>
-        <member name="P:Inertia.Network.DefaultNetworkProtocol.Instance">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="P:Inertia.Network.DefaultNetworkProtocol.ProtocolVersion">
-            <summary>
-            Specify the version of the network protocol that can be used.
-            </summary>
-        </member>
-        <member name="M:Inertia.Network.DefaultNetworkProtocol.OnParseMessage(Inertia.Network.NetworkMessage)">
-            <summary>
-            Occurs when a <see cref="T:Inertia.Network.NetworkMessage"/> is requested to be written before being sent.
-            </summary>
-            <param name="message"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Inertia.Network.DefaultNetworkProtocol.OnReceiveData(Inertia.Network.TcpClientEntity,Inertia.BasicReader)">
-            <summary>
-            Occurs when data is received from a <see cref="T:Inertia.Network.TcpClientEntity"/>.
-            </summary>
-            <param name="client"></param>
-            <param name="reader"></param>
-        </member>
-        <member name="M:Inertia.Network.DefaultNetworkProtocol.OnReceiveData(Inertia.Network.UdpClientEntity,Inertia.BasicReader)">
-            <summary>
-            Occurs when data is received from a <see cref="T:Inertia.Network.UdpClientEntity"/>.
-            </summary>
-            <param name="client"></param>
-            <param name="reader"></param>
-        </member>
-        <member name="M:Inertia.Network.DefaultNetworkProtocol.OnReceiveData(Inertia.Network.TcpConnectionEntity,Inertia.BasicReader)">
-            <summary>
-            Occurs when data is received from a <see cref="T:Inertia.Network.TcpConnectionEntity"/>.
-            </summary>
-            <param name="connection"></param>
-            <param name="reader"></param>
-        </member>
-        <member name="M:Inertia.Network.DefaultNetworkProtocol.OnReceiveData(Inertia.Network.UdpConnectionEntity,Inertia.BasicReader)">
-            <summary>
-            Occurs when data is received from a <see cref="T:Inertia.Network.UdpConnectionEntity"/>.
-            </summary>
-            <param name="connection"></param>
-            <param name="reader"></param>
-        </member>
-        <member name="T:Inertia.Network.TcpConnectionEntity">
-             <summary>
-            
-             </summary>
-        </member>
-        <member name="P:Inertia.Network.TcpConnectionEntity.IsConnected">
-            <summary>
-            Returns true if the connection is active otherwise false.
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:Inertia.Network.TcpConnectionEntity.Send(System.Byte[])">
-            <summary>
-            Sends the specified data through the current connection.
-            </summary>
-            <param name="data"></param>
-        </member>
-        <member name="M:Inertia.Network.TcpConnectionEntity.Send(Inertia.Network.NetworkMessage)">
-            <summary>
-            Sends the specified <see cref="T:Inertia.Network.NetworkMessage"/> through the current connection.
-            </summary>
-            <param name="message"></param>
-        </member>
-        <member name="M:Inertia.Network.TcpConnectionEntity.Disconnect(Inertia.Network.NetworkDisconnectReason)">
-            <summary>
-            Terminate the connection with the indicated reason.
-            </summary>
-            <param name="reason"></param>
-        </member>
-        <member name="M:Inertia.Network.TcpConnectionEntity.Dispose(System.Boolean)">
-            <summary>
-            
-            </summary>
-            <param name="disposing"></param>
-        </member>
-        <member name="T:Inertia.Network.UdpConnectionEntity">
-             <summary>
-            
-             </summary>
-        </member>
-        <member name="M:Inertia.Network.UdpConnectionEntity.Send(System.Byte[])">
-            <summary>
-            Sends the specified data through the current connection.
-            </summary>
-            <param name="data"></param>
-        </member>
-        <member name="M:Inertia.Network.UdpConnectionEntity.Send(Inertia.Network.NetworkMessage)">
-            <summary>
-            Sends the specified <see cref="T:Inertia.Network.NetworkMessage"/> through the current connection.
-            </summary>
-            <param name="message"></param>
-        </member>
-        <member name="M:Inertia.Network.UdpConnectionEntity.Dispose(System.Boolean)">
-            <summary>
-            
-            </summary>
-            <param name="disposing"></param>
         </member>
         <member name="T:Inertia.Network.LoaderManager">
             <summary>
