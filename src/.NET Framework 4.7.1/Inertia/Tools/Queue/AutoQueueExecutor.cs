@@ -21,21 +21,18 @@ namespace Inertia
         {
             get
             {
-                lock (_queue)
-                {
-                    return _queue.Count;
-                }
+                return _queue.Count;
             }
         }
 
-        private List<BasicAction> _queue;
+        private Queue<BasicAction> _queue;
 
         /// <summary>
         /// Initialize a new instance of the class <see cref="AutoQueueExecutor"/>
         /// </summary>
         public AutoQueueExecutor()
         {
-            _queue = new List<BasicAction>(); ;
+            _queue = new Queue<BasicAction>();
             Task.Factory.StartNew(Execute);
         }
 
@@ -52,7 +49,10 @@ namespace Inertia
 
             foreach (var action in actions)
             {
-                _queue.Add(action);
+                if (action != null)
+                {
+                    _queue.Enqueue(action);
+                }
             }
         }
 
@@ -68,32 +68,27 @@ namespace Inertia
             }
         }
 
-        private async void Execute()
+        private async Task Execute()
         {
             while (!IsDisposed)
             {
-                if (Count == 0)
+                if (_queue.Count == 0)
                 {
-                    await Task.Delay(50);
+                    await Task.Delay(20).ConfigureAwait(false);
                     continue;
                 }
 
                 lock (_queue)
                 {
-                    for (var i = 0; i < _queue.Count; i++)
+                    try
                     {
-                        var action = _queue[i];
-                        try
-                        {
-                            action();
-                        }
-                        catch { }
+                        var action = _queue.Dequeue();
+                        action.Invoke();
                     }
-
-                    _queue.Clear();
+                    catch (Exception)
+                    {
+                    }
                 }
-
-                await Task.Delay(1);
             }
         }
     }

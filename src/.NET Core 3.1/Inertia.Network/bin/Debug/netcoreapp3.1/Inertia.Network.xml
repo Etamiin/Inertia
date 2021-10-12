@@ -136,6 +136,16 @@
             <param name="ip"></param>
             <param name="port"></param>
         </member>
+        <member name="M:Inertia.Network.NetworkServerEntity.StartAsync">
+            <summary>
+            Start asynchronously the server.
+            </summary>
+        </member>
+        <member name="M:Inertia.Network.NetworkServerEntity.Close">
+            <summary>
+            Close the server.
+            </summary>
+        </member>
         <member name="M:Inertia.Network.NetworkServerEntity.Start">
             <summary>
             Start the server.
@@ -146,11 +156,6 @@
             Close the server with the specified reason.
             </summary>
             <param name="reason"></param>
-        </member>
-        <member name="M:Inertia.Network.NetworkServerEntity.StartAsync">
-            <summary>
-            Start asynchronously the server.
-            </summary>
         </member>
         <member name="M:Inertia.Network.NetworkServerEntity.Dispose">
             <summary>

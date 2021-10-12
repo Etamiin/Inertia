@@ -49,7 +49,7 @@ namespace Inertia.Network
         /// <param name="client"></param>
         public void TryCall(NetworkMessage message, TcpClientEntity client)
         {
-            OnTcpClient(message, client);
+            OnTcpClient?.Invoke(message, client);
         }
         /// <summary>
         /// Attempts to execute the specified NetworkMessage.
@@ -58,7 +58,7 @@ namespace Inertia.Network
         /// <param name="client"></param>
         public void TryCall(NetworkMessage message, UdpClientEntity client)
         {
-            OnUdpClient(message, client);
+            OnUdpClient?.Invoke(message, client);
         }
         /// <summary>
         /// Attempts to execute the specified NetworkMessage.
@@ -67,7 +67,7 @@ namespace Inertia.Network
         /// <param name="connection"></param>
         public void TryCall(NetworkMessage message, TcpConnectionEntity connection)
         {
-            OnTcpConnection(message, connection);
+            OnTcpConnection?.Invoke(message, connection);
         }
         /// <summary>
         /// Attempts to execute the specified NetworkMessage.
@@ -76,7 +76,7 @@ namespace Inertia.Network
         /// <param name="connection"></param>
         public void TryCall(NetworkMessage message, UdpConnectionEntity connection)
         {
-            OnUdpConnection(message, connection);
+            OnUdpConnection?.Invoke(message, connection);
         }
     }
 }

@@ -62,10 +62,6 @@
     <Compile Include="Runtime\Interfaces\IInertiaPlugin.cs" />
     <Compile Include="Runtime\Run.cs" />
     <Compile Include="Runtime\RuntimeManager.cs" />
-    <Compile Include="Storage\FileStorage.cs" />
-    <Compile Include="Storage\FileStoragePack.cs" />
-    <Compile Include="Storage\InFileStorageElement.cs" />
-    <Compile Include="Storage\InFileStorageMark.cs" />
     <Compile Include="Tools\Clock.cs" />
     <Compile Include="Tools\Log.cs" />
     <Compile Include="Tools\Queue\AutoQueueExecutor.cs" />

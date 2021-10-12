@@ -65,7 +65,7 @@ namespace Inertia.Network
         /// Close the server with the specified reason.
         /// </summary>
         /// <param name="reason"></param>
-        public override void Close(NetworkDisconnectReason reason = NetworkDisconnectReason.Manual)
+        public override void Close(NetworkDisconnectReason reason)
         {
             if (IsDisposed)
             {

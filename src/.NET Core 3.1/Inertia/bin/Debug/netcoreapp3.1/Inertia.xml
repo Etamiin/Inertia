@@ -1297,11 +1297,6 @@
             
             </summary>
         </member>
-        <member name="T:BasicAction`5">
-            <summary>
-            
-            </summary>
-        </member>
         <member name="T:BasicReturnAction`1">
             <summary>
             
@@ -1323,11 +1318,6 @@
              </summary>
         </member>
         <member name="T:BasicReturnAction`5">
-             <summary>
-            
-             </summary>
-        </member>
-        <member name="T:BasicReturnAction`6">
              <summary>
             
              </summary>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace Inertia
 {
@@ -43,7 +44,7 @@ namespace Inertia
         {
             var arguments = new List<string>();
             var inSentence = false;
-            var sentence = string.Empty;
+            var sentence = new StringBuilder();
 
             for (var i = 0; i < args.Length; i++)
             {
@@ -59,17 +60,17 @@ namespace Inertia
 
                 if (args[i].EndsWith($"{ '"' }"))
                 {
-                    sentence += args[i];
-                    arguments.Add(sentence.Substring(1, sentence.Length - 2));
+                    sentence.Append(args[i]);
+                    arguments.Add(sentence.ToString().Substring(1, sentence.Length - 2));
 
-                    sentence = string.Empty;
+                    sentence = new StringBuilder();
                     inSentence = false;
                 }
                 else
                 {
                     if (inSentence)
                     {
-                        sentence += args[i] + " ";
+                        sentence.Append(args[i] + " ");
                     }
                     else
                     {
@@ -148,7 +149,7 @@ namespace Inertia
         /// <returns></returns>
         public string CombineArguments(int startIndex, int length)
         {
-            var combined = string.Empty;
+            var combined = new StringBuilder();
             for (var i = startIndex; i < length; i++)
             {
                 if (i >= _arguments.Length)
@@ -158,13 +159,13 @@ namespace Inertia
 
                 if (i > startIndex)
                 {
-                    combined += " ";
+                    combined.Append(" ");
                 }
 
-                combined += _arguments[i];
+                combined.Append(_arguments[i]);
             }
 
-            return combined;
+            return combined.ToString();
         }
         /// <summary>
         /// Combines all arguments of the executed command.

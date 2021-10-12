@@ -78,7 +78,7 @@ namespace Inertia.Runtime
         }
         internal sealed class NextFrameExecution
         {
-            private BasicAction _action;
+            private readonly BasicAction _action;
 
             internal NextFrameExecution(BasicAction action)
             {

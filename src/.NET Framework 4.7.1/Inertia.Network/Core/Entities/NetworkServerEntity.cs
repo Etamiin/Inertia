@@ -31,12 +31,27 @@ namespace Inertia.Network
         /// </summary>
         /// <param name="ip"></param>
         /// <param name="port"></param>
-        public NetworkServerEntity(string ip, int port)
+        protected NetworkServerEntity(string ip, int port)
         {
             _targetIp = ip.Replace("localhost", "127.0.0.1");
             _targetPort = port;
 
             DefaultNetworkProtocol.Initialize();
+        }
+
+        /// <summary>
+        /// Start asynchronously the server.
+        /// </summary>
+        public void StartAsync()
+        {
+            Task.Factory.StartNew(() => Start());
+        }
+        /// <summary>
+        /// Close the server.
+        /// </summary>
+        public void Close()
+        {
+            Close(NetworkDisconnectReason.Manual);
         }
 
         /// <summary>
@@ -47,15 +62,7 @@ namespace Inertia.Network
         /// Close the server with the specified reason.
         /// </summary>
         /// <param name="reason"></param>
-        public abstract void Close(NetworkDisconnectReason reason = NetworkDisconnectReason.Manual);
-
-        /// <summary>
-        /// Start asynchronously the server.
-        /// </summary>
-        public void StartAsync()
-        {
-            Task.Factory.StartNew(() => Start());
-        }
+        public abstract void Close(NetworkDisconnectReason reason);
 
         /// <summary>
         /// 
@@ -84,11 +91,11 @@ namespace Inertia.Network
 
         internal void OnStarted()
         {
-            Started();
+            Started?.Invoke();
         }
         internal void OnClosed(NetworkDisconnectReason reason)
         {
-            Closed(reason);
+            Closed?.Invoke(reason);
         }
     }
 }

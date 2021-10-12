@@ -7,7 +7,7 @@ namespace Inertia.Runtime
 {
     internal static class RuntimeManager
     {
-        internal static bool IsManuallyRunned { get; set; } = false;
+        internal static bool IsManuallyRunned { get; set; }
 
         internal static event BasicAction UpdatingSiT = () => { };
         private static event BasicAction Updating = () => { };

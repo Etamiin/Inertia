@@ -68,7 +68,7 @@ namespace Inertia
 
             lock (Executing)
             {
-                Executing();
+                Executing?.Invoke();
             }
         }
 

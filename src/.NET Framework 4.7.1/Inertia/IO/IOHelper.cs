@@ -97,7 +97,7 @@ namespace Inertia
         {
             using (stream)
             {
-                var sha256 = string.Empty;
+                var sha256 = new StringBuilder();
                 long totalLength = 0;
 
                 while (stream.Length > totalLength)
@@ -112,10 +112,10 @@ namespace Inertia
                     }
 
                     totalLength += length;
-                    sha256 += GetSHA256(data);
+                    sha256.Append(GetSHA256(data));
                 }
 
-                return sha256;
+                return sha256.ToString();
             }
         }
 
