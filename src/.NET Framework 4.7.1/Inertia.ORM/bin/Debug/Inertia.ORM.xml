@@ -4,16 +4,6 @@
         <name>Inertia.ORM</name>
     </assembly>
     <members>
-        <member name="T:Inertia.ORM.AutoGenerateTables">
-            <summary>
-            Represent the state that will automatically create all tables in a <see cref="T:Inertia.ORM.Database"/>
-            </summary>
-        </member>
-        <member name="M:Inertia.ORM.AutoGenerateTables.#ctor">
-            <summary>
-            Instantiate a new instance of the class <see cref="T:Inertia.ORM.AutoGenerateTables"/>
-            </summary>
-        </member>
         <member name="T:Inertia.ORM.AttachTo">
             <summary>
             Attach a <see cref="T:Inertia.ORM.Table"/> object to a <see cref="T:Inertia.ORM.Database"/>
@@ -40,6 +30,38 @@
             Instantiate a new instance of the class <see cref="T:Inertia.ORM.AttachTo"/>
             <param name="databaseType"></param>
             </summary>
+        </member>
+        <member name="T:Inertia.ORM.AutoGenerateTables">
+            <summary>
+            Represent the state that will automatically create all tables in a <see cref="T:Inertia.ORM.Database"/>
+            </summary>
+        </member>
+        <member name="M:Inertia.ORM.AutoGenerateTables.#ctor">
+            <summary>
+            Instantiate a new instance of the class <see cref="T:Inertia.ORM.AutoGenerateTables"/>
+            </summary>
+        </member>
+        <member name="T:Inertia.ORM.DecimalPrecision">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:Inertia.ORM.DecimalPrecision.FieldPrecision">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:Inertia.ORM.DecimalPrecision.FieldScale">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Inertia.ORM.DecimalPrecision.#ctor(System.Byte,System.Byte)">
+            <summary>
+            Instantiate a new instance of the class <see cref="T:Inertia.ORM.DecimalPrecision"/>
+            </summary>
+            <param name="precision"></param>
+            <param name="scale"></param>
         </member>
         <member name="T:Inertia.ORM.IgnoreField">
             <summary>
@@ -82,28 +104,6 @@
             Instantiate a new instance of the class <see cref="T:Inertia.ORM.PrimaryKey"/>
             </summary>
             <param name="autoIncrement">Set the auto increment state of the primary key field</param>
-        </member>
-        <member name="T:Inertia.ORM.DecimalPrecision">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="F:Inertia.ORM.DecimalPrecision.FieldPrecision">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="F:Inertia.ORM.DecimalPrecision.FieldScale">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="M:Inertia.ORM.DecimalPrecision.#ctor(System.Byte,System.Byte)">
-            <summary>
-            Instantiate a new instance of the class <see cref="T:Inertia.ORM.DecimalPrecision"/>
-            </summary>
-            <param name="precision"></param>
-            <param name="scale"></param>
         </member>
         <member name="T:Inertia.ORM.VarChar">
             <summary>
@@ -983,27 +983,6 @@
             
             </summary>
         </member>
-        <member name="T:Inertia.ORM.InitializationFailedException">
-            <summary>
-            Throw when <see cref="T:Inertia.ORM.SqlManager"/> failed to initialize
-            </summary>
-        </member>
-        <member name="P:Inertia.ORM.InitializationFailedException.Message">
-             <summary>
-            
-             </summary>
-        </member>
-        <member name="F:Inertia.ORM.InitializationFailedException.ExMessage">
-             <summary>
-            
-             </summary>
-        </member>
-        <member name="M:Inertia.ORM.InitializationFailedException.#ctor(System.String)">
-            <summary>
-            Instantiate a new instance of the class <see cref="T:Inertia.ORM.InitializationFailedException"/>
-            </summary>
-            <param name="exMsg"></param>
-        </member>
         <member name="T:Inertia.ORM.DatabaseAlreadyInitializedException">
             <summary>
             Throw when a <see cref="T:Inertia.ORM.Database"/> is already registered
@@ -1051,6 +1030,27 @@
             </summary>
             <param name="database"></param>
             <param name="ex"></param>
+        </member>
+        <member name="T:Inertia.ORM.InitializationFailedException">
+            <summary>
+            Throw when <see cref="T:Inertia.ORM.SqlManager"/> failed to initialize
+            </summary>
+        </member>
+        <member name="P:Inertia.ORM.InitializationFailedException.Message">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="F:Inertia.ORM.InitializationFailedException.ExMessage">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="M:Inertia.ORM.InitializationFailedException.#ctor(System.String)">
+            <summary>
+            Instantiate a new instance of the class <see cref="T:Inertia.ORM.InitializationFailedException"/>
+            </summary>
+            <param name="exMsg"></param>
         </member>
         <member name="T:Inertia.ORM.SqlManager">
              <summary>

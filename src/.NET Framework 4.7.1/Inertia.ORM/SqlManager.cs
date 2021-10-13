@@ -29,7 +29,7 @@ namespace Inertia.ORM
         /// <returns></returns>
         public static bool TrySearchDatabase(string name, out Database database)
         {
-            if (!m_initialized) Initialize();
+            Initialize();
 
             return m_databases.TryGetValue(name, out database);
         }
@@ -54,7 +54,7 @@ namespace Inertia.ORM
         /// <returns></returns>
         public static bool TrySearchDatabase(Type databaseType, out Database database)
         {
-            if (!m_initialized) Initialize();
+            Initialize();
 
             database = m_databases.Values.FirstOrDefault((db) => db.GetType() == databaseType);
             return database != null;
@@ -67,16 +67,29 @@ namespace Inertia.ORM
         /// <param name="onDatabase"></param>
         public static void TryUseDatabase<T>(BasicAction<T> onDatabase) where T : Database
         {
-            if (TrySearchDatabase<T>(out T db))
+            if (TrySearchDatabase(out T db))
+            {
                 onDatabase?.Invoke(db);
+            }
         }
 
         private static void Initialize()
         {
+            if (m_initialized)
+            {
+                return;
+            }
+
             m_initialized = true;
 
-            if (m_databases == null) m_databases = new Dictionary<string, Database>();
-            if (m_queue == null) m_queue = new AutoQueueExecutor();
+            if (m_databases == null)
+            {
+                m_databases = new Dictionary<string, Database>();
+            }
+            if (m_queue == null)
+            {
+                m_queue = new AutoQueueExecutor();
+            }
 
             var uTables = new Dictionary<string, List<Type>>();
             var utTables = new Dictionary<Type, List<Type>>();
@@ -89,13 +102,17 @@ namespace Inertia.ORM
                     foreach (var type in assembly.GetTypes())
                     {
                         if (type.IsAbstract || !type.IsClass)
+                        {
                             continue;
+                        }
 
                         if (type.IsSubclassOf(typeof(Database)))
                         {
                             var db = (Database)Activator.CreateInstance(type);
                             if (m_databases.ContainsKey(db.Name))
+                            {
                                 throw new DatabaseAlreadyInitializedException(db.Name);
+                            }
 
                             db.TryCreateItSelf();
                             m_databases.Add(db.Name, db);
@@ -108,16 +125,24 @@ namespace Inertia.ORM
                                 if (!string.IsNullOrEmpty(attachTo.DatabaseName))
                                 {
                                     if (uTables.TryGetValue(attachTo.DatabaseName, out List<Type> types))
+                                    {
                                         types.Add(type);
+                                    }
                                     else
+                                    {
                                         uTables.Add(attachTo.DatabaseName, new List<Type>() { type });
+                                    }
                                 }
                                 else if (attachTo.DatabaseType != null)
                                 {
                                     if (utTables.TryGetValue(attachTo.DatabaseType, out List<Type> types))
+                                    {
                                         types.Add(type);
+                                    }
                                     else
+                                    {
                                         utTables.Add(attachTo.DatabaseType, new List<Type>() { type });
+                                    }
                                 }
                             }
                         }
@@ -129,7 +154,9 @@ namespace Inertia.ORM
                     if (TrySearchDatabase(pair.Key, out Database db))
                     {
                         if (db.GetType().GetCustomAttribute<AutoGenerateTables>() == null)
+                        {
                             continue;
+                        }
 
                         RegisterTablesTo(db, pair.Value);
                     }
@@ -139,7 +166,9 @@ namespace Inertia.ORM
                     if (TrySearchDatabase(pair.Key, out Database db))
                     {
                         if (db.GetType().GetCustomAttribute<AutoGenerateTables>() == null)
+                        {
                             continue;
+                        }
 
                         RegisterTablesTo(db, pair.Value);
                     }
@@ -160,7 +189,7 @@ namespace Inertia.ORM
                 throw new InitializationFailedException(ex.ToString());
             }
         }
-
+    
         internal static bool CreateTableInstance<T>(out T instance) where T : Table
         {
             instance = null;
@@ -174,7 +203,10 @@ namespace Inertia.ORM
         internal static void SetQuery(this MySqlCommand command, string query, SqlCondition condition = null)
         {
             command.CommandText = query;
-            if (condition != null) condition.ApplyToCmd(command);
+            if (condition != null)
+            {
+                condition.ApplyToCmd(command);
+            }
 
             command.Prepare();
         }
@@ -183,7 +215,9 @@ namespace Inertia.ORM
             using (var reader = command.ExecuteReader())
             {
                 while (reader.Read())
+                {
                     onReader(reader);
+                }
             }
         }
     }

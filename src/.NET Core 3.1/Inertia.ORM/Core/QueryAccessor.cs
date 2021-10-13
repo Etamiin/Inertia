@@ -24,7 +24,9 @@ namespace Inertia.ORM
 
             //if (!SqlManager.TrySearchDatabase(out m_database))
             if (m_database == null)
+            {
                 throw new ArgumentNullException(typeof(DatabaseKey).Name, "Invalid Database for the QueryAccessor.");
+            }
         }
 
         /// <summary>
@@ -392,7 +394,10 @@ namespace Inertia.ORM
         {
             SqlManager.EnqueueAsyncOperation(() => {
                 var deleted = m_database.Delete<TableKey>(condition);
-                if (deleted) onDeleted?.Invoke();
+                if (deleted)
+                {
+                    onDeleted?.Invoke();
+                }
             });
         }
         /// <summary>
@@ -403,7 +408,10 @@ namespace Inertia.ORM
         {
             SqlManager.EnqueueAsyncOperation(() => {
                 var deleted = m_database.DeleteAll<TableKey>();
-                if (deleted) onDeleted?.Invoke();
+                if (deleted)
+                {
+                    onDeleted?.Invoke();
+                }
             });
         }
 
@@ -417,7 +425,10 @@ namespace Inertia.ORM
         {
             SqlManager.EnqueueAsyncOperation(() => {
                 var updated = m_database.UpdateAll(reference, columnsToUpdate);
-                if (updated) onUpdated?.Invoke();
+                if (updated)
+                {
+                    onUpdated?.Invoke();
+                }
             });
         }
 

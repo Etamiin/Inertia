@@ -19,6 +19,7 @@ namespace Inertia.Network
         private byte[] _buffer;
         private Socket _socket;
         private BasicReader _reader;
+        private bool _disconnectionNotified;
 
         internal TcpConnectionEntity(Socket socket)
         {
@@ -71,7 +72,7 @@ namespace Inertia.Network
                 throw new ObjectDisposedException(nameof(TcpConnectionEntity));
             }
 
-            if (IsConnected)
+            if (IsConnected || !_disconnectionNotified)
             {
                 _socket?.Shutdown(SocketShutdown.Both);
                 _socket?.Disconnect(false);
@@ -80,6 +81,7 @@ namespace Inertia.Network
                 _reader = null;
                 _buffer = null;
                 _socket = null;
+                _disconnectionNotified = true;
                 Disconnected?.Invoke(reason);
             }
         }

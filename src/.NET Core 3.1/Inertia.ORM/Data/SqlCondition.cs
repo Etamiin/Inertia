@@ -11,7 +11,7 @@ namespace Inertia.ORM
     /// </summary>
     public sealed class SqlCondition : IDisposable
     {
-        private static Dictionary<ConditionOperator, string> m_operators = new Dictionary<ConditionOperator, string>()
+        private static Dictionary<ConditionOperator, string> m_operators = new Dictionary<ConditionOperator, string>
         {
             { ConditionOperator.Equal, "=" }, { ConditionOperator.NotEqual, "<>" }, { ConditionOperator.Greater, ">" },
             { ConditionOperator.GreaterOrEqual, ">=" }, { ConditionOperator.Less, "<" }, { ConditionOperator.LessOrEqual, "<=" },
@@ -47,7 +47,10 @@ namespace Inertia.ORM
         /// <returns></returns>
         public SqlCondition BeginBrackets(ConditionType type = ConditionType.AND)
         {
-            if (m_builder.Length > 0) m_builder.Append($" { type.ToString().ToUpper() } ");
+            if (m_builder.Length > 0)
+            {
+                m_builder.Append($" { type.ToString().ToUpper() } ");
+            }
 
             m_builder.Append("(");
             m_bracketInput = true;
@@ -61,7 +64,9 @@ namespace Inertia.ORM
         public SqlCondition EndBrackets()
         {
             if (IsDisposed)
+            {
                 throw new ObjectDisposedException(nameof(SqlCondition));
+            }
 
             m_builder.Append(")");
             m_bracketInput = false;
@@ -79,29 +84,49 @@ namespace Inertia.ORM
         public SqlCondition Add(string fieldName, object value, ConditionOperator conditionOperator, ConditionType type = ConditionType.AND)
         {
             if (IsDisposed)
+            {
                 throw new ObjectDisposedException(nameof(SqlCondition));
+            }
 
             if (value == null)
             {
                 if (conditionOperator == ConditionOperator.Like)
+                {
                     return this;
+                }
                 
                 if (conditionOperator != ConditionOperator.Equal && conditionOperator != ConditionOperator.NotEqual)
+                {
                     conditionOperator = ConditionOperator.Equal;
+                }
             }
 
             if (m_builder.Length > 0 && (m_builder[m_builder.Length - 1] != '(' && m_builder[m_builder.Length - 1] != ')'))
+            {
                 m_builder.Append($" { type } ");
+            }
 
             m_builder.Append(fieldName);
 
             if (value == null)
             {
-                if (conditionOperator == ConditionOperator.Equal) m_builder.Append(" IS NULL");
-                else if (conditionOperator == ConditionOperator.NotEqual) m_builder.Append(" IS NOT NULL");
+                if (conditionOperator == ConditionOperator.Equal)
+                {
+                    m_builder.Append(" IS NULL");
+                }
+                else if (conditionOperator == ConditionOperator.NotEqual)
+                {
+                    m_builder.Append(" IS NOT NULL");
+                }
             }
-            else if (conditionOperator == ConditionOperator.Like) m_builder.Append($" LIKE { value }");
-            else m_builder.Append(m_operators[conditionOperator]);
+            else if (conditionOperator == ConditionOperator.Like)
+            {
+                m_builder.Append($" LIKE { value }");
+            }
+            else
+            {
+                m_builder.Append(m_operators[conditionOperator]);
+            }
 
             if (conditionOperator != ConditionOperator.In)
             {
@@ -110,7 +135,10 @@ namespace Inertia.ORM
                 m_builder.Append(paramName);
                 m_params.Add(paramName, value);
             }
-            else AddIn();
+            else
+            {
+                AddIn();
+            }
 
             return this;
 
@@ -121,18 +149,31 @@ namespace Inertia.ORM
                 {
                     for (var i = 0; i < inList.Count(); i++)
                     {
-                        if (i > 0) inBuilder.Append(",");
+                        if (i > 0)
+                        {
+                            inBuilder.Append(",");
+                        }
+
                         AddInElement(inList.ElementAt(i));
                     }
                 }
-                else AddInElement(value);
+                else
+                {
+                    AddInElement(value);
+                }
 
                 m_builder.Append(inBuilder.ToString());
                 
                 void AddInElement(object element)
                 {
-                    if (element.GetType().IsValueType) inBuilder.Append(element.ToString());
-                    else inBuilder.Append($"\"{ element }\"");
+                    if (element.GetType().IsValueType)
+                    {
+                        inBuilder.Append(element.ToString());
+                    }
+                    else
+                    {
+                        inBuilder.Append($"\"{ element }\"");
+                    }
                 }
             }
         }
@@ -147,10 +188,14 @@ namespace Inertia.ORM
         public SqlCondition AddBetween(string fieldName, object value1, object value2, ConditionType type = ConditionType.AND)
         {
             if (IsDisposed)
+            {
                 throw new ObjectDisposedException(nameof(SqlCondition));
+            }
 
             if (m_builder.Length > 0 && (m_builder[m_builder.Length - 1] != '(' && m_builder[m_builder.Length - 1] != ')'))
+            {
                 m_builder.Append($" { type } ");
+            }
 
             var pn1 = GetNextParamName();
             var pn2 = GetNextParamName();
@@ -170,10 +215,14 @@ namespace Inertia.ORM
         public SqlCondition AddStringPattern(string strQuery, ConditionType type = ConditionType.AND)
         {
             if (IsDisposed)
+            {
                 throw new ObjectDisposedException(nameof(SqlCondition));
+            }
 
             if (m_builder.Length > 0 && (m_builder[m_builder.Length - 1] != '(' && m_builder[m_builder.Length - 1] != ')'))
+            {
                 m_builder.Append($" { type } ");
+            }
 
             m_builder.Append(strQuery);
             return this;
@@ -215,21 +264,26 @@ namespace Inertia.ORM
         /// </summary>
         public void Dispose()
         {
-            if (IsDisposed)
-                return;
-
-            m_params.Clear();
-            IsDisposed = true;
+            if (!IsDisposed)
+            {
+                m_params.Clear();
+                IsDisposed = true;
+            }
         }
 
         internal void ApplyToCmd(MySqlCommand command)
         {
             foreach (var param in m_params)
+            {
                 command.Parameters.AddWithValue(param.Key, param.Value);
+            }
         }
         internal string GetQuery()
         {
-            if (m_bracketInput) EndBrackets();
+            if (m_bracketInput)
+            {
+                EndBrackets();
+            }
 
             return 
                 $"{ (m_builder.Length > 0 ? "WHERE " : string.Empty)}{ m_builder }" +
@@ -240,10 +294,18 @@ namespace Inertia.ORM
         private void OrderBy(string type, params string[] columns)
         {
             if (IsDisposed)
+            {
                 throw new ObjectDisposedException(nameof(SqlCondition));
+            }
 
-            if (m_orderBuilder == null) m_orderBuilder = new StringBuilder("ORDER BY ");
-            else m_orderBuilder.Append(", ");
+            if (m_orderBuilder == null)
+            {
+                m_orderBuilder = new StringBuilder("ORDER BY ");
+            }
+            else
+            {
+                m_orderBuilder.Append(", ");
+            }
 
             m_orderBuilder.Append($"{ string.Join(",", columns) } { type }");
         }

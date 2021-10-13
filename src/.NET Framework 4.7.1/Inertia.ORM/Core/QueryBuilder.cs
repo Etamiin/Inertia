@@ -22,7 +22,10 @@ namespace Inertia.ORM
                     var isNotNull = field.GetCustomAttribute<NotNull>();
                     var isPrimaryKey = field.GetCustomAttribute<PrimaryKey>();
 
-                    if (i > 0) sb.Append(",");
+                    if (i > 0)
+                    {
+                        sb.Append(",");
+                    }
 
                     sb.Append($"`{ field.Name }` ");
 
@@ -37,26 +40,41 @@ namespace Inertia.ORM
                         {
                             var precision = field.GetCustomAttribute<DecimalPrecision>();
                             if (precision != null)
+                            {
                                 sb.Append($"({ precision.FieldPrecision },{ precision.FieldScale })");
+                            }
                         }
                     }
 
                     if (isNotNull != null)
                     {
                         sb.Append(" NOT NULL");
-                        if (isNotNull.Unique) sb.Append(" UNIQUE");
+                        if (isNotNull.Unique)
+                        {
+                            sb.Append(" UNIQUE");
+                        }
                     }
 
                     if (isPrimaryKey != null)
                     {
-                        if (!string.IsNullOrEmpty(primaryKeys)) primaryKeys += ",";
+                        if (!string.IsNullOrEmpty(primaryKeys))
+                        {
+                            primaryKeys += ",";
+                        }
 
                         primaryKeys += $"`{ field.Name }`";
-                        if (isPrimaryKey.AutoIncrement) sb.Append(" AUTO_INCREMENT");
+                        if (isPrimaryKey.AutoIncrement)
+                        {
+                            sb.Append(" AUTO_INCREMENT");
+                        }
                     }
                 }
 
-                if (!string.IsNullOrEmpty(primaryKeys)) sb.Append(", primary key(" + primaryKeys + ")");
+                if (!string.IsNullOrEmpty(primaryKeys))
+                {
+                    sb.Append(", primary key(" + primaryKeys + ")");
+                }
+
                 sb.Append(")");
             });
         }
@@ -91,8 +109,14 @@ namespace Inertia.ORM
         internal static string GetSelectQuery(Table table, SqlCondition condition, string[] columnsToSelect, bool distinct)
         {
             return UseBuilder($"SELECT { (distinct ? "DISTINCT " : string.Empty) }", condition, (sb) => {
-                if (columnsToSelect.Length > 0) sb.Append(string.Join(",", columnsToSelect));
-                else sb.Append("*");
+                if (columnsToSelect.Length > 0)
+                {
+                    sb.Append(string.Join(",", columnsToSelect));
+                }
+                else
+                {
+                    sb.Append("*");
+                }
 
                 sb.Append($" FROM `{ table.Identifier }`");
             });
@@ -108,16 +132,28 @@ namespace Inertia.ORM
 
             return UseBuilder($"UPDATE `{ table.Identifier }` SET ", condition, (sb) => {
                 var cCount = columns.Length;
-                if (cCount == 0) cCount--;
+                if (cCount == 0)
+                {
+                    cCount--;
+                }
 
                 for (var i = 0; i < fields.Length; i++)
                 {
                     var field = fields[i];
-                    if (field.GetCustomAttribute<PrimaryKey>() != null) continue;
+                    if (field.GetCustomAttribute<PrimaryKey>() != null)
+                    {
+                        continue;
+                    }
                     if (cCount > 0)
                     {
-                        if (!columns.Contains(field.Name)) continue;
-                        else cCount--;
+                        if (!columns.Contains(field.Name))
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            cCount--;
+                        }
                     }
 
                     var pName = $"@{ iParam++ }";
@@ -125,8 +161,14 @@ namespace Inertia.ORM
                     command.Parameters.AddWithValue(pName, field.GetValue(table));
                     sb.Append($"{ field.Name }={ pName }");
 
-                    if (cCount == 0) break;
-                    if (i < fields.Length - 1) sb.Append(", ");
+                    if (cCount == 0)
+                    {
+                        break;
+                    }
+                    if (i < fields.Length - 1)
+                    {
+                        sb.Append(", ");
+                    }
                 }
             });
         }
@@ -160,7 +202,11 @@ namespace Inertia.ORM
             var sb = new StringBuilder(baseStr);
             onBuilder?.Invoke(sb);
 
-            if (condition != null) sb.Append($" { condition.GetQuery() }");
+            if (condition != null)
+            {
+                sb.Append($" { condition.GetQuery() }");
+            }
+
             return sb.ToString();
         }
     }

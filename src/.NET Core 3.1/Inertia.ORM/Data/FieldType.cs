@@ -33,8 +33,14 @@ namespace Inertia.ORM
 
         internal static FieldType GetFieldType(Type type)
         {
-            if (FieldTypes == null) GenerateFields();
-            if (!FieldTypes.ContainsKey(type)) return FieldTypes[typeof(object)];
+            if (FieldTypes == null)
+            {
+                GenerateFields();
+            }
+            if (!FieldTypes.ContainsKey(type))
+            {
+                return FieldTypes[typeof(object)];
+            }
 
             return FieldTypes[type];
         }

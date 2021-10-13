@@ -16,7 +16,7 @@ namespace Inertia.ORM
         /// 
         /// </summary>
         public readonly Type DatabaseType;
-
+        
         /// <summary>
         /// Instantiate a new instance of the class <see cref="AttachTo"/>
         /// </summary>

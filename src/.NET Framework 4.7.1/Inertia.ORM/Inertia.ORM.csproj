@@ -52,12 +52,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Attributes\AutoGenerateTables.cs" />
     <Compile Include="Attributes\AttachTo.cs" />
+    <Compile Include="Attributes\AutoGenerateTables.cs" />
+    <Compile Include="Attributes\DecimalPrecision.cs" />
     <Compile Include="Attributes\IgnoreField.cs" />
     <Compile Include="Attributes\NotNull.cs" />
     <Compile Include="Attributes\PrimaryKey.cs" />
-    <Compile Include="Attributes\DecimalPrecision.cs" />
     <Compile Include="Attributes\VarChar.cs" />
     <Compile Include="Core\Database.cs" />
     <Compile Include="Core\QueryAccessor.cs" />
@@ -68,9 +68,9 @@
     <Compile Include="Enums\ConditionOperator.cs" />
     <Compile Include="Enums\ConditionType.cs" />
     <Compile Include="Enums\QueryType.cs" />
-    <Compile Include="Exceptions\InitializationFailedException.cs" />
     <Compile Include="Exceptions\DatabaseAlreadyInitializedException.cs" />
     <Compile Include="Exceptions\DatabaseConnectionFailedException.cs" />
+    <Compile Include="Exceptions\InitializationFailedException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SqlManager.cs" />
   </ItemGroup>

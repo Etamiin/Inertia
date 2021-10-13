@@ -23,21 +23,28 @@ namespace Inertia.ORM
         public Table()
         {
             var attachTo = GetType().GetCustomAttribute<AttachTo>();
-            if (attachTo == null) return;
-
-            if (!string.IsNullOrEmpty(attachTo.DatabaseName))
+            if (attachTo != null)
             {
-                if (SqlManager.TrySearchDatabase(attachTo.DatabaseName, out Database db))
-                    this.Database = db;
-            }
-            else if (attachTo.DatabaseType != null)
-            {
-                if (SqlManager.TrySearchDatabase(attachTo.DatabaseType, out Database db))
-                    this.Database = db;
-            }
+                if (!string.IsNullOrEmpty(attachTo.DatabaseName))
+                {
+                    if (SqlManager.TrySearchDatabase(attachTo.DatabaseName, out Database db))
+                    {
+                        this.Database = db;
+                    }
+                }
+                else if (attachTo.DatabaseType != null)
+                {
+                    if (SqlManager.TrySearchDatabase(attachTo.DatabaseType, out Database db))
+                    {
+                        this.Database = db;
+                    }
+                }
 
-            if (this.Database == null)
-                throw new ArgumentNullException($"The database '{ attachTo.DatabaseName }' isn't registered");
+                if (this.Database == null)
+                {
+                    throw new ArgumentNullException($"The database '{ attachTo.DatabaseName }' isn't registered");
+                }
+            }
         }
 
         /// <summary>
@@ -82,7 +89,10 @@ namespace Inertia.ORM
         internal static FieldInfo[] GetFields(Type type)
         {
             var fields = type.GetFields(BindingFlags.Public | BindingFlags.Instance);
-            if (fields.Length == 0) return new FieldInfo[0];
+            if (fields.Length == 0)
+            {
+                return new FieldInfo[0];
+            }
 
             return Array.FindAll(fields, (f) => {
                 return !f.IsStatic && f.GetCustomAttribute<IgnoreField>() == null && FieldType.GetFieldType(f.FieldType).Code != TypeCode.Object;
