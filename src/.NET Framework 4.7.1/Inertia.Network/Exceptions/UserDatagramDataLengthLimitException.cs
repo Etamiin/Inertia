@@ -16,13 +16,6 @@ namespace Inertia.Network
         /// </summary>
         public override string Message => GetMessage();
 
-        /// <summary>
-        /// Instantiate a new instance of the class <see cref="UserDatagramDataLengthLimitException"/>
-        /// </summary>
-        public UserDatagramDataLengthLimitException()
-        {
-        }
-
         private string GetMessage()
         {
             return $"You can't send more than { ushort.MaxValue } bytes from user datagram networking.";

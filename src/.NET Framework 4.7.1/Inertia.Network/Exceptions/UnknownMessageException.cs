@@ -15,23 +15,21 @@ namespace Inertia.Network
         /// Message of the exception
         /// </summary>
         public override string Message => GetMessage();
-        /// <summary>
-        /// Unknown received MessageID
-        /// </summary>
-        public readonly uint PacketId;
+
+        private readonly uint _packetId;
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="messageType"></param>
+        /// <param name="packetId"></param>
         public UnknownMessageException(uint packetId)
         {
-            PacketId = packetId;
+            _packetId = packetId;
         }
 
         private string GetMessage()
         {
-            return "Invalid Message ID(" + PacketId + ")";
+            return $"Invalid Message ID({ _packetId })";
         }
     }
 }

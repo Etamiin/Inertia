@@ -154,7 +154,7 @@ namespace Inertia
         /// </summary>
         /// <param name="compressedData"></param>
         /// <returns></returns>
-        public static byte[] GzipDecompress(ref byte[] compressedData)
+        public static byte[] GzipDecompress(byte[] compressedData)
         {
             using (var cms = new MemoryStream(compressedData))
             {

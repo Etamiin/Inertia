@@ -105,7 +105,7 @@ namespace Inertia.Runtime
         /// <summary>
         /// Execute the Runtime cycle manually.
         /// </summary>
-        public static void Update()
+        public static void ManualUpdate()
         {
             RuntimeManager.IsManuallyRunned = true;
             RuntimeManager.ExecuteCycle(null);

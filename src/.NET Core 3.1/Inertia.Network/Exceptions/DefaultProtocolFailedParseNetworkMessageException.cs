@@ -12,7 +12,7 @@ namespace Inertia.Network
         /// </summary>
         public override string Message => _exMessage;
 
-        private string _exMessage;
+        private readonly string _exMessage;
 
         /// <summary>
         /// Initialize a new instance of the class <see cref="DefaultProtocolFailedParseNetworkMessageException"/>

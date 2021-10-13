@@ -49,8 +49,10 @@ namespace Inertia.ORM
             return false;
         }
         /// <summary>
-        /// Returns a <typeparamref name="T"/> already registered.
+        /// 
         /// </summary>
+        /// <param name="databaseType"></param>
+        /// <param name="database"></param>
         /// <returns></returns>
         public static bool TrySearchDatabase(Type databaseType, out Database database)
         {

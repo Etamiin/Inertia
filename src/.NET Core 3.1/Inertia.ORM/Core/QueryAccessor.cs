@@ -13,17 +13,14 @@ namespace Inertia.ORM
     /// <typeparam name="DatabaseKey"></typeparam>
     public sealed class QueryAccessor<TableKey, DatabaseKey> where TableKey : Table where DatabaseKey : Database
     {
-        private DatabaseKey _database;
+        private readonly DatabaseKey _database;
 
         /// <summary>
         /// Initialize a new instance of the class <see cref="QueryAccessor{TableKey, DatabaseKey}"/>
         /// </summary>
         public QueryAccessor()
         {
-            SqlManager.TrySearchDatabase(out _database);
-
-            //if (!SqlManager.TrySearchDatabase(out _database))
-            if (_database == null)
+            if (!SqlManager.TrySearchDatabase(out _database))
             {
                 throw new ArgumentNullException(typeof(DatabaseKey).Name, "Invalid Database for the QueryAccessor.");
             }
@@ -32,7 +29,6 @@ namespace Inertia.ORM
         /// <summary>
         /// Selects the first element from the specified <see cref="Table"/> with the specified parameters and returns an instance of the <typeparamref name="TableKey"/>.
         /// </summary>
-        /// <typeparam name="TableKey"></typeparam>
         /// <param name="columnsToSelect"></param>
         /// <returns></returns>
         public TableKey Select(params string[] columnsToSelect)
@@ -42,7 +38,6 @@ namespace Inertia.ORM
         /// <summary>
         /// Selects the first element from the specified <see cref="Table"/> with the specified parameters and returns an instance of the <typeparamref name="TableKey"/>.
         /// </summary>
-        /// <typeparam name="TableKey"></typeparam>
         /// <param name="columnsToSelect"></param>
         /// <param name="distinct"></param>
         /// <returns></returns>
@@ -53,7 +48,6 @@ namespace Inertia.ORM
         /// <summary>
         /// Selects the first element from the specified <see cref="Table"/> with the specified parameters and returns an instance of the <typeparamref name="TableKey"/>.
         /// </summary>
-        /// <typeparam name="TableKey"></typeparam>
         /// <param name="columnsToSelect"></param>
         /// <param name="condition"></param>
         /// <returns></returns>
@@ -64,7 +58,6 @@ namespace Inertia.ORM
         /// <summary>
         /// Selects the first element from the specified <see cref="Table"/> with the specified parameters and returns an instance of the <typeparamref name="TableKey"/>.
         /// </summary>
-        /// <typeparam name="TableKey"></typeparam>
         /// <param name="columnsToSelect"></param>
         /// <param name="condition"></param>
         /// <param name="distinct"></param>
@@ -77,7 +70,6 @@ namespace Inertia.ORM
         /// <summary>
         /// Selects all the elements from the specified <see cref="Table"/> with the specified parameters and returns an instance of the <typeparamref name="TableKey"/>.
         /// </summary>
-        /// <typeparam name="TableKey"></typeparam>
         /// <param name="columnsToSelect"></param>
         /// <returns></returns>
         public TableKey[] SelectAll(params string[] columnsToSelect)
@@ -87,7 +79,6 @@ namespace Inertia.ORM
         /// <summary>
         /// Selects all the elements from the specified <see cref="Table"/> with the specified parameters and returns an instance of the <typeparamref name="TableKey"/>.
         /// </summary>
-        /// <typeparam name="TableKey"></typeparam>
         /// <param name="columnsToSelect"></param>
         /// <param name="distinct"></param>
         /// <returns></returns>
@@ -98,7 +89,6 @@ namespace Inertia.ORM
         /// <summary>
         /// Selects all the elements from the specified <see cref="Table"/> with the specified parameters and returns an instance of the <typeparamref name="TableKey"/>.
         /// </summary>
-        /// <typeparam name="TableKey"></typeparam>
         /// <param name="columnsToSelect"></param>
         /// <param name="condition"></param>
         /// <returns></returns>
@@ -109,7 +99,6 @@ namespace Inertia.ORM
         /// <summary>
         /// Selects all the elements from the specified <see cref="Table"/> with the specified parameters and returns an instance of the <typeparamref name="TableKey"/>.
         /// </summary>
-        /// <typeparam name="TableKey"></typeparam>
         /// <param name="columnsToSelect"></param>
         /// <param name="condition"></param>
         /// <param name="distinct"></param>
@@ -123,7 +112,6 @@ namespace Inertia.ORM
         /// <summary>
         /// Delete all the elements from the specified <see cref="Table"/> based on the specified <see cref="SqlCondition"/>
         /// </summary>
-        /// <typeparam name="TableKey"></typeparam>
         /// <param name="condition"></param>
         /// <returns></returns>
         public bool Delete(SqlCondition condition)
@@ -171,7 +159,6 @@ namespace Inertia.ORM
         /// Execute a COUNT query with the specified parameters and return the result.
         /// </summary>
         /// <param name="condition"></param>
-        /// <param name="distinct"></param>
         /// <returns></returns>
         public long Count(SqlCondition condition)
         {
@@ -190,10 +177,19 @@ namespace Inertia.ORM
         /// <summary>
         /// Execute a COUNT query with the specified parameters and return the result.
         /// </summary>
+        /// <param name="columnName"></param>
+        /// <returns></returns>
+        public long Count(string columnName)
+        {
+            return Count(columnName, null, false);
+        }
+        /// <summary>
+        /// Execute a COUNT query with the specified parameters and return the result.
+        /// </summary>
         /// <param name="distinct"></param>
         /// <param name="columnName"></param>
         /// <returns></returns>
-        public long Count(string columnName, bool distinct = false)
+        public long Count(string columnName, bool distinct)
         {
             return Count(columnName, null, distinct);
         }
@@ -223,9 +219,18 @@ namespace Inertia.ORM
         /// Return true if a row exist in the database based on the specified conditions
         /// </summary>
         /// <param name="condition"></param>
+        /// <returns></returns>
+        public bool Exist(SqlCondition condition)
+        {
+            return _database.Count<TableKey>(condition, false) > 0;
+        }
+        /// <summary>
+        /// Return true if a row exist in the database based on the specified conditions
+        /// </summary>
+        /// <param name="condition"></param>
         /// <param name="distinct"></param>
         /// <returns></returns>
-        public bool Exist(SqlCondition condition, bool distinct = false)
+        public bool Exist(SqlCondition condition, bool distinct)
         {
             return _database.Count<TableKey>(condition, distinct) > 0;
         }
@@ -449,8 +454,16 @@ namespace Inertia.ORM
         /// 
         /// </summary>
         /// <param name="onCounted"></param>
+        public void CountAsync(BasicAction<long> onCounted)
+        {
+            CountAsync(string.Empty, null, onCounted, false);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="onCounted"></param>
         /// <param name="distinct"></param>
-        public void CountAsync(BasicAction<long> onCounted, bool distinct = false)
+        public void CountAsync(BasicAction<long> onCounted, bool distinct)
         {
             CountAsync(string.Empty, null, onCounted, distinct);
         }
@@ -459,8 +472,17 @@ namespace Inertia.ORM
         /// </summary>
         /// <param name="condition"></param>
         /// <param name="onCounted"></param>
+        public void CountAsync(SqlCondition condition, BasicAction<long> onCounted)
+        {
+            CountAsync(string.Empty, condition, onCounted, false);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="condition"></param>
+        /// <param name="onCounted"></param>
         /// <param name="distinct"></param>
-        public void CountAsync(SqlCondition condition, BasicAction<long> onCounted, bool distinct = false)
+        public void CountAsync(SqlCondition condition, BasicAction<long> onCounted, bool distinct)
         {
             CountAsync(string.Empty, condition, onCounted, distinct);
         }
@@ -469,8 +491,17 @@ namespace Inertia.ORM
         /// </summary>
         /// <param name="columnName"></param>
         /// <param name="onCounted"></param>
+        public void CountAsync(string columnName, BasicAction<long> onCounted)
+        {
+            CountAsync(columnName, null, onCounted, false);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="columnName"></param>
+        /// <param name="onCounted"></param>
         /// <param name="distinct"></param>
-        public void CountAsync(string columnName, BasicAction<long> onCounted, bool distinct = false)
+        public void CountAsync(string columnName, BasicAction<long> onCounted, bool distinct)
         {
             CountAsync(columnName, null, onCounted, distinct);
         }
@@ -481,7 +512,7 @@ namespace Inertia.ORM
         /// <param name="condition"></param>
         /// <param name="onCounted"></param>
         /// <param name="distinct"></param>
-        public void CountAsync(string columnName, SqlCondition condition, BasicAction<long> onCounted, bool distinct = false)
+        public void CountAsync(string columnName, SqlCondition condition, BasicAction<long> onCounted, bool distinct)
         {
             SqlManager.EnqueueAsyncOperation(() => {
                 var count = _database.Count<TableKey>(columnName, condition, distinct);
@@ -494,8 +525,20 @@ namespace Inertia.ORM
         /// </summary>
         /// <param name="condition"></param>
         /// <param name="onExist"></param>
+        public void ExistAsync(SqlCondition condition, BasicAction<bool> onExist)
+        {
+            SqlManager.EnqueueAsyncOperation(() => {
+                var count = _database.Count<TableKey>(condition, false);
+                onExist?.Invoke(count > 0);
+            });
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="condition"></param>
+        /// <param name="onExist"></param>
         /// <param name="distinct"></param>
-        public void ExistAsync(SqlCondition condition, BasicAction<bool> onExist, bool distinct = false)
+        public void ExistAsync(SqlCondition condition, BasicAction<bool> onExist, bool distinct)
         {
             SqlManager.EnqueueAsyncOperation(() => {
                 var count = _database.Count<TableKey>(condition, distinct);

@@ -64,7 +64,7 @@ public static class Extensions
     /// <returns></returns>
     public static byte[] GzipDecompress(this byte[] compressedData)
     {
-        return IOHelper.GzipDecompress(ref compressedData);
+        return IOHelper.GzipDecompress(compressedData);
     }
 
     /// <summary>

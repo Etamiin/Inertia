@@ -51,6 +51,17 @@
             
             </summary>
         </member>
+        <member name="M:Inertia.ORM.DecimalPrecision.#ctor">
+            <summary>
+            Instantiate a new instance of the class <see cref="T:Inertia.ORM.DecimalPrecision"/>
+            </summary>
+        </member>
+        <member name="M:Inertia.ORM.DecimalPrecision.#ctor(System.Byte)">
+            <summary>
+            Instantiate a new instance of the class <see cref="T:Inertia.ORM.DecimalPrecision"/>
+            </summary>
+            <param name="precision"></param>
+        </member>
         <member name="M:Inertia.ORM.DecimalPrecision.#ctor(System.Byte,System.Byte)">
             <summary>
             Instantiate a new instance of the class <see cref="T:Inertia.ORM.DecimalPrecision"/>
@@ -442,7 +453,6 @@
             <summary>
             Selects the first element from the specified <see cref="T:Inertia.ORM.Table"/> with the specified parameters and returns an instance of the <typeparamref name="TableKey"/>.
             </summary>
-            <typeparam name="TableKey"></typeparam>
             <param name="columnsToSelect"></param>
             <returns></returns>
         </member>
@@ -450,7 +460,6 @@
             <summary>
             Selects the first element from the specified <see cref="T:Inertia.ORM.Table"/> with the specified parameters and returns an instance of the <typeparamref name="TableKey"/>.
             </summary>
-            <typeparam name="TableKey"></typeparam>
             <param name="columnsToSelect"></param>
             <param name="distinct"></param>
             <returns></returns>
@@ -459,7 +468,6 @@
             <summary>
             Selects the first element from the specified <see cref="T:Inertia.ORM.Table"/> with the specified parameters and returns an instance of the <typeparamref name="TableKey"/>.
             </summary>
-            <typeparam name="TableKey"></typeparam>
             <param name="columnsToSelect"></param>
             <param name="condition"></param>
             <returns></returns>
@@ -468,7 +476,6 @@
             <summary>
             Selects the first element from the specified <see cref="T:Inertia.ORM.Table"/> with the specified parameters and returns an instance of the <typeparamref name="TableKey"/>.
             </summary>
-            <typeparam name="TableKey"></typeparam>
             <param name="columnsToSelect"></param>
             <param name="condition"></param>
             <param name="distinct"></param>
@@ -478,7 +485,6 @@
             <summary>
             Selects all the elements from the specified <see cref="T:Inertia.ORM.Table"/> with the specified parameters and returns an instance of the <typeparamref name="TableKey"/>.
             </summary>
-            <typeparam name="TableKey"></typeparam>
             <param name="columnsToSelect"></param>
             <returns></returns>
         </member>
@@ -486,7 +492,6 @@
             <summary>
             Selects all the elements from the specified <see cref="T:Inertia.ORM.Table"/> with the specified parameters and returns an instance of the <typeparamref name="TableKey"/>.
             </summary>
-            <typeparam name="TableKey"></typeparam>
             <param name="columnsToSelect"></param>
             <param name="distinct"></param>
             <returns></returns>
@@ -495,7 +500,6 @@
             <summary>
             Selects all the elements from the specified <see cref="T:Inertia.ORM.Table"/> with the specified parameters and returns an instance of the <typeparamref name="TableKey"/>.
             </summary>
-            <typeparam name="TableKey"></typeparam>
             <param name="columnsToSelect"></param>
             <param name="condition"></param>
             <returns></returns>
@@ -504,7 +508,6 @@
             <summary>
             Selects all the elements from the specified <see cref="T:Inertia.ORM.Table"/> with the specified parameters and returns an instance of the <typeparamref name="TableKey"/>.
             </summary>
-            <typeparam name="TableKey"></typeparam>
             <param name="columnsToSelect"></param>
             <param name="condition"></param>
             <param name="distinct"></param>
@@ -514,7 +517,6 @@
             <summary>
             Delete all the elements from the specified <see cref="T:Inertia.ORM.Table"/> based on the specified <see cref="T:Inertia.ORM.SqlCondition"/>
             </summary>
-            <typeparam name="TableKey"></typeparam>
             <param name="condition"></param>
             <returns></returns>
         </member>
@@ -550,7 +552,6 @@
             Execute a COUNT query with the specified parameters and return the result.
             </summary>
             <param name="condition"></param>
-            <param name="distinct"></param>
             <returns></returns>
         </member>
         <member name="M:Inertia.ORM.QueryAccessor`2.Count(Inertia.ORM.SqlCondition,System.Boolean)">
@@ -559,6 +560,13 @@
             </summary>
             <param name="condition"></param>
             <param name="distinct"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.QueryAccessor`2.Count(System.String)">
+            <summary>
+            Execute a COUNT query with the specified parameters and return the result.
+            </summary>
+            <param name="columnName"></param>
             <returns></returns>
         </member>
         <member name="M:Inertia.ORM.QueryAccessor`2.Count(System.String,System.Boolean)">
@@ -583,6 +591,13 @@
             </summary>
             <param name="distinct"></param>
             <param name="columnName"></param>
+            <param name="condition"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.QueryAccessor`2.Exist(Inertia.ORM.SqlCondition)">
+            <summary>
+            Return true if a row exist in the database based on the specified conditions
+            </summary>
             <param name="condition"></param>
             <returns></returns>
         </member>
@@ -739,12 +754,25 @@
             <param name="onUpdated"></param>
             <param name="columnsToUpdate"></param>
         </member>
+        <member name="M:Inertia.ORM.QueryAccessor`2.CountAsync(BasicAction{System.Int64})">
+            <summary>
+            
+            </summary>
+            <param name="onCounted"></param>
+        </member>
         <member name="M:Inertia.ORM.QueryAccessor`2.CountAsync(BasicAction{System.Int64},System.Boolean)">
             <summary>
             
             </summary>
             <param name="onCounted"></param>
             <param name="distinct"></param>
+        </member>
+        <member name="M:Inertia.ORM.QueryAccessor`2.CountAsync(Inertia.ORM.SqlCondition,BasicAction{System.Int64})">
+            <summary>
+            
+            </summary>
+            <param name="condition"></param>
+            <param name="onCounted"></param>
         </member>
         <member name="M:Inertia.ORM.QueryAccessor`2.CountAsync(Inertia.ORM.SqlCondition,BasicAction{System.Int64},System.Boolean)">
             <summary>
@@ -753,6 +781,13 @@
             <param name="condition"></param>
             <param name="onCounted"></param>
             <param name="distinct"></param>
+        </member>
+        <member name="M:Inertia.ORM.QueryAccessor`2.CountAsync(System.String,BasicAction{System.Int64})">
+            <summary>
+            
+            </summary>
+            <param name="columnName"></param>
+            <param name="onCounted"></param>
         </member>
         <member name="M:Inertia.ORM.QueryAccessor`2.CountAsync(System.String,BasicAction{System.Int64},System.Boolean)">
             <summary>
@@ -770,6 +805,13 @@
             <param name="condition"></param>
             <param name="onCounted"></param>
             <param name="distinct"></param>
+        </member>
+        <member name="M:Inertia.ORM.QueryAccessor`2.ExistAsync(Inertia.ORM.SqlCondition,BasicAction{System.Boolean})">
+            <summary>
+            
+            </summary>
+            <param name="condition"></param>
+            <param name="onExist"></param>
         </member>
         <member name="M:Inertia.ORM.QueryAccessor`2.ExistAsync(Inertia.ORM.SqlCondition,BasicAction{System.Boolean},System.Boolean)">
             <summary>
@@ -888,6 +930,12 @@
             Initialize a new instance of the class <see cref="T:Inertia.ORM.SqlCondition"/>.
             </summary>
         </member>
+        <member name="M:Inertia.ORM.SqlCondition.BeginBrackets">
+            <summary>
+            Open a new bracket in the query (ex: "(").
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:Inertia.ORM.SqlCondition.BeginBrackets(Inertia.ORM.ConditionType)">
             <summary>
             Open a new bracket in the query (ex: "(").
@@ -901,6 +949,15 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:Inertia.ORM.SqlCondition.Add(System.String,System.Object,Inertia.ORM.ConditionOperator)">
+            <summary>
+            Add a new condition with specified parameters.
+            </summary>
+            <param name="fieldName">Field name to check</param>
+            <param name="value"></param>
+            <param name="conditionOperator">SQL operator</param>
+            <returns></returns>
+        </member>
         <member name="M:Inertia.ORM.SqlCondition.Add(System.String,System.Object,Inertia.ORM.ConditionOperator,Inertia.ORM.ConditionType)">
             <summary>
             Add a new condition with specified parameters.
@@ -911,6 +968,15 @@
             <param name="type">SQL condition type</param>
             <returns></returns>
         </member>
+        <member name="M:Inertia.ORM.SqlCondition.AddBetween(System.String,System.Object,System.Object)">
+            <summary>
+            Add a SQL "BETWEEN" condition with specified parameters.
+            </summary>
+            <param name="fieldName">Field name to check</param>
+            <param name="value1"></param>
+            <param name="value2"></param>
+            <returns></returns>
+        </member>
         <member name="M:Inertia.ORM.SqlCondition.AddBetween(System.String,System.Object,System.Object,Inertia.ORM.ConditionType)">
             <summary>
             Add a SQL "BETWEEN" condition with specified parameters.
@@ -919,6 +985,13 @@
             <param name="value1"></param>
             <param name="value2"></param>
             <param name="type">SQL condition type</param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.SqlCondition.AddStringPattern(System.String)">
+            <summary>
+            Add a custom string condition (ex: "id >= 2 OR value >= 5") to the current instance.
+            </summary>
+            <param name="strQuery"></param>
             <returns></returns>
         </member>
         <member name="M:Inertia.ORM.SqlCondition.AddStringPattern(System.String,Inertia.ORM.ConditionType)">
@@ -1100,8 +1173,10 @@
         </member>
         <member name="M:Inertia.ORM.SqlManager.TrySearchDatabase(System.Type,Inertia.ORM.Database@)">
             <summary>
-            Returns a <typeparamref name="T"/> already registered.
+            
             </summary>
+            <param name="databaseType"></param>
+            <param name="database"></param>
             <returns></returns>
         </member>
         <member name="M:Inertia.ORM.SqlManager.TryUseDatabase``1(BasicAction{``0})">

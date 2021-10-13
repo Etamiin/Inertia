@@ -53,7 +53,6 @@ namespace Inertia
         /// </summary>
         /// <param name="uriRequest"></param>
         /// <param name="callback"></param>
-        /// <param name="parameters"></param>
         /// <returns></returns>
         public static void GetRequestAsync(Uri uriRequest, BasicAction<string> callback)
         {
@@ -66,7 +65,7 @@ namespace Inertia
         /// <param name="callback"></param>
         /// <param name="parameters"></param>
         /// <returns></returns>
-        public static void GetRequestAsync(Uri uriRequest, BasicAction<string> callback, RequestParameters parameters = null)
+        public static void GetRequestAsync(Uri uriRequest, BasicAction<string> callback, RequestParameters parameters)
         {
             Task.Factory.StartNew(() => callback?.Invoke(GetRequest(uriRequest, parameters)));
         }
@@ -120,7 +119,6 @@ namespace Inertia
         /// </summary>
         /// <param name="uriRequest"></param>
         /// <param name="callback"></param>
-        /// <param name="parameters"></param>
         /// <returns></returns>
         public static void GetRequestDataAsync(Uri uriRequest, BasicAction<byte[]> callback)
         {

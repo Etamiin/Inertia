@@ -40,7 +40,7 @@ namespace Inertia.ORM
         /// <summary>
         /// Initialize a new instance of class <see cref="Database"/>
         /// </summary>
-        public Database()
+        protected Database()
         {
             _connectionString = $"server={ Host.Replace("localhost", "127.0.0.1") };uid={ User };pwd={ Password };database={ Name };port={ Port };SslMode={ Ssl }";
         }
@@ -277,7 +277,7 @@ namespace Inertia.ORM
         {
             if (!SqlManager.CreateTableInstance(out T table))
             {
-                return new T[] { table };
+                return new[] { table };
             }
 
             var tables = new List<T>();
@@ -655,7 +655,9 @@ namespace Inertia.ORM
                     cmd.SetQuery(QueryBuilder.GetSumQuery(table, columnName, condition), condition);
                     cmd.OnReader((reader) => {
                         if (!reader.IsDBNull(0))
+                        {
                             sum = reader.GetDecimal(0);
+                        }
                     });
                 });
 

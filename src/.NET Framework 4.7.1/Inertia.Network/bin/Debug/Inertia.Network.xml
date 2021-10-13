@@ -665,16 +665,11 @@
             Message of the exception
             </summary>
         </member>
-        <member name="F:Inertia.Network.UnknownMessageException.PacketId">
-            <summary>
-            Unknown received MessageID
-            </summary>
-        </member>
         <member name="M:Inertia.Network.UnknownMessageException.#ctor(System.UInt32)">
             <summary>
             
             </summary>
-            <param name="messageType"></param>
+            <param name="packetId"></param>
         </member>
         <member name="T:Inertia.Network.UserDatagramDataLengthLimitException">
             <summary>
@@ -684,11 +679,6 @@
         <member name="P:Inertia.Network.UserDatagramDataLengthLimitException.Message">
             <summary>
             Message of the exception
-            </summary>
-        </member>
-        <member name="M:Inertia.Network.UserDatagramDataLengthLimitException.#ctor">
-            <summary>
-            Instantiate a new instance of the class <see cref="T:Inertia.Network.UserDatagramDataLengthLimitException"/>
             </summary>
         </member>
         <member name="T:NetworkDisconnectHandler">

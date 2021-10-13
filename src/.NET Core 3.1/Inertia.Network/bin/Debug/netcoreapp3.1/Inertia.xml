@@ -600,11 +600,6 @@
             
              </summary>
         </member>
-        <member name="M:Inertia.BoolFlagTooLargeException.#ctor">
-            <summary>
-            Initialize a new instance of the class <see cref="T:Inertia.BoolFlagTooLargeException"/>
-            </summary>
-        </member>
         <member name="T:Inertia.TypeNonSerializableException">
             <summary>
             Exception thrown when a non-serializable object tries to be serialized.
@@ -710,7 +705,7 @@
             <param name="hasBetterSize">Returns true if the returned data is lower in length than the non-compressed data</param>
             <returns></returns>
         </member>
-        <member name="M:Inertia.IOHelper.GzipDecompress(System.Byte[]@)">
+        <member name="M:Inertia.IOHelper.GzipDecompress(System.Byte[])">
             <summary>
             Decompress and return the specified data.
             </summary>
@@ -943,7 +938,7 @@
             Stop the current script
             </summary>
         </member>
-        <member name="M:Inertia.Runtime.Run.Update">
+        <member name="M:Inertia.Runtime.Run.ManualUpdate">
             <summary>
             Execute the Runtime cycle manually.
             </summary>
@@ -1078,11 +1073,6 @@
         <member name="P:Inertia.ManualQueueExecutor.Count">
             <summary>
             Returns the number of actions currently queued.
-            </summary>
-        </member>
-        <member name="M:Inertia.ManualQueueExecutor.#ctor">
-            <summary>
-            Initialize a new instance of the class <see cref="T:Inertia.ManualQueueExecutor"/>
             </summary>
         </member>
         <member name="M:Inertia.ManualQueueExecutor.Enqueue(BasicAction[])">
@@ -1234,7 +1224,6 @@
             </summary>
             <param name="uriRequest"></param>
             <param name="callback"></param>
-            <param name="parameters"></param>
             <returns></returns>
         </member>
         <member name="M:Inertia.WebHelper.GetRequestAsync(System.Uri,BasicAction{System.String},Inertia.RequestParameters)">
@@ -1267,7 +1256,6 @@
             </summary>
             <param name="uriRequest"></param>
             <param name="callback"></param>
-            <param name="parameters"></param>
             <returns></returns>
         </member>
         <member name="M:Inertia.WebHelper.GetRequestDataAsync(System.Uri,BasicAction{System.Byte[]},Inertia.RequestParameters)">

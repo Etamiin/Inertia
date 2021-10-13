@@ -9,9 +9,9 @@ namespace Inertia.Network
     /// </summary>
     public sealed class TcpClientEntity : NetworkClientEntity, IDisposable
     {
-        private byte[] _buffer;
+        private readonly byte[] _buffer;
+        private readonly BasicReader _reader;
         private Socket _socket;
-        private BasicReader _reader;
 
         /// <summary>
         /// Instantiate a new instance of the class <see cref="TcpClientEntity"/>

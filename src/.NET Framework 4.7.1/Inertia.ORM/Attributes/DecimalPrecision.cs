@@ -20,9 +20,26 @@ namespace Inertia.ORM
         /// <summary>
         /// Instantiate a new instance of the class <see cref="DecimalPrecision"/>
         /// </summary>
+        public DecimalPrecision()
+        {
+            FieldPrecision = 12;
+            FieldScale = 3;
+        }
+        /// <summary>
+        /// Instantiate a new instance of the class <see cref="DecimalPrecision"/>
+        /// </summary>
+        /// <param name="precision"></param>
+        public DecimalPrecision(byte precision)
+        {
+            FieldPrecision = precision;
+            FieldScale = 3;
+        }
+        /// <summary>
+        /// Instantiate a new instance of the class <see cref="DecimalPrecision"/>
+        /// </summary>
         /// <param name="precision"></param>
         /// <param name="scale"></param>
-        public DecimalPrecision(byte precision = 12, byte scale = 3)
+        public DecimalPrecision(byte precision, byte scale)
         {
             FieldPrecision = precision;
             FieldScale = scale;

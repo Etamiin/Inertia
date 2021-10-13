@@ -81,7 +81,7 @@ namespace Inertia
                 lock (_queue)
                 {
                     var action = _queue.Dequeue();
-                    action?.Invoke();
+                    action.Invoke();
                 }
             }
         }

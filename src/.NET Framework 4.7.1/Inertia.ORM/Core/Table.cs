@@ -20,7 +20,7 @@ namespace Inertia.ORM
         /// <summary>
         /// Instantiate a new instance of class <see cref="Table"/>
         /// </summary>
-        public Table()
+        protected Table()
         {
             var attachTo = GetType().GetCustomAttribute<AttachTo>();
             if (attachTo != null)

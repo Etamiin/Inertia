@@ -26,10 +26,10 @@ namespace Inertia.ORM
         internal int ParamIndex;
 
         private readonly StringBuilder _builder;
+        private readonly Dictionary<string, object> _params;
         private StringBuilder _orderBuilder;
         private int _limit;
         private bool _bracketInput;
-        private Dictionary<string, object> _params;
 
         /// <summary>
         /// Initialize a new instance of the class <see cref="SqlCondition"/>.
@@ -43,9 +43,17 @@ namespace Inertia.ORM
         /// <summary>
         /// Open a new bracket in the query (ex: "(").
         /// </summary>
+        /// <returns></returns>
+        public SqlCondition BeginBrackets()
+        {
+            return BeginBrackets(ConditionType.AND);
+        }
+        /// <summary>
+        /// Open a new bracket in the query (ex: "(").
+        /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
-        public SqlCondition BeginBrackets(ConditionType type = ConditionType.AND)
+        public SqlCondition BeginBrackets(ConditionType type)
         {
             if (_builder.Length > 0)
             {
@@ -79,9 +87,20 @@ namespace Inertia.ORM
         /// <param name="fieldName">Field name to check</param>
         /// <param name="value"></param>
         /// <param name="conditionOperator">SQL operator</param>
+        /// <returns></returns>
+        public SqlCondition Add(string fieldName, object value, ConditionOperator conditionOperator)
+        {
+            return Add(fieldName, value, conditionOperator, ConditionType.AND);
+        }
+        /// <summary>
+        /// Add a new condition with specified parameters.
+        /// </summary>
+        /// <param name="fieldName">Field name to check</param>
+        /// <param name="value"></param>
+        /// <param name="conditionOperator">SQL operator</param>
         /// <param name="type">SQL condition type</param>
         /// <returns></returns>
-        public SqlCondition Add(string fieldName, object value, ConditionOperator conditionOperator, ConditionType type = ConditionType.AND)
+        public SqlCondition Add(string fieldName, object value, ConditionOperator conditionOperator, ConditionType type)
         {
             if (IsDisposed)
             {
@@ -183,9 +202,20 @@ namespace Inertia.ORM
         /// <param name="fieldName">Field name to check</param>
         /// <param name="value1"></param>
         /// <param name="value2"></param>
+        /// <returns></returns>
+        public SqlCondition AddBetween(string fieldName, object value1, object value2)
+        {
+            return AddBetween(fieldName, value1, value2, ConditionType.AND);
+        }
+        /// <summary>
+        /// Add a SQL "BETWEEN" condition with specified parameters.
+        /// </summary>
+        /// <param name="fieldName">Field name to check</param>
+        /// <param name="value1"></param>
+        /// <param name="value2"></param>
         /// <param name="type">SQL condition type</param>
         /// <returns></returns>
-        public SqlCondition AddBetween(string fieldName, object value1, object value2, ConditionType type = ConditionType.AND)
+        public SqlCondition AddBetween(string fieldName, object value1, object value2, ConditionType type)
         {
             if (IsDisposed)
             {
@@ -199,7 +229,7 @@ namespace Inertia.ORM
 
             var pn1 = GetNextParamName();
             var pn2 = GetNextParamName();
-            
+
             _builder.Append($"{ fieldName } BETWEEN { pn1 } AND { pn2 }");
             _params.Add(pn1, value1);
             _params.Add(pn2, value2);
@@ -210,9 +240,18 @@ namespace Inertia.ORM
         /// Add a custom string condition (ex: "id >= 2 OR value >= 5") to the current instance.
         /// </summary>
         /// <param name="strQuery"></param>
+        /// <returns></returns>
+        public SqlCondition AddStringPattern(string strQuery)
+        {
+            return AddStringPattern(strQuery, ConditionType.AND);
+        }
+        /// <summary>
+        /// Add a custom string condition (ex: "id >= 2 OR value >= 5") to the current instance.
+        /// </summary>
+        /// <param name="strQuery"></param>
         /// <param name="type">SQL condition type</param>
         /// <returns></returns>
-        public SqlCondition AddStringPattern(string strQuery, ConditionType type = ConditionType.AND)
+        public SqlCondition AddStringPattern(string strQuery, ConditionType type)
         {
             if (IsDisposed)
             {
@@ -227,7 +266,7 @@ namespace Inertia.ORM
             _builder.Append(strQuery);
             return this;
         }
-        
+
         /// <summary>
         /// Add a SQL "ORDER BY" condition by ascending.
         /// </summary>

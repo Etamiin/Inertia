@@ -19,13 +19,6 @@ namespace Inertia
         public int Count { get; private set; }
 
         /// <summary>
-        /// Initialize a new instance of the class <see cref="ManualQueueExecutor"/>
-        /// </summary>
-        public ManualQueueExecutor()
-        {
-        }
-
-        /// <summary>
         /// Enqueue the specified actions at the end of the queue.
         /// </summary>
         /// <param name="actions"></param>

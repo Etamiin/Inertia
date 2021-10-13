@@ -77,6 +77,11 @@ namespace Inertia.Network
         /// <returns></returns>
         public static NetworkMessage CreateMessage(uint messageId)
         {
+            if (!_isDataLoaded)
+            {
+                SetProtocol(new DefaultNetworkProtocol());
+            }
+
             if (_messageTypes.ContainsKey(messageId))
             {
                 return CreateMessage(_messageTypes[messageId]);
@@ -91,6 +96,11 @@ namespace Inertia.Network
         /// <param name="message"></param>
         public static NetworkMessageCaller GetCaller(NetworkMessage message)
         {
+            if (!_isDataLoaded)
+            {
+                SetProtocol(new DefaultNetworkProtocol());
+            }
+
             _messageHookers.TryGetValue(message.GetType(), out NetworkMessageCaller caller);
             return caller;
         }
