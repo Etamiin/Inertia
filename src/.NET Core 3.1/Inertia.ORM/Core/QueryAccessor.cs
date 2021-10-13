@@ -13,17 +13,17 @@ namespace Inertia.ORM
     /// <typeparam name="DatabaseKey"></typeparam>
     public sealed class QueryAccessor<TableKey, DatabaseKey> where TableKey : Table where DatabaseKey : Database
     {
-        private DatabaseKey m_database;
+        private DatabaseKey _database;
 
         /// <summary>
         /// Initialize a new instance of the class <see cref="QueryAccessor{TableKey, DatabaseKey}"/>
         /// </summary>
         public QueryAccessor()
         {
-            SqlManager.TrySearchDatabase(out m_database);
+            SqlManager.TrySearchDatabase(out _database);
 
-            //if (!SqlManager.TrySearchDatabase(out m_database))
-            if (m_database == null)
+            //if (!SqlManager.TrySearchDatabase(out _database))
+            if (_database == null)
             {
                 throw new ArgumentNullException(typeof(DatabaseKey).Name, "Invalid Database for the QueryAccessor.");
             }
@@ -71,7 +71,7 @@ namespace Inertia.ORM
         /// <returns></returns>
         public TableKey Select(SqlCondition condition, bool distinct, params string[] columnsToSelect)
         {
-            return m_database.Select<TableKey>(condition, distinct, columnsToSelect);
+            return _database.Select<TableKey>(condition, distinct, columnsToSelect);
         }
 
         /// <summary>
@@ -116,7 +116,7 @@ namespace Inertia.ORM
         /// <returns></returns>
         public TableKey[] SelectAll(SqlCondition condition, bool distinct, params string[] columnsToSelect)
         {
-            return m_database.SelectAll<TableKey>(condition, distinct, columnsToSelect);
+            return _database.SelectAll<TableKey>(condition, distinct, columnsToSelect);
         }
 
 
@@ -128,55 +128,68 @@ namespace Inertia.ORM
         /// <returns></returns>
         public bool Delete(SqlCondition condition)
         {
-            return m_database.Delete<TableKey>(condition);
+            return _database.Delete<TableKey>(condition);
         }
         /// <summary>
         /// Delete all the elements from the specified <see cref="Table"/>
         /// </summary>
-        /// <typeparam name="TableKey"></typeparam>
         /// <returns></returns>
         public bool DeleteAll()
         {
-            return m_database.DeleteAll<TableKey>();
+            return _database.DeleteAll<TableKey>();
         }
 
         /// <summary>
         /// Update all the elements in the specified <see cref="Table"/> with the reference's values
         /// </summary>
-        /// <typeparam name="TableKey"></typeparam>
         /// <param name="reference"></param>
         /// <param name="columnsToUpdate"></param>
         /// <returns></returns>
         public bool UpdateAll(TableKey reference, params string[] columnsToUpdate)
         {
-            return m_database.UpdateAll(reference, columnsToUpdate);
+            return _database.UpdateAll(reference, columnsToUpdate);
         }
 
         /// <summary>
         /// Execute a COUNT query with the specified parameters and return the result.
         /// </summary>
-        /// <typeparam name="TableKey"></typeparam>
+        /// <returns></returns>
+        public long Count()
+        {
+            return Count(string.Empty, null, false);
+        }
+        /// <summary>
+        /// Execute a COUNT query with the specified parameters and return the result.
+        /// </summary>
         /// <param name="distinct"></param>
         /// <returns></returns>
-        public long Count(bool distinct = false)
+        public long Count(bool distinct)
         {
             return Count(string.Empty, null, distinct);
         }
         /// <summary>
         /// Execute a COUNT query with the specified parameters and return the result.
         /// </summary>
-        /// <typeparam name="TableKey"></typeparam>
         /// <param name="condition"></param>
         /// <param name="distinct"></param>
         /// <returns></returns>
-        public long Count(SqlCondition condition, bool distinct = false)
+        public long Count(SqlCondition condition)
+        {
+            return Count(string.Empty, condition, false);
+        }
+        /// <summary>
+        /// Execute a COUNT query with the specified parameters and return the result.
+        /// </summary>
+        /// <param name="condition"></param>
+        /// <param name="distinct"></param>
+        /// <returns></returns>
+        public long Count(SqlCondition condition, bool distinct)
         {
             return Count(string.Empty, condition, distinct);
         }
         /// <summary>
         /// Execute a COUNT query with the specified parameters and return the result.
         /// </summary>
-        /// <typeparam name="TableKey"></typeparam>
         /// <param name="distinct"></param>
         /// <param name="columnName"></param>
         /// <returns></returns>
@@ -187,32 +200,39 @@ namespace Inertia.ORM
         /// <summary>
         /// Execute a COUNT query with the specified parameters and return the result.
         /// </summary>
-        /// <typeparam name="TableKey"></typeparam>
+        /// <param name="columnName"></param>
+        /// <param name="condition"></param>
+        /// <returns></returns>
+        public long Count(string columnName, SqlCondition condition)
+        {
+            return _database.Count<TableKey>(columnName, condition, false);
+        }
+        /// <summary>
+        /// Execute a COUNT query with the specified parameters and return the result.
+        /// </summary>
         /// <param name="distinct"></param>
         /// <param name="columnName"></param>
         /// <param name="condition"></param>
         /// <returns></returns>
-        public long Count(string columnName, SqlCondition condition, bool distinct = false)
+        public long Count(string columnName, SqlCondition condition, bool distinct)
         {
-            return m_database.Count<TableKey>(columnName, condition, distinct);
+            return _database.Count<TableKey>(columnName, condition, distinct);
         }
 
         /// <summary>
         /// Return true if a row exist in the database based on the specified conditions
         /// </summary>
-        /// <typeparam name="TableKey"></typeparam>
         /// <param name="condition"></param>
         /// <param name="distinct"></param>
         /// <returns></returns>
         public bool Exist(SqlCondition condition, bool distinct = false)
         {
-            return m_database.Count<TableKey>(condition, distinct) > 0;
+            return _database.Count<TableKey>(condition, distinct) > 0;
         }
 
         /// <summary>
         /// 
         /// </summary>
-        /// <typeparam name="TableKey"></typeparam>
         /// <param name="columnName"></param>
         /// <returns></returns>
         public long Average(string columnName)
@@ -222,19 +242,17 @@ namespace Inertia.ORM
         /// <summary>
         /// 
         /// </summary>
-        /// <typeparam name="TableKey"></typeparam>
         /// <param name="columnName"></param>
         /// <param name="condition"></param>
         /// <returns></returns>
         public long Average(string columnName, SqlCondition condition)
         {
-            return m_database.Average<TableKey>(columnName, condition);
+            return _database.Average<TableKey>(columnName, condition);
         }
 
         /// <summary>
         /// 
         /// </summary>
-        /// <typeparam name="TableKey"></typeparam>
         /// <param name="columnName"></param>
         /// <returns></returns>
         public TableKey Max(string columnName)
@@ -244,19 +262,17 @@ namespace Inertia.ORM
         /// <summary>
         /// 
         /// </summary>
-        /// <typeparam name="TableKey"></typeparam>
         /// <param name="columnName"></param>
         /// <param name="condition"></param>
         /// <returns></returns>
         public TableKey Max(string columnName, SqlCondition condition)
         {
-            return m_database.Max<TableKey>(columnName, condition);
+            return _database.Max<TableKey>(columnName, condition);
         }
 
         /// <summary>
         /// 
         /// </summary>
-        /// <typeparam name="TableKey"></typeparam>
         /// <param name="columnName"></param>
         /// <returns></returns>
         public TableKey Min(string columnName)
@@ -266,19 +282,17 @@ namespace Inertia.ORM
         /// <summary>
         /// 
         /// </summary>
-        /// <typeparam name="TableKey"></typeparam>
         /// <param name="columnName"></param>
         /// <param name="condition"></param>
         /// <returns></returns>
         public TableKey Min(string columnName, SqlCondition condition)
         {
-            return m_database.Min<TableKey>(columnName, condition);
+            return _database.Min<TableKey>(columnName, condition);
         }
 
         /// <summary>
         /// 
         /// </summary>
-        /// <typeparam name="TableKey"></typeparam>
         /// <param name="columnName"></param>
         /// <returns></returns>
         public decimal Sum(string columnName)
@@ -288,13 +302,12 @@ namespace Inertia.ORM
         /// <summary>
         /// 
         /// </summary>
-        /// <typeparam name="TableKey"></typeparam>
         /// <param name="columnName"></param>
         /// <param name="condition"></param>
         /// <returns></returns>
         public decimal Sum(string columnName, SqlCondition condition)
         {
-            return m_database.Sum<TableKey>(columnName, condition);
+            return _database.Sum<TableKey>(columnName, condition);
         }
 
         /// <summary>
@@ -336,7 +349,7 @@ namespace Inertia.ORM
         public void SelectAsync(SqlCondition condition, BasicAction<TableKey> onSelected, bool distinct, params string[] columnsToSelect)
         {
             SqlManager.EnqueueAsyncOperation(() => {
-                var table = m_database.Select<TableKey>(condition, distinct, columnsToSelect);
+                var table = _database.Select<TableKey>(condition, distinct, columnsToSelect);
                 onSelected?.Invoke(table);
             });
         }
@@ -380,7 +393,7 @@ namespace Inertia.ORM
         public void SelectAllAsync(SqlCondition condition, BasicAction<TableKey[]> onSelected, bool distinct, params string[] columnsToSelect)
         {
             SqlManager.EnqueueAsyncOperation(() => {
-                var tables = m_database.SelectAll<TableKey>(condition, distinct, columnsToSelect);
+                var tables = _database.SelectAll<TableKey>(condition, distinct, columnsToSelect);
                 onSelected?.Invoke(tables);
             });
         }
@@ -393,7 +406,7 @@ namespace Inertia.ORM
         public void DeleteAsync(SqlCondition condition, BasicAction onDeleted)
         {
             SqlManager.EnqueueAsyncOperation(() => {
-                var deleted = m_database.Delete<TableKey>(condition);
+                var deleted = _database.Delete<TableKey>(condition);
                 if (deleted)
                 {
                     onDeleted?.Invoke();
@@ -407,7 +420,7 @@ namespace Inertia.ORM
         public void DeleteAllAsync(BasicAction onDeleted)
         {
             SqlManager.EnqueueAsyncOperation(() => {
-                var deleted = m_database.DeleteAll<TableKey>();
+                var deleted = _database.DeleteAll<TableKey>();
                 if (deleted)
                 {
                     onDeleted?.Invoke();
@@ -424,7 +437,7 @@ namespace Inertia.ORM
         public void UpdateAllAsync(TableKey reference, BasicAction onUpdated, params string[] columnsToUpdate)
         {
             SqlManager.EnqueueAsyncOperation(() => {
-                var updated = m_database.UpdateAll(reference, columnsToUpdate);
+                var updated = _database.UpdateAll(reference, columnsToUpdate);
                 if (updated)
                 {
                     onUpdated?.Invoke();
@@ -471,7 +484,7 @@ namespace Inertia.ORM
         public void CountAsync(string columnName, SqlCondition condition, BasicAction<long> onCounted, bool distinct = false)
         {
             SqlManager.EnqueueAsyncOperation(() => {
-                var count = m_database.Count<TableKey>(columnName, condition, distinct);
+                var count = _database.Count<TableKey>(columnName, condition, distinct);
                 onCounted?.Invoke(count);
             });
         }
@@ -485,7 +498,7 @@ namespace Inertia.ORM
         public void ExistAsync(SqlCondition condition, BasicAction<bool> onExist, bool distinct = false)
         {
             SqlManager.EnqueueAsyncOperation(() => {
-                var count = m_database.Count<TableKey>(condition, distinct);
+                var count = _database.Count<TableKey>(condition, distinct);
                 onExist?.Invoke(count > 0);
             });
         }
@@ -508,7 +521,7 @@ namespace Inertia.ORM
         public void AverageAsync(string columnName, SqlCondition condition, BasicAction<long> onAverage)
         {
             SqlManager.EnqueueAsyncOperation(() => {
-                var average = m_database.Average<TableKey>(columnName, condition);
+                var average = _database.Average<TableKey>(columnName, condition);
                 onAverage?.Invoke(average);
             });
         }
@@ -531,7 +544,7 @@ namespace Inertia.ORM
         public void MaxAsync(string columnName, SqlCondition condition, BasicAction<TableKey> onMax)
         {
             SqlManager.EnqueueAsyncOperation(() => {
-                var max = m_database.Max<TableKey>(columnName, condition);
+                var max = _database.Max<TableKey>(columnName, condition);
                 onMax?.Invoke(max);
             });            
         }
@@ -554,7 +567,7 @@ namespace Inertia.ORM
         public void MinAsync(string columnName, SqlCondition condition, BasicAction<TableKey> onMin)
         {
             SqlManager.EnqueueAsyncOperation(() => {
-                var min = m_database.Min<TableKey>(columnName, condition);
+                var min = _database.Min<TableKey>(columnName, condition);
                 onMin?.Invoke(min);
             });            
         }
@@ -577,7 +590,7 @@ namespace Inertia.ORM
         public void SumAsync(string columnName, SqlCondition condition, BasicAction<decimal> onSum)
         {
             SqlManager.EnqueueAsyncOperation(() => {
-                var sum = m_database.Sum<TableKey>(columnName, condition);
+                var sum = _database.Sum<TableKey>(columnName, condition);
                 onSum?.Invoke(sum);
             });            
         }

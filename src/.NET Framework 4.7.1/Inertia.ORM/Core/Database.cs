@@ -35,14 +35,14 @@ namespace Inertia.ORM
         /// </summary>
         public virtual MySqlSslMode Ssl { get; } = MySqlSslMode.None;
 
-        private string m_connectionString;
+        private readonly string _connectionString;
 
         /// <summary>
         /// Initialize a new instance of class <see cref="Database"/>
         /// </summary>
         public Database()
         {
-            m_connectionString = $"server={ Host.Replace("localhost", "127.0.0.1") };uid={ User };pwd={ Password };database={ Name };port={ Port };SslMode={ Ssl }";
+            _connectionString = $"server={ Host.Replace("localhost", "127.0.0.1") };uid={ User };pwd={ Password };database={ Name };port={ Port };SslMode={ Ssl }";
         }
 
         internal void TryCreateItSelf()
@@ -62,7 +62,7 @@ namespace Inertia.ORM
         {
             try
             {
-                var conn = new MySqlConnection(m_connectionString);
+                var conn = new MySqlConnection(_connectionString);
                 conn.Open();
 
                 return conn;
@@ -393,9 +393,18 @@ namespace Inertia.ORM
         /// Execute a COUNT query with the specified parameters and return the result.
         /// </summary>
         /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public long Count<T>() where T : Table
+        {
+            return Count<T>(string.Empty, null, false);
+        }
+        /// <summary>
+        /// Execute a COUNT query with the specified parameters and return the result.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
         /// <param name="distinct"></param>
         /// <returns></returns>
-        public long Count<T>(bool distinct = false) where T : Table
+        public long Count<T>(bool distinct) where T : Table
         {
             return Count<T>(string.Empty, null, distinct);
         }
@@ -404,11 +413,31 @@ namespace Inertia.ORM
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="condition"></param>
+        /// <returns></returns>
+        public long Count<T>(SqlCondition condition) where T : Table
+        {
+            return Count<T>(string.Empty, condition, false);
+        }
+        /// <summary>
+        /// Execute a COUNT query with the specified parameters and return the result.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="condition"></param>
         /// <param name="distinct"></param>
         /// <returns></returns>
-        public long Count<T>(SqlCondition condition, bool distinct = false) where T : Table
+        public long Count<T>(SqlCondition condition, bool distinct) where T : Table
         {
             return Count<T>(string.Empty, condition, distinct);
+        }
+        /// <summary>
+        /// Execute a COUNT query with the specified parameters and return the result.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="columnName"></param>
+        /// <returns></returns>
+        public long Count<T>(string columnName) where T : Table
+        {
+            return Count<T>(columnName, null, false);
         }
         /// <summary>
         /// Execute a COUNT query with the specified parameters and return the result.
@@ -417,9 +446,20 @@ namespace Inertia.ORM
         /// <param name="distinct"></param>
         /// <param name="columnName"></param>
         /// <returns></returns>
-        public long Count<T>(string columnName, bool distinct = false) where T : Table
+        public long Count<T>(string columnName, bool distinct) where T : Table
         {
             return Count<T>(columnName, null, distinct);
+        }
+        /// <summary>
+        /// Execute a COUNT query with the specified parameters and return the result.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="columnName"></param>
+        /// <param name="condition"></param>
+        /// <returns></returns>
+        public long Count<T>(string columnName, SqlCondition condition) where T : Table
+        {
+            return Count<T>(columnName, condition, false);
         }
         /// <summary>
         /// Execute a COUNT query with the specified parameters and return the result.
@@ -429,7 +469,7 @@ namespace Inertia.ORM
         /// <param name="columnName"></param>
         /// <param name="condition"></param>
         /// <returns></returns>
-        public long Count<T>(string columnName, SqlCondition condition, bool distinct = false) where T : Table
+        public long Count<T>(string columnName, SqlCondition condition, bool distinct) where T : Table
         {
             if (SqlManager.CreateTableInstance(out T table))
             {
@@ -455,9 +495,19 @@ namespace Inertia.ORM
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="condition"></param>
+        /// <returns></returns>
+        public bool Exist<T>(SqlCondition condition) where T : Table
+        {
+            return Count<T>(condition, false) > 0;
+        }
+        /// <summary>
+        /// Return true if a row exist in the database based on the specified conditions
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="condition"></param>
         /// <param name="distinct"></param>
         /// <returns></returns>
-        public bool Exist<T>(SqlCondition condition, bool distinct = false) where T : Table
+        public bool Exist<T>(SqlCondition condition, bool distinct) where T : Table
         {
             return Count<T>(condition, distinct) > 0;
         }

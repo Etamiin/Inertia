@@ -92,7 +92,7 @@ namespace Inertia.Network
             {
                 if (data.Length > ushort.MaxValue)
                 {
-                    throw new UserDatagramDataLengthLimitException(data.Length);
+                    throw new UserDatagramDataLengthLimitException();
                 }
 
                 _client?.SendAsync(data, data.Length);

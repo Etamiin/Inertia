@@ -9,9 +9,9 @@ namespace Inertia.Runtime
     {
         internal static bool IsManuallyRunned { get; set; }
 
-        internal static event BasicAction UpdatingSiT = () => { };
-        private static event BasicAction Updating = () => { };
-        private static event BasicAction Destroying = () => { };
+        internal static event BasicAction UpdatingSiT;
+        private static event BasicAction Updating;
+        private static event BasicAction Destroying;
 
         private static bool _isInitialized;
 

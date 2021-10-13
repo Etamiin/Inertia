@@ -3,23 +3,17 @@
 namespace Inertia.ORM
 {
     /// <summary>
-    /// Throw when failed to connect to a <see cref="Database"/>
+    /// Throw when failed to connect to a <see cref="_database"/>
     /// </summary>
     public class DatabaseConnectionFailedException : Exception
     {
         /// <summary>
         ///
         /// </summary>
-        public override string Message => $"Can't connect to database '{ Database.Name }'. Invalid credentials?";
+        public override string Message => $"Can't connect to database '{ _database.Name }': { _exception }";
 
-        /// <summary>
-        /// Database that throwed the exception
-        /// </summary>
-        public readonly Database Database;
-        /// <summary>
-        /// 
-        /// </summary>
-        public readonly Exception Exception;
+        private readonly Database _database;
+        private readonly Exception _exception;
 
         /// <summary>
         /// Instantiante a new instance of the class <see cref="DatabaseConnectionFailedException"/>
@@ -28,8 +22,8 @@ namespace Inertia.ORM
         /// <param name="ex"></param>
         public DatabaseConnectionFailedException(Database database, Exception ex)
         {
-            Database = database;
-            Exception = ex;
+            _database = database;
+            _exception = ex;
         }
     }
 }

@@ -12,10 +12,7 @@ namespace Inertia.ORM
         /// </summary>
         public override string Message => ExMessage;
 
-        /// <summary>
-        ///
-        /// </summary>
-        public readonly string ExMessage;
+        private readonly string ExMessage;
 
         /// <summary>
         /// Instantiate a new instance of the class <see cref="InitializationFailedException"/>

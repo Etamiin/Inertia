@@ -15,9 +15,18 @@ namespace Inertia
         /// Execute a HTTP GET request with specified parameters and return the string response.
         /// </summary>
         /// <param name="uriRequest"></param>
+        /// <returns></returns>
+        public static string GetRequest(Uri uriRequest)
+        {
+            return GetRequest(uriRequest, null);
+        }
+        /// <summary>
+        /// Execute a HTTP GET request with specified parameters and return the string response.
+        /// </summary>
+        /// <param name="uriRequest"></param>
         /// <param name="parameters"></param>
         /// <returns></returns>
-        public static string GetRequest(Uri uriRequest, RequestParameters parameters = null)
+        public static string GetRequest(Uri uriRequest, RequestParameters parameters)
         {
             try
             {
@@ -46,6 +55,17 @@ namespace Inertia
         /// <param name="callback"></param>
         /// <param name="parameters"></param>
         /// <returns></returns>
+        public static void GetRequestAsync(Uri uriRequest, BasicAction<string> callback)
+        {
+            Task.Factory.StartNew(() => callback?.Invoke(GetRequest(uriRequest, null)));
+        }
+        /// <summary>
+        /// Execute a HTTP GET request asynchronously.
+        /// </summary>
+        /// <param name="uriRequest"></param>
+        /// <param name="callback"></param>
+        /// <param name="parameters"></param>
+        /// <returns></returns>
         public static void GetRequestAsync(Uri uriRequest, BasicAction<string> callback, RequestParameters parameters = null)
         {
             Task.Factory.StartNew(() => callback?.Invoke(GetRequest(uriRequest, parameters)));
@@ -54,9 +74,18 @@ namespace Inertia
         /// Execute a HTTP GET request and return the data response.
         /// </summary>
         /// <param name="uriRequest"></param>
+        /// <returns></returns>
+        public static byte[] GetRequestData(Uri uriRequest)
+        {
+            return GetRequestData(uriRequest, null);
+        }
+        /// <summary>
+        /// Execute a HTTP GET request and return the data response.
+        /// </summary>
+        /// <param name="uriRequest"></param>
         /// <param name="parameters"></param>
         /// <returns></returns>
-        public static byte[] GetRequestData(Uri uriRequest, RequestParameters parameters = null)
+        public static byte[] GetRequestData(Uri uriRequest, RequestParameters parameters)
         {
             try
             {
@@ -93,20 +122,40 @@ namespace Inertia
         /// <param name="callback"></param>
         /// <param name="parameters"></param>
         /// <returns></returns>
-        public static void GetRequestDataAsync(Uri uriRequest, BasicAction<byte[]> callback, RequestParameters parameters = null)
+        public static void GetRequestDataAsync(Uri uriRequest, BasicAction<byte[]> callback)
         {
-            Task.Factory.StartNew(() => callback?.Invoke(GetRequestData(uriRequest)));
+            Task.Factory.StartNew(() => callback?.Invoke(GetRequestData(uriRequest, null)));
+        }
+        /// <summary>
+        /// Execute a HTTP GET request asynchronously.
+        /// </summary>
+        /// <param name="uriRequest"></param>
+        /// <param name="callback"></param>
+        /// <param name="parameters"></param>
+        /// <returns></returns>
+        public static void GetRequestDataAsync(Uri uriRequest, BasicAction<byte[]> callback, RequestParameters parameters)
+        {
+            Task.Factory.StartNew(() => callback?.Invoke(GetRequestData(uriRequest, parameters)));
         }
 
         /// <summary>
         /// Execute a HTTP POST request with specified parameters and return the string response.
         /// </summary>
         /// <param name="uriRequest"></param>
-        /// <param name="parameters"></param>
         /// <returns></returns>
-        public static string PostRequest(Uri uriRequest, RequestParameters parameters = null)
+        public static string PostRequest(Uri uriRequest)
         {
-            return PostRequest(uriRequest, data: "", parameters);
+            return PostRequest(uriRequest, data: string.Empty, null);
+        }
+        /// <summary>
+        /// Execute a HTTP POST request with specified parameters and return the string response.
+        /// </summary>
+        /// <param name="uriRequest"></param>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public static string PostRequest(Uri uriRequest, string data)
+        {
+            return PostRequest(uriRequest, data: data, null);
         }
         /// <summary>
         /// Execute a HTTP POST request with specified parameters and return the string response.
@@ -115,7 +164,7 @@ namespace Inertia
         /// <param name="data"></param>
         /// <param name="parameters"></param>
         /// <returns></returns>
-        public static string PostRequest(Uri uriRequest, string data, RequestParameters parameters = null)
+        public static string PostRequest(Uri uriRequest, string data, RequestParameters parameters)
         {
             try
             {
@@ -157,9 +206,19 @@ namespace Inertia
         /// </summary>
         /// <param name="uriRequest"></param>
         /// <param name="data"></param>
+        /// <returns></returns>
+        public static byte[] PostRequestData(Uri uriRequest, string data)
+        {
+            return PostRequestData(uriRequest, data, null);
+        }
+        /// <summary>
+        /// Execute a HTTP POST request and return the data response.
+        /// </summary>
+        /// <param name="uriRequest"></param>
+        /// <param name="data"></param>
         /// <param name="parameters"></param>
         /// <returns></returns>
-        public static byte[] PostRequestData(Uri uriRequest, string data, RequestParameters parameters = null)
+        public static byte[] PostRequestData(Uri uriRequest, string data, RequestParameters parameters)
         {
             try
             {
@@ -206,11 +265,10 @@ namespace Inertia
         /// <param name="uriRequest"></param>
         /// <param name="data"></param>
         /// <param name="callback"></param>
-        /// <param name="parameters"></param>
         /// <returns></returns>
-        public static void PostRequestAsync(Uri uriRequest, string data, BasicAction<string> callback, RequestParameters parameters = null)
+        public static void PostRequestAsync(Uri uriRequest, string data, BasicAction<string> callback)
         {
-            Task.Factory.StartNew(() => callback?.Invoke(PostRequest(uriRequest, data, parameters)));
+            Task.Factory.StartNew(() => callback?.Invoke(PostRequest(uriRequest, data, null)));
         }
         /// <summary>
         /// Execute a HTTP POST request asynchronously.
@@ -220,7 +278,30 @@ namespace Inertia
         /// <param name="callback"></param>
         /// <param name="parameters"></param>
         /// <returns></returns>
-        public static void PostRequestDataAsync(Uri uriRequest, string data, BasicAction<byte[]> callback, RequestParameters parameters = null)
+        public static void PostRequestAsync(Uri uriRequest, string data, BasicAction<string> callback, RequestParameters parameters)
+        {
+            Task.Factory.StartNew(() => callback?.Invoke(PostRequest(uriRequest, data, parameters)));
+        }
+        /// <summary>
+        /// Execute a HTTP POST request asynchronously.
+        /// </summary>
+        /// <param name="uriRequest"></param>
+        /// <param name="data"></param>
+        /// <param name="callback"></param>
+        /// <returns></returns>
+        public static void PostRequestDataAsync(Uri uriRequest, string data, BasicAction<byte[]> callback)
+        {
+            Task.Factory.StartNew(() => callback?.Invoke(PostRequestData(uriRequest, data, null)));
+        }
+        /// <summary>
+        /// Execute a HTTP POST request asynchronously.
+        /// </summary>
+        /// <param name="uriRequest"></param>
+        /// <param name="data"></param>
+        /// <param name="callback"></param>
+        /// <param name="parameters"></param>
+        /// <returns></returns>
+        public static void PostRequestDataAsync(Uri uriRequest, string data, BasicAction<byte[]> callback, RequestParameters parameters)
         {
             Task.Factory.StartNew(() => callback?.Invoke(PostRequestData(uriRequest, data, parameters)));
         }

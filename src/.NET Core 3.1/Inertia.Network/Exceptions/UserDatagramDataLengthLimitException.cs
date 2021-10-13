@@ -15,25 +15,17 @@ namespace Inertia.Network
         /// Message of the exception
         /// </summary>
         public override string Message => GetMessage();
-        /// <summary>
-        /// Length of bytes trying to sent
-        /// </summary>
-        public readonly int Length;
 
         /// <summary>
         /// Instantiate a new instance of the class <see cref="UserDatagramDataLengthLimitException"/>
         /// </summary>
-        /// <param name="length"></param>
-        public UserDatagramDataLengthLimitException(int length)
+        public UserDatagramDataLengthLimitException()
         {
-            Length = length;
         }
 
         private string GetMessage()
         {
-            return
-                "You can't send more than " + ushort.MaxValue + " bytes from user datagram networking.\n" +
-                "Trying to send " + Length + " bytes.";
+            return $"You can't send more than { ushort.MaxValue } bytes from user datagram networking.";
         }
     }
 }

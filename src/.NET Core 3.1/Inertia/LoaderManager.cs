@@ -93,7 +93,9 @@ namespace Inertia
                             {
                                 var inertiaCommand = (TextCommand)type.GetConstructor(Type.EmptyTypes).Invoke(new object[] { });
                                 if (!Commands.ContainsKey(inertiaCommand.Name))
+                                {
                                     Commands.Add(inertiaCommand.Name, inertiaCommand);
+                                }
                             }
                         }
                     }

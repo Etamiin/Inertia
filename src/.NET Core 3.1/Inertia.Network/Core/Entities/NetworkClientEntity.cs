@@ -11,11 +11,11 @@ namespace Inertia.Network
         /// <summary>
         /// Occurs when the client is connected.
         /// </summary>
-        public event BasicAction Connected = () => { };
+        public event BasicAction Connected;
         /// <summary>
         /// Occurs when the client is disconnected.
         /// </summary>
-        public event NetworkDisconnectHandler Disconnected = (reason) => { };
+        public event NetworkDisconnectHandler Disconnected;
 
         /// <summary>
         /// Returns true if the current instance is disposed
@@ -31,7 +31,7 @@ namespace Inertia.Network
         /// </summary>
         /// <param name="ip"></param>
         /// <param name="port"></param>
-        public NetworkClientEntity(string ip, int port)
+        protected NetworkClientEntity(string ip, int port)
         {
             _targetIp = ip.Replace("localhost", "127.0.0.1");
             _targetPort = port;
@@ -60,7 +60,7 @@ namespace Inertia.Network
         /// Terminate the connection with the indicated reason.
         /// </summary>
         /// <param name="reason"></param>
-        public abstract void Disconnect(NetworkDisconnectReason reason = NetworkDisconnectReason.Manual);
+        public abstract void Disconnect(NetworkDisconnectReason reason);
 
         /// <summary>
         /// Sends the indicated data through the current connection.
@@ -72,7 +72,7 @@ namespace Inertia.Network
         /// </summary>
         public void ConnectAsync()
         {
-            Task.Factory.StartNew(() => Connect());
+            Task.Factory.StartNew(Connect);
         }
         /// <summary>
         /// Sends the specified NetworkMessage through the current connection.

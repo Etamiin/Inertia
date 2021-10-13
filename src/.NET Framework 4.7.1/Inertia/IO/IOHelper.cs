@@ -91,9 +91,18 @@ namespace Inertia
         /// Returns the SHA256 representation of the specified <see cref="FileStream"/>.
         /// </summary>
         /// <param name="stream"></param>
+        /// <returns></returns>
+        public static string GetSHA256(FileStream stream)
+        {
+            return GetSHA256(stream, ushort.MaxValue);
+        }
+        /// <summary>
+        /// Returns the SHA256 representation of the specified <see cref="FileStream"/>.
+        /// </summary>
+        /// <param name="stream"></param>
         /// <param name="bufferLength"></param>
         /// <returns></returns>
-        public static string GetSHA256(FileStream stream, int bufferLength = ushort.MaxValue)
+        public static string GetSHA256(FileStream stream, int bufferLength)
         {
             using (stream)
             {
@@ -125,7 +134,7 @@ namespace Inertia
         /// <param name="data"></param>
         /// <param name="hasBetterSize">Returns true if the returned data is lower in length than the non-compressed data</param>
         /// <returns></returns>
-        public static byte[] GzipCompress(byte[] data, out bool hasBetterSize)
+        public static byte[] GzipCompress(ref byte[] data, out bool hasBetterSize)
         {
             using (var ms = new MemoryStream())
             {
@@ -145,7 +154,7 @@ namespace Inertia
         /// </summary>
         /// <param name="compressedData"></param>
         /// <returns></returns>
-        public static byte[] GzipDecompress(byte[] compressedData)
+        public static byte[] GzipDecompress(ref byte[] compressedData)
         {
             using (var cms = new MemoryStream(compressedData))
             {

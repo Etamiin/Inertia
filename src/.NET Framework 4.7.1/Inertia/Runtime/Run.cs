@@ -23,10 +23,14 @@ namespace Inertia.Runtime
             /// </summary>
             public bool IsRunning { get; set; }
 
-            private BasicAction<ExecuteScriptIn> _action;
-            private float _time, _currentTime, _totalTime;
+            private readonly BasicAction<ExecuteScriptIn> _action;
+            private readonly float _time;
+            private float _currentTime, _totalTime;
 
-            internal ExecuteScriptIn(float time, BasicAction<ExecuteScriptIn> action, bool permanent = false)
+            internal ExecuteScriptIn(float time, BasicAction<ExecuteScriptIn> action) : this(time, action, false)
+            {
+            }
+            internal ExecuteScriptIn(float time, BasicAction<ExecuteScriptIn> action, bool permanent)
             {
                 _action = action;
                 _time = time;
@@ -112,9 +116,19 @@ namespace Inertia.Runtime
         /// </summary>
         /// <param name="delayInSeconds"></param>
         /// <param name="callback"></param>
+        /// <returns></returns>
+        public static ExecuteScriptIn Delayed(float delayInSeconds, BasicAction<ExecuteScriptIn> callback)
+        {
+            return new ExecuteScriptIn(delayInSeconds, callback);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="delayInSeconds"></param>
+        /// <param name="callback"></param>
         /// <param name="permanent"></param>
         /// <returns></returns>
-        public static ExecuteScriptIn Delayed(float delayInSeconds, BasicAction<ExecuteScriptIn> callback, bool permanent = false)
+        public static ExecuteScriptIn Delayed(float delayInSeconds, BasicAction<ExecuteScriptIn> callback, bool permanent)
         {
             return new ExecuteScriptIn(delayInSeconds, callback, permanent);
         }

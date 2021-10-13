@@ -11,14 +11,14 @@ namespace Inertia.ORM
     /// </summary>
     public static class SqlManager
     {
-        private static Dictionary<string, Database> m_databases;
+        private static Dictionary<string, Database> _databases;
 
-        private static bool m_initialized;
-        private static AutoQueueExecutor m_queue;
+        private static bool _initialized;
+        private static AutoQueueExecutor _queue;
 
         internal static void EnqueueAsyncOperation(BasicAction action)
         {
-            m_queue.Enqueue(action);
+            _queue.Enqueue(action);
         }
 
         /// <summary>
@@ -31,7 +31,7 @@ namespace Inertia.ORM
         {
             Initialize();
 
-            return m_databases.TryGetValue(name, out database);
+            return _databases.TryGetValue(name, out database);
         }
         /// <summary>
         /// Returns a <typeparamref name="T"/> already registered.
@@ -56,7 +56,7 @@ namespace Inertia.ORM
         {
             Initialize();
 
-            database = m_databases.Values.FirstOrDefault((db) => db.GetType() == databaseType);
+            database = _databases.Values.FirstOrDefault((db) => db.GetType() == databaseType);
             return database != null;
         }
 
@@ -75,20 +75,20 @@ namespace Inertia.ORM
 
         private static void Initialize()
         {
-            if (m_initialized)
+            if (_initialized)
             {
                 return;
             }
 
-            m_initialized = true;
+            _initialized = true;
 
-            if (m_databases == null)
+            if (_databases == null)
             {
-                m_databases = new Dictionary<string, Database>();
+                _databases = new Dictionary<string, Database>();
             }
-            if (m_queue == null)
+            if (_queue == null)
             {
-                m_queue = new AutoQueueExecutor();
+                _queue = new AutoQueueExecutor();
             }
 
             var uTables = new Dictionary<string, List<Type>>();
@@ -109,13 +109,13 @@ namespace Inertia.ORM
                         if (type.IsSubclassOf(typeof(Database)))
                         {
                             var db = (Database)Activator.CreateInstance(type);
-                            if (m_databases.ContainsKey(db.Name))
+                            if (_databases.ContainsKey(db.Name))
                             {
                                 throw new DatabaseAlreadyInitializedException(db.Name);
                             }
 
                             db.TryCreateItSelf();
-                            m_databases.Add(db.Name, db);
+                            _databases.Add(db.Name, db);
                         }
                         else if (type.IsSubclassOf(typeof(Table)))
                         {
@@ -130,7 +130,7 @@ namespace Inertia.ORM
                                     }
                                     else
                                     {
-                                        uTables.Add(attachTo.DatabaseName, new List<Type>() { type });
+                                        uTables.Add(attachTo.DatabaseName, new List<Type> { type });
                                     }
                                 }
                                 else if (attachTo.DatabaseType != null)
@@ -141,7 +141,7 @@ namespace Inertia.ORM
                                     }
                                     else
                                     {
-                                        utTables.Add(attachTo.DatabaseType, new List<Type>() { type });
+                                        utTables.Add(attachTo.DatabaseType, new List<Type> { type });
                                     }
                                 }
                             }
@@ -185,7 +185,7 @@ namespace Inertia.ORM
             }
             catch (Exception ex)
             {
-                m_databases.Clear();
+                _databases.Clear();
                 throw new InitializationFailedException(ex.ToString());
             }
         }
@@ -210,13 +210,13 @@ namespace Inertia.ORM
 
             command.Prepare();
         }
-        internal static void OnReader(this MySqlCommand command, BasicAction<MySqlDataReader> onReader)
+        internal static void OnReader(this MySqlCommand command, BasicAction<MySqlDataReader> readerCallback)
         {
             using (var reader = command.ExecuteReader())
             {
                 while (reader.Read())
                 {
-                    onReader(reader);
+                    readerCallback(reader);
                 }
             }
         }

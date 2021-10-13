@@ -16,8 +16,14 @@ namespace Inertia.ORM
         /// <summary>
         /// Instantiate a new instance of the class <see cref="NotNull"/>
         /// </summary>
+        public NotNull()
+        {
+        }
+        /// <summary>
+        /// Instantiate a new instance of the class <see cref="NotNull"/>
+        /// </summary>
         /// <param name="unique">Add unique statement to the field ?</param>
-        public NotNull(bool unique = false)
+        public NotNull(bool unique)
         {
             Unique = unique;
         }

@@ -8,7 +8,7 @@ namespace Inertia.Network
     /// </summary>
     public sealed class TcpConnectionEntity : NetworkConnectionEntity
     {
-        internal event NetworkDisconnectHandler Disconnected = (reason) => { };
+        internal event NetworkDisconnectHandler Disconnected;
 
         /// <summary>
         /// Returns true if the connection is active otherwise false.
@@ -94,7 +94,7 @@ namespace Inertia.Network
         {
             if (disposing)
             {
-                Disconnect(NetworkDisconnectReason.Manual);
+                Disconnect();
                 Disconnected = null;
             }
 

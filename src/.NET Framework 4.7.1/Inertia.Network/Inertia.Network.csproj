@@ -60,7 +60,6 @@
     <Compile Include="Exceptions\DefaultProtocolFailedParseNetworkMessageException.cs" />
     <Compile Include="Exceptions\UnknownMessageException.cs" />
     <Compile Include="Exceptions\UserDatagramDataLengthLimitException.cs" />
-    <Compile Include="LoaderManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

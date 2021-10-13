@@ -25,7 +25,7 @@ namespace Inertia
             }
         }
 
-        private Queue<BasicAction> _queue;
+        private readonly Queue<BasicAction> _queue;
 
         /// <summary>
         /// Initialize a new instance of the class <see cref="AutoQueueExecutor"/>

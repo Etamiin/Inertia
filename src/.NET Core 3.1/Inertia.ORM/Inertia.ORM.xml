@@ -36,11 +36,6 @@
             Represent the state that will automatically create all tables in a <see cref="T:Inertia.ORM.Database"/>
             </summary>
         </member>
-        <member name="M:Inertia.ORM.AutoGenerateTables.#ctor">
-            <summary>
-            Instantiate a new instance of the class <see cref="T:Inertia.ORM.AutoGenerateTables"/>
-            </summary>
-        </member>
         <member name="T:Inertia.ORM.DecimalPrecision">
             <summary>
             
@@ -68,11 +63,6 @@
             
             </summary>
         </member>
-        <member name="M:Inertia.ORM.IgnoreField.#ctor">
-            <summary>
-            Instantiate a new instance of the class <see cref="T:Inertia.ORM.IgnoreField"/>
-            </summary>
-        </member>
         <member name="T:Inertia.ORM.NotNull">
             <summary>
             
@@ -81,6 +71,11 @@
         <member name="F:Inertia.ORM.NotNull.Unique">
             <summary>
             
+            </summary>
+        </member>
+        <member name="M:Inertia.ORM.NotNull.#ctor">
+            <summary>
+            Instantiate a new instance of the class <see cref="T:Inertia.ORM.NotNull"/>
             </summary>
         </member>
         <member name="M:Inertia.ORM.NotNull.#ctor(System.Boolean)">
@@ -278,12 +273,27 @@
             <param name="columnsToUpdate"></param>
             <returns></returns>
         </member>
+        <member name="M:Inertia.ORM.Database.Count``1">
+            <summary>
+            Execute a COUNT query with the specified parameters and return the result.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+        </member>
         <member name="M:Inertia.ORM.Database.Count``1(System.Boolean)">
             <summary>
             Execute a COUNT query with the specified parameters and return the result.
             </summary>
             <typeparam name="T"></typeparam>
             <param name="distinct"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.Database.Count``1(Inertia.ORM.SqlCondition)">
+            <summary>
+            Execute a COUNT query with the specified parameters and return the result.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="condition"></param>
             <returns></returns>
         </member>
         <member name="M:Inertia.ORM.Database.Count``1(Inertia.ORM.SqlCondition,System.Boolean)">
@@ -295,6 +305,14 @@
             <param name="distinct"></param>
             <returns></returns>
         </member>
+        <member name="M:Inertia.ORM.Database.Count``1(System.String)">
+            <summary>
+            Execute a COUNT query with the specified parameters and return the result.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="columnName"></param>
+            <returns></returns>
+        </member>
         <member name="M:Inertia.ORM.Database.Count``1(System.String,System.Boolean)">
             <summary>
             Execute a COUNT query with the specified parameters and return the result.
@@ -304,6 +322,15 @@
             <param name="columnName"></param>
             <returns></returns>
         </member>
+        <member name="M:Inertia.ORM.Database.Count``1(System.String,Inertia.ORM.SqlCondition)">
+            <summary>
+            Execute a COUNT query with the specified parameters and return the result.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="columnName"></param>
+            <param name="condition"></param>
+            <returns></returns>
+        </member>
         <member name="M:Inertia.ORM.Database.Count``1(System.String,Inertia.ORM.SqlCondition,System.Boolean)">
             <summary>
             Execute a COUNT query with the specified parameters and return the result.
@@ -311,6 +338,14 @@
             <typeparam name="T"></typeparam>
             <param name="distinct"></param>
             <param name="columnName"></param>
+            <param name="condition"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.Database.Exist``1(Inertia.ORM.SqlCondition)">
+            <summary>
+            Return true if a row exist in the database based on the specified conditions
+            </summary>
+            <typeparam name="T"></typeparam>
             <param name="condition"></param>
             <returns></returns>
         </member>
@@ -487,23 +522,34 @@
             <summary>
             Delete all the elements from the specified <see cref="T:Inertia.ORM.Table"/>
             </summary>
-            <typeparam name="TableKey"></typeparam>
             <returns></returns>
         </member>
         <member name="M:Inertia.ORM.QueryAccessor`2.UpdateAll(`0,System.String[])">
             <summary>
             Update all the elements in the specified <see cref="T:Inertia.ORM.Table"/> with the reference's values
             </summary>
-            <typeparam name="TableKey"></typeparam>
             <param name="reference"></param>
             <param name="columnsToUpdate"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.QueryAccessor`2.Count">
+            <summary>
+            Execute a COUNT query with the specified parameters and return the result.
+            </summary>
             <returns></returns>
         </member>
         <member name="M:Inertia.ORM.QueryAccessor`2.Count(System.Boolean)">
             <summary>
             Execute a COUNT query with the specified parameters and return the result.
             </summary>
-            <typeparam name="TableKey"></typeparam>
+            <param name="distinct"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.QueryAccessor`2.Count(Inertia.ORM.SqlCondition)">
+            <summary>
+            Execute a COUNT query with the specified parameters and return the result.
+            </summary>
+            <param name="condition"></param>
             <param name="distinct"></param>
             <returns></returns>
         </member>
@@ -511,7 +557,6 @@
             <summary>
             Execute a COUNT query with the specified parameters and return the result.
             </summary>
-            <typeparam name="TableKey"></typeparam>
             <param name="condition"></param>
             <param name="distinct"></param>
             <returns></returns>
@@ -520,16 +565,22 @@
             <summary>
             Execute a COUNT query with the specified parameters and return the result.
             </summary>
-            <typeparam name="TableKey"></typeparam>
             <param name="distinct"></param>
             <param name="columnName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.QueryAccessor`2.Count(System.String,Inertia.ORM.SqlCondition)">
+            <summary>
+            Execute a COUNT query with the specified parameters and return the result.
+            </summary>
+            <param name="columnName"></param>
+            <param name="condition"></param>
             <returns></returns>
         </member>
         <member name="M:Inertia.ORM.QueryAccessor`2.Count(System.String,Inertia.ORM.SqlCondition,System.Boolean)">
             <summary>
             Execute a COUNT query with the specified parameters and return the result.
             </summary>
-            <typeparam name="TableKey"></typeparam>
             <param name="distinct"></param>
             <param name="columnName"></param>
             <param name="condition"></param>
@@ -539,7 +590,6 @@
             <summary>
             Return true if a row exist in the database based on the specified conditions
             </summary>
-            <typeparam name="TableKey"></typeparam>
             <param name="condition"></param>
             <param name="distinct"></param>
             <returns></returns>
@@ -548,7 +598,6 @@
             <summary>
             
             </summary>
-            <typeparam name="TableKey"></typeparam>
             <param name="columnName"></param>
             <returns></returns>
         </member>
@@ -556,7 +605,6 @@
             <summary>
             
             </summary>
-            <typeparam name="TableKey"></typeparam>
             <param name="columnName"></param>
             <param name="condition"></param>
             <returns></returns>
@@ -565,7 +613,6 @@
             <summary>
             
             </summary>
-            <typeparam name="TableKey"></typeparam>
             <param name="columnName"></param>
             <returns></returns>
         </member>
@@ -573,7 +620,6 @@
             <summary>
             
             </summary>
-            <typeparam name="TableKey"></typeparam>
             <param name="columnName"></param>
             <param name="condition"></param>
             <returns></returns>
@@ -582,7 +628,6 @@
             <summary>
             
             </summary>
-            <typeparam name="TableKey"></typeparam>
             <param name="columnName"></param>
             <returns></returns>
         </member>
@@ -590,7 +635,6 @@
             <summary>
             
             </summary>
-            <typeparam name="TableKey"></typeparam>
             <param name="columnName"></param>
             <param name="condition"></param>
             <returns></returns>
@@ -599,7 +643,6 @@
             <summary>
             
             </summary>
-            <typeparam name="TableKey"></typeparam>
             <param name="columnName"></param>
             <returns></returns>
         </member>
@@ -607,7 +650,6 @@
             <summary>
             
             </summary>
-            <typeparam name="TableKey"></typeparam>
             <param name="columnName"></param>
             <param name="condition"></param>
             <returns></returns>
@@ -905,7 +947,7 @@
             <summary>
             Add a SQL "LIMIT" condition.
             </summary>
-            <param name="limit"></param>
+            <param name="limitValue"></param>
             <returns></returns>
         </member>
         <member name="M:Inertia.ORM.SqlCondition.Dispose">
@@ -1006,23 +1048,13 @@
         </member>
         <member name="T:Inertia.ORM.DatabaseConnectionFailedException">
             <summary>
-            Throw when failed to connect to a <see cref="F:Inertia.ORM.DatabaseConnectionFailedException.Database"/>
+            Throw when failed to connect to a <see cref="F:Inertia.ORM.DatabaseConnectionFailedException._database"/>
             </summary>
         </member>
         <member name="P:Inertia.ORM.DatabaseConnectionFailedException.Message">
              <summary>
             
              </summary>
-        </member>
-        <member name="F:Inertia.ORM.DatabaseConnectionFailedException.Database">
-            <summary>
-            Database that throwed the exception
-            </summary>
-        </member>
-        <member name="F:Inertia.ORM.DatabaseConnectionFailedException.Exception">
-            <summary>
-            
-            </summary>
         </member>
         <member name="M:Inertia.ORM.DatabaseConnectionFailedException.#ctor(Inertia.ORM.Database,System.Exception)">
             <summary>
@@ -1037,11 +1069,6 @@
             </summary>
         </member>
         <member name="P:Inertia.ORM.InitializationFailedException.Message">
-             <summary>
-            
-             </summary>
-        </member>
-        <member name="F:Inertia.ORM.InitializationFailedException.ExMessage">
              <summary>
             
              </summary>

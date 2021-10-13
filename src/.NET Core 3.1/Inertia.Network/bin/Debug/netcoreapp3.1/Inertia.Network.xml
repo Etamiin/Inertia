@@ -686,20 +686,9 @@
             Message of the exception
             </summary>
         </member>
-        <member name="F:Inertia.Network.UserDatagramDataLengthLimitException.Length">
-            <summary>
-            Length of bytes trying to sent
-            </summary>
-        </member>
-        <member name="M:Inertia.Network.UserDatagramDataLengthLimitException.#ctor(System.Int32)">
+        <member name="M:Inertia.Network.UserDatagramDataLengthLimitException.#ctor">
             <summary>
             Instantiate a new instance of the class <see cref="T:Inertia.Network.UserDatagramDataLengthLimitException"/>
-            </summary>
-            <param name="length"></param>
-        </member>
-        <member name="T:Inertia.Network.LoaderManager">
-            <summary>
-            
             </summary>
         </member>
         <member name="T:NetworkDisconnectHandler">

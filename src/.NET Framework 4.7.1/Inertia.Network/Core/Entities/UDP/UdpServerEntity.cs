@@ -13,7 +13,7 @@ namespace Inertia.Network
         /// <summary>
         /// Occurs when receiving for the first time data from an udp connection.
         /// </summary>
-        public event NetworkUdpConnectionAddedHandler ConnectionAdded = (connection) => { };
+        public event NetworkUdpConnectionAddedHandler ConnectionAdded;
 
         /// <summary>
         /// Returns true if <see cref="Start"/> was called successfully.
@@ -143,7 +143,7 @@ namespace Inertia.Network
             {
                 if (data.Length > ushort.MaxValue)
                 {
-                    throw new UserDatagramDataLengthLimitException(data.Length);
+                    throw new UserDatagramDataLengthLimitException();
                 }
 
                 _client?.Send(data, data.Length, endPoint);
@@ -169,7 +169,9 @@ namespace Inertia.Network
             catch (Exception ex)
             {
                 if (ex is SocketException || ex is ObjectDisposedException)
+                {
                     return;
+                }
             }
 
             if (IsInitialized)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace Inertia.Network
 {
@@ -17,8 +18,8 @@ namespace Inertia.Network
         /// </summary>
         public static int NetworkBufferLength { get; set; } = 8192;
 
-        private static Dictionary<uint, Type> MessageTypes => LoaderManager.NetworkMessageTypes;
-        private static Dictionary<Type, NetworkMessageCaller> MessageHookers => LoaderManager.NetworkMessageHookers;
+        private static Dictionary<uint, Type> _messageTypes;
+        private static Dictionary<Type, NetworkMessageCaller> _messageHookers;
 
         private static NetworkProtocol _protocol;
 
@@ -76,9 +77,9 @@ namespace Inertia.Network
         /// <returns></returns>
         public static NetworkMessage CreateMessage(uint messageId)
         {
-            if (MessageTypes.ContainsKey(messageId))
+            if (_messageTypes.ContainsKey(messageId))
             {
-                return CreateMessage(MessageTypes[messageId]);
+                return CreateMessage(_messageTypes[messageId]);
             }
 
             return null;            
@@ -90,7 +91,7 @@ namespace Inertia.Network
         /// <param name="message"></param>
         public static NetworkMessageCaller GetCaller(NetworkMessage message)
         {
-            MessageHookers.TryGetValue(message.GetType(), out NetworkMessageCaller caller);
+            _messageHookers.TryGetValue(message.GetType(), out NetworkMessageCaller caller);
             return caller;
         }
 
@@ -99,12 +100,57 @@ namespace Inertia.Network
         /// </summary>
         public virtual ushort ProtocolVersion { get; }
 
+        private static bool _isDataLoaded => _messageTypes != null;
+
         /// <summary>
         /// 
         /// </summary>
-        public NetworkProtocol()
+        protected NetworkProtocol()
         {
-            LoaderManager.DefaultLoadNetwork();
+            if (!_isDataLoaded)
+            {
+                _messageTypes = new Dictionary<uint, Type>();
+                _messageHookers = new Dictionary<Type, NetworkMessageCaller>();
+
+                var assemblys = AppDomain.CurrentDomain.GetAssemblies();
+                foreach (var assembly in assemblys)
+                {
+                    var types = assembly.GetTypes();
+                    foreach (var type in types)
+                    {
+                        var isValidMessage = type.IsClass && type.IsSubclassOf(typeof(NetworkMessage)) && !type.IsAbstract;
+                        if (isValidMessage)
+                        {
+                            var message = CreateMessage(type);
+
+                            if (!_messageTypes.ContainsKey(message.MessageId))
+                            {
+                                _messageTypes.Add(message.MessageId, type);
+
+                                var sMethods = type.GetMethods(BindingFlags.Static | BindingFlags.NonPublic);
+                                if (sMethods.Length > 0)
+                                {
+                                    foreach (var smethod in sMethods)
+                                    {
+                                        var ps = smethod.GetParameters();
+                                        if (ps.Length >= 2 && ps[0].ParameterType.IsSubclassOf(typeof(NetworkMessage)) && (ps[1].ParameterType.IsSubclassOf(typeof(NetworkClientEntity)) || ps[1].ParameterType.IsSubclassOf(typeof(NetworkConnectionEntity))))
+                                        {
+                                            var msgType = ps[0].ParameterType;
+
+                                            if (!_messageHookers.ContainsKey(msgType))
+                                            {
+                                                _messageHookers.Add(msgType, new NetworkMessageCaller());
+                                            }
+
+                                            _messageHookers[msgType].RegisterReference(smethod, ps[1].ParameterType);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         /// <summary>

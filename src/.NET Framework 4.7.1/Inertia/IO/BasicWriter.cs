@@ -70,7 +70,7 @@ namespace Inertia
         }
 
         private BinaryWriter _writer;
-        private Encoding _encoding;
+        private readonly Encoding _encoding;
 
         /// <summary>
         /// Initialize a new instance based on <see cref="Encoding.UTF8"/> algorithm
@@ -333,7 +333,7 @@ namespace Inertia
                 throw new TypeNonSerializableException(typeof(T));
             }
 
-            var binaryFormatter = new BinaryFormatter()
+            var binaryFormatter = new BinaryFormatter
             {
                 TypeFormat = System.Runtime.Serialization.Formatters.FormatterTypeStyle.TypesWhenNeeded
             };

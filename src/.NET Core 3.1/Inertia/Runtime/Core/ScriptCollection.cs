@@ -23,7 +23,7 @@ namespace Inertia.Runtime
         /// </summary>
         public bool IsDisposed { get; private set; }
 
-        private List<Script> _scripts;
+        private readonly List<Script> _scripts;
 
         /// <summary>
         /// Initialize a new instance of the class <see cref="ScriptCollection"/>
@@ -42,7 +42,9 @@ namespace Inertia.Runtime
         public T Add<T>(params object[] args) where T : Script
         {
             if (IsDisposed)
+            {
                 throw new ObjectDisposedException(nameof(ScriptCollection));
+            }
 
             var s = (Script)typeof(T).GetConstructor(Type.EmptyTypes).Invoke(new object[] { });
 
@@ -50,7 +52,9 @@ namespace Inertia.Runtime
             s.Awake(args);
 
             lock (_scripts)
+            {
                 _scripts.Add(s);
+            }
 
             return (T)s;
         }
@@ -62,17 +66,17 @@ namespace Inertia.Runtime
         public void Remove<T>() where T : Script
         {
             if (IsDisposed)
+            {
                 throw new ObjectDisposedException(nameof(ScriptCollection));
+            }
 
             lock (_scripts)
             {
-                try
+                var script = _scripts.Find((s) => s.GetType() == typeof(T) && !s.IsDisposed);
+                if (script != null)
                 {
-                    var script = _scripts.Find((s) => s.GetType() == typeof(T) && !s.IsDisposed);
-                    if (script != null)
-                        script.Dispose();
+                    script.Dispose();
                 }
-                catch { }
             }
         }
         /// <summary>
@@ -82,7 +86,9 @@ namespace Inertia.Runtime
         public void RemoveAll<T>() where T : Script
         {
             if (IsDisposed)
+            {
                 throw new ObjectDisposedException(nameof(ScriptCollection));
+            }
 
             lock (_scripts)
             {
@@ -90,7 +96,9 @@ namespace Inertia.Runtime
                 foreach (var script in scripts)
                 {
                     if (script != null)
+                    {
                         script.Dispose();
+                    }
                 }
             }
         }
@@ -103,7 +111,9 @@ namespace Inertia.Runtime
         public T GetScript<T>() where T : Script
         {
             if (IsDisposed)
+            {
                 throw new ObjectDisposedException(nameof(ScriptCollection));
+            }
 
             lock (_scripts)
             {
@@ -118,7 +128,9 @@ namespace Inertia.Runtime
         public T[] GetScripts<T>() where T : Script
         {
             if (IsDisposed)
+            {
                 throw new ObjectDisposedException(nameof(ScriptCollection));
+            }
 
             var result = new List<T>();
 
@@ -127,7 +139,9 @@ namespace Inertia.Runtime
                 foreach (var s in _scripts)
                 {
                     if (s.GetType() == typeof(T))
+                    {
                         result.Add((T)s);
+                    }
                 }
             }
 
@@ -145,18 +159,20 @@ namespace Inertia.Runtime
         /// </summary>
         public void Dispose()
         {
-            if (IsDisposed)
-                return;
-
-            lock (_scripts)
+            if (!IsDisposed)
             {
-                foreach (var script in _scripts)
-                    script.Dispose();
+                lock (_scripts)
+                {
+                    foreach (var script in _scripts)
+                    {
+                        script.Dispose();
+                    }
 
-                _scripts.Clear();
+                    _scripts.Clear();
+                }
+
+                IsDisposed = true;
             }
-
-            IsDisposed = true;
         }
     }
 }

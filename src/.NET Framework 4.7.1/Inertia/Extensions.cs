@@ -55,7 +55,7 @@ public static class Extensions
     /// <returns></returns>
     public static byte[] GzipCompress(this byte[] data, out bool hasBetterSize)
     {
-        return IOHelper.GzipCompress(data, out hasBetterSize);
+        return IOHelper.GzipCompress(ref data, out hasBetterSize);
     }
     /// <summary>
     /// Decompress and return the specified data.
@@ -64,7 +64,7 @@ public static class Extensions
     /// <returns></returns>
     public static byte[] GzipDecompress(this byte[] compressedData)
     {
-        return IOHelper.GzipDecompress(compressedData);
+        return IOHelper.GzipDecompress(ref compressedData);
     }
 
     /// <summary>

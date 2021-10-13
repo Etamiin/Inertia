@@ -11,7 +11,7 @@ namespace Inertia.ORM
         internal static string GetCreateQuery(Table table)
         {
             return UseBuilder($"CREATE TABLE IF NOT EXISTS `{ table.Identifier }` (", null, (sb) => {
-                var primaryKeys = string.Empty;
+                var primaryKeys = new StringBuilder();
                 var fields = Table.GetFields(table.GetType());
 
                 for (var i = 0; i < fields.Length; i++)
@@ -57,12 +57,12 @@ namespace Inertia.ORM
 
                     if (isPrimaryKey != null)
                     {
-                        if (!string.IsNullOrEmpty(primaryKeys))
+                        if (primaryKeys.Length > 0)
                         {
-                            primaryKeys += ",";
+                            primaryKeys.Append(",");
                         }
 
-                        primaryKeys += $"`{ field.Name }`";
+                        primaryKeys.Append($"`{ field.Name }`");
                         if (isPrimaryKey.AutoIncrement)
                         {
                             sb.Append(" AUTO_INCREMENT");
@@ -70,9 +70,9 @@ namespace Inertia.ORM
                     }
                 }
 
-                if (!string.IsNullOrEmpty(primaryKeys))
+                if (primaryKeys.Length > 0)
                 {
-                    sb.Append(", primary key(" + primaryKeys + ")");
+                    sb.Append($", primary key({ primaryKeys })");
                 }
 
                 sb.Append(")");
@@ -82,23 +82,23 @@ namespace Inertia.ORM
         {
             return UseBuilder($"INSERT INTO `{ table.Identifier }`", null, (sb) => {
                 var fields = Table.GetFields(table.GetType());
-                var names = string.Empty;
-                var _params = string.Empty;
+                var names = new StringBuilder();
+                var _params = new StringBuilder();
                 var iparam = 0;
 
                 for (var i = 0; i < fields.Length; i++)
                 {
                     if (i > 0)
                     {
-                        names += ",";
-                        _params += ",";
+                        names.Append(",");
+                        _params.Append(",");
                     }
 
                     var field = fields[i];
                     var pname = $"@{ iparam++ }";
 
-                    names += field.Name;
-                    _params += pname;
+                    names.Append(field.Name);
+                    _params.Append(pname);
 
                     command.Parameters.AddWithValue(pname, field.GetValue(table));
                 }

@@ -71,7 +71,7 @@ namespace Inertia
         }
 
         private BinaryReader _reader;
-        private Encoding _encoding;
+        private readonly Encoding _encoding;
 
         /// <summary>
         /// Initialize a new instance with empty data

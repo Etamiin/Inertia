@@ -13,14 +13,14 @@ namespace Inertia.Network
         /// <summary>
         /// Occurs when a new client is connected.
         /// </summary>
-        public event NetworkTcpClientConnectionCreatedHandler ClientConnected = (connection) => { };
+        public event NetworkTcpClientConnectionCreatedHandler ClientConnected;
         /// <summary>
         /// Occurs when a client disconnect.
         /// </summary>
-        public event NetworkTcpClientConnectionDisconnectedHandler ClientDisconnected = (connection, reason) => { };
+        public event NetworkTcpClientConnectionDisconnectedHandler ClientDisconnected;
 
         private Socket _socket;
-        private List<TcpConnectionEntity> _connections;
+        private readonly List<TcpConnectionEntity> _connections;
 
         /// <summary>
         /// Instantiate a new instance of the class <see cref="TcpServerEntity"/>
@@ -126,29 +126,25 @@ namespace Inertia.Network
         {
             if (IsRunning())
             {
-                try
+                var socket = ((Socket)iar.AsyncState).EndAccept(iar);
+                var connection = new TcpConnectionEntity(socket);
+
+                connection.Disconnected += (reason) =>
                 {
-                    var socket = ((Socket)iar.AsyncState).EndAccept(iar);
-                    var connection = new TcpConnectionEntity(socket);
-
-                    connection.Disconnected += (reason) =>
-                    {
-                        lock (_connections)
-                        {
-                            _connections.Remove(connection);
-                        }
-
-                        ClientDisconnected?.Invoke(connection, reason);
-                    };
-
                     lock (_connections)
                     {
-                        _connections.Add(connection);
+                        _connections.Remove(connection);
                     }
 
-                    ClientConnected?.Invoke(connection);
+                    ClientDisconnected?.Invoke(connection, reason);
+                };
+
+                lock (_connections)
+                {
+                    _connections.Add(connection);
                 }
-                catch { }
+
+                ClientConnected?.Invoke(connection);
 
                 if (IsRunning())
                 {

@@ -7,7 +7,7 @@ namespace Inertia
     /// </summary>
     public sealed class ManualQueueExecutor : IDisposable
     {
-        private event BasicAction Executing = () => { };
+        private event BasicAction Executing;
 
         /// <summary>
         /// Returns true if the current instance is disposed.

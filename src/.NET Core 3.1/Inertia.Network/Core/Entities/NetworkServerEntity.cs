@@ -11,11 +11,11 @@ namespace Inertia.Network
         /// <summary>
         /// Occurs when the server is started.
         /// </summary>
-        public event BasicAction Started = () => { };
+        public event BasicAction Started;
         /// <summary>
         /// Occurs when the server is closed.
         /// </summary>
-        public event NetworkDisconnectHandler Closed = (reason) => { };
+        public event NetworkDisconnectHandler Closed;
 
         /// <summary>
         /// Returns true if the current instance is disposed.

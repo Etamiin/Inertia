@@ -81,11 +81,11 @@
             <param name="index">Target index</param>
             <returns>The data object as <typeparamref name="T"/></returns>
         </member>
-        <member name="M:Inertia.TextCommandArgs.GetNextArgument(System.String@)">
+        <member name="M:Inertia.TextCommandArgs.TryGetNextArgument(System.String@)">
             <summary>
             Returns true if an argument is available in the queue otherwise false.
             </summary>
-            <param name="argument">The argument result</param>
+            <param name="cmdArgument">The argument result</param>
             <returns></returns>
         </member>
         <member name="M:Inertia.TextCommandArgs.CombineArguments(System.Int32)">
@@ -106,6 +106,12 @@
         <member name="M:Inertia.TextCommandArgs.CombineAllArguments">
             <summary>
             Combines all arguments of the executed command.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.TextCommandArgs.GetAllArguments">
+            <summary>
+            
             </summary>
             <returns></returns>
         </member>
@@ -681,6 +687,13 @@
             <param name="data"></param>
             <returns></returns>
         </member>
+        <member name="M:Inertia.IOHelper.GetSHA256(System.IO.FileStream)">
+            <summary>
+            Returns the SHA256 representation of the specified <see cref="T:System.IO.FileStream"/>.
+            </summary>
+            <param name="stream"></param>
+            <returns></returns>
+        </member>
         <member name="M:Inertia.IOHelper.GetSHA256(System.IO.FileStream,System.Int32)">
             <summary>
             Returns the SHA256 representation of the specified <see cref="T:System.IO.FileStream"/>.
@@ -689,7 +702,7 @@
             <param name="bufferLength"></param>
             <returns></returns>
         </member>
-        <member name="M:Inertia.IOHelper.GzipCompress(System.Byte[],System.Boolean@)">
+        <member name="M:Inertia.IOHelper.GzipCompress(System.Byte[]@,System.Boolean@)">
             <summary>
             Compress and return the specified data.
             </summary>
@@ -697,7 +710,7 @@
             <param name="hasBetterSize">Returns true if the returned data is lower in length than the non-compressed data</param>
             <returns></returns>
         </member>
-        <member name="M:Inertia.IOHelper.GzipDecompress(System.Byte[])">
+        <member name="M:Inertia.IOHelper.GzipDecompress(System.Byte[]@)">
             <summary>
             Decompress and return the specified data.
             </summary>
@@ -934,6 +947,14 @@
             <summary>
             Execute the Runtime cycle manually.
             </summary>
+        </member>
+        <member name="M:Inertia.Runtime.Run.Delayed(System.Single,BasicAction{Inertia.Runtime.Run.ExecuteScriptIn})">
+            <summary>
+            
+            </summary>
+            <param name="delayInSeconds"></param>
+            <param name="callback"></param>
+            <returns></returns>
         </member>
         <member name="M:Inertia.Runtime.Run.Delayed(System.Single,BasicAction{Inertia.Runtime.Run.ExecuteScriptIn},System.Boolean)">
             <summary>
@@ -1192,11 +1213,27 @@
             
              </summary>
         </member>
+        <member name="M:Inertia.WebHelper.GetRequest(System.Uri)">
+            <summary>
+            Execute a HTTP GET request with specified parameters and return the string response.
+            </summary>
+            <param name="uriRequest"></param>
+            <returns></returns>
+        </member>
         <member name="M:Inertia.WebHelper.GetRequest(System.Uri,Inertia.RequestParameters)">
             <summary>
             Execute a HTTP GET request with specified parameters and return the string response.
             </summary>
             <param name="uriRequest"></param>
+            <param name="parameters"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.WebHelper.GetRequestAsync(System.Uri,BasicAction{System.String})">
+            <summary>
+            Execute a HTTP GET request asynchronously.
+            </summary>
+            <param name="uriRequest"></param>
+            <param name="callback"></param>
             <param name="parameters"></param>
             <returns></returns>
         </member>
@@ -1209,11 +1246,27 @@
             <param name="parameters"></param>
             <returns></returns>
         </member>
+        <member name="M:Inertia.WebHelper.GetRequestData(System.Uri)">
+            <summary>
+            Execute a HTTP GET request and return the data response.
+            </summary>
+            <param name="uriRequest"></param>
+            <returns></returns>
+        </member>
         <member name="M:Inertia.WebHelper.GetRequestData(System.Uri,Inertia.RequestParameters)">
             <summary>
             Execute a HTTP GET request and return the data response.
             </summary>
             <param name="uriRequest"></param>
+            <param name="parameters"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.WebHelper.GetRequestDataAsync(System.Uri,BasicAction{System.Byte[]})">
+            <summary>
+            Execute a HTTP GET request asynchronously.
+            </summary>
+            <param name="uriRequest"></param>
+            <param name="callback"></param>
             <param name="parameters"></param>
             <returns></returns>
         </member>
@@ -1226,12 +1279,19 @@
             <param name="parameters"></param>
             <returns></returns>
         </member>
-        <member name="M:Inertia.WebHelper.PostRequest(System.Uri,Inertia.RequestParameters)">
+        <member name="M:Inertia.WebHelper.PostRequest(System.Uri)">
             <summary>
             Execute a HTTP POST request with specified parameters and return the string response.
             </summary>
             <param name="uriRequest"></param>
-            <param name="parameters"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.WebHelper.PostRequest(System.Uri,System.String)">
+            <summary>
+            Execute a HTTP POST request with specified parameters and return the string response.
+            </summary>
+            <param name="uriRequest"></param>
+            <param name="data"></param>
             <returns></returns>
         </member>
         <member name="M:Inertia.WebHelper.PostRequest(System.Uri,System.String,Inertia.RequestParameters)">
@@ -1243,6 +1303,14 @@
             <param name="parameters"></param>
             <returns></returns>
         </member>
+        <member name="M:Inertia.WebHelper.PostRequestData(System.Uri,System.String)">
+            <summary>
+            Execute a HTTP POST request and return the data response.
+            </summary>
+            <param name="uriRequest"></param>
+            <param name="data"></param>
+            <returns></returns>
+        </member>
         <member name="M:Inertia.WebHelper.PostRequestData(System.Uri,System.String,Inertia.RequestParameters)">
             <summary>
             Execute a HTTP POST request and return the data response.
@@ -1250,6 +1318,15 @@
             <param name="uriRequest"></param>
             <param name="data"></param>
             <param name="parameters"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.WebHelper.PostRequestAsync(System.Uri,System.String,BasicAction{System.String})">
+            <summary>
+            Execute a HTTP POST request asynchronously.
+            </summary>
+            <param name="uriRequest"></param>
+            <param name="data"></param>
+            <param name="callback"></param>
             <returns></returns>
         </member>
         <member name="M:Inertia.WebHelper.PostRequestAsync(System.Uri,System.String,BasicAction{System.String},Inertia.RequestParameters)">
@@ -1260,6 +1337,15 @@
             <param name="data"></param>
             <param name="callback"></param>
             <param name="parameters"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.WebHelper.PostRequestDataAsync(System.Uri,System.String,BasicAction{System.Byte[]})">
+            <summary>
+            Execute a HTTP POST request asynchronously.
+            </summary>
+            <param name="uriRequest"></param>
+            <param name="data"></param>
+            <param name="callback"></param>
             <returns></returns>
         </member>
         <member name="M:Inertia.WebHelper.PostRequestDataAsync(System.Uri,System.String,BasicAction{System.Byte[]},Inertia.RequestParameters)">

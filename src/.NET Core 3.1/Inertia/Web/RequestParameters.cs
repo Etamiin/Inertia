@@ -10,8 +10,8 @@ namespace Inertia
     /// </summary>
     public sealed class RequestParameters
     {
-        private Dictionary<CoreRequestHeaders, string> _coreHeaders;
-        private Dictionary<string, string> _headers;
+        private readonly Dictionary<CoreRequestHeaders, string> _coreHeaders;
+        private readonly Dictionary<string, string> _headers;
         private long _contentLength = -1;
         private DateTime _date;
         private DateTime _modifiedSince;

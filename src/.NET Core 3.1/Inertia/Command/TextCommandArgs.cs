@@ -35,9 +35,9 @@ namespace Inertia
         }
 
         private bool _disposed;
-        private string _line;
-        private string[] _arguments;
-        private object[] _dataArguments;
+        private readonly string[] _arguments;
+        private readonly object[] _dataArguments;
+        private readonly string _line;
         private int _position;
 
         internal TextCommandArgs(string line, string name, string[] args, object[] dataCollection)
@@ -53,7 +53,7 @@ namespace Inertia
                     continue;
                 }
 
-                if (args[i].StartsWith($"{ '"' }".ToString()))
+                if (args[i].StartsWith($"{ '"' }"))
                 {
                     inSentence = true;
                 }
@@ -106,7 +106,7 @@ namespace Inertia
         /// <returns>The data object as <typeparamref name="T"/></returns>
         public T GetDataAt<T>(int index)
         {
-            if (index >= 0 || index < _dataArguments.Length)
+            if (index >= 0 && index < _dataArguments.Length)
             {
                 var data = _dataArguments[index];
                 return data != null ? (T)data : default(T);
@@ -118,17 +118,17 @@ namespace Inertia
         /// <summary>
         /// Returns true if an argument is available in the queue otherwise false.
         /// </summary>
-        /// <param name="argument">The argument result</param>
+        /// <param name="cmdArgument">The argument result</param>
         /// <returns></returns>
-        public bool GetNextArgument(out string argument)
+        public bool TryGetNextArgument(out string cmdArgument)
         {
-            if (_position >= 0 || _position < Count)
+            if (_position >= 0 && _position < Count)
             {
-                argument = this[_position++];
+                cmdArgument = this[_position++];
                 return true;
             }
 
-            argument = string.Empty;
+            cmdArgument = string.Empty;
             return false;
         }
 
@@ -180,7 +180,15 @@ namespace Inertia
         /// 
         /// </summary>
         /// <returns></returns>
-        public object[] GetAllArguments(int startIndex = 0)
+        public object[] GetAllArguments()
+        {
+            return GetAllArguments(0);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public object[] GetAllArguments(int startIndex)
         {
             var args = new object[Count - startIndex];
             if (args.Length > 0)
