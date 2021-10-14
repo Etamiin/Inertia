@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -10,19 +11,27 @@ namespace Inertia.ORM
     /// A help tool for faster access to queries
     /// </summary>
     /// <typeparam name="TableKey"></typeparam>
-    /// <typeparam name="DatabaseKey"></typeparam>
-    public sealed class QueryAccessor<TableKey, DatabaseKey> where TableKey : Table where DatabaseKey : Database
+    public sealed class QueryAccessor<TableKey> where TableKey : Table
     {
-        private readonly DatabaseKey _database;
+        private readonly Database _database;
 
         /// <summary>
         /// Initialize a new instance of the class <see cref="QueryAccessor{TableKey, DatabaseKey}"/>
         /// </summary>
         public QueryAccessor()
         {
-            if (!SqlManager.TrySearchDatabase(out _database))
+            var attachedTo = typeof(TableKey).GetCustomAttribute<AttachTo>();
+            if (attachedTo != null)
             {
-                throw new ArgumentNullException(typeof(DatabaseKey).Name, "Invalid Database for the QueryAccessor.");
+                if (!SqlManager.TrySearchDatabase(attachedTo.DatabaseType, out _database))
+                {
+                    throw new ArgumentNullException(attachedTo.DatabaseType.Name, "Invalid Database for the QueryAccessor.");
+                }
+            }
+            else
+            {
+                var tableName = typeof(TableKey).Name;
+                throw new ArgumentNullException(tableName, $"No Database attached to { tableName } table.");
             }
         }
 

@@ -93,8 +93,8 @@ namespace Inertia.ORM
                 _queue = new AutoQueueExecutor();
             }
 
-            var uTables = new Dictionary<string, List<Type>>();
-            var utTables = new Dictionary<Type, List<Type>>();
+            var namedDbDict = new Dictionary<string, List<Type>>();
+            var typedDbDict = new Dictionary<Type, List<Type>>();
 
             try
             {
@@ -111,13 +111,15 @@ namespace Inertia.ORM
                         if (type.IsSubclassOf(typeof(Database)))
                         {
                             var db = (Database)Activator.CreateInstance(type);
-                            if (_databases.ContainsKey(db.Name))
+                            if (!_databases.ContainsKey(db.Name))
+                            {
+                                _databases.Add(db.Name, db);
+                                db.TryCreateItSelf();
+                            }
+                            else
                             {
                                 throw new DatabaseAlreadyInitializedException(db.Name);
                             }
-
-                            db.TryCreateItSelf();
-                            _databases.Add(db.Name, db);
                         }
                         else if (type.IsSubclassOf(typeof(Table)))
                         {
@@ -126,24 +128,24 @@ namespace Inertia.ORM
                             {
                                 if (!string.IsNullOrEmpty(attachTo.DatabaseName))
                                 {
-                                    if (uTables.TryGetValue(attachTo.DatabaseName, out List<Type> types))
+                                    if (namedDbDict.TryGetValue(attachTo.DatabaseName, out List<Type> types))
                                     {
                                         types.Add(type);
                                     }
                                     else
                                     {
-                                        uTables.Add(attachTo.DatabaseName, new List<Type> { type });
+                                        namedDbDict.Add(attachTo.DatabaseName, new List<Type> { type });
                                     }
                                 }
                                 else if (attachTo.DatabaseType != null)
                                 {
-                                    if (utTables.TryGetValue(attachTo.DatabaseType, out List<Type> types))
+                                    if (typedDbDict.TryGetValue(attachTo.DatabaseType, out List<Type> types))
                                     {
                                         types.Add(type);
                                     }
                                     else
                                     {
-                                        utTables.Add(attachTo.DatabaseType, new List<Type> { type });
+                                        typedDbDict.Add(attachTo.DatabaseType, new List<Type> { type });
                                     }
                                 }
                             }
@@ -151,31 +153,32 @@ namespace Inertia.ORM
                     }
                 }
 
-                foreach (var pair in uTables)
+                foreach (var pair in namedDbDict)
                 {
-                    if (TrySearchDatabase(pair.Key, out Database db))
-                    {
-                        if (db.GetType().GetCustomAttribute<AutoGenerateTables>() == null)
-                        {
-                            continue;
-                        }
-
-                        RegisterTablesTo(db, pair.Value);
-                    }
+                    TryRegisterDb(pair.Value, dbName: pair.Key);
                 }
-                foreach (var pair in utTables)
+                foreach (var pair in typedDbDict)
                 {
-                    if (TrySearchDatabase(pair.Key, out Database db))
-                    {
-                        if (db.GetType().GetCustomAttribute<AutoGenerateTables>() == null)
-                        {
-                            continue;
-                        }
-
-                        RegisterTablesTo(db, pair.Value);
-                    }
+                    TryRegisterDb(pair.Value, dbType: pair.Key);
                 }
 
+                void TryRegisterDb(List<Type> tables, string dbName = "", Type dbType = null)
+                {
+                    Database db = null;
+                    if (!string.IsNullOrEmpty(dbName))
+                    {
+                        TrySearchDatabase(dbName, out db);
+                    }
+                    else if (dbType != null)
+                    {
+                        TrySearchDatabase(dbType, out db);
+                    }
+
+                    if (db != null && db.GetType().GetCustomAttribute<AutoGenerateTables>() != null)
+                    {
+                        RegisterTablesTo(db, tables);
+                    }
+                }
                 void RegisterTablesTo(Database db, List<Type> types)
                 {
                     foreach (var type in types)
@@ -183,6 +186,8 @@ namespace Inertia.ORM
                         var table = (Table)Activator.CreateInstance(type);
                         db.Create(table);
                     }
+
+                    db.OnInitialized();
                 }
             }
             catch (Exception ex)

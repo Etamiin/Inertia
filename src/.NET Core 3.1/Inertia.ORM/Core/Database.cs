@@ -36,6 +36,7 @@ namespace Inertia.ORM
         public virtual MySqlSslMode Ssl { get; } = MySqlSslMode.None;
 
         private readonly string _connectionString;
+        private bool _isInitialized;
 
         /// <summary>
         /// Initialize a new instance of class <see cref="Database"/>
@@ -45,10 +46,14 @@ namespace Inertia.ORM
             _connectionString = $"server={ Host.Replace("localhost", "127.0.0.1") };uid={ User };pwd={ Password };database={ Name };port={ Port };SslMode={ Ssl }";
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public abstract void OnInitialized();
+
         internal void TryCreateItSelf()
         {
-            var tempStrConn = $"server={ Host.Replace("localhost", "127.0.0.1") };uid={ User };pwd={ Password };port={ Port };SslMode={ Ssl }";
-            using (var conn = new MySqlConnection(tempStrConn))
+            using (var conn = new MySqlConnection(_connectionString))
             {
                 conn.Open();
                 using (var cmd = new MySqlCommand($"CREATE DATABASE IF NOT EXISTS `{ Name }`", conn))
@@ -73,24 +78,30 @@ namespace Inertia.ORM
             }
         }
 
-        internal void ExecuteCommand(string query, BasicAction<MySqlCommand> onCommand)
+        internal void ExecuteCommand(string query, BasicAction<MySqlCommand> onCommand, bool force = false)
         {
-            using (var conn = CreateConnection())
+            if (_isInitialized || force)
             {
-                using (var cmd = new MySqlCommand(query, conn))
+                using (var conn = CreateConnection())
                 {
-                    onCommand(cmd);
+                    using (var cmd = new MySqlCommand(query, conn))
+                    {
+                        onCommand(cmd);
+                    }
                 }
             }
         }
-        internal void ExecuteCommand(BasicAction<MySqlCommand> onCommand)
+        internal void ExecuteCommand(BasicAction<MySqlCommand> onCommand, bool force = false)
         {
-            using (var conn = CreateConnection())
+            if (_isInitialized || force)
             {
-                using (var cmd = new MySqlCommand())
+                using (var conn = CreateConnection())
                 {
-                    cmd.Connection = conn;
-                    onCommand(cmd);
+                    using (var cmd = new MySqlCommand())
+                    {
+                        cmd.Connection = conn;
+                        onCommand(cmd);
+                    }
                 }
             }
         }
@@ -195,39 +206,42 @@ namespace Inertia.ORM
         /// <returns></returns>
         public T Select<T>(SqlCondition condition, bool distinct, params string[] columnsToSelect) where T : Table
         {
-            if (!SqlManager.CreateTableInstance(out T table))
-            {
-                return table;
-            }
+            T table = null;
 
-            if (condition == null)
-            {
-                condition = new SqlCondition().Limit(1);
-            }
-
-            var fields = Table.GetFields<T>();
             ExecuteCommand((cmd) => {
-                cmd.SetQuery(QueryBuilder.GetSelectQuery(table, condition, columnsToSelect, distinct), condition);
-                cmd.OnReader((reader) => {
-                    for (var i = 0; i < reader.FieldCount; i++)
+                if (SqlManager.CreateTableInstance(out table))
+                {
+                    if (condition == null)
                     {
-                        var field = fields.FirstOrDefault((f) => f.Name == reader.GetName(i));
-                        if (field != null)
-                        {
-                            object value = null;
-                            if (field.FieldType == typeof(bool))
-                            {
-                                value = reader.GetBoolean(i);
-                            }
-                            else if (!reader.IsDBNull(i))
-                            {
-                                value = reader.GetValue(i);
-                            }
-
-                            field.SetValue(table, value);
-                        }
+                        condition = new SqlCondition();
                     }
-                });
+
+                    condition.Limit(1);
+
+                    var fields = Table.GetFields<T>();
+
+                    cmd.SetQuery(QueryBuilder.GetSelectQuery(table, condition, columnsToSelect, distinct), condition);
+                    cmd.OnReader((reader) => {
+                        for (var i = 0; i < reader.FieldCount; i++)
+                        {
+                            var field = fields.FirstOrDefault((f) => f.Name == reader.GetName(i));
+                            if (field != null)
+                            {
+                                object value = null;
+                                if (field.FieldType == typeof(bool))
+                                {
+                                    value = reader.GetBoolean(i);
+                                }
+                                else if (!reader.IsDBNull(i))
+                                {
+                                    value = reader.GetValue(i);
+                                }
+
+                                field.SetValue(table, value);
+                            }
+                        }
+                    });
+                }
             });
 
             return table;
@@ -275,45 +289,47 @@ namespace Inertia.ORM
         /// <returns></returns>
         public T[] SelectAll<T>(SqlCondition condition, bool distinct, params string[] columnsToSelect) where T : Table
         {
-            if (!SqlManager.CreateTableInstance(out T table))
-            {
-                return new[] { table };
-            }
-
-            var tables = new List<T>();
-            var fields = Table.GetFields<T>();
+            var result = new T[0];
 
             ExecuteCommand((cmd) => {
-                cmd.SetQuery(QueryBuilder.GetSelectQuery(table, condition, columnsToSelect, distinct), condition);
-                cmd.OnReader((reader) => {
-                    var created = SqlManager.CreateTableInstance(out T instance);
-                    if (created)
-                    {
-                        for (var i = 0; i < reader.FieldCount; i++)
-                        {
-                            var field = fields.FirstOrDefault((f) => f.Name == reader.GetName(i));
-                            if (field != null)
-                            {
-                                object value = null;
-                                if (field.FieldType == typeof(bool))
-                                {
-                                    value = reader.GetBoolean(i);
-                                }
-                                else if (!reader.IsDBNull(i))
-                                {
-                                    value = reader.GetValue(i);
-                                }
+                if (SqlManager.CreateTableInstance(out T table))
+                {
+                    var tables = new List<T>();
+                    var fields = Table.GetFields<T>();
 
-                                field.SetValue(instance, value);
+                    cmd.SetQuery(QueryBuilder.GetSelectQuery(table, condition, columnsToSelect, distinct), condition);
+                    cmd.OnReader((reader) => {
+                        var created = SqlManager.CreateTableInstance(out T instance);
+                        if (created)
+                        {
+                            for (var i = 0; i < reader.FieldCount; i++)
+                            {
+                                var field = fields.FirstOrDefault((f) => f.Name == reader.GetName(i));
+                                if (field != null)
+                                {
+                                    object value = null;
+                                    if (field.FieldType == typeof(bool))
+                                    {
+                                        value = reader.GetBoolean(i);
+                                    }
+                                    else if (!reader.IsDBNull(i))
+                                    {
+                                        value = reader.GetValue(i);
+                                    }
+
+                                    field.SetValue(instance, value);
+                                }
                             }
                         }
-                    }
 
-                    tables.Add(instance);
-                });
+                        tables.Add(instance);
+                    });
+
+                    result = tables.ToArray();
+                }
             });
 
-            return tables.ToArray();
+            return result;
         }
 
         /// <summary>
@@ -324,21 +340,17 @@ namespace Inertia.ORM
         /// <returns></returns>
         public bool Delete<T>(SqlCondition condition) where T : Table
         {
-            if (SqlManager.CreateTableInstance(out T table))
-            {
-                var deleted = false;
+            var deleted = false;
 
-                ExecuteCommand((cmd) => {
+            ExecuteCommand((cmd) => {
+                if (SqlManager.CreateTableInstance(out T table))
+                {
                     cmd.SetQuery(QueryBuilder.GetDeleteQuery(table, condition), condition);
                     deleted = cmd.ExecuteNonQuery() > 0;
-                });
+                }
+            });
 
-                return deleted;
-            }
-            else
-            {
-                return false;
-            }
+            return deleted;
         }
         /// <summary>
         /// Delete all the elements from the specified <see cref="Table"/>
@@ -347,21 +359,17 @@ namespace Inertia.ORM
         /// <returns></returns>
         public bool DeleteAll<T>() where T : Table
         {
-            if (SqlManager.CreateTableInstance(out T table))
-            {
-                var deleted = false;
+            var deleted = false;
 
-                ExecuteCommand((cmd) => {
+            ExecuteCommand((cmd) => {
+                if (SqlManager.CreateTableInstance(out T table))
+                {
                     cmd.SetQuery(QueryBuilder.GetDeleteQuery(table, null));
                     deleted = cmd.ExecuteNonQuery() > 0;
-                });
+                }
+            });
 
-                return deleted;
-            }
-            else
-            {
-                return false;
-            }
+            return deleted;
         }
 
         /// <summary>
@@ -376,6 +384,7 @@ namespace Inertia.ORM
             if (reference != null)
             {
                 var updated = false;
+
                 ExecuteCommand((cmd) => {
                     cmd.SetQuery(QueryBuilder.GetUpdateQuery(reference, cmd, null, columnsToUpdate));
                     updated = cmd.ExecuteNonQuery() > 0;
@@ -471,23 +480,20 @@ namespace Inertia.ORM
         /// <returns></returns>
         public long Count<T>(string columnName, SqlCondition condition, bool distinct) where T : Table
         {
-            if (SqlManager.CreateTableInstance(out T table))
-            {
-                long count = 0;
+            long count = 0;
 
-                ExecuteCommand((cmd) => {
+            ExecuteCommand((cmd) => {
+                if (SqlManager.CreateTableInstance(out T table))
+                {
                     cmd.SetQuery(QueryBuilder.GetCountQuery(table, columnName, condition, distinct), condition);
                     cmd.OnReader((reader) => {
                         count = reader.GetInt64(0);
                     });
-                });
+                }
 
-                return count;
-            }
-            else
-            {
-                return -1;
-            }
+            });
+
+            return count;
         }
 
         /// <summary>
@@ -531,22 +537,19 @@ namespace Inertia.ORM
         /// <returns></returns>
         public long Average<T>(string columnName, SqlCondition condition) where T : Table
         {
-            if (SqlManager.CreateTableInstance(out T table))
-            {
-                long avg = 0;
-                ExecuteCommand((cmd) => {
+            long avg = -1;
+
+            ExecuteCommand((cmd) => {
+                if (SqlManager.CreateTableInstance(out T table))
+                {
                     cmd.SetQuery(QueryBuilder.GetAvgQuery(table, columnName, condition), condition);
                     cmd.OnReader((reader) => {
                         avg = reader.GetInt64(0);
                     });
-                });
+                }
+            });
 
-                return avg;
-            }
-            else
-            {
-                return -1;
-            }
+            return avg;
         }
 
         /// <summary>
@@ -568,9 +571,11 @@ namespace Inertia.ORM
         /// <returns></returns>
         public T Max<T>(string columnName, SqlCondition condition) where T : Table
         {
-            if (!SqlManager.CreateTableInstance(out T table))
-            {
-                ExecuteCommand((cmd) => {
+            T table = null;
+
+            ExecuteCommand((cmd) => {
+                if (!SqlManager.CreateTableInstance(out table))
+                {
                     cmd.SetQuery(QueryBuilder.GetMaxQuery(table, columnName, condition), condition);
                     cmd.OnReader((reader) => {
                         var field = Table.GetFields<T>().FirstOrDefault((f) => f.Name == columnName);
@@ -579,14 +584,10 @@ namespace Inertia.ORM
                             field.SetValue(table, reader.GetValue(0));
                         }
                     });
-                });
+                }                
+            });
 
-                return table;
-            }
-            else
-            {
-                return default;
-            }
+            return table;
         }
         
         /// <summary>
@@ -608,9 +609,11 @@ namespace Inertia.ORM
         /// <returns></returns>
         public T Min<T>(string columnName, SqlCondition condition) where T : Table
         {
-            if (SqlManager.CreateTableInstance(out T table))
-            {
-                ExecuteCommand((cmd) => {
+            T table = null;
+
+            ExecuteCommand((cmd) => {
+                if (SqlManager.CreateTableInstance(out table))
+                {
                     cmd.SetQuery(QueryBuilder.GetMinQuery(table, columnName, condition), condition);
                     cmd.OnReader((reader) => {
                         var field = Table.GetFields<T>().FirstOrDefault((f) => f.Name == columnName);
@@ -619,14 +622,10 @@ namespace Inertia.ORM
                             field.SetValue(table, reader.GetValue(0));
                         }
                     });
-                });
+                }
+            });
 
-                return table;
-            }
-            else
-            {
-                return default;
-            }
+            return table;
         }
 
         /// <summary>
@@ -648,10 +647,10 @@ namespace Inertia.ORM
         /// <returns></returns>
         public decimal Sum<T>(string columnName, SqlCondition condition) where T : Table
         {
-            if (SqlManager.CreateTableInstance(out T table))
-            {
-                decimal sum = 0;
-                ExecuteCommand((cmd) => {
+            decimal sum = -1;
+            ExecuteCommand((cmd) => {
+                if (SqlManager.CreateTableInstance(out T table))
+                {
                     cmd.SetQuery(QueryBuilder.GetSumQuery(table, columnName, condition), condition);
                     cmd.OnReader((reader) => {
                         if (!reader.IsDBNull(0))
@@ -659,14 +658,10 @@ namespace Inertia.ORM
                             sum = reader.GetDecimal(0);
                         }
                     });
-                });
+                }
+            });
 
-                return sum;
-            }
-            else
-            {
-                return default;
-            }
+            return sum;
         }
 
         internal bool Create(Table table)
@@ -675,7 +670,7 @@ namespace Inertia.ORM
             {
                 ExecuteCommand(QueryBuilder.GetCreateQuery(table), (cmd) => {
                     cmd.ExecuteNonQuery();
-                });
+                }, force: true);
 
                 return true;
             }

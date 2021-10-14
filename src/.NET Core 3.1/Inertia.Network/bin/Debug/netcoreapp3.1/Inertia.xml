@@ -1510,6 +1510,11 @@
             
             </summary>
         </member>
+        <member name="M:Log.HandleExceptions">
+            <summary>
+            
+            </summary>
+        </member>
         <member name="M:Log.Line(System.Object)">
             <summary>
             

@@ -47,9 +47,10 @@ namespace Inertia.Network
                     _disconnectNotified = false;
                     _client = new UdpClient();
                     _client.Connect(new IPEndPoint(IPAddress.Parse(_targetIp), _targetPort));
-                    _client.BeginReceive(new AsyncCallback(OnReceiveData), _client);
 
                     OnConnected();
+
+                    _client.BeginReceive(new AsyncCallback(OnReceiveData), _client);
                 }
                 catch
                 {
@@ -69,10 +70,12 @@ namespace Inertia.Network
                 throw new ObjectDisposedException(nameof(UdpClientEntity));
             }
 
-            if (IsConnected() || !_disconnectNotified)
+            if (IsConnected())
             {
                 _client?.Close();
-
+            }
+            if (!_disconnectNotified)
+            {
                 _disconnectNotified = true;
                 OnDisconnected(reason);
             }

@@ -42,7 +42,7 @@ namespace Inertia.ORM
 
                 if (this.Database == null)
                 {
-                    throw new ArgumentNullException($"The database '{ attachTo.DatabaseName }' isn't registered");
+                    throw new ArgumentNullException($"The database isn't registered for table '{ Identifier }'");
                 }
             }
         }

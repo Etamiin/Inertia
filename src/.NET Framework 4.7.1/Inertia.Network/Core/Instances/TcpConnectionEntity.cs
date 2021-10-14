@@ -26,6 +26,10 @@ namespace Inertia.Network
             _socket = socket;
             _buffer = new byte[NetworkProtocol.NetworkBufferLength];
             _reader = new BasicReader();
+        }
+
+        internal void AllowCommunications()
+        {
             _socket.BeginReceive(_buffer, 0, _buffer.Length, SocketFlags.None, new AsyncCallback(OnReceiveData), _socket);
         }
 
@@ -72,11 +76,14 @@ namespace Inertia.Network
                 throw new ObjectDisposedException(nameof(TcpConnectionEntity));
             }
 
-            if (IsConnected || !_disconnectionNotified)
+            if (IsConnected)
             {
                 _socket?.Shutdown(SocketShutdown.Both);
                 _socket?.Disconnect(false);
                 _reader?.Dispose();
+            }
+            if (!_disconnectionNotified)
+            {
 
                 _reader = null;
                 _buffer = null;

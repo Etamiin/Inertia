@@ -132,6 +132,21 @@
             
              </summary>
         </member>
+        <member name="T:Inertia.CustomDeserialization">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:Inertia.CustomSerialization">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:Inertia.IgnoreField">
+            <summary>
+            
+            </summary>
+        </member>
         <member name="T:Inertia.BasicReader">
              <summary>
             
@@ -342,6 +357,13 @@
             Read the next object in the stream having a <see cref="T:System.SerializableAttribute"/>
             </summary>
             <returns>Deserialized object</returns>
+        </member>
+        <member name="M:Inertia.BasicReader.GetTypedValue``1">
+            <summary>
+            Read the next object in the stream based on the specified <see cref="T:System.Type"/>
+            </summary>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
         </member>
         <member name="M:Inertia.BasicReader.Dispose">
              <summary>
@@ -620,6 +642,11 @@
             Initialize a new instance of the class <see cref="T:Inertia.TypeNonSerializableException"/>
             </summary>
             <param name="type"></param>
+        </member>
+        <member name="T:Inertia.IAutoSerializable">
+            <summary>
+            
+            </summary>
         </member>
         <member name="T:Inertia.ISerializableData">
             <summary>
@@ -1506,6 +1533,11 @@
             </summary>
         </member>
         <member name="P:Log.ErrorTitle">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Log.HandleExceptions">
             <summary>
             
             </summary>

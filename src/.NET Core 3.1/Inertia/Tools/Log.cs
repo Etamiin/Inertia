@@ -39,7 +39,20 @@ public static class Log
     /// </summary>
     public static string ErrorTitle { get; set; } = "[ERROR]: ";
 
+    private static bool _isHandlingException;
     private static AutoQueueExecutor _queue;
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public static void HandleExceptions()
+    {
+        if (!_isHandlingException)
+        {
+            AppDomain.CurrentDomain.UnhandledException += (sender, e) => Error(e);
+            _isHandlingException = true;
+        }
+    }
 
     /// <summary>
     /// 

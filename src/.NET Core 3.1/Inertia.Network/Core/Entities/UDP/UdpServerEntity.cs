@@ -55,9 +55,10 @@ namespace Inertia.Network
                     _closeNotified = false;
                     _connections = new Dictionary<IPEndPoint, UdpConnectionEntity>();
                     _client = new UdpClient(new IPEndPoint(IPAddress.Parse(_targetIp), _targetPort));
-                    _client.BeginReceive(new AsyncCallback(OnReceiveData), _client);
 
                     OnStarted();
+
+                    _client.BeginReceive(new AsyncCallback(OnReceiveData), _client);
                 }
                 catch
                 {
@@ -76,10 +77,13 @@ namespace Inertia.Network
                 throw new ObjectDisposedException(nameof(UdpServerEntity));
             }
 
-            if (IsInitialized || !_closeNotified)
+            if (IsInitialized)
             {
                 _client?.Close();
-
+                _client = null;
+            }
+            if (!_closeNotified)
+            {
                 _connections.Clear();
                 _closeNotified = true;
 

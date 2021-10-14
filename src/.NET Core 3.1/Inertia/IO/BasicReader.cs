@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 
@@ -12,6 +13,25 @@ namespace Inertia
     /// </summary>
     public class BasicReader : IDisposable
     {
+        private static Dictionary<Type, BasicReturnAction<BasicReader, object>> _typageDefinitions = new Dictionary<Type, BasicReturnAction<BasicReader, object>>
+        {
+            { typeof(bool), (reader) => reader.GetBool() },
+            { typeof(string), (reader) => reader.GetString() },
+            { typeof(float), (reader) => reader.GetFloat() },
+            { typeof(decimal), (reader) => reader.GetDecimal() },
+            { typeof(double), (reader) => reader.GetDouble() },
+            { typeof(byte), (reader) => reader.GetByte() },
+            { typeof(sbyte), (reader) => reader.GetSByte() },
+            { typeof(char), (reader) => reader.GetChar() },
+            { typeof(short), (reader) => reader.GetShort() },
+            { typeof(ushort), (reader) => reader.GetUShort() },
+            { typeof(int), (reader) => reader.GetInt() },
+            { typeof(uint), (reader) => reader.GetUInt() },
+            { typeof(long), (reader) => reader.GetLong() },
+            { typeof(ulong), (reader) => reader.GetULong() },
+            { typeof(byte[]), (reader) => reader.GetBytes() },
+        };
+
         /// <summary>
         /// Returns true is the current instance is disposed.
         /// </summary>
@@ -394,9 +414,9 @@ namespace Inertia
         /// <returns>Readed byte array value or empty byte array if nothing can be read</returns>
         public byte[] GetBytes()
         {
-            if (IsUpdatable(sizeof(long)))
+            if (IsUpdatable(sizeof(uint)))
             {
-                var length = GetLong();
+                var length = GetUInt();
                 return GetBytes(length);
             }
             else
@@ -485,6 +505,77 @@ namespace Inertia
             {
                 TypeFormat = System.Runtime.Serialization.Formatters.FormatterTypeStyle.TypesWhenNeeded
             }.Deserialize(_reader.BaseStream);
+        }
+
+        public IAutoSerializable GetAuto(Type type)
+        {
+            if (type.GetInterface(nameof(IAutoSerializable)) == null)
+            {
+                throw new Exception($"Type '{ type.Name }' isn't '{ nameof(IAutoSerializable) }'");
+            }
+
+            var instance = Activator.CreateInstance(type);
+            var fields = instance.GetType().GetFields(BindingFlags.Public | BindingFlags.Instance);
+
+            foreach (var field in fields)
+            {
+                var ignored = field.GetCustomAttribute<IgnoreField>() != null;
+                if (!ignored)
+                {
+                    if (field.FieldType.GetInterface(nameof(IAutoSerializable)) != null)
+                    {
+                        field.SetValue(instance, GetAuto(field.FieldType));
+                    }
+                    else
+                    {
+                        var customization = field.GetCustomAttribute<CustomDeserialization>();
+                        if (customization == null)
+                        {
+                            field.SetValue(instance, GetTypedValue(field.FieldType));
+                        }
+                        else
+                        {
+                            var method = type.GetMethod($"Deserialize{ field.Name }", BindingFlags.NonPublic | BindingFlags.Instance);
+                            if (method != null)
+                            {
+                                var parameters = method.GetParameters();
+                                if (parameters.Length == 1 && parameters[0].ParameterType == typeof(BasicReader))
+                                {
+                                    method.Invoke(instance, new object[] { this });
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return (IAutoSerializable)instance;
+        }
+
+        public T GetAuto<T>() where T : IAutoSerializable
+        {
+            return (T)GetAuto(typeof(T));
+        }
+
+        public object GetTypedValue(Type type)
+        {
+            if (_typageDefinitions.ContainsKey(type))
+            {
+                return _typageDefinitions[type](this);
+            }
+            else
+            {
+                return GetObject();
+            }
+        }
+        /// <summary>
+        /// Read the next object in the stream based on the specified <see cref="Type"/>
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public T GetTypedValue<T>()
+        {
+            return (T)GetTypedValue(typeof(T));
         }
 
         /// <summary>

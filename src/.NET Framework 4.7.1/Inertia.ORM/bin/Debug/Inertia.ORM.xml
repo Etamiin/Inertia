@@ -167,6 +167,11 @@
             Initialize a new instance of class <see cref="T:Inertia.ORM.Database"/>
             </summary>
         </member>
+        <member name="M:Inertia.ORM.Database.OnInitialized">
+            <summary>
+            
+            </summary>
+        </member>
         <member name="M:Inertia.ORM.Database.TryExecuteQuery(System.String)">
             <summary>
             Execute a custom SQL query and returns true if the query was successfully executed.
@@ -437,26 +442,25 @@
             <param name="condition"></param>
             <returns></returns>
         </member>
-        <member name="T:Inertia.ORM.QueryAccessor`2">
+        <member name="T:Inertia.ORM.QueryAccessor`1">
             <summary>
             A help tool for faster access to queries
             </summary>
             <typeparam name="TableKey"></typeparam>
-            <typeparam name="DatabaseKey"></typeparam>
         </member>
-        <member name="M:Inertia.ORM.QueryAccessor`2.#ctor">
+        <member name="M:Inertia.ORM.QueryAccessor`1.#ctor">
             <summary>
-            Initialize a new instance of the class <see cref="T:Inertia.ORM.QueryAccessor`2"/>
+            Initialize a new instance of the class <see cref="!:QueryAccessor&lt;TableKey, DatabaseKey&gt;"/>
             </summary>
         </member>
-        <member name="M:Inertia.ORM.QueryAccessor`2.Select(System.String[])">
+        <member name="M:Inertia.ORM.QueryAccessor`1.Select(System.String[])">
             <summary>
             Selects the first element from the specified <see cref="T:Inertia.ORM.Table"/> with the specified parameters and returns an instance of the <typeparamref name="TableKey"/>.
             </summary>
             <param name="columnsToSelect"></param>
             <returns></returns>
         </member>
-        <member name="M:Inertia.ORM.QueryAccessor`2.Select(System.Boolean,System.String[])">
+        <member name="M:Inertia.ORM.QueryAccessor`1.Select(System.Boolean,System.String[])">
             <summary>
             Selects the first element from the specified <see cref="T:Inertia.ORM.Table"/> with the specified parameters and returns an instance of the <typeparamref name="TableKey"/>.
             </summary>
@@ -464,7 +468,7 @@
             <param name="distinct"></param>
             <returns></returns>
         </member>
-        <member name="M:Inertia.ORM.QueryAccessor`2.Select(Inertia.ORM.SqlCondition,System.String[])">
+        <member name="M:Inertia.ORM.QueryAccessor`1.Select(Inertia.ORM.SqlCondition,System.String[])">
             <summary>
             Selects the first element from the specified <see cref="T:Inertia.ORM.Table"/> with the specified parameters and returns an instance of the <typeparamref name="TableKey"/>.
             </summary>
@@ -472,7 +476,7 @@
             <param name="condition"></param>
             <returns></returns>
         </member>
-        <member name="M:Inertia.ORM.QueryAccessor`2.Select(Inertia.ORM.SqlCondition,System.Boolean,System.String[])">
+        <member name="M:Inertia.ORM.QueryAccessor`1.Select(Inertia.ORM.SqlCondition,System.Boolean,System.String[])">
             <summary>
             Selects the first element from the specified <see cref="T:Inertia.ORM.Table"/> with the specified parameters and returns an instance of the <typeparamref name="TableKey"/>.
             </summary>
@@ -481,14 +485,14 @@
             <param name="distinct"></param>
             <returns></returns>
         </member>
-        <member name="M:Inertia.ORM.QueryAccessor`2.SelectAll(System.String[])">
+        <member name="M:Inertia.ORM.QueryAccessor`1.SelectAll(System.String[])">
             <summary>
             Selects all the elements from the specified <see cref="T:Inertia.ORM.Table"/> with the specified parameters and returns an instance of the <typeparamref name="TableKey"/>.
             </summary>
             <param name="columnsToSelect"></param>
             <returns></returns>
         </member>
-        <member name="M:Inertia.ORM.QueryAccessor`2.SelectAll(System.Boolean,System.String[])">
+        <member name="M:Inertia.ORM.QueryAccessor`1.SelectAll(System.Boolean,System.String[])">
             <summary>
             Selects all the elements from the specified <see cref="T:Inertia.ORM.Table"/> with the specified parameters and returns an instance of the <typeparamref name="TableKey"/>.
             </summary>
@@ -496,7 +500,7 @@
             <param name="distinct"></param>
             <returns></returns>
         </member>
-        <member name="M:Inertia.ORM.QueryAccessor`2.SelectAll(Inertia.ORM.SqlCondition,System.String[])">
+        <member name="M:Inertia.ORM.QueryAccessor`1.SelectAll(Inertia.ORM.SqlCondition,System.String[])">
             <summary>
             Selects all the elements from the specified <see cref="T:Inertia.ORM.Table"/> with the specified parameters and returns an instance of the <typeparamref name="TableKey"/>.
             </summary>
@@ -504,7 +508,7 @@
             <param name="condition"></param>
             <returns></returns>
         </member>
-        <member name="M:Inertia.ORM.QueryAccessor`2.SelectAll(Inertia.ORM.SqlCondition,System.Boolean,System.String[])">
+        <member name="M:Inertia.ORM.QueryAccessor`1.SelectAll(Inertia.ORM.SqlCondition,System.Boolean,System.String[])">
             <summary>
             Selects all the elements from the specified <see cref="T:Inertia.ORM.Table"/> with the specified parameters and returns an instance of the <typeparamref name="TableKey"/>.
             </summary>
@@ -513,20 +517,20 @@
             <param name="distinct"></param>
             <returns></returns>
         </member>
-        <member name="M:Inertia.ORM.QueryAccessor`2.Delete(Inertia.ORM.SqlCondition)">
+        <member name="M:Inertia.ORM.QueryAccessor`1.Delete(Inertia.ORM.SqlCondition)">
             <summary>
             Delete all the elements from the specified <see cref="T:Inertia.ORM.Table"/> based on the specified <see cref="T:Inertia.ORM.SqlCondition"/>
             </summary>
             <param name="condition"></param>
             <returns></returns>
         </member>
-        <member name="M:Inertia.ORM.QueryAccessor`2.DeleteAll">
+        <member name="M:Inertia.ORM.QueryAccessor`1.DeleteAll">
             <summary>
             Delete all the elements from the specified <see cref="T:Inertia.ORM.Table"/>
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Inertia.ORM.QueryAccessor`2.UpdateAll(`0,System.String[])">
+        <member name="M:Inertia.ORM.QueryAccessor`1.UpdateAll(`0,System.String[])">
             <summary>
             Update all the elements in the specified <see cref="T:Inertia.ORM.Table"/> with the reference's values
             </summary>
@@ -534,27 +538,27 @@
             <param name="columnsToUpdate"></param>
             <returns></returns>
         </member>
-        <member name="M:Inertia.ORM.QueryAccessor`2.Count">
+        <member name="M:Inertia.ORM.QueryAccessor`1.Count">
             <summary>
             Execute a COUNT query with the specified parameters and return the result.
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Inertia.ORM.QueryAccessor`2.Count(System.Boolean)">
+        <member name="M:Inertia.ORM.QueryAccessor`1.Count(System.Boolean)">
             <summary>
             Execute a COUNT query with the specified parameters and return the result.
             </summary>
             <param name="distinct"></param>
             <returns></returns>
         </member>
-        <member name="M:Inertia.ORM.QueryAccessor`2.Count(Inertia.ORM.SqlCondition)">
+        <member name="M:Inertia.ORM.QueryAccessor`1.Count(Inertia.ORM.SqlCondition)">
             <summary>
             Execute a COUNT query with the specified parameters and return the result.
             </summary>
             <param name="condition"></param>
             <returns></returns>
         </member>
-        <member name="M:Inertia.ORM.QueryAccessor`2.Count(Inertia.ORM.SqlCondition,System.Boolean)">
+        <member name="M:Inertia.ORM.QueryAccessor`1.Count(Inertia.ORM.SqlCondition,System.Boolean)">
             <summary>
             Execute a COUNT query with the specified parameters and return the result.
             </summary>
@@ -562,14 +566,14 @@
             <param name="distinct"></param>
             <returns></returns>
         </member>
-        <member name="M:Inertia.ORM.QueryAccessor`2.Count(System.String)">
+        <member name="M:Inertia.ORM.QueryAccessor`1.Count(System.String)">
             <summary>
             Execute a COUNT query with the specified parameters and return the result.
             </summary>
             <param name="columnName"></param>
             <returns></returns>
         </member>
-        <member name="M:Inertia.ORM.QueryAccessor`2.Count(System.String,System.Boolean)">
+        <member name="M:Inertia.ORM.QueryAccessor`1.Count(System.String,System.Boolean)">
             <summary>
             Execute a COUNT query with the specified parameters and return the result.
             </summary>
@@ -577,7 +581,7 @@
             <param name="columnName"></param>
             <returns></returns>
         </member>
-        <member name="M:Inertia.ORM.QueryAccessor`2.Count(System.String,Inertia.ORM.SqlCondition)">
+        <member name="M:Inertia.ORM.QueryAccessor`1.Count(System.String,Inertia.ORM.SqlCondition)">
             <summary>
             Execute a COUNT query with the specified parameters and return the result.
             </summary>
@@ -585,7 +589,7 @@
             <param name="condition"></param>
             <returns></returns>
         </member>
-        <member name="M:Inertia.ORM.QueryAccessor`2.Count(System.String,Inertia.ORM.SqlCondition,System.Boolean)">
+        <member name="M:Inertia.ORM.QueryAccessor`1.Count(System.String,Inertia.ORM.SqlCondition,System.Boolean)">
             <summary>
             Execute a COUNT query with the specified parameters and return the result.
             </summary>
@@ -594,14 +598,14 @@
             <param name="condition"></param>
             <returns></returns>
         </member>
-        <member name="M:Inertia.ORM.QueryAccessor`2.Exist(Inertia.ORM.SqlCondition)">
+        <member name="M:Inertia.ORM.QueryAccessor`1.Exist(Inertia.ORM.SqlCondition)">
             <summary>
             Return true if a row exist in the database based on the specified conditions
             </summary>
             <param name="condition"></param>
             <returns></returns>
         </member>
-        <member name="M:Inertia.ORM.QueryAccessor`2.Exist(Inertia.ORM.SqlCondition,System.Boolean)">
+        <member name="M:Inertia.ORM.QueryAccessor`1.Exist(Inertia.ORM.SqlCondition,System.Boolean)">
             <summary>
             Return true if a row exist in the database based on the specified conditions
             </summary>
@@ -609,29 +613,14 @@
             <param name="distinct"></param>
             <returns></returns>
         </member>
-        <member name="M:Inertia.ORM.QueryAccessor`2.Average(System.String)">
+        <member name="M:Inertia.ORM.QueryAccessor`1.Average(System.String)">
             <summary>
             
             </summary>
             <param name="columnName"></param>
             <returns></returns>
         </member>
-        <member name="M:Inertia.ORM.QueryAccessor`2.Average(System.String,Inertia.ORM.SqlCondition)">
-            <summary>
-            
-            </summary>
-            <param name="columnName"></param>
-            <param name="condition"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Inertia.ORM.QueryAccessor`2.Max(System.String)">
-            <summary>
-            
-            </summary>
-            <param name="columnName"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Inertia.ORM.QueryAccessor`2.Max(System.String,Inertia.ORM.SqlCondition)">
+        <member name="M:Inertia.ORM.QueryAccessor`1.Average(System.String,Inertia.ORM.SqlCondition)">
             <summary>
             
             </summary>
@@ -639,29 +628,14 @@
             <param name="condition"></param>
             <returns></returns>
         </member>
-        <member name="M:Inertia.ORM.QueryAccessor`2.Min(System.String)">
+        <member name="M:Inertia.ORM.QueryAccessor`1.Max(System.String)">
             <summary>
             
             </summary>
             <param name="columnName"></param>
             <returns></returns>
         </member>
-        <member name="M:Inertia.ORM.QueryAccessor`2.Min(System.String,Inertia.ORM.SqlCondition)">
-            <summary>
-            
-            </summary>
-            <param name="columnName"></param>
-            <param name="condition"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Inertia.ORM.QueryAccessor`2.Sum(System.String)">
-            <summary>
-            
-            </summary>
-            <param name="columnName"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Inertia.ORM.QueryAccessor`2.Sum(System.String,Inertia.ORM.SqlCondition)">
+        <member name="M:Inertia.ORM.QueryAccessor`1.Max(System.String,Inertia.ORM.SqlCondition)">
             <summary>
             
             </summary>
@@ -669,46 +643,44 @@
             <param name="condition"></param>
             <returns></returns>
         </member>
-        <member name="M:Inertia.ORM.QueryAccessor`2.SelectAsync(BasicAction{`0},System.String[])">
+        <member name="M:Inertia.ORM.QueryAccessor`1.Min(System.String)">
+            <summary>
+            
+            </summary>
+            <param name="columnName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.QueryAccessor`1.Min(System.String,Inertia.ORM.SqlCondition)">
+            <summary>
+            
+            </summary>
+            <param name="columnName"></param>
+            <param name="condition"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.QueryAccessor`1.Sum(System.String)">
+            <summary>
+            
+            </summary>
+            <param name="columnName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.QueryAccessor`1.Sum(System.String,Inertia.ORM.SqlCondition)">
+            <summary>
+            
+            </summary>
+            <param name="columnName"></param>
+            <param name="condition"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.QueryAccessor`1.SelectAsync(BasicAction{`0},System.String[])">
             <summary>
             
             </summary>
             <param name="onSelected"></param>
             <param name="columnsToSelect"></param>
         </member>
-        <member name="M:Inertia.ORM.QueryAccessor`2.SelectAsync(BasicAction{`0},System.Boolean,System.String[])">
-            <summary>
-            
-            </summary>
-            <param name="onSelected"></param>
-            <param name="distinct"></param>
-            <param name="columnsToSelect"></param>
-        </member>
-        <member name="M:Inertia.ORM.QueryAccessor`2.SelectAsync(Inertia.ORM.SqlCondition,BasicAction{`0},System.String[])">
-            <summary>
-            
-            </summary>
-            <param name="condition"></param>
-            <param name="onSelected"></param>
-            <param name="columnsToSelect"></param>
-        </member>
-        <member name="M:Inertia.ORM.QueryAccessor`2.SelectAsync(Inertia.ORM.SqlCondition,BasicAction{`0},System.Boolean,System.String[])">
-            <summary>
-            
-            </summary>
-            <param name="condition"></param>
-            <param name="distinct"></param>
-            <param name="onSelected"></param>
-            <param name="columnsToSelect"></param>
-        </member>
-        <member name="M:Inertia.ORM.QueryAccessor`2.SelectAllAsync(BasicAction{`0[]},System.String[])">
-            <summary>
-            
-            </summary>
-            <param name="onSelected"></param>
-            <param name="columnsToSelect"></param>
-        </member>
-        <member name="M:Inertia.ORM.QueryAccessor`2.SelectAllAsync(BasicAction{`0[]},System.Boolean,System.String[])">
+        <member name="M:Inertia.ORM.QueryAccessor`1.SelectAsync(BasicAction{`0},System.Boolean,System.String[])">
             <summary>
             
             </summary>
@@ -716,7 +688,7 @@
             <param name="distinct"></param>
             <param name="columnsToSelect"></param>
         </member>
-        <member name="M:Inertia.ORM.QueryAccessor`2.SelectAllAsync(Inertia.ORM.SqlCondition,BasicAction{`0[]},System.String[])">
+        <member name="M:Inertia.ORM.QueryAccessor`1.SelectAsync(Inertia.ORM.SqlCondition,BasicAction{`0},System.String[])">
             <summary>
             
             </summary>
@@ -724,7 +696,39 @@
             <param name="onSelected"></param>
             <param name="columnsToSelect"></param>
         </member>
-        <member name="M:Inertia.ORM.QueryAccessor`2.SelectAllAsync(Inertia.ORM.SqlCondition,BasicAction{`0[]},System.Boolean,System.String[])">
+        <member name="M:Inertia.ORM.QueryAccessor`1.SelectAsync(Inertia.ORM.SqlCondition,BasicAction{`0},System.Boolean,System.String[])">
+            <summary>
+            
+            </summary>
+            <param name="condition"></param>
+            <param name="distinct"></param>
+            <param name="onSelected"></param>
+            <param name="columnsToSelect"></param>
+        </member>
+        <member name="M:Inertia.ORM.QueryAccessor`1.SelectAllAsync(BasicAction{`0[]},System.String[])">
+            <summary>
+            
+            </summary>
+            <param name="onSelected"></param>
+            <param name="columnsToSelect"></param>
+        </member>
+        <member name="M:Inertia.ORM.QueryAccessor`1.SelectAllAsync(BasicAction{`0[]},System.Boolean,System.String[])">
+            <summary>
+            
+            </summary>
+            <param name="onSelected"></param>
+            <param name="distinct"></param>
+            <param name="columnsToSelect"></param>
+        </member>
+        <member name="M:Inertia.ORM.QueryAccessor`1.SelectAllAsync(Inertia.ORM.SqlCondition,BasicAction{`0[]},System.String[])">
+            <summary>
+            
+            </summary>
+            <param name="condition"></param>
+            <param name="onSelected"></param>
+            <param name="columnsToSelect"></param>
+        </member>
+        <member name="M:Inertia.ORM.QueryAccessor`1.SelectAllAsync(Inertia.ORM.SqlCondition,BasicAction{`0[]},System.Boolean,System.String[])">
             <summary>
             
             </summary>
@@ -733,20 +737,20 @@
             <param name="distinct"></param>
             <param name="columnsToSelect"></param>
         </member>
-        <member name="M:Inertia.ORM.QueryAccessor`2.DeleteAsync(Inertia.ORM.SqlCondition,BasicAction)">
+        <member name="M:Inertia.ORM.QueryAccessor`1.DeleteAsync(Inertia.ORM.SqlCondition,BasicAction)">
             <summary>
             
             </summary>
             <param name="condition"></param>
             <param name="onDeleted"></param>
         </member>
-        <member name="M:Inertia.ORM.QueryAccessor`2.DeleteAllAsync(BasicAction)">
+        <member name="M:Inertia.ORM.QueryAccessor`1.DeleteAllAsync(BasicAction)">
             <summary>
             
             </summary>
             <param name="onDeleted"></param>
         </member>
-        <member name="M:Inertia.ORM.QueryAccessor`2.UpdateAllAsync(`0,BasicAction,System.String[])">
+        <member name="M:Inertia.ORM.QueryAccessor`1.UpdateAllAsync(`0,BasicAction,System.String[])">
             <summary>
             
             </summary>
@@ -754,27 +758,27 @@
             <param name="onUpdated"></param>
             <param name="columnsToUpdate"></param>
         </member>
-        <member name="M:Inertia.ORM.QueryAccessor`2.CountAsync(BasicAction{System.Int64})">
+        <member name="M:Inertia.ORM.QueryAccessor`1.CountAsync(BasicAction{System.Int64})">
             <summary>
             
             </summary>
             <param name="onCounted"></param>
         </member>
-        <member name="M:Inertia.ORM.QueryAccessor`2.CountAsync(BasicAction{System.Int64},System.Boolean)">
+        <member name="M:Inertia.ORM.QueryAccessor`1.CountAsync(BasicAction{System.Int64},System.Boolean)">
             <summary>
             
             </summary>
             <param name="onCounted"></param>
             <param name="distinct"></param>
         </member>
-        <member name="M:Inertia.ORM.QueryAccessor`2.CountAsync(Inertia.ORM.SqlCondition,BasicAction{System.Int64})">
+        <member name="M:Inertia.ORM.QueryAccessor`1.CountAsync(Inertia.ORM.SqlCondition,BasicAction{System.Int64})">
             <summary>
             
             </summary>
             <param name="condition"></param>
             <param name="onCounted"></param>
         </member>
-        <member name="M:Inertia.ORM.QueryAccessor`2.CountAsync(Inertia.ORM.SqlCondition,BasicAction{System.Int64},System.Boolean)">
+        <member name="M:Inertia.ORM.QueryAccessor`1.CountAsync(Inertia.ORM.SqlCondition,BasicAction{System.Int64},System.Boolean)">
             <summary>
             
             </summary>
@@ -782,14 +786,14 @@
             <param name="onCounted"></param>
             <param name="distinct"></param>
         </member>
-        <member name="M:Inertia.ORM.QueryAccessor`2.CountAsync(System.String,BasicAction{System.Int64})">
+        <member name="M:Inertia.ORM.QueryAccessor`1.CountAsync(System.String,BasicAction{System.Int64})">
             <summary>
             
             </summary>
             <param name="columnName"></param>
             <param name="onCounted"></param>
         </member>
-        <member name="M:Inertia.ORM.QueryAccessor`2.CountAsync(System.String,BasicAction{System.Int64},System.Boolean)">
+        <member name="M:Inertia.ORM.QueryAccessor`1.CountAsync(System.String,BasicAction{System.Int64},System.Boolean)">
             <summary>
             
             </summary>
@@ -797,7 +801,7 @@
             <param name="onCounted"></param>
             <param name="distinct"></param>
         </member>
-        <member name="M:Inertia.ORM.QueryAccessor`2.CountAsync(System.String,Inertia.ORM.SqlCondition,BasicAction{System.Int64},System.Boolean)">
+        <member name="M:Inertia.ORM.QueryAccessor`1.CountAsync(System.String,Inertia.ORM.SqlCondition,BasicAction{System.Int64},System.Boolean)">
             <summary>
             
             </summary>
@@ -806,14 +810,14 @@
             <param name="onCounted"></param>
             <param name="distinct"></param>
         </member>
-        <member name="M:Inertia.ORM.QueryAccessor`2.ExistAsync(Inertia.ORM.SqlCondition,BasicAction{System.Boolean})">
+        <member name="M:Inertia.ORM.QueryAccessor`1.ExistAsync(Inertia.ORM.SqlCondition,BasicAction{System.Boolean})">
             <summary>
             
             </summary>
             <param name="condition"></param>
             <param name="onExist"></param>
         </member>
-        <member name="M:Inertia.ORM.QueryAccessor`2.ExistAsync(Inertia.ORM.SqlCondition,BasicAction{System.Boolean},System.Boolean)">
+        <member name="M:Inertia.ORM.QueryAccessor`1.ExistAsync(Inertia.ORM.SqlCondition,BasicAction{System.Boolean},System.Boolean)">
             <summary>
             
             </summary>
@@ -821,14 +825,14 @@
             <param name="onExist"></param>
             <param name="distinct"></param>
         </member>
-        <member name="M:Inertia.ORM.QueryAccessor`2.AverageAsync(System.String,BasicAction{System.Int64})">
+        <member name="M:Inertia.ORM.QueryAccessor`1.AverageAsync(System.String,BasicAction{System.Int64})">
             <summary>
             
             </summary>
             <param name="columnName"></param>
             <param name="onAverage"></param>
         </member>
-        <member name="M:Inertia.ORM.QueryAccessor`2.AverageAsync(System.String,Inertia.ORM.SqlCondition,BasicAction{System.Int64})">
+        <member name="M:Inertia.ORM.QueryAccessor`1.AverageAsync(System.String,Inertia.ORM.SqlCondition,BasicAction{System.Int64})">
             <summary>
             
             </summary>
@@ -836,14 +840,14 @@
             <param name="condition"></param>
             <param name="onAverage"></param>
         </member>
-        <member name="M:Inertia.ORM.QueryAccessor`2.MaxAsync(System.String,BasicAction{`0})">
+        <member name="M:Inertia.ORM.QueryAccessor`1.MaxAsync(System.String,BasicAction{`0})">
             <summary>
             
             </summary>
             <param name="columnName"></param>
             <param name="onMax"></param>
         </member>
-        <member name="M:Inertia.ORM.QueryAccessor`2.MaxAsync(System.String,Inertia.ORM.SqlCondition,BasicAction{`0})">
+        <member name="M:Inertia.ORM.QueryAccessor`1.MaxAsync(System.String,Inertia.ORM.SqlCondition,BasicAction{`0})">
             <summary>
             
             </summary>
@@ -851,14 +855,14 @@
             <param name="condition"></param>
             <param name="onMax"></param>
         </member>
-        <member name="M:Inertia.ORM.QueryAccessor`2.MinAsync(System.String,BasicAction{`0})">
+        <member name="M:Inertia.ORM.QueryAccessor`1.MinAsync(System.String,BasicAction{`0})">
             <summary>
             
             </summary>
             <param name="columnName"></param>
             <param name="onMin"></param>
         </member>
-        <member name="M:Inertia.ORM.QueryAccessor`2.MinAsync(System.String,Inertia.ORM.SqlCondition,BasicAction{`0})">
+        <member name="M:Inertia.ORM.QueryAccessor`1.MinAsync(System.String,Inertia.ORM.SqlCondition,BasicAction{`0})">
             <summary>
             
             </summary>
@@ -866,14 +870,14 @@
             <param name="condition"></param>
             <param name="onMin"></param>
         </member>
-        <member name="M:Inertia.ORM.QueryAccessor`2.SumAsync(System.String,BasicAction{System.Decimal})">
+        <member name="M:Inertia.ORM.QueryAccessor`1.SumAsync(System.String,BasicAction{System.Decimal})">
             <summary>
             
             </summary>
             <param name="columnName"></param>
             <param name="onSum"></param>
         </member>
-        <member name="M:Inertia.ORM.QueryAccessor`2.SumAsync(System.String,Inertia.ORM.SqlCondition,BasicAction{System.Decimal})">
+        <member name="M:Inertia.ORM.QueryAccessor`1.SumAsync(System.String,Inertia.ORM.SqlCondition,BasicAction{System.Decimal})">
             <summary>
             
             </summary>

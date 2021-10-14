@@ -49,12 +49,11 @@ namespace Inertia.Network
                     _disconnectNotified = false;
                     _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                     _socket.Connect(new IPEndPoint(IPAddress.Parse(_targetIp), _targetPort));
-                    _socket.BeginReceive(_buffer, 0, _buffer.Length, SocketFlags.None, OnReceiveData, _socket);
 
-                    //Sleep for 1 second to avoid packet sent loss in OnConnected event
-                    System.Threading.Thread.Sleep(1000);
-
+                    //throw event before starting to receive data
                     OnConnected();
+
+                    _socket.BeginReceive(_buffer, 0, _buffer.Length, SocketFlags.None, OnReceiveData, _socket);
                 }
                 catch
                 {
@@ -74,11 +73,13 @@ namespace Inertia.Network
                 throw new ObjectDisposedException(nameof(TcpClientEntity));
             }
 
-            if (IsConnected() || !_disconnectNotified)
+            if (IsConnected())
             {
                 _socket?.Shutdown(SocketShutdown.Both);
                 _socket?.Disconnect(false);
-
+            }
+            if (!_disconnectNotified)
+            {
                 _reader.Clear();
                 _disconnectNotified = true;
                 OnDisconnected(reason);

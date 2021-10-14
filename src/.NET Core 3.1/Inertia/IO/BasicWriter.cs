@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 
@@ -113,7 +114,7 @@ namespace Inertia
         /// <returns>Returns the current instance</returns>
         public BasicWriter SetEmpty(uint size)
         {
-            return SetBytes(new byte[size - 4]);
+            return SetBytesWithoutHeader(new byte[size]);
         }
         /// <summary>
         /// Write the specified value in the stream
@@ -278,7 +279,7 @@ namespace Inertia
         /// <returns>Returns the current instance</returns>
         public BasicWriter SetBytes(byte[] value)
         {
-            _writer.Write(value.LongLength);
+            _writer.Write((uint)value.Length);
             return SetBytesWithoutHeader(value);
         }
         /// <summary>
@@ -341,6 +342,49 @@ namespace Inertia
             binaryFormatter.Serialize(_writer.BaseStream, value);
             return this;
         }
+
+        public BasicWriter SetAuto(IAutoSerializable instance)
+        {
+            var type = instance.GetType();
+            var fields = type.GetFields(BindingFlags.Public | BindingFlags.Instance);
+
+            foreach (var field in fields)
+            {
+                var ignored = field.GetCustomAttribute<IgnoreField>() != null;
+                if (!ignored)
+                {
+                    var value = field.GetValue(instance);
+
+                    if (field.FieldType.GetInterface(nameof(IAutoSerializable)) != null)
+                    {
+                        SetAuto(value as IAutoSerializable);
+                    }
+                    else
+                    {
+                        var customization = field.GetCustomAttribute<CustomSerialization>();
+                        if (customization == null)
+                        {
+                            SetValue(value);
+                        }
+                        else
+                        {
+                            var method = type.GetMethod($"Serialize{ field.Name }", BindingFlags.NonPublic | BindingFlags.Instance);
+                            if (method != null)
+                            {
+                                var parameters = method.GetParameters();
+                                if (parameters.Length == 1 && parameters[0].ParameterType == typeof(BasicWriter))
+                                {
+                                    method.Invoke(instance, new object[] { this });
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return this;
+        }
+
         /// <summary>
         /// Automatically write the specified value in the stream
         /// </summary>

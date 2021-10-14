@@ -51,9 +51,10 @@ namespace Inertia.Network
                     _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                     _socket.Bind(new IPEndPoint(IPAddress.Parse(_targetIp), _targetPort));
                     _socket.Listen(1000);
-                    _socket.BeginAccept(new AsyncCallback(OnAcceptConnection), _socket);
 
                     OnStarted();
+
+                    _socket.BeginAccept(new AsyncCallback(OnAcceptConnection), _socket);
                 }
                 catch
                 {
@@ -73,20 +74,19 @@ namespace Inertia.Network
                 throw new ObjectDisposedException(nameof(TcpServerEntity));
             }
 
-            if (IsRunning() || !_closeNotified)
+            if (IsRunning())
             {
                 _socket?.Shutdown(SocketShutdown.Both);
                 _socket?.Disconnect(false);
-
-                TcpConnectionEntity[] connections;
+            }
+            if (!_closeNotified)
+            {
                 lock (_connections)
                 {
-                    connections = _connections.ToArray();
-                }
-
-                foreach (var connection in connections)
-                {
-                    connection.Dispose();
+                    foreach (var connection in _connections)
+                    {
+                        connection.Dispose();
+                    }
                 }
 
                 _closeNotified = true;
@@ -145,6 +145,8 @@ namespace Inertia.Network
                 }
 
                 ClientConnected?.Invoke(connection);
+
+                connection.AllowCommunications();
 
                 if (IsRunning())
                 {
