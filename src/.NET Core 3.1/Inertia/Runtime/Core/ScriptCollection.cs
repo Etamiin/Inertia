@@ -3,11 +3,9 @@ using System.Collections.Generic;
 
 namespace Inertia.Runtime
 {
-    /// <summary>
-    ///
-    /// </summary>
     public sealed class ScriptCollection : IDisposable
     {
+        public bool IsDisposed { get; private set; }
         /// <summary>
         /// Returns the number of <see cref="Script"/> running in the collection.
         /// </summary>
@@ -18,10 +16,6 @@ namespace Inertia.Runtime
                 return _scripts.Count;
             }
         }
-        /// <summary>
-        /// Returns true if the currnet instance is disposed.
-        /// </summary>
-        public bool IsDisposed { get; private set; }
 
         private readonly List<Script> _scripts;
 
@@ -154,9 +148,6 @@ namespace Inertia.Runtime
             script.Parent = null;
         }
 
-        /// <summary>
-        ///
-        /// </summary>
         public void Dispose()
         {
             if (!IsDisposed)

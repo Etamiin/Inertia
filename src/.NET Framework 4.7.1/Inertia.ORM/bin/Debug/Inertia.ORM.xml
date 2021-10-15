@@ -69,11 +69,6 @@
             <param name="precision"></param>
             <param name="scale"></param>
         </member>
-        <member name="T:Inertia.ORM.IgnoreField">
-            <summary>
-            
-            </summary>
-        </member>
         <member name="T:Inertia.ORM.NotNull">
             <summary>
             
@@ -450,7 +445,7 @@
         </member>
         <member name="M:Inertia.ORM.QueryAccessor`1.#ctor">
             <summary>
-            Initialize a new instance of the class <see cref="!:QueryAccessor&lt;TableKey, DatabaseKey&gt;"/>
+            Initialize a new instance of the class <see cref="T:Inertia.ORM.QueryAccessor`1"/>
             </summary>
         </member>
         <member name="M:Inertia.ORM.QueryAccessor`1.Select(System.String[])">
@@ -798,6 +793,15 @@
             
             </summary>
             <param name="columnName"></param>
+            <param name="onCounted"></param>
+            <param name="distinct"></param>
+        </member>
+        <member name="M:Inertia.ORM.QueryAccessor`1.CountAsync(System.String,Inertia.ORM.SqlCondition,BasicAction{System.Int64})">
+            <summary>
+            
+            </summary>
+            <param name="columnName"></param>
+            <param name="condition"></param>
             <param name="onCounted"></param>
             <param name="distinct"></param>
         </member>

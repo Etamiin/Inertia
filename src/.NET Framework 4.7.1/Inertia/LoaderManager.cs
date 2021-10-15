@@ -7,9 +7,6 @@ using Inertia.Runtime;
 
 namespace Inertia
 {
-    /// <summary>
-    /// 
-    /// </summary>
     public static class LoaderManager
     {
         internal static Dictionary<string, TextCommand> Commands;
@@ -18,9 +15,6 @@ namespace Inertia
         private static bool _commandsLoaded => Commands != null;
         private static bool _pluginLoaded => _plugins != null;
 
-        /// <summary>
-        ///
-        /// </summary>
         public static void LoadPlugins()
         {
             if (_pluginLoaded || !Directory.Exists("Plugins"))

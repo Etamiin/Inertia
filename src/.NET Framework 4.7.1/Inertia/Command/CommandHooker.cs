@@ -3,15 +3,8 @@ using System.Linq;
 
 namespace Inertia
 {
-    /// <summary>
-    ///
-    /// </summary>
     public static class CommandHooker
     {
-        /// <summary>
-        /// Returns all loaded textual commands.
-        /// </summary>
-        /// <returns></returns>
         public static TextCommand[] GetAllCommands()
         {
             LoaderManager.DefaultLoadCommands();
@@ -21,11 +14,6 @@ namespace Inertia
                 return LoaderManager.Commands.Values.ToArray();
             }
         }
-        /// <summary>
-        /// Returns the <see cref="TextCommand"/> associated with the specified name.
-        /// </summary>
-        /// <param name="commandName"></param>
-        /// <returns></returns>
         public static TextCommand GetCommandByName(string commandName)
         {
             LoaderManager.DefaultLoadCommands();
@@ -34,12 +22,6 @@ namespace Inertia
             return command;
         }
 
-        /// <summary>
-        /// Executes a command line and returns the associated <see cref="TextCommandArgs"/> instance.
-        /// </summary>
-        /// <param name="commandLine"></param>
-        /// <param name="dataCollection">The list of objects to be associated with the command</param>
-        /// <returns></returns>
         public static bool TryExecuteCommandLine(string commandLine, params object[] dataCollection)
         {
             var args = commandLine.Split(' ');
@@ -54,7 +36,7 @@ namespace Inertia
             var command = GetCommandByName(commandName);
             if (command != null)
             {
-                command.Execute(new TextCommandArgs(commandLine, commandName, arguments, dataCollection));
+                command.OnExecute(new TextCommandArgs(commandLine, arguments, dataCollection));
                 return true;
             }
 

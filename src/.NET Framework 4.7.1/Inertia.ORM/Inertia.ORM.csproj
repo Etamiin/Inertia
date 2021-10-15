@@ -55,7 +55,6 @@
     <Compile Include="Attributes\AttachTo.cs" />
     <Compile Include="Attributes\AutoGenerateTables.cs" />
     <Compile Include="Attributes\DecimalPrecision.cs" />
-    <Compile Include="Attributes\IgnoreField.cs" />
     <Compile Include="Attributes\NotNull.cs" />
     <Compile Include="Attributes\PrimaryKey.cs" />
     <Compile Include="Attributes\VarChar.cs" />

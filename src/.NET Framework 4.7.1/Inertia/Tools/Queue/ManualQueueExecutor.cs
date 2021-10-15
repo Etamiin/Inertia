@@ -2,27 +2,16 @@
 
 namespace Inertia
 {
-    /// <summary>
-    ///
-    /// </summary>
     public sealed class ManualQueueExecutor : IDisposable
     {
         private event BasicAction Executing;
 
-        /// <summary>
-        /// Returns true if the current instance is disposed.
-        /// </summary>
         public bool IsDisposed { get; private set; }
         /// <summary>
         /// Returns the number of actions currently queued.
         /// </summary>
         public int Count { get; private set; }
 
-        /// <summary>
-        /// Enqueue the specified actions at the end of the queue.
-        /// </summary>
-        /// <param name="actions"></param>
-        /// <returns>Returns the current instance</returns>
         public ManualQueueExecutor Enqueue(params BasicAction[] actions)
         {
             if (IsDisposed)
@@ -65,9 +54,6 @@ namespace Inertia
             }
         }
 
-        /// <summary>
-        ///
-        /// </summary>
         public void Dispose()
         {
             if (!IsDisposed)

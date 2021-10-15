@@ -53,7 +53,6 @@ namespace Inertia.ORM
 
         internal void TryCreateItSelf()
         {
-            //var tempStrConn = $"server={ Host.Replace("localhost", "127.0.0.1") };uid={ User };pwd={ Password };port={ Port };SslMode={ Ssl }";
             using (var conn = new MySqlConnection(_connectionString))
             {
                 conn.Open();
@@ -214,8 +213,10 @@ namespace Inertia.ORM
                 {
                     if (condition == null)
                     {
-                        condition = new SqlCondition().Limit(1);
+                        condition = new SqlCondition();
                     }
+
+                    condition.Limit(1);
 
                     var fields = Table.GetFields<T>();
 

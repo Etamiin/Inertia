@@ -10,10 +10,6 @@ namespace Inertia
     public sealed class TextCommandArgs : IDisposable
     {
         /// <summary>
-        /// Returns the name of the command executed.
-        /// </summary>
-        public string Name { get; private set; }
-        /// <summary>
         /// Returns the number of arguments of the command executed.
         /// </summary>
         public int Count
@@ -34,13 +30,14 @@ namespace Inertia
             }
         }
 
-        private bool _disposed;
         private readonly string[] _arguments;
         private readonly object[] _dataArguments;
         private readonly string _line;
+
+        private bool _disposed;
         private int _position;
 
-        internal TextCommandArgs(string line, string name, string[] args, object[] dataCollection)
+        internal TextCommandArgs(string line, string[] args, object[] dataCollection)
         {
             var arguments = new List<string>();
             var inSentence = false;
@@ -79,7 +76,6 @@ namespace Inertia
                 }
             }
 
-            Name = name;
             _arguments = arguments.ToArray();
             _dataArguments = dataCollection ?? (new object[] { });
             _line = line;
@@ -118,17 +114,17 @@ namespace Inertia
         /// <summary>
         /// Returns true if an argument is available in the queue otherwise false.
         /// </summary>
-        /// <param name="cmdArgument">The argument result</param>
+        /// <param name="arg">The argument result</param>
         /// <returns></returns>
-        public bool TryGetNextArgument(out string cmdArgument)
+        public bool TryGetNextArgument(out string arg)
         {
             if (_position >= 0 && _position < Count)
             {
-                cmdArgument = this[_position++];
+                arg = this[_position++];
                 return true;
             }
 
-            cmdArgument = string.Empty;
+            arg = string.Empty;
             return false;
         }
 
@@ -176,18 +172,10 @@ namespace Inertia
             return CombineArguments(0, Count);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         public object[] GetAllArguments()
         {
             return GetAllArguments(0);
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         public object[] GetAllArguments(int startIndex)
         {
             var args = new object[Count - startIndex];
@@ -211,9 +199,6 @@ namespace Inertia
             return _line;
         }
 
-        /// <summary>
-        ///
-        /// </summary>
         public void Dispose()
         {
             if (!_disposed)

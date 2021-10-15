@@ -3,14 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 
 namespace Inertia
 {
-    /// <summary>
-    ///
-    /// </summary>
     public class BasicReader : IDisposable
     {
         private static Dictionary<Type, BasicReturnAction<BasicReader, object>> _typageDefinitions = new Dictionary<Type, BasicReturnAction<BasicReader, object>>
@@ -32,9 +28,6 @@ namespace Inertia
             { typeof(byte[]), (reader) => reader.GetBytes() },
         };
 
-        /// <summary>
-        /// Returns true is the current instance is disposed.
-        /// </summary>
         public bool IsDisposed { get; private set; }
         /// <summary>
         /// Returns the total length of the stream.
@@ -125,9 +118,6 @@ namespace Inertia
             Fill(data);
         }
 
-        /// <summary>
-        /// Clear the current stream.
-        /// </summary>
         public void Clear()
         {
             if (!IsDisposed && _reader != null)
@@ -169,10 +159,6 @@ namespace Inertia
             return this;
         }
 
-        /// <summary>
-        /// Remove all the readed data in the stream and refresh the stream with the non-readed data
-        /// </summary>
-        /// <returns></returns>
         public BasicReader RemoveReadedBytes()
         {
             var available = GetBytes(UnreadedLength);
@@ -211,7 +197,6 @@ namespace Inertia
         {
             return GetByte().GetBits(length);
         }
-
         /// <summary>
         /// Read a <see cref="string"/> value with the current instance <see cref="Encoding"/> algorithm in the stream and change the position
         /// </summary>
@@ -452,62 +437,53 @@ namespace Inertia
         /// Create an instance of <typeparamref name="T"/> and return it after deserialization
         /// </summary>
         /// <returns>Returns a <see cref="ISerializableObject"/></returns>
-        public T TryDeserializeObject<T>() where T : ISerializableObject
+        public T GetSerializableObject<T>() where T : ISerializableObject
         {
-            var parameters = typeof(T)
-                .GetConstructors()[0].GetParameters()
-                .Select(p => (object)null)
-                .ToArray();
-            var instance = (T)Activator.CreateInstance(typeof(T), parameters);
-            if (instance != null)
-            {
-                instance.Deserialize(this);
-                return instance;
-            }
-
-            return default(T);
+            return (T)GetSerializableObject(typeof(T));
         }
         /// <summary>
         /// Create an instance of <typeparamref name="T"/> and return it after deserialization
         /// </summary>
-        /// <returns>Returns a <see cref="ISerializableData"/></returns>
-        public T TryDeserializeData<T>() where T : ISerializableData
+        /// <returns>Returns a <see cref="ISerializableObject"/></returns>
+        public object GetSerializableObject(Type type)
         {
-            var parameters = typeof(T)
+            var parameters = type
                 .GetConstructors()[0].GetParameters()
                 .Select(p => (object)null)
                 .ToArray();
-            var instance = (T)Activator.CreateInstance(typeof(T), parameters);
+            var instance = Activator.CreateInstance(type, parameters);
             if (instance != null)
             {
-                instance.Deserialize(GetBytes());
+                ((ISerializableObject)instance).Deserialize(this);
                 return instance;
             }
 
-            return default(T);
+            return null;
         }
         /// <summary>
-        /// Read the next <typeparamref name="T"/> object in the stream having a <see cref="SerializableAttribute"/>
+        /// Create an instance of <typeparamref name="T"/> deserialize it and then return it
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <returns>Deserialized instance of <typeparamref name="T"/></returns>
-        public T GetObject<T>()
+        /// <returns></returns>
+        public T GetAutoSerializable<T>() where T : IAutoSerializable
         {
-            return (T)GetObject();
+            return (T)GetAutoSerializable(typeof(T));
         }
         /// <summary>
-        /// Read the next object in the stream having a <see cref="SerializableAttribute"/>
+        /// Deserialize the specified instance of <typeparamref name="T"/>
         /// </summary>
-        /// <returns>Deserialized object</returns>
-        public object GetObject()
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public void GetAutoSerializable<T>(T instance) where T : IAutoSerializable
         {
-            return new BinaryFormatter
-            {
-                TypeFormat = System.Runtime.Serialization.Formatters.FormatterTypeStyle.TypesWhenNeeded
-            }.Deserialize(_reader.BaseStream);
+            GetAutoSerializable((IAutoSerializable)instance);
         }
-
-        public IAutoSerializable GetAuto(Type type)
+        /// <summary>
+        /// Create an instance of specified <see cref="IAutoSerializable"/> deserialize it and then return it
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public IAutoSerializable GetAutoSerializable(Type type)
         {
             if (type.GetInterface(nameof(IAutoSerializable)) == null)
             {
@@ -515,6 +491,16 @@ namespace Inertia
             }
 
             var instance = Activator.CreateInstance(type);
+            return GetAutoSerializable((IAutoSerializable)instance);
+        }
+        /// <summary>
+        /// Deserialize the specified instance of <see cref="IAutoSerializable"/>
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public IAutoSerializable GetAutoSerializable(IAutoSerializable instance)
+        {
+            var type = instance.GetType();
             var fields = instance.GetType().GetFields(BindingFlags.Public | BindingFlags.Instance);
 
             foreach (var field in fields)
@@ -524,7 +510,7 @@ namespace Inertia
                 {
                     if (field.FieldType.GetInterface(nameof(IAutoSerializable)) != null)
                     {
-                        field.SetValue(instance, GetAuto(field.FieldType));
+                        field.SetValue(instance, GetAutoSerializable(field.FieldType));
                     }
                     else
                     {
@@ -535,7 +521,7 @@ namespace Inertia
                         }
                         else
                         {
-                            var method = type.GetMethod($"Deserialize{ field.Name }", BindingFlags.NonPublic | BindingFlags.Instance);
+                            var method = type.GetMethod(customization.MethodName, BindingFlags.NonPublic | BindingFlags.Instance);
                             if (method != null)
                             {
                                 var parameters = method.GetParameters();
@@ -549,25 +535,9 @@ namespace Inertia
                 }
             }
 
-            return (IAutoSerializable)instance;
+            return instance;
         }
 
-        public T GetAuto<T>() where T : IAutoSerializable
-        {
-            return (T)GetAuto(typeof(T));
-        }
-
-        public object GetTypedValue(Type type)
-        {
-            if (_typageDefinitions.ContainsKey(type))
-            {
-                return _typageDefinitions[type](this);
-            }
-            else
-            {
-                return GetObject();
-            }
-        }
         /// <summary>
         /// Read the next object in the stream based on the specified <see cref="Type"/>
         /// </summary>
@@ -577,18 +547,38 @@ namespace Inertia
         {
             return (T)GetTypedValue(typeof(T));
         }
-
         /// <summary>
-        ///
+        /// Read the next object in the stream based on the specified <see cref="Type"/>
         /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public object GetTypedValue(Type type)
+        {
+            if (_typageDefinitions.ContainsKey(type))
+            {
+                return _typageDefinitions[type](this);
+            }
+            else
+            {
+                if (type.GetInterface(nameof(IAutoSerializable)) != null)
+                {
+                    return GetAutoSerializable(type);
+                }
+                else if (type.GetInterface(nameof(ISerializableObject)) != null)
+                {
+                    return GetSerializableObject(type);
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
+
         public void Dispose()
         {
             Dispose(true);
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="disposing"></param>
         protected virtual void Dispose(bool disposing)
         {
             if (!IsDisposed && disposing)

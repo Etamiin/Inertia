@@ -16,7 +16,7 @@ namespace Inertia.ORM
         private readonly Database _database;
 
         /// <summary>
-        /// Initialize a new instance of the class <see cref="QueryAccessor{TableKey, DatabaseKey}"/>
+        /// Initialize a new instance of the class <see cref="QueryAccessor{TableKey}"/>
         /// </summary>
         public QueryAccessor()
         {
@@ -513,6 +513,17 @@ namespace Inertia.ORM
         public void CountAsync(string columnName, BasicAction<long> onCounted, bool distinct)
         {
             CountAsync(columnName, null, onCounted, distinct);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="columnName"></param>
+        /// <param name="condition"></param>
+        /// <param name="onCounted"></param>
+        /// <param name="distinct"></param>
+        public void CountAsync(string columnName, SqlCondition condition, BasicAction<long> onCounted)
+        {
+            CountAsync(columnName, condition, onCounted, false);
         }
         /// <summary>
         /// 
