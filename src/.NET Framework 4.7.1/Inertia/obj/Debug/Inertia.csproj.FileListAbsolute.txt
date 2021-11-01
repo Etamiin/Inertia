@@ -1,11 +1,4 @@
 C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Framework 4.7.1\Inertia\bin\Debug\Inertia.xml
-<<<<<<< HEAD
-C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Framework 4.7.1\Inertia\bin\Debug\Inertia.dll
-C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Framework 4.7.1\Inertia\bin\Debug\Inertia.pdb
-C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Framework 4.7.1\Inertia\obj\Debug\Inertia.csproj.CoreCompileInputs.cache
-C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Framework 4.7.1\Inertia\obj\Debug\Inertia.dll
-C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Framework 4.7.1\Inertia\obj\Debug\Inertia.pdb
-=======
 C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Framework 4.7.1\Inertia\obj\Debug\Inertia.csproj.CoreCompileInputs.cache
 C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Framework 4.7.1\Inertia\obj\Debug\Inertia.dll
 C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Framework 4.7.1\Inertia\obj\Debug\Inertia.pdb
@@ -15,4 +8,3 @@ C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Framework 4.7.1\Inertia\
 C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Framework 4.7.1\Inertia\bin\Debug\Inertia.dll
 C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Framework 4.7.1\Inertia\bin\Debug\Inertia.pdb
 C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Framework 4.7.1\Inertia\obj\Debug\Inertia.csproj.AssemblyReference.cache
->>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40

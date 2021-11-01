@@ -3,37 +3,6 @@ C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\obj
 C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\obj\Debug\netcoreapp3.1\Inertia.ORM.AssemblyInfoInputs.cache
 C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\obj\Debug\netcoreapp3.1\Inertia.ORM.AssemblyInfo.cs
 C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\obj\Debug\netcoreapp3.1\Inertia.ORM.csproj.CoreCompileInputs.cache
-<<<<<<< HEAD
-C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\bin\Debug\netcoreapp3.1\Inertia.ORM.deps.json
-C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\bin\Debug\netcoreapp3.1\Inertia.ORM.dll
-C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\bin\Debug\netcoreapp3.1\Inertia.ORM.pdb
-C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\bin\Debug\netcoreapp3.1\Inertia.ORM.xml
-C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\bin\Debug\netcoreapp3.1\BouncyCastle.Crypto.dll
-C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\bin\Debug\netcoreapp3.1\Google.Protobuf.dll
-C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\bin\Debug\netcoreapp3.1\K4os.Compression.LZ4.dll
-C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\bin\Debug\netcoreapp3.1\K4os.Compression.LZ4.Streams.dll
-C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\bin\Debug\netcoreapp3.1\K4os.Hash.xxHash.dll
-C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\bin\Debug\netcoreapp3.1\Microsoft.Win32.SystemEvents.dll
-C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\bin\Debug\netcoreapp3.1\MySql.Data.dll
-C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\bin\Debug\netcoreapp3.1\Ubiety.Dns.Core.dll
-C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\bin\Debug\netcoreapp3.1\Zstandard.Net.dll
-C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\bin\Debug\netcoreapp3.1\System.Configuration.ConfigurationManager.dll
-C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\bin\Debug\netcoreapp3.1\System.Drawing.Common.dll
-C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\bin\Debug\netcoreapp3.1\System.Security.Cryptography.ProtectedData.dll
-C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\bin\Debug\netcoreapp3.1\System.Security.Permissions.dll
-C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\bin\Debug\netcoreapp3.1\System.Windows.Extensions.dll
-C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\bin\Debug\netcoreapp3.1\runtimes\win\lib\netcoreapp3.0\Microsoft.Win32.SystemEvents.dll
-C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\bin\Debug\netcoreapp3.1\runtimes\unix\lib\netcoreapp3.0\System.Drawing.Common.dll
-C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\bin\Debug\netcoreapp3.1\runtimes\win\lib\netcoreapp3.0\System.Drawing.Common.dll
-C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\bin\Debug\netcoreapp3.1\runtimes\win\lib\netstandard2.0\System.Security.Cryptography.ProtectedData.dll
-C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\bin\Debug\netcoreapp3.1\runtimes\win\lib\netcoreapp3.0\System.Windows.Extensions.dll
-C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\bin\Debug\netcoreapp3.1\Inertia.dll
-C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\bin\Debug\netcoreapp3.1\Inertia.pdb
-C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\bin\Debug\netcoreapp3.1\Inertia.xml
-C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\obj\Debug\netcoreapp3.1\Inertia.ORM.csproj.CopyComplete
-C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\obj\Debug\netcoreapp3.1\Inertia.ORM.dll
-C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\obj\Debug\netcoreapp3.1\Inertia.ORM.pdb
-=======
 C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\obj\Debug\netcoreapp3.1\Inertia.ORM.csproj.CopyComplete
 C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\obj\Debug\netcoreapp3.1\Inertia.ORM.dll
 C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\obj\Debug\netcoreapp3.1\Inertia.ORM.pdb
@@ -63,4 +32,3 @@ C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\bin
 C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\bin\Debug\Inertia.dll
 C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\bin\Debug\Inertia.pdb
 C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\bin\Debug\Inertia.xml
->>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
