@@ -1,0 +1,36 @@
+<<<<<<< HEAD
+C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia\bin\Debug\netcoreapp3.1\Inertia.deps.json
+C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia\bin\Debug\netcoreapp3.1\Inertia.dll
+C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia\bin\Debug\netcoreapp3.1\Inertia.pdb
+C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia\bin\Debug\netcoreapp3.1\Inertia.xml
+=======
+>>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
+C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia\obj\Debug\netcoreapp3.1\Inertia.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia\obj\Debug\netcoreapp3.1\Inertia.AssemblyInfoInputs.cache
+C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia\obj\Debug\netcoreapp3.1\Inertia.AssemblyInfo.cs
+C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia\obj\Debug\netcoreapp3.1\Inertia.csproj.CoreCompileInputs.cache
+C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia\obj\Debug\netcoreapp3.1\Inertia.dll
+C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia\obj\Debug\netcoreapp3.1\Inertia.pdb
+<<<<<<< HEAD
+=======
+C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia\bin\netcoreapp3.1\Inertia.deps.json
+C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia\bin\netcoreapp3.1\Inertia.dll
+C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia\bin\netcoreapp3.1\Inertia.pdb
+C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia\bin\netcoreapp3.1\Inertia.xml
+C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\MarkdownMonster\bin\Debug\netcoreapp3.1\Addins\Weblog\Inertia.deps.json
+C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\MarkdownMonster\bin\Debug\netcoreapp3.1\Addins\Weblog\Inertia.dll
+C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\MarkdownMonster\bin\Debug\netcoreapp3.1\Addins\Weblog\Inertia.pdb
+C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\MarkdownMonster\bin\Debug\netcoreapp3.1\Addins\Weblog\Inertia.xml
+C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NETCore3.1\Inertia\bin\Debug\Inertia.deps.json
+C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NETCore3.1\Inertia\bin\Debug\Inertia.dll
+C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NETCore3.1\Inertia\bin\Debug\Inertia.pdb
+C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NETCore3.1\Inertia\bin\Debug\Inertia.xml
+C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core3.1\Inertia\bin\Debug\Inertia.deps.json
+C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core3.1\Inertia\bin\Debug\Inertia.dll
+C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core3.1\Inertia\bin\Debug\Inertia.pdb
+C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core3.1\Inertia\bin\Debug\Inertia.xml
+C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia\bin\Debug\Inertia.deps.json
+C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia\bin\Debug\Inertia.dll
+C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia\bin\Debug\Inertia.pdb
+C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia\bin\Debug\Inertia.xml
+>>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
