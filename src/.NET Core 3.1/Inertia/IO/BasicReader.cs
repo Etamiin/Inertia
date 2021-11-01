@@ -2,19 +2,44 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.Serialization.Formatters.Binary;
+using System.Reflection;
 using System.Text;
 
 namespace Inertia
 {
-    /// <summary>
-    ///
-    /// </summary>
     public class BasicReader : IDisposable
     {
-        /// <summary>
-        /// Returns true is the current instance is disposed.
-        /// </summary>
+        private static Dictionary<Type, BasicReturnAction<BasicReader, object>> _typageDefinitions = new Dictionary<Type, BasicReturnAction<BasicReader, object>>
+        {
+            { typeof(bool), (reader) => reader.GetBool() },
+            { typeof(string), (reader) => reader.GetString() },
+            { typeof(float), (reader) => reader.GetFloat() },
+            { typeof(decimal), (reader) => reader.GetDecimal() },
+            { typeof(double), (reader) => reader.GetDouble() },
+            { typeof(byte), (reader) => reader.GetByte() },
+            { typeof(sbyte), (reader) => reader.GetSByte() },
+            { typeof(char), (reader) => reader.GetChar() },
+            { typeof(short), (reader) => reader.GetShort() },
+            { typeof(ushort), (reader) => reader.GetUShort() },
+            { typeof(int), (reader) => reader.GetInt() },
+            { typeof(uint), (reader) => reader.GetUInt() },
+            { typeof(long), (reader) => reader.GetLong() },
+            { typeof(ulong), (reader) => reader.GetULong() },
+            { typeof(byte[]), (reader) => reader.GetBytes() },
+        };
+
+        public static void SetTypeDeserialization(Type type, BasicReturnAction<BasicReader, object> deserialization)
+        {
+            if (!_typageDefinitions.ContainsKey(type))
+            {
+                _typageDefinitions.Add(type, deserialization);
+            }
+            else
+            {
+                _typageDefinitions[type] = deserialization;
+            }
+        }
+
         public bool IsDisposed { get; private set; }
         /// <summary>
         /// Returns the total length of the stream.
@@ -105,9 +130,6 @@ namespace Inertia
             Fill(data);
         }
 
-        /// <summary>
-        /// Clear the current stream.
-        /// </summary>
         public void Clear()
         {
             if (!IsDisposed && _reader != null)
@@ -149,10 +171,6 @@ namespace Inertia
             return this;
         }
 
-        /// <summary>
-        /// Remove all the readed data in the stream and refresh the stream with the non-readed data
-        /// </summary>
-        /// <returns></returns>
         public BasicReader RemoveReadedBytes()
         {
             var available = GetBytes(UnreadedLength);
@@ -191,7 +209,6 @@ namespace Inertia
         {
             return GetByte().GetBits(length);
         }
-
         /// <summary>
         /// Read a <see cref="string"/> value with the current instance <see cref="Encoding"/> algorithm in the stream and change the position
         /// </summary>
@@ -394,9 +411,9 @@ namespace Inertia
         /// <returns>Readed byte array value or empty byte array if nothing can be read</returns>
         public byte[] GetBytes()
         {
-            if (IsUpdatable(sizeof(long)))
+            if (IsUpdatable(sizeof(uint)))
             {
-                var length = GetLong();
+                var length = GetUInt();
                 return GetBytes(length);
             }
             else
@@ -432,72 +449,145 @@ namespace Inertia
         /// Create an instance of <typeparamref name="T"/> and return it after deserialization
         /// </summary>
         /// <returns>Returns a <see cref="ISerializableObject"/></returns>
-        public T TryDeserializeObject<T>() where T : ISerializableObject
+        public T GetSerializableObject<T>() where T : ISerializableObject
         {
-            var parameters = typeof(T)
-                .GetConstructors()[0].GetParameters()
-                .Select(p => (object)null)
-                .ToArray();
-            var instance = (T)Activator.CreateInstance(typeof(T), parameters);
-            if (instance != null)
-            {
-                instance.Deserialize(this);
-                return instance;
-            }
-
-            return default(T);
+            return (T)GetSerializableObject(typeof(T));
         }
         /// <summary>
         /// Create an instance of <typeparamref name="T"/> and return it after deserialization
         /// </summary>
-        /// <returns>Returns a <see cref="ISerializableData"/></returns>
-        public T TryDeserializeData<T>() where T : ISerializableData
+        /// <returns>Returns a <see cref="ISerializableObject"/></returns>
+        public object GetSerializableObject(Type type)
         {
-            var parameters = typeof(T)
+            var parameters = type
                 .GetConstructors()[0].GetParameters()
                 .Select(p => (object)null)
                 .ToArray();
-            var instance = (T)Activator.CreateInstance(typeof(T), parameters);
+            var instance = Activator.CreateInstance(type, parameters);
             if (instance != null)
             {
-                instance.Deserialize(GetBytes());
+                ((ISerializableObject)instance).Deserialize(this);
                 return instance;
             }
 
-            return default(T);
+            return null;
         }
         /// <summary>
-        /// Read the next <typeparamref name="T"/> object in the stream having a <see cref="SerializableAttribute"/>
+        /// Create an instance of <typeparamref name="T"/> deserialize it and then return it
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <returns>Deserialized instance of <typeparamref name="T"/></returns>
-        public T GetObject<T>()
+        /// <returns></returns>
+        public T GetAutoSerializable<T>() where T : IAutoSerializable
         {
-            return (T)GetObject();
+            return (T)GetAutoSerializable(typeof(T));
         }
         /// <summary>
-        /// Read the next object in the stream having a <see cref="SerializableAttribute"/>
+        /// Deserialize the specified instance of <typeparamref name="T"/>
         /// </summary>
-        /// <returns>Deserialized object</returns>
-        public object GetObject()
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public void GetAutoSerializable<T>(T instance) where T : IAutoSerializable
         {
-            return new BinaryFormatter
+            GetAutoSerializable((IAutoSerializable)instance);
+        }
+        /// <summary>
+        /// Create an instance of specified <see cref="IAutoSerializable"/> deserialize it and then return it
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public IAutoSerializable GetAutoSerializable(Type type)
+        {
+            if (type.GetInterface(nameof(IAutoSerializable)) == null)
             {
-                TypeFormat = System.Runtime.Serialization.Formatters.FormatterTypeStyle.TypesWhenNeeded
-            }.Deserialize(_reader.BaseStream);
+                throw new Exception($"Type '{ type.Name }' isn't '{ nameof(IAutoSerializable) }'");
+            }
+
+            var instance = Activator.CreateInstance(type);
+            return GetAutoSerializable((IAutoSerializable)instance);
+        }
+        /// <summary>
+        /// Deserialize the specified instance of <see cref="IAutoSerializable"/>
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public IAutoSerializable GetAutoSerializable(IAutoSerializable instance)
+        {
+            var type = instance.GetType();
+            var fields = instance.GetType().GetFields(BindingFlags.Public | BindingFlags.Instance).OrderBy((x) => x.MetadataToken);
+
+            foreach (var field in fields)
+            {
+                if (field.GetCustomAttribute<IgnoreField>() == null)
+                {
+                    if (!typeof(IAutoSerializable).IsAssignableFrom(field.FieldType))
+                    {
+                        var customization = field.GetCustomAttribute<CustomDeserialization>();
+                        if (customization == null)
+                        {
+                            field.SetValue(instance, GetValue(field.FieldType));
+                        }
+                        else
+                        {
+                            var method = type.GetMethod(customization.MethodName, BindingFlags.NonPublic | BindingFlags.Instance);
+                            var parameters = method?.GetParameters();
+
+                            if (parameters.Length == 1 && parameters[0].ParameterType == typeof(BasicReader))
+                            {
+                                method.Invoke(instance, new object[] { this });
+                            }
+                        }
+                    }
+                    else
+                    {
+                        field.SetValue(instance, GetAutoSerializable(field.FieldType));
+                    }
+                }
+            }
+
+            return instance;
         }
 
         /// <summary>
-        ///
+        /// Read the next object in the stream based on the specified <see cref="Type"/>
         /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public T GetValue<T>()
+        {
+            return (T)GetValue(typeof(T));
+        }
+        /// <summary>
+        /// Read the next object in the stream based on the specified <see cref="Type"/>
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public object GetValue(Type type)
+        {
+            if (_typageDefinitions.ContainsKey(type))
+            {
+                return _typageDefinitions[type](this);
+            }
+            else
+            {
+                if (type.GetInterface(nameof(IAutoSerializable)) != null)
+                {
+                    return GetAutoSerializable(type);
+                }
+                else if (type.GetInterface(nameof(ISerializableObject)) != null)
+                {
+                    return GetSerializableObject(type);
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
+
         public void Dispose()
         {
             Dispose(true);
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="disposing"></param>
         protected virtual void Dispose(bool disposing)
         {
             if (!IsDisposed && disposing)

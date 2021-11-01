@@ -12,8 +12,15 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\Inertia.ORM.xml</DocumentationFile>
+    <NoWarn>1701;1702;1591</NoWarn>
+    <Optimize>false</Optimize>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <OutDir>$(SolutionDir).NET Core 3.1\Inertia.ORM\bin\$(Configuration)</OutDir>
+  </PropertyGroup>
+  
   <ItemGroup>
     <None Remove="Inertia.ORM.xml" />
   </ItemGroup>

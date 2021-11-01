@@ -6,9 +6,6 @@ using System.Net;
 
 namespace Inertia
 {
-    /// <summary>
-    ///
-    /// </summary>
     public static class WebHelper
     {
         /// <summary>

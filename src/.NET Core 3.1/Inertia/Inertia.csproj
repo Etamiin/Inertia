@@ -7,12 +7,21 @@
     <Product />
     <AssemblyVersion>2.108.27.1515</AssemblyVersion>
     <FileVersion>2.108.27.1515</FileVersion>
+    <SignAssembly>false</SignAssembly>
+    <Version>1.0.0</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia\Inertia.xml</DocumentationFile>
+    <NoWarn>1701;1702;1591</NoWarn>
+    <Optimize>false</Optimize>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <OutDir>$(SolutionDir).NET Core 3.1\Inertia\bin\$(Configuration)</OutDir>
+  </PropertyGroup>
+  
   <ItemGroup>
     <None Remove="Inertia.xml" />
   </ItemGroup>

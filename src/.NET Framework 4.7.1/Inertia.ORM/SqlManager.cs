@@ -13,8 +13,123 @@ namespace Inertia.ORM
     {
         private static Dictionary<string, Database> _databases;
 
-        private static bool _initialized;
         private static AutoQueueExecutor _queue;
+
+        static SqlManager()
+        {
+            if (_databases == null)
+            {
+                _databases = new Dictionary<string, Database>();
+            }
+            if (_queue == null)
+            {
+                _queue = new AutoQueueExecutor();
+            }
+
+            var namedDbDict = new Dictionary<string, List<Type>>();
+            var typedDbDict = new Dictionary<Type, List<Type>>();
+
+            try
+            {
+                var assemblys = AppDomain.CurrentDomain.GetAssemblies();
+                foreach (var assembly in assemblys)
+                {
+                    foreach (var type in assembly.GetTypes())
+                    {
+                        if (type.IsAbstract || !type.IsClass)
+                        {
+                            continue;
+                        }
+
+                        if (type.IsSubclassOf(typeof(Database)))
+                        {
+                            var db = (Database)Activator.CreateInstance(type);
+                            if (!_databases.ContainsKey(db.Name))
+                            {
+                                _databases.Add(db.Name, db);
+                                db.TryCreateItSelf();
+                            }
+                            else
+                            {
+                                throw new DatabaseAlreadyInitializedException(db.Name);
+                            }
+                        }
+                        else if (type.IsSubclassOf(typeof(Table)))
+                        {
+                            var attachTo = type.GetCustomAttribute<AttachTo>(false);
+                            if (attachTo != null)
+                            {
+                                if (!string.IsNullOrEmpty(attachTo.DatabaseName))
+                                {
+                                    if (namedDbDict.TryGetValue(attachTo.DatabaseName, out List<Type> types))
+                                    {
+                                        types.Add(type);
+                                    }
+                                    else
+                                    {
+                                        namedDbDict.Add(attachTo.DatabaseName, new List<Type> { type });
+                                    }
+                                }
+                                else if (attachTo.DatabaseType != null)
+                                {
+                                    if (typedDbDict.TryGetValue(attachTo.DatabaseType, out List<Type> types))
+                                    {
+                                        types.Add(type);
+                                    }
+                                    else
+                                    {
+                                        typedDbDict.Add(attachTo.DatabaseType, new List<Type> { type });
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                foreach (var pair in namedDbDict)
+                {
+                    TryRegisterDb(pair.Value, dbName: pair.Key);
+                }
+                foreach (var pair in typedDbDict)
+                {
+                    TryRegisterDb(pair.Value, dbType: pair.Key);
+                }
+
+                void TryRegisterDb(List<Type> tables, string dbName = "", Type dbType = null)
+                {
+                    Database db = null;
+                    if (!string.IsNullOrEmpty(dbName))
+                    {
+                        TrySearchDatabase(dbName, out db);
+                    }
+                    else if (dbType != null)
+                    {
+                        TrySearchDatabase(dbType, out db);
+                    }
+
+                    if (db != null && db.GetType().GetCustomAttribute<AutoGenerateTables>() != null)
+                    {
+                        RegisterTablesTo(db, tables);
+                    }
+                }
+                void RegisterTablesTo(Database db, List<Type> types)
+                {
+                    foreach (var type in types)
+                    {
+                        var table = (Table)Activator.CreateInstance(type);
+                        db.Create(table);
+                    }
+
+                    db.IsInitialized = true;
+                    db.OnInitialized();
+                }
+            }
+            catch (Exception ex)
+            {
+                _databases.Clear();
+                throw new InitializationFailedException(ex.ToString());
+            }
+        }
 
         internal static void EnqueueAsyncOperation(BasicAction action)
         {
@@ -29,8 +144,6 @@ namespace Inertia.ORM
         /// <returns></returns>
         public static bool TrySearchDatabase(string name, out Database database)
         {
-            Initialize();
-
             return _databases.TryGetValue(name, out database);
         }
         /// <summary>
@@ -56,8 +169,6 @@ namespace Inertia.ORM
         /// <returns></returns>
         public static bool TrySearchDatabase(Type databaseType, out Database database)
         {
-            Initialize();
-
             database = _databases.Values.FirstOrDefault((db) => db.GetType() == databaseType);
             return database != null;
         }
@@ -75,123 +186,6 @@ namespace Inertia.ORM
             }
         }
 
-        private static void Initialize()
-        {
-            if (_initialized)
-            {
-                return;
-            }
-
-            _initialized = true;
-
-            if (_databases == null)
-            {
-                _databases = new Dictionary<string, Database>();
-            }
-            if (_queue == null)
-            {
-                _queue = new AutoQueueExecutor();
-            }
-
-            var uTables = new Dictionary<string, List<Type>>();
-            var utTables = new Dictionary<Type, List<Type>>();
-
-            try
-            {
-                var assemblys = AppDomain.CurrentDomain.GetAssemblies();
-                foreach (var assembly in assemblys)
-                {
-                    foreach (var type in assembly.GetTypes())
-                    {
-                        if (type.IsAbstract || !type.IsClass)
-                        {
-                            continue;
-                        }
-
-                        if (type.IsSubclassOf(typeof(Database)))
-                        {
-                            var db = (Database)Activator.CreateInstance(type);
-                            if (_databases.ContainsKey(db.Name))
-                            {
-                                throw new DatabaseAlreadyInitializedException(db.Name);
-                            }
-
-                            db.TryCreateItSelf();
-                            _databases.Add(db.Name, db);
-                        }
-                        else if (type.IsSubclassOf(typeof(Table)))
-                        {
-                            var attachTo = type.GetCustomAttribute<AttachTo>(false);
-                            if (attachTo != null)
-                            {
-                                if (!string.IsNullOrEmpty(attachTo.DatabaseName))
-                                {
-                                    if (uTables.TryGetValue(attachTo.DatabaseName, out List<Type> types))
-                                    {
-                                        types.Add(type);
-                                    }
-                                    else
-                                    {
-                                        uTables.Add(attachTo.DatabaseName, new List<Type> { type });
-                                    }
-                                }
-                                else if (attachTo.DatabaseType != null)
-                                {
-                                    if (utTables.TryGetValue(attachTo.DatabaseType, out List<Type> types))
-                                    {
-                                        types.Add(type);
-                                    }
-                                    else
-                                    {
-                                        utTables.Add(attachTo.DatabaseType, new List<Type> { type });
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                foreach (var pair in uTables)
-                {
-                    if (TrySearchDatabase(pair.Key, out Database db))
-                    {
-                        if (db.GetType().GetCustomAttribute<AutoGenerateTables>() == null)
-                        {
-                            continue;
-                        }
-
-                        RegisterTablesTo(db, pair.Value);
-                    }
-                }
-                foreach (var pair in utTables)
-                {
-                    if (TrySearchDatabase(pair.Key, out Database db))
-                    {
-                        if (db.GetType().GetCustomAttribute<AutoGenerateTables>() == null)
-                        {
-                            continue;
-                        }
-
-                        RegisterTablesTo(db, pair.Value);
-                    }
-                }
-
-                void RegisterTablesTo(Database db, List<Type> types)
-                {
-                    foreach (var type in types)
-                    {
-                        var table = (Table)Activator.CreateInstance(type);
-                        db.Create(table);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                _databases.Clear();
-                throw new InitializationFailedException(ex.ToString());
-            }
-        }
-    
         internal static bool CreateTableInstance<T>(out T instance) where T : Table
         {
             instance = null;

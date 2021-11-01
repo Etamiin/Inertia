@@ -2,14 +2,8 @@
 
 namespace Inertia.Runtime
 {
-    /// <summary>
-    ///
-    /// </summary>
     public sealed class ScriptArgumentsCollection : IDisposable
     {
-        /// <summary>
-        /// Returns true if the current instance is disposed.
-        /// </summary>
         public bool IsDisposed { get; private set; }
         /// <summary>
         /// Returns the number of arguments in the collection.
@@ -46,12 +40,6 @@ namespace Inertia.Runtime
             }
         }
 
-        /// <summary>
-        /// Returns the argument as <typeparamref name="T"/> at the specified index in the collection.
-        /// </summary>
-        /// <typeparam name="T">Specified <see cref="Type"/> to cast</typeparam>
-        /// <param name="index"></param>
-        /// <returns></returns>
         public T GetArgumentAt<T>(int index)
         {
             if (index >= 0 && index < Count)
@@ -80,9 +68,6 @@ namespace Inertia.Runtime
             }
         }
 
-        /// <summary>
-        ///
-        /// </summary>
         public void Dispose()
         {
             if (!IsDisposed)

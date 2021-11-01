@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
+using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace Inertia
 {
-    /// <summary>
-    ///
-    /// </summary>
     public class BasicWriter : IDisposable
     {
         private static Dictionary<Type, BasicAction<BasicWriter, object>> _typageDefinitions = new Dictionary<Type, BasicAction<BasicWriter, object>>
@@ -30,9 +28,18 @@ namespace Inertia
             { typeof(byte[]), (writer, value) => writer.SetBytes((byte[])value) }
         };
 
-        /// <summary>
-        /// Returns true is the current instance is disposed.
-        /// </summary>
+        public static void SetTypeSerialization(Type type, BasicAction<BasicWriter, object> serialization)
+        {
+            if (!_typageDefinitions.ContainsKey(type))
+            {
+                _typageDefinitions.Add(type, serialization);
+            }
+            else
+            {
+                _typageDefinitions[type] = serialization;
+            }
+        }
+
         public bool IsDisposed { get; private set; }
         /// <summary>
         /// Returns the total length of the stream.
@@ -85,12 +92,9 @@ namespace Inertia
         public BasicWriter(Encoding encoding)
         {
             _encoding = encoding;
-            _writer = new BinaryWriter(new MemoryStream(), encoding);            
+            _writer = new BinaryWriter(new MemoryStream(), encoding);
         }
 
-        /// <summary>
-        /// Clear the current stream.
-        /// </summary>
         public void Clear()
         {
             if (IsDisposed)
@@ -113,7 +117,7 @@ namespace Inertia
         /// <returns>Returns the current instance</returns>
         public BasicWriter SetEmpty(uint size)
         {
-            return SetBytes(new byte[size - 4]);
+            return SetBytesWithoutHeader(new byte[size]);
         }
         /// <summary>
         /// Write the specified value in the stream
@@ -278,7 +282,7 @@ namespace Inertia
         /// <returns>Returns the current instance</returns>
         public BasicWriter SetBytes(byte[] value)
         {
-            _writer.Write(value.LongLength);
+            _writer.Write((uint)value.Length);
             return SetBytesWithoutHeader(value);
         }
         /// <summary>
@@ -301,46 +305,64 @@ namespace Inertia
             return SetLong(value.Ticks);
         }
         /// <summary>
-        /// Write customized serializable object in the stream
+        /// Write an instance of <see cref="ISerializableObject"/> in the stream
         /// </summary>
-        /// <param name="obj"><see cref="ISerializableObject"/> to serialize</param>
+        /// <param name="value"><see cref="ISerializableObject"/> to serialize</param>
         /// <returns>Returns the current instance</returns>
-        public BasicWriter SetSerializableObject(ISerializableObject obj)
+        public BasicWriter SetSerializableObject(ISerializableObject value)
         {
-            obj.Serialize(this);
+            value.Serialize(this);
             return this;
         }
         /// <summary>
-        /// Write customized serializable object in the stream
+        /// Write an instance of <see cref="IAutoSerializable"/> in the stream
         /// </summary>
-        /// <param name="data"><see cref="ISerializableData"/> to serialize</param>
-        /// <returns>Returns the current instance</returns>
-        public BasicWriter SetSerializableData(ISerializableData data)
-        {
-            return SetBytes(data.Serialize());
-        }
-        /// <summary>
-        /// Write the specified serializable value in the stream
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="value">The object to serialize</param>
+        /// <param name="value"></param>
         /// <returns></returns>
-        /// <exception cref="TypeNonSerializableException"></exception>
-        public BasicWriter SetObject<T>(T value)
+        public BasicWriter SetAutoSerializable(IAutoSerializable value)
         {
-            if (!value.GetType().IsSerializable)
+            var type = value.GetType();
+            var fields = type.GetFields(BindingFlags.Public | BindingFlags.Instance).OrderBy((x) => x.MetadataToken);
+
+            foreach (var field in fields)
             {
-                throw new TypeNonSerializableException(typeof(T));
+                if (field.GetCustomAttribute<IgnoreField>() == null)
+                {
+                    var fieldValue = field.GetValue(value);
+
+                    if (!typeof(IAutoSerializable).IsAssignableFrom(field.FieldType))
+                    {
+                        var customization = field.GetCustomAttribute<CustomSerialization>();
+                        if (customization == null)
+                        {
+                            SetValue(fieldValue);
+                        }
+                        else
+                        {
+                            var method = type.GetMethod(customization.MethodName, BindingFlags.NonPublic | BindingFlags.Instance);
+                            var parameters = method?.GetParameters();
+
+                            if (parameters.Length == 1 && parameters[0].ParameterType == typeof(BasicWriter))
+                            {
+                                method.Invoke(value, new object[] { this });
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (fieldValue == null)
+                        {
+                            throw new MissingFieldException($"{ field.Name } is null");
+                        } 
+                        
+                        SetAutoSerializable(fieldValue as IAutoSerializable);
+                    }
+                }
             }
 
-            var binaryFormatter = new BinaryFormatter
-            {
-                TypeFormat = System.Runtime.Serialization.Formatters.FormatterTypeStyle.TypesWhenNeeded
-            };
-
-            binaryFormatter.Serialize(_writer.BaseStream, value);
             return this;
         }
+
         /// <summary>
         /// Automatically write the specified value in the stream
         /// </summary>
@@ -355,7 +377,14 @@ namespace Inertia
             }
             else
             {
-                SetObject(value);
+                if (objType.GetInterface(nameof(IAutoSerializable)) != null)
+                {
+                    SetAutoSerializable((IAutoSerializable)value);
+                }
+                else if (objType.GetInterface(nameof(ISerializableObject)) != null)
+                {
+                    SetSerializableObject((ISerializableObject)value);
+                }
             }
 
             return this;
@@ -413,17 +442,10 @@ namespace Inertia
             return data;
         }
 
-        /// <summary>
-        ///
-        /// </summary>
         public void Dispose()
         {
             Dispose(true);
-        }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="disposing"></param>
+        }        
         protected virtual void Dispose(bool disposing)
         {
             if (!IsDisposed && disposing)

@@ -5,14 +5,8 @@ using System.Threading.Tasks;
 
 namespace Inertia
 {
-    /// <summary>
-    ///
-    /// </summary>
     public sealed class AutoQueueExecutor : IDisposable
     {
-        /// <summary>
-        /// Returns true if the current instance is disposed.
-        /// </summary>
         public bool IsDisposed { get; private set; }
         /// <summary>
         /// Returns the number of actions currently queued.
@@ -36,10 +30,6 @@ namespace Inertia
             Task.Factory.StartNew(Execute);
         }
 
-        /// <summary>
-        /// Enqueue the specified actions at the end of the queue.
-        /// </summary>
-        /// <param name="actions"></param>
         public void Enqueue(params BasicAction[] actions)
         {
             if (IsDisposed)
@@ -56,9 +46,6 @@ namespace Inertia
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         public void Dispose()
         {
             if (!IsDisposed)
@@ -80,8 +67,7 @@ namespace Inertia
 
                 lock (_queue)
                 {
-                    var action = _queue.Dequeue();
-                    action.Invoke();
+                    _queue.Dequeue()?.Invoke();
                 }
             }
         }

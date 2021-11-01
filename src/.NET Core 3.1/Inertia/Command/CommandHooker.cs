@@ -1,45 +1,52 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Inertia
 {
-    /// <summary>
-    ///
-    /// </summary>
     public static class CommandHooker
     {
-        /// <summary>
-        /// Returns all loaded textual commands.
-        /// </summary>
-        /// <returns></returns>
-        public static TextCommand[] GetAllCommands()
-        {
-            LoaderManager.DefaultLoadCommands();
+        internal static Dictionary<string, TextCommand> _commands;
 
-            lock (LoaderManager.Commands)
+        static CommandHooker()
+        {
+            _commands = new Dictionary<string, TextCommand>();
+
+            var assemblys = AppDomain.CurrentDomain.GetAssemblies();
+            foreach (var assembly in assemblys)
             {
-                return LoaderManager.Commands.Values.ToArray();
+                var types = assembly.GetTypes();
+                foreach (var type in types)
+                {
+                    if (type.IsClass)
+                    {
+                        if (type.IsSubclassOf(typeof(TextCommand)) && !type.IsAbstract)
+                        {
+                            var inertiaCommand = (TextCommand)type.GetConstructor(Type.EmptyTypes).Invoke(new object[] { });
+                            if (!_commands.ContainsKey(inertiaCommand.Name))
+                            {
+                                _commands.Add(inertiaCommand.Name, inertiaCommand);
+                            }
+                        }
+                    }
+                }
             }
         }
-        /// <summary>
-        /// Returns the <see cref="TextCommand"/> associated with the specified name.
-        /// </summary>
-        /// <param name="commandName"></param>
-        /// <returns></returns>
+
+        public static TextCommand[] GetAllCommands()
+        {
+            lock (_commands)
+            {
+                return _commands.Values.ToArray();
+            }
+        }
         public static TextCommand GetCommandByName(string commandName)
         {
-            LoaderManager.DefaultLoadCommands();
-            LoaderManager.Commands.TryGetValue(commandName, out TextCommand command);
+            _commands.TryGetValue(commandName, out TextCommand command);
 
             return command;
         }
 
-        /// <summary>
-        /// Executes a command line and returns the associated <see cref="TextCommandArgs"/> instance.
-        /// </summary>
-        /// <param name="commandLine"></param>
-        /// <param name="dataCollection">The list of objects to be associated with the command</param>
-        /// <returns></returns>
         public static bool TryExecuteCommandLine(string commandLine, params object[] dataCollection)
         {
             var args = commandLine.Split(' ');
@@ -54,7 +61,7 @@ namespace Inertia
             var command = GetCommandByName(commandName);
             if (command != null)
             {
-                command.Execute(new TextCommandArgs(commandLine, commandName, arguments, dataCollection));
+                command.OnExecute(new TextCommandArgs(commandLine, arguments, dataCollection));
                 return true;
             }
 

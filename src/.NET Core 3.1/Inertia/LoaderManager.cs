@@ -7,20 +7,11 @@ using Inertia.Runtime;
 
 namespace Inertia
 {
-    /// <summary>
-    /// 
-    /// </summary>
     public static class LoaderManager
     {
-        internal static Dictionary<string, TextCommand> Commands;
-
         private static List<IInertiaPlugin> _plugins;
-        private static bool _commandsLoaded => Commands != null;
         private static bool _pluginLoaded => _plugins != null;
 
-        /// <summary>
-        ///
-        /// </summary>
         public static void LoadPlugins()
         {
             if (_pluginLoaded || !Directory.Exists("Plugins"))
@@ -73,34 +64,6 @@ namespace Inertia
 
             plugin = default;
             return false;
-        }
-
-        internal static void DefaultLoadCommands()
-        {
-            if (!_commandsLoaded)
-            {
-                Commands = new Dictionary<string, TextCommand>();
-
-                var assemblys = AppDomain.CurrentDomain.GetAssemblies();
-                foreach (var assembly in assemblys)
-                {
-                    var types = assembly.GetTypes();
-                    foreach (var type in types)
-                    {
-                        if (type.IsClass)
-                        {
-                            if (type.IsSubclassOf(typeof(TextCommand)) && !type.IsAbstract)
-                            {
-                                var inertiaCommand = (TextCommand)type.GetConstructor(Type.EmptyTypes).Invoke(new object[] { });
-                                if (!Commands.ContainsKey(inertiaCommand.Name))
-                                {
-                                    Commands.Add(inertiaCommand.Name, inertiaCommand);
-                                }
-                            }
-                        }
-                    }
-                }
-            }            
         }
     }
 }

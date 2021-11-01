@@ -2,9 +2,6 @@
 
 namespace Inertia.Runtime
 {
-    /// <summary>
-    ///
-    /// </summary>
     public abstract class Script : IDisposable
     {
         /// <summary>
@@ -12,9 +9,6 @@ namespace Inertia.Runtime
         /// </summary>
         public static float DeltaTime { get; internal set; }
 
-        /// <summary>
-        /// Returns true is the current instance is destroyed.
-        /// </summary>
         public bool IsDestroyed { get; private set; }
 
         internal ScriptCollection Parent;
@@ -61,24 +55,14 @@ namespace Inertia.Runtime
         /// </summary>
         protected virtual void OnDestroy() { }
 
-        /// <summary>
-        /// 
-        /// </summary>
         public void Destroy()
         {
             Dispose(true);
-        }
-        /// <summary>
-        ///
-        /// </summary>
+        }        
         public void Dispose()
         {
             Dispose(true);
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="disposing"></param>
         protected virtual void Dispose(bool disposing)
         {
             if (!IsDestroyed && !IsDisposed)

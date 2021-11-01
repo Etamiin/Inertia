@@ -6,18 +6,9 @@ using System.Threading.Tasks;
 
 namespace Inertia.Runtime
 {
-    /// <summary>
-    /// 
-    /// </summary>
     public interface IInertiaPlugin
     {
-        /// <summary>
-        /// 
-        /// </summary>
         void OnInitialize();
-        /// <summary>
-        /// 
-        /// </summary>
         void OnExecute();
     }
 }

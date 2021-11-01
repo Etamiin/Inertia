@@ -7,38 +7,30 @@ namespace Inertia.Runtime
 {
     internal static class RuntimeManager
     {
+        static RuntimeManager()
+        {
+            var clock = new Clock();
+
+            Task.Factory.StartNew(() => {
+                while (!IsManuallyRunned)
+                {
+                    ExecuteCycle(clock);
+                }
+            });
+        }
+
         internal static bool IsManuallyRunned { get; set; }
 
-        internal static event BasicAction UpdatingSiT;
-        private static event BasicAction Updating;
-        private static event BasicAction Destroying;
-
-        private static bool _isInitialized;
-
-        internal static void OnRegisterExtends()
-        {
-            if (!_isInitialized)
-            {
-                Initialize();
-            }
-        }
+        internal static event BasicAction UpdatingSiT = () => { };
+        private static event BasicAction Updating = () => { };
+        private static event BasicAction Destroying = () => { };
 
         internal static void OnScriptCreated(Script script)
         {
-            if (!_isInitialized)
-            {
-                Initialize();
-            }
-
             Updating += script.Update;
         }
         internal static void OnScriptDestroyed(Script script)
         {
-            if (!_isInitialized)
-            {
-                Initialize();
-            }
-
             Updating -= script.Update;
             Destroying += script.PreDestroy;
         }
@@ -48,7 +40,7 @@ namespace Inertia.Runtime
             script.Parent.FinalizeRemove(script);
         }
 
-        internal static void ExecuteCycle(Clock clock)
+        internal static void ExecuteCycle(Clock clock, float deltaTime = 0f)
         {
             if (clock != null)
             {
@@ -58,9 +50,13 @@ namespace Inertia.Runtime
                     Thread.Sleep(1);
                     currentMsUpdate = clock.GetElapsedSeconds();
                 }
-
+                
                 Script.DeltaTime = (float)currentMsUpdate;
                 clock.Reset();
+            }
+            else
+            {
+                Script.DeltaTime = deltaTime;
             }
 
             lock (UpdatingSiT)
@@ -75,26 +71,6 @@ namespace Inertia.Runtime
             {
                 Destroying?.Invoke();
             }
-        }
-
-        private static void Initialize()
-        {
-            if (!_isInitialized)
-            {
-                _isInitialized = true;
-                ExecuteLogic();
-            }
-        }
-        private static void ExecuteLogic()
-        {
-            var clock = new Clock();
-
-            Task.Factory.StartNew(() => {
-                while (!IsManuallyRunned)
-                {
-                    ExecuteCycle(clock);
-                }
-            });
         }
     }
 }

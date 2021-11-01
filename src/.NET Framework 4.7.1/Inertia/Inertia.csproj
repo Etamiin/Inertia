@@ -22,6 +22,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Debug\Inertia.xml</DocumentationFile>
+    <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -47,14 +48,34 @@
     <Compile Include="Command\TextCommandArgs.cs" />
     <Compile Include="Delegates.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="IO\Attributes\CustomDeserialization.cs" />
+    <Compile Include="IO\Attributes\CustomSerialization.cs" />
+    <Compile Include="IO\Attributes\IgnoreField.cs" />
     <Compile Include="IO\BasicReader.cs" />
     <Compile Include="IO\BasicWriter.cs" />
     <Compile Include="IO\Exceptions\BoolFlagTooLargeException.cs" />
-    <Compile Include="IO\Exceptions\TypeNonSerializableException.cs" />
-    <Compile Include="IO\Interfaces\ISerializableData.cs" />
+    <Compile Include="IO\Interfaces\IAutoSerializable.cs" />
     <Compile Include="IO\Interfaces\ISerializableObject.cs" />
     <Compile Include="IO\IOHelper.cs" />
     <Compile Include="LoaderManager.cs" />
+    <Compile Include="Network\Core\Entities\NetworkClientEntity.cs" />
+    <Compile Include="Network\Core\Entities\NetworkConnectionEntity.cs" />
+    <Compile Include="Network\Core\Entities\NetworkServerEntity.cs" />
+    <Compile Include="Network\Core\Entities\TCP\TcpClientEntity.cs" />
+    <Compile Include="Network\Core\Entities\TCP\TcpServerEntity.cs" />
+    <Compile Include="Network\Core\Entities\UDP\UdpClientEntity.cs" />
+    <Compile Include="Network\Core\Entities\UDP\UdpServerEntity.cs" />
+    <Compile Include="Network\Core\Instances\DefaultNetworkProtocol.cs" />
+    <Compile Include="Network\Core\Instances\TcpConnectionEntity.cs" />
+    <Compile Include="Network\Core\Instances\UdpConnectionEntity.cs" />
+    <Compile Include="Network\Core\Protocol\NetworkMessage.cs" />
+    <Compile Include="Network\Core\Protocol\NetworkMessageCaller.cs" />
+    <Compile Include="Network\Core\Protocol\NetworkMessageHandler.cs" />
+    <Compile Include="Network\Core\Protocol\NetworkProtocol.cs" />
+    <Compile Include="Network\Enums\NetworkDisconnectReason.cs" />
+    <Compile Include="Network\Exceptions\DefaultProtocolFailedParseNetworkMessageException.cs" />
+    <Compile Include="Network\Exceptions\UnknownMessageException.cs" />
+    <Compile Include="Network\Exceptions\UserDatagramDataLengthLimitException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Runtime\Core\Script.cs" />
     <Compile Include="Runtime\Core\ScriptCollection.cs" />
