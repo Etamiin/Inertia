@@ -4,86 +4,32 @@
         <name>Inertia</name>
     </assembly>
     <members>
-        <member name="P:Inertia.TextCommand.Name">
+        <member name="T:Inertia.CommandHooker">
             <summary>
-            Returns the name of the command.
+            Core component for command line management and execution.
             </summary>
         </member>
-        <member name="T:Inertia.TextCommandArgs">
+        <member name="T:Inertia.InertiaInitializationException">
             <summary>
-            Provides methods for accessing arguments when running a <see cref="T:Inertia.TextCommand"/>
+            This exception is thrown in case an error occurs during the initialization of a core component.
             </summary>
-        </member>
-        <member name="P:Inertia.TextCommandArgs.Count">
-            <summary>
-            Returns the number of arguments of the command executed.
-            </summary>
-        </member>
-        <member name="P:Inertia.TextCommandArgs.DataCount">
-            <summary>
-            Returns the number of data objects of the command executed.
-            </summary>
-        </member>
-        <member name="P:Inertia.TextCommandArgs.Item(System.Int32)">
-            <summary>
-            Returns the argument of the command executed at the specified index.
-            </summary>
-            <param name="index">Target index</param>
-            <returns>The string argument</returns>
-        </member>
-        <member name="M:Inertia.TextCommandArgs.GetDataAt``1(System.Int32)">
-            <summary>
-            Returns the data argument of Type <typeparamref name="T"/> at the specified index
-            </summary>
-            <typeparam name="T">Target data object type</typeparam>
-            <param name="index">Target index</param>
-            <returns>The data object as <typeparamref name="T"/></returns>
-        </member>
-        <member name="M:Inertia.TextCommandArgs.TryGetNextArgument(System.String@)">
-            <summary>
-            Returns true if an argument is available in the queue otherwise false.
-            </summary>
-            <param name="arg">The argument result</param>
-            <returns></returns>
-        </member>
-        <member name="M:Inertia.TextCommandArgs.CombineArguments(System.Int32)">
-            <summary>
-            Combines all arguments of the executed command from the specified index.
-            </summary>
-            <param name="startIndex"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Inertia.TextCommandArgs.CombineArguments(System.Int32,System.Int32)">
-            <summary>
-            Combines all arguments of the executed command from the specified index to the specified length.
-            </summary>
-            <param name="startIndex"></param>
-            <param name="length"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Inertia.TextCommandArgs.CombineAllArguments">
-            <summary>
-            Combines all arguments of the executed command.
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:Inertia.TextCommandArgs.ToString">
-            <summary>
-            Returns the command line executed.
-            </summary>
-            <returns></returns>
         </member>
         <member name="M:Inertia.CustomDeserialization.#ctor(System.String)">
             <summary>
-            Specify that the field with a <see cref="T:Inertia.CustomDeserialization"/> attribute will execute the specfied method to be deserialized
+            Specify that the value of the field will be deserialized by the method indicated in parameter.
             </summary>
             <param name="methodName"></param>
         </member>
         <member name="M:Inertia.CustomSerialization.#ctor(System.String)">
             <summary>
-            Specify that the field with a <see cref="T:Inertia.CustomSerialization"/> attribute will execute the specfied method to be serialized
+            Specify that the value of the field will be serialized by the method indicated in parameter.
             </summary>
             <param name="methodName"></param>
+        </member>
+        <member name="T:Inertia.IgnoreField">
+            <summary>
+            Ignore a field during procedures involving instance fields
+            </summary>
         </member>
         <member name="P:Inertia.BasicReader.TotalLength">
             <summary>
@@ -99,30 +45,6 @@
             <summary>
             Get or Set the position in the stream.
             </summary>
-        </member>
-        <member name="M:Inertia.BasicReader.#ctor">
-            <summary>
-            Initialize a new instance with empty data
-            </summary>
-        </member>
-        <member name="M:Inertia.BasicReader.#ctor(System.Text.Encoding)">
-            <summary>
-            Initialize a new instance with empty data based on the specified <see cref="T:System.Text.Encoding"/>
-            </summary>
-            <param name="encoding"><see cref="T:System.Text.Encoding"/> for the reader</param>
-        </member>
-        <member name="M:Inertia.BasicReader.#ctor(System.Byte[])">
-            <summary>
-            Initialize a new instance with the specified data
-            </summary>
-            <param name="data">The target byte array</param>
-        </member>
-        <member name="M:Inertia.BasicReader.#ctor(System.Byte[],System.Text.Encoding)">
-            <summary>
-            Initialize a new instance with the specified data based on the specified <see cref="T:System.Text.Encoding"/>
-            </summary>
-            <param name="data">Data to read</param>
-            <param name="encoding"><see cref="T:System.Text.Encoding"/> for the reader</param>
         </member>
         <member name="M:Inertia.BasicReader.Fill(System.Byte[])">
             <summary>
@@ -314,17 +236,6 @@
             Get or Set the position in the stream.
             </summary>
         </member>
-        <member name="M:Inertia.BasicWriter.#ctor">
-            <summary>
-            Initialize a new instance based on <see cref="P:System.Text.Encoding.UTF8"/> algorithm
-            </summary>
-        </member>
-        <member name="M:Inertia.BasicWriter.#ctor(System.Text.Encoding)">
-            <summary>
-            Initialize a new instance based on the specified <see cref="T:System.Text.Encoding"/> algorithm
-            </summary>
-            <param name="encoding"></param>
-        </member>
         <member name="M:Inertia.BasicWriter.SetEmpty(System.UInt32)">
             <summary>
             Write empty data of specified size
@@ -510,29 +421,17 @@
             Exception thrown when flag size limit is reached
             </summary>
         </member>
+        <member name="T:Inertia.IAutoSerializable">
+            <summary>
+            Allows the system to automatically serialize or deserialize the fields of an instance (using the attributes <see cref="T:Inertia.CustomSerialization"/> and <see cref="T:Inertia.CustomDeserialization"/>)
+            </summary>
+        </member>
         <member name="M:Inertia.LoaderManager.TryGetPlugin``1(``0@)">
             <summary>
             Returns the specified <see cref="T:Inertia.Runtime.IInertiaPlugin"/> loaded instance.
             </summary>
             <typeparam name="T"></typeparam>
             <returns></returns>
-        </member>
-        <member name="P:Inertia.Network.NetworkClientEntity.Connected">
-            <summary>
-            Occurs when the client is connected.
-            </summary>
-        </member>
-        <member name="P:Inertia.Network.NetworkClientEntity.Disconnected">
-            <summary>
-            Occurs when the client is disconnected.
-            </summary>
-        </member>
-        <member name="M:Inertia.Network.NetworkClientEntity.#ctor(System.String,System.Int32)">
-            <summary>
-            Instantiate a new instance of the class <see cref="T:Inertia.Network.NetworkClientEntity"/>.
-            </summary>
-            <param name="ip"></param>
-            <param name="port"></param>
         </member>
         <member name="P:Inertia.Network.NetworkServerEntity.Started">
             <summary>
@@ -551,13 +450,6 @@
             <param name="ip"></param>
             <param name="port"></param>
         </member>
-        <member name="M:Inertia.Network.TcpClientEntity.#ctor(System.String,System.Int32)">
-            <summary>
-            Instantiate a new instance of the class <see cref="T:Inertia.Network.TcpClientEntity"/>
-            </summary>
-            <param name="ip"></param>
-            <param name="port"></param>
-        </member>
         <member name="M:Inertia.Network.TcpServerEntity.#ctor">
             <summary>
             Instantiate a new instance of the class <see cref="T:Inertia.Network.TcpServerEntity"/>
@@ -566,13 +458,6 @@
         <member name="M:Inertia.Network.TcpServerEntity.#ctor(System.String,System.Int32)">
             <summary>
             Instantiate a new instance of the class <see cref="T:Inertia.Network.TcpServerEntity"/>
-            </summary>
-            <param name="ip"></param>
-            <param name="port"></param>
-        </member>
-        <member name="M:Inertia.Network.UdpClientEntity.#ctor(System.String,System.Int32)">
-            <summary>
-            Instantiate a new instance of the class <see cref="T:Inertia.Network.UdpClientEntity"/>
             </summary>
             <param name="ip"></param>
             <param name="port"></param>

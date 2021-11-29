@@ -79,16 +79,9 @@ namespace Inertia
         private BinaryWriter _writer;
         private readonly Encoding _encoding;
 
-        /// <summary>
-        /// Initialize a new instance based on <see cref="Encoding.UTF8"/> algorithm
-        /// </summary>
         public BasicWriter() : this(Encoding.UTF8)
         {
         }
-        /// <summary>
-        /// Initialize a new instance based on the specified <see cref="Encoding"/> algorithm
-        /// </summary>
-        /// <param name="encoding"></param>
         public BasicWriter(Encoding encoding)
         {
             _encoding = encoding;
@@ -444,18 +437,11 @@ namespace Inertia
 
         public void Dispose()
         {
-            Dispose(true);
-        }        
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!IsDisposed && disposing)
+            if (!IsDisposed)
             {
-                if (disposing)
-                {
-                    _writer.Flush();
-                    _writer.Close();
-                    _writer.Dispose();
-                }
+                _writer.Flush();
+                _writer.Close();
+                _writer.Dispose();
 
                 IsDisposed = true;
             }

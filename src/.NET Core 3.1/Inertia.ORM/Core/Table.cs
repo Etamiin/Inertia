@@ -8,6 +8,11 @@ namespace Inertia.ORM
     /// </summary>
     public abstract class Table
     {
+        //Supprimer la propriété Identifier et remplacer par un attribut
+        //Supprimer l'attribut "AttachTo" pour le remplacer par le nouvelle attribut
+        //"TableDetails" ou autre, qui prends en argument le nom de la table et la DB lié
+        //faire les changements nécessaires
+
         /// <summary>
         /// Returns the name of the table
         /// </summary>

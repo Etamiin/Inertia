@@ -9,6 +9,8 @@ namespace Inertia.Network
     {
         public static DefaultNetworkProtocol Instance { get; private set; }
 
+        //changer ca -> initialisation sur constructeur static -> dans NetworkProtocol
+        //changer ca -> initialisation sur constructeur static -> dans NetworkProtocol
         internal static void Initialize()
         {
             if (Instance == null)
