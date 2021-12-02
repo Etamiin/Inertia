@@ -6,13 +6,17 @@ using System.Linq;
 
 namespace Inertia.ORM
 {
+<<<<<<< HEAD
     /// <summary>
     ///
     /// </summary>
+=======
+>>>>>>> premaster
     public static class SqlManager
     {
         private static Dictionary<string, Database> _databases;
 
+<<<<<<< HEAD
 <<<<<<< HEAD
         private static bool _initialized;
         private static AutoQueueExecutor _queue;
@@ -86,10 +90,13 @@ namespace Inertia.ORM
             _initialized = true;
 
 =======
+=======
+>>>>>>> premaster
         private static AutoQueueExecutor _queue;
 
         static SqlManager()
         {
+<<<<<<< HEAD
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
             if (_databases == null)
             {
@@ -107,6 +114,13 @@ namespace Inertia.ORM
             var namedDbDict = new Dictionary<string, List<Type>>();
             var typedDbDict = new Dictionary<Type, List<Type>>();
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
+=======
+            _databases = new Dictionary<string, Database>();
+            _queue = new AutoQueueExecutor();
+
+            var namedDb = new Dictionary<string, List<Type>>();
+            var typedDb = new Dictionary<Type, List<Type>>();
+>>>>>>> premaster
 
             try
             {
@@ -124,6 +138,7 @@ namespace Inertia.ORM
                         {
                             var db = (Database)Activator.CreateInstance(type);
 <<<<<<< HEAD
+<<<<<<< HEAD
                             if (_databases.ContainsKey(db.Name))
                             {
                                 throw new DatabaseAlreadyInitializedException(db.Name);
@@ -132,6 +147,8 @@ namespace Inertia.ORM
                             db.TryCreateItSelf();
                             _databases.Add(db.Name, db);
 =======
+=======
+>>>>>>> premaster
                             if (!_databases.ContainsKey(db.Name))
                             {
                                 _databases.Add(db.Name, db);
@@ -141,6 +158,7 @@ namespace Inertia.ORM
                             {
                                 throw new DatabaseAlreadyInitializedException(db.Name);
                             }
+<<<<<<< HEAD
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
                         }
                         else if (type.IsSubclassOf(typeof(Table)))
@@ -155,11 +173,23 @@ namespace Inertia.ORM
 =======
                                     if (namedDbDict.TryGetValue(attachTo.DatabaseName, out List<Type> types))
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
+=======
+                        }
+                        else if (type.IsSubclassOf(typeof(Table)))
+                        {
+                            var link = type.GetCustomAttribute<TableLink>(false);
+                            if (link != null)
+                            {
+                                if (!string.IsNullOrEmpty(link.DatabaseName))
+                                {
+                                    if (namedDb.TryGetValue(link.DatabaseName, out List<Type> types))
+>>>>>>> premaster
                                     {
                                         types.Add(type);
                                     }
                                     else
                                     {
+<<<<<<< HEAD
 <<<<<<< HEAD
                                         uTables.Add(attachTo.DatabaseName, new List<Type> { type });
 =======
@@ -174,16 +204,28 @@ namespace Inertia.ORM
 =======
                                     if (typedDbDict.TryGetValue(attachTo.DatabaseType, out List<Type> types))
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
+=======
+                                        namedDb.Add(link.DatabaseName, new List<Type> { type });
+                                    }
+                                }
+                                else if (link.DatabaseType != null)
+                                {
+                                    if (typedDb.TryGetValue(link.DatabaseType, out List<Type> types))
+>>>>>>> premaster
                                     {
                                         types.Add(type);
                                     }
                                     else
                                     {
 <<<<<<< HEAD
+<<<<<<< HEAD
                                         utTables.Add(attachTo.DatabaseType, new List<Type> { type });
 =======
                                         typedDbDict.Add(attachTo.DatabaseType, new List<Type> { type });
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
+=======
+                                        typedDb.Add(link.DatabaseType, new List<Type> { type });
+>>>>>>> premaster
                                     }
                                 }
                             }
@@ -191,6 +233,7 @@ namespace Inertia.ORM
                     }
                 }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
                 foreach (var pair in uTables)
                 {
@@ -223,6 +266,13 @@ namespace Inertia.ORM
                     TryRegisterDb(pair.Value, dbName: pair.Key);
                 }
                 foreach (var pair in typedDbDict)
+=======
+                foreach (var pair in namedDb)
+                {
+                    TryRegisterDb(pair.Value, dbName: pair.Key);
+                }
+                foreach (var pair in typedDb)
+>>>>>>> premaster
                 {
                     TryRegisterDb(pair.Value, dbType: pair.Key);
                 }
@@ -239,12 +289,19 @@ namespace Inertia.ORM
                         TrySearchDatabase(dbType, out db);
                     }
 
+<<<<<<< HEAD
                     if (db != null && db.GetType().GetCustomAttribute<AutoGenerateTables>() != null)
+=======
+                    if (db != null && db.AutoGenerateTable)
+>>>>>>> premaster
                     {
                         RegisterTablesTo(db, tables);
                     }
                 }
+<<<<<<< HEAD
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
+=======
+>>>>>>> premaster
                 void RegisterTablesTo(Database db, List<Type> types)
                 {
                     foreach (var type in types)
@@ -253,11 +310,17 @@ namespace Inertia.ORM
                         db.Create(table);
                     }
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 
                     db.IsInitialized = true;
                     db.OnInitialized();
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
+=======
+
+                    db.IsInitialized = true;
+                    db.OnInitialized();
+>>>>>>> premaster
                 }
             }
             catch (Exception ex)
@@ -267,10 +330,15 @@ namespace Inertia.ORM
             }
         }
 <<<<<<< HEAD
+<<<<<<< HEAD
     
 =======
 
         internal static void EnqueueAsyncOperation(BasicAction action)
+=======
+
+        internal static void PoolAsyncOperation(BasicAction action)
+>>>>>>> premaster
         {
             _queue.Enqueue(action);
         }
@@ -300,18 +368,22 @@ namespace Inertia.ORM
             database = default;
             return false;
         }
+<<<<<<< HEAD
         /// <summary>
         /// 
         /// </summary>
         /// <param name="databaseType"></param>
         /// <param name="database"></param>
         /// <returns></returns>
+=======
+>>>>>>> premaster
         public static bool TrySearchDatabase(Type databaseType, out Database database)
         {
             database = _databases.Values.FirstOrDefault((db) => db.GetType() == databaseType);
             return database != null;
         }
 
+<<<<<<< HEAD
         /// <summary>
         /// Try to find the specified <typeparamref name="T"/> <see cref="Database"/> and execute the specified action with it
         /// </summary>
@@ -326,6 +398,8 @@ namespace Inertia.ORM
         }
 
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
+=======
+>>>>>>> premaster
         internal static bool CreateTableInstance<T>(out T instance) where T : Table
         {
             instance = null;

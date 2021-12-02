@@ -15,6 +15,7 @@ namespace Inertia.Network
         private event BasicAction<NetworkMessage, TcpConnectionEntity> OnTcpConnection;
         private event BasicAction<NetworkMessage, UdpConnectionEntity> OnUdpConnection;
 
+<<<<<<< HEAD
         internal NetworkMessageCaller()
         {
         }
@@ -74,6 +75,33 @@ namespace Inertia.Network
         public void TryCall(NetworkMessage message, UdpConnectionEntity connection)
         {
             OnUdpConnection?.Invoke(message, connection);
+=======
+        private Dictionary<Type, MethodInfo> _references;
+
+        internal NetworkMessageCaller()
+        {
+            _references = new Dictionary<Type, MethodInfo>();
+        }
+
+        internal void RegisterReference(Type messageType, MethodInfo method)
+        {
+            if (!_references.ContainsKey(messageType))
+            {
+                _references.Add(messageType, method);
+            }
+            else
+            {
+                _references[messageType] = method;
+            }
+        }
+
+        public void CallReferences(NetworkMessage message, object receiver)
+        {
+            foreach (var reference in _references)
+            {
+                reference.Value.Invoke(null, new object[] { message, receiver });
+            }
+>>>>>>> premaster
         }
     }
 }

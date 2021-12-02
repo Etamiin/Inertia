@@ -1,8 +1,14 @@
+<<<<<<< HEAD
 ﻿using System.Collections.Generic;
+=======
+﻿using System;
+using System.Collections.Generic;
+>>>>>>> premaster
 using System.Text;
 using System.IO;
 using Inertia;
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 /// <summary>
 /// 
@@ -18,6 +24,12 @@ public static class Extensions
 public static class Extensions
 {
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
+=======
+public static class Extensions
+{
+    private readonly static Random Randomizer = new Random();
+
+>>>>>>> premaster
     public static void Shuffle<T>(this IList<T> collection)
     {
         var iStart = 0;
@@ -25,13 +37,18 @@ public static class Extensions
 
         while (iStart < collection.Count - 1)
         {
+<<<<<<< HEAD
             int iRand = IOHelper.Randomizer.Next(iStart, collection.Count);
+=======
+            int iRand = Randomizer.Next(iStart, collection.Count);
+>>>>>>> premaster
             savedValue = collection[iStart];
             collection[iStart++] = collection[iRand];
             collection[iRand] = savedValue;
         }
     }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
     /// <summary>
     /// Returns the SHA256 representation of the specified text.
@@ -40,10 +57,13 @@ public static class Extensions
     /// <returns></returns>
 =======
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
+=======
+>>>>>>> premaster
     public static string GetSHA256(this string text)
     {
         return text.GetSHA256(Encoding.UTF8);
     }
+<<<<<<< HEAD
 <<<<<<< HEAD
     /// <summary>
     /// Returns the SHA256 representation of the specified text.
@@ -53,11 +73,14 @@ public static class Extensions
     /// <returns></returns>
 =======
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
+=======
+>>>>>>> premaster
     public static string GetSHA256(this string text, Encoding encoding)
     {
         return IOHelper.GetSHA256(encoding.GetBytes(text));
     }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
     /// <summary>
     /// Compress and return the specified data.
@@ -67,10 +90,13 @@ public static class Extensions
     /// <returns></returns>
 =======
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
+=======
+>>>>>>> premaster
     public static byte[] GzipCompress(this byte[] data, out bool hasBetterSize)
     {
         return IOHelper.GzipCompress(ref data, out hasBetterSize);
     }
+<<<<<<< HEAD
 <<<<<<< HEAD
     /// <summary>
     /// Decompress and return the specified data.
@@ -79,11 +105,14 @@ public static class Extensions
     /// <returns></returns>
 =======
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
+=======
+>>>>>>> premaster
     public static byte[] GzipDecompress(this byte[] compressedData)
     {
         return IOHelper.GzipDecompress(compressedData);
     }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
     /// <summary>
     /// Encrypts the specified data with the specified key.
@@ -93,10 +122,13 @@ public static class Extensions
     /// <returns></returns>
 =======
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
+=======
+>>>>>>> premaster
     public static byte[] EncryptWithString(this byte[] data, string key)
     {
         return IOHelper.EncryptWithString(data, key);
     }
+<<<<<<< HEAD
 <<<<<<< HEAD
     /// <summary>
     /// Decrypts the specified data with the specified key.
@@ -106,6 +138,8 @@ public static class Extensions
     /// <returns></returns>
 =======
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
+=======
+>>>>>>> premaster
     public static byte[] DecryptWithString(this byte[] encryptedData, string key)
     {
         return IOHelper.DecryptWithString(encryptedData, key);
@@ -150,6 +184,10 @@ public static class Extensions
     }
 
     /* INTERNAL EXTENSIONS */
+<<<<<<< HEAD
+=======
+    [Obsolete]
+>>>>>>> premaster
     internal static string ConventionFolderPath(this string folderPath)
     {
         if (string.IsNullOrEmpty(folderPath))

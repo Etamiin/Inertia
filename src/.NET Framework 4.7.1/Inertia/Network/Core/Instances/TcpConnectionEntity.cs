@@ -3,6 +3,7 @@ using System.Net.Sockets;
 
 namespace Inertia.Network
 {
+<<<<<<< HEAD
     public sealed class TcpConnectionEntity : NetworkConnectionEntity
     {
         internal BasicAction<NetworkDisconnectReason> Disconnected { get; set; }
@@ -11,16 +12,31 @@ namespace Inertia.Network
 
         internal readonly uint Id;
 
+=======
+    public sealed class TcpConnectionEntity : NetworkConnectionEntity, IDisposable
+    {
+        internal event BasicAction<NetworkDisconnectReason> Disconnected;
+
+        public bool IsConnected => _socket != null && _socket.Connected;
+
+>>>>>>> premaster
         private byte[] _buffer;
         private Socket _socket;
         private BasicReader _reader;
         private bool _disconnectionNotified;
         
+<<<<<<< HEAD
         internal TcpConnectionEntity(Socket socket, uint id)
         {
             Id = id;
             _socket = socket;
             _buffer = new byte[NetworkProtocol.NetworkBufferLength];
+=======
+        internal TcpConnectionEntity(Socket socket, uint id) : base(id)
+        {
+            _socket = socket;
+            _buffer = new byte[NetworkProtocol.GetCurrentProtocol().NetworkBufferLength];
+>>>>>>> premaster
             _reader = new BasicReader();
         }
 
@@ -39,11 +55,19 @@ namespace Inertia.Network
                 throw new ObjectDisposedException(nameof(TcpConnectionEntity));
             }
 
+<<<<<<< HEAD
             try { _socket?.Send(data); } catch { }
         }
         public override void Send(NetworkMessage message)
         {
             Send(NetworkProtocol.GetProtocol().OnParseMessage(message));
+=======
+            _socket?.Send(data);
+        }
+        public override void Send(NetworkMessage message)
+        {
+            Send(NetworkProtocol.GetCurrentProtocol().OnSerializeMessage(message));
+>>>>>>> premaster
         }
 
         public void Disconnect()
@@ -68,14 +92,21 @@ namespace Inertia.Network
                 _socket?.Disconnect(false);
                 _reader?.Dispose();
             }
+<<<<<<< HEAD
             if (!_disconnectionNotified)
             {
 
                 _reader = null;
+=======
+
+            if (!_disconnectionNotified)
+            {
+>>>>>>> premaster
                 _buffer = null;
                 _socket = null;
                 _disconnectionNotified = true;
                 Disconnected?.Invoke(reason);
+<<<<<<< HEAD
             }
         }
 
@@ -91,6 +122,20 @@ namespace Inertia.Network
             }
 
             base.Dispose(disposing);
+=======
+                Disconnected = null;
+            }
+        }
+
+        public void Dispose()
+        {
+            if (!IsDisposed)
+            {
+                Disconnect();
+
+                IsDisposed = true;
+            }
+>>>>>>> premaster
         }
 
         private void OnReceiveData(IAsyncResult iar)
@@ -108,7 +153,11 @@ namespace Inertia.Network
                     var data = new byte[received];
                     Array.Copy(_buffer, data, received);
 
+<<<<<<< HEAD
                     NetworkProtocol.GetProtocol().OnReceiveData(this, _reader.Fill(data));
+=======
+                    NetworkProtocol.ProcessParsing(this, _reader.Fill(data));
+>>>>>>> premaster
                 }
                 catch (Exception ex)
                 {
@@ -129,4 +178,8 @@ namespace Inertia.Network
             }
         }
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> premaster

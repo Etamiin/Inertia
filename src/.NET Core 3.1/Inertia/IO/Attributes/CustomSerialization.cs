@@ -10,9 +10,15 @@ namespace Inertia
     public class CustomSerialization : Attribute
     {
         internal readonly string MethodName;
+<<<<<<< HEAD
         
         /// <summary>
         /// Specify that the field with a <see cref="CustomSerialization"/> attribute will execute the specfied method to be serialized
+=======
+
+        /// <summary>
+        /// Specify that the value of the field will be serialized by the method indicated in parameter.
+>>>>>>> premaster
         /// </summary>
         /// <param name="methodName"></param>
         public CustomSerialization(string methodName)

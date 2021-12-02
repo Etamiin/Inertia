@@ -6,9 +6,12 @@ using System.Text;
 
 namespace Inertia.ORM
 {
+<<<<<<< HEAD
     /// <summary>
     /// 
     /// </summary>
+=======
+>>>>>>> premaster
     public sealed class SqlCondition : IDisposable
     {
         private static Dictionary<ConditionOperator, string> _operators = new Dictionary<ConditionOperator, string>
@@ -18,9 +21,12 @@ namespace Inertia.ORM
             { ConditionOperator.NotGreater, "!>" }, { ConditionOperator.NotLess, "!<" }, { ConditionOperator.In, " IN " }
         };
 
+<<<<<<< HEAD
         /// <summary>
         /// 
         /// </summary>
+=======
+>>>>>>> premaster
         public bool IsDisposed { get; private set; }
 
         internal int ParamIndex;
@@ -298,6 +304,7 @@ namespace Inertia.ORM
             return this;
         }
 
+<<<<<<< HEAD
         /// <summary>
         /// 
         /// </summary>
@@ -310,6 +317,8 @@ namespace Inertia.ORM
             }
         }
 
+=======
+>>>>>>> premaster
         internal void ApplyToCmd(MySqlCommand command)
         {
             foreach (var param in _params)
@@ -324,12 +333,28 @@ namespace Inertia.ORM
                 EndBrackets();
             }
 
+<<<<<<< HEAD
             return 
+=======
+            return
+>>>>>>> premaster
                 $"{ (_builder.Length > 0 ? "WHERE " : string.Empty)}{ _builder }" +
                 $"{ (_orderBuilder != null ? _orderBuilder.ToString() : string.Empty) }" +
                 $"{ (_limit > 0 ? $" LIMIT { _limit }" : string.Empty)}";
         }
 
+<<<<<<< HEAD
+=======
+        public void Dispose()
+        {
+            if (!IsDisposed)
+            {
+                _params.Clear();
+                IsDisposed = true;
+            }
+        }
+
+>>>>>>> premaster
         private void OrderBy(string type, params string[] columns)
         {
             if (IsDisposed)

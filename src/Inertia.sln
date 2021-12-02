@@ -1,7 +1,12 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
+<<<<<<< HEAD
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31321.278
+=======
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31912.275
+>>>>>>> premaster
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".NET Core 3.1", ".NET Core 3.1", "{995BBA1E-BDCA-44DE-B0CD-4F98A0876649}"
 EndProject
@@ -10,19 +15,25 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Inertia.ORM", ".NET Core 3.1\Inertia.ORM\Inertia.ORM.csproj", "{6541822D-517A-472B-BCAD-D98DEF8147B7}"
 EndProject
 <<<<<<< HEAD
+<<<<<<< HEAD
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Inertia.Network", ".NET Core 3.1\Inertia.Network\Inertia.Network.csproj", "{E0D7B72A-452A-4197-B817-D5D3BA4DE53D}"
 EndProject
 =======
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
+=======
+>>>>>>> premaster
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".NET Framework 4.7.1", ".NET Framework 4.7.1", "{79F872E3-A3B9-46EB-886F-A7B67655A5A2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inertia", ".NET Framework 4.7.1\Inertia\Inertia.csproj", "{445EE1E5-7BE7-47D4-A6FD-B2DFF62F118A}"
 EndProject
 <<<<<<< HEAD
+<<<<<<< HEAD
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inertia.Network", ".NET Framework 4.7.1\Inertia.Network\Inertia.Network.csproj", "{68811FE4-A94E-4376-8FB9-EDF0E99A368B}"
 EndProject
 =======
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
+=======
+>>>>>>> premaster
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inertia.ORM", ".NET Framework 4.7.1\Inertia.ORM\Inertia.ORM.csproj", "{D5C9811A-B507-4FF7-B8CB-A061CD24C83C}"
 EndProject
 Global
@@ -40,16 +51,20 @@ Global
 		{6541822D-517A-472B-BCAD-D98DEF8147B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6541822D-517A-472B-BCAD-D98DEF8147B7}.Release|Any CPU.Build.0 = Release|Any CPU
 <<<<<<< HEAD
+<<<<<<< HEAD
 		{E0D7B72A-452A-4197-B817-D5D3BA4DE53D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E0D7B72A-452A-4197-B817-D5D3BA4DE53D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E0D7B72A-452A-4197-B817-D5D3BA4DE53D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E0D7B72A-452A-4197-B817-D5D3BA4DE53D}.Release|Any CPU.Build.0 = Release|Any CPU
 =======
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
+=======
+>>>>>>> premaster
 		{445EE1E5-7BE7-47D4-A6FD-B2DFF62F118A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{445EE1E5-7BE7-47D4-A6FD-B2DFF62F118A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{445EE1E5-7BE7-47D4-A6FD-B2DFF62F118A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{445EE1E5-7BE7-47D4-A6FD-B2DFF62F118A}.Release|Any CPU.Build.0 = Release|Any CPU
+<<<<<<< HEAD
 <<<<<<< HEAD
 		{68811FE4-A94E-4376-8FB9-EDF0E99A368B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{68811FE4-A94E-4376-8FB9-EDF0E99A368B}.Debug|Any CPU.Build.0 = Debug|Any CPU
@@ -57,6 +72,8 @@ Global
 		{68811FE4-A94E-4376-8FB9-EDF0E99A368B}.Release|Any CPU.Build.0 = Release|Any CPU
 =======
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
+=======
+>>>>>>> premaster
 		{D5C9811A-B507-4FF7-B8CB-A061CD24C83C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D5C9811A-B507-4FF7-B8CB-A061CD24C83C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D5C9811A-B507-4FF7-B8CB-A061CD24C83C}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -69,12 +86,16 @@ Global
 		{67CE7EB4-B9F5-4FF0-98DD-FC286E4D0D05} = {995BBA1E-BDCA-44DE-B0CD-4F98A0876649}
 		{6541822D-517A-472B-BCAD-D98DEF8147B7} = {995BBA1E-BDCA-44DE-B0CD-4F98A0876649}
 <<<<<<< HEAD
+<<<<<<< HEAD
 		{E0D7B72A-452A-4197-B817-D5D3BA4DE53D} = {995BBA1E-BDCA-44DE-B0CD-4F98A0876649}
 		{445EE1E5-7BE7-47D4-A6FD-B2DFF62F118A} = {79F872E3-A3B9-46EB-886F-A7B67655A5A2}
 		{68811FE4-A94E-4376-8FB9-EDF0E99A368B} = {79F872E3-A3B9-46EB-886F-A7B67655A5A2}
 =======
 		{445EE1E5-7BE7-47D4-A6FD-B2DFF62F118A} = {79F872E3-A3B9-46EB-886F-A7B67655A5A2}
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
+=======
+		{445EE1E5-7BE7-47D4-A6FD-B2DFF62F118A} = {79F872E3-A3B9-46EB-886F-A7B67655A5A2}
+>>>>>>> premaster
 		{D5C9811A-B507-4FF7-B8CB-A061CD24C83C} = {79F872E3-A3B9-46EB-886F-A7B67655A5A2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution

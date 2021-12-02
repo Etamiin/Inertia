@@ -2,6 +2,7 @@
 
 namespace Inertia.ORM
 {
+<<<<<<< HEAD
     /// <summary>
     /// 
     /// </summary>
@@ -17,6 +18,13 @@ namespace Inertia.ORM
         /// Instantiate a new instance of the class <see cref="VarChar"/>
         /// </summary>
         /// <param name="length"></param>
+=======
+    [AttributeUsage(AttributeTargets.Field, AllowMultiple = false, Inherited = false)]
+    public class VarChar : Attribute
+    {
+        public readonly int Length;
+
+>>>>>>> premaster
         public VarChar(int length)
         {
             Length = length;

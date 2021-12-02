@@ -4,6 +4,7 @@
         <name>Inertia.ORM</name>
     </assembly>
     <members>
+<<<<<<< HEAD
         <member name="T:Inertia.ORM.AttachTo">
             <summary>
             Attach a <see cref="T:Inertia.ORM.Table"/> object to a <see cref="T:Inertia.ORM.Database"/>
@@ -125,6 +126,11 @@
         <member name="T:Inertia.ORM.Database">
             <summary>
             SQL Database
+=======
+        <member name="T:Inertia.ORM.TableLink">
+            <summary>
+            Link a <see cref="T:Inertia.ORM.Table"/> object to a <see cref="T:Inertia.ORM.Database"/>
+>>>>>>> premaster
             </summary>
         </member>
         <member name="P:Inertia.ORM.Database.Name">
@@ -154,7 +160,11 @@
         </member>
         <member name="P:Inertia.ORM.Database.Ssl">
             <summary>
+<<<<<<< HEAD
             
+=======
+            Returns the SSL mode used by the MySql connection
+>>>>>>> premaster
             </summary>
         </member>
         <member name="M:Inertia.ORM.Database.#ctor">
@@ -162,11 +172,14 @@
             Initialize a new instance of class <see cref="T:Inertia.ORM.Database"/>
             </summary>
         </member>
+<<<<<<< HEAD
         <member name="M:Inertia.ORM.Database.OnInitialized">
             <summary>
             
             </summary>
         </member>
+=======
+>>>>>>> premaster
         <member name="M:Inertia.ORM.Database.TryExecuteQuery(System.String)">
             <summary>
             Execute a custom SQL query and returns true if the query was successfully executed.
@@ -369,6 +382,7 @@
             <param name="distinct"></param>
             <returns></returns>
         </member>
+<<<<<<< HEAD
         <member name="M:Inertia.ORM.Database.Average``1(System.String)">
             <summary>
             
@@ -437,6 +451,8 @@
             <param name="condition"></param>
             <returns></returns>
         </member>
+=======
+>>>>>>> premaster
         <member name="T:Inertia.ORM.QueryAccessor`1">
             <summary>
             A help tool for faster access to queries
@@ -608,6 +624,7 @@
             <param name="distinct"></param>
             <returns></returns>
         </member>
+<<<<<<< HEAD
         <member name="M:Inertia.ORM.QueryAccessor`1.Average(System.String)">
             <summary>
             
@@ -899,16 +916,21 @@
             Returns the name of the table
             </summary>
         </member>
+=======
+>>>>>>> premaster
         <member name="P:Inertia.ORM.Table.Database">
             <summary>
             Returns the <see cref="P:Inertia.ORM.Table.Database"/> attached
             </summary>
         </member>
+<<<<<<< HEAD
         <member name="M:Inertia.ORM.Table.#ctor">
             <summary>
             Instantiate a new instance of class <see cref="T:Inertia.ORM.Table"/>
             </summary>
         </member>
+=======
+>>>>>>> premaster
         <member name="M:Inertia.ORM.Table.Insert">
             <summary>
             Insert the current instance values in <see cref="P:Inertia.ORM.Table.Database"/>
@@ -923,6 +945,7 @@
             <param name="columnsToUpdate"></param>
             <returns></returns>
         </member>
+<<<<<<< HEAD
         <member name="T:Inertia.ORM.SqlCondition">
             <summary>
             
@@ -933,6 +956,8 @@
             
             </summary>
         </member>
+=======
+>>>>>>> premaster
         <member name="M:Inertia.ORM.SqlCondition.#ctor">
             <summary>
             Initialize a new instance of the class <see cref="T:Inertia.ORM.SqlCondition"/>.
@@ -1031,16 +1056,20 @@
             <param name="limitValue"></param>
             <returns></returns>
         </member>
+<<<<<<< HEAD
         <member name="M:Inertia.ORM.SqlCondition.Dispose">
             <summary>
             
             </summary>
         </member>
+=======
+>>>>>>> premaster
         <member name="T:Inertia.ORM.ConditionOperator">
             <summary>
             SQL conditonal operators
             </summary>
         </member>
+<<<<<<< HEAD
         <member name="F:Inertia.ORM.ConditionOperator.Equal">
             <summary>
             
@@ -1091,11 +1120,14 @@
             
             </summary>
         </member>
+=======
+>>>>>>> premaster
         <member name="T:Inertia.ORM.ConditionType">
             <summary>
             SQL conditional types
             </summary>
         </member>
+<<<<<<< HEAD
         <member name="F:Inertia.ORM.ConditionType.AND">
             <summary>
             
@@ -1106,11 +1138,14 @@
             
             </summary>
         </member>
+=======
+>>>>>>> premaster
         <member name="T:Inertia.ORM.DatabaseAlreadyInitializedException">
             <summary>
             Throw when a <see cref="T:Inertia.ORM.Database"/> is already registered
             </summary>
         </member>
+<<<<<<< HEAD
         <member name="P:Inertia.ORM.DatabaseAlreadyInitializedException.Message">
              <summary>
             
@@ -1127,11 +1162,14 @@
             </summary>
             <param name="dbName"></param>
         </member>
+=======
+>>>>>>> premaster
         <member name="T:Inertia.ORM.DatabaseConnectionFailedException">
             <summary>
             Throw when failed to connect to a <see cref="F:Inertia.ORM.DatabaseConnectionFailedException._database"/>
             </summary>
         </member>
+<<<<<<< HEAD
         <member name="P:Inertia.ORM.DatabaseConnectionFailedException.Message">
              <summary>
             
@@ -1144,11 +1182,14 @@
             <param name="database"></param>
             <param name="ex"></param>
         </member>
+=======
+>>>>>>> premaster
         <member name="T:Inertia.ORM.InitializationFailedException">
             <summary>
             Throw when <see cref="T:Inertia.ORM.SqlManager"/> failed to initialize
             </summary>
         </member>
+<<<<<<< HEAD
         <member name="P:Inertia.ORM.InitializationFailedException.Message">
              <summary>
             
@@ -1165,6 +1206,8 @@
             
              </summary>
         </member>
+=======
+>>>>>>> premaster
         <member name="M:Inertia.ORM.SqlManager.TrySearchDatabase(System.String,Inertia.ORM.Database@)">
             <summary>
             Returns a <see cref="T:Inertia.ORM.Database"/> already registered.
@@ -1179,6 +1222,7 @@
             </summary>
             <returns></returns>
         </member>
+<<<<<<< HEAD
         <member name="M:Inertia.ORM.SqlManager.TrySearchDatabase(System.Type,Inertia.ORM.Database@)">
             <summary>
             
@@ -1194,5 +1238,7 @@
             <typeparam name="T"></typeparam>
             <param name="onDatabase"></param>
         </member>
+=======
+>>>>>>> premaster
     </members>
 </doc>

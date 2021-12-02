@@ -13,11 +13,19 @@ using System.Reflection;
 
 [assembly: System.Reflection.AssemblyCompanyAttribute("Etamiin")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
+<<<<<<< HEAD
 [assembly: System.Reflection.AssemblyFileVersionAttribute("2.108.27.1515")]
 [assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
 [assembly: System.Reflection.AssemblyProductAttribute("Inertia.ORM")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Inertia.ORM")]
 [assembly: System.Reflection.AssemblyVersionAttribute("2.108.27.1515")]
+=======
+[assembly: System.Reflection.AssemblyFileVersionAttribute("1.12")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyProductAttribute("Inertia.ORM")]
+[assembly: System.Reflection.AssemblyTitleAttribute("Inertia.ORM")]
+[assembly: System.Reflection.AssemblyVersionAttribute("1.12")]
+>>>>>>> premaster
 
 // Généré par la classe MSBuild WriteCodeFragment.
 

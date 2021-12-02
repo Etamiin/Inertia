@@ -2,9 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 using System.Reflection;
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
+=======
+using System.Reflection;
+>>>>>>> premaster
 using System.Text;
 using System.Threading.Tasks;
 
@@ -14,6 +18,7 @@ namespace Inertia.ORM
     /// A help tool for faster access to queries
     /// </summary>
     /// <typeparam name="TableKey"></typeparam>
+<<<<<<< HEAD
 <<<<<<< HEAD
     /// <typeparam name="DatabaseKey"></typeparam>
     public sealed class QueryAccessor<TableKey, DatabaseKey> where TableKey : Table where DatabaseKey : Database
@@ -29,6 +34,8 @@ namespace Inertia.ORM
             {
                 throw new ArgumentNullException(typeof(DatabaseKey).Name, "Invalid Database for the QueryAccessor.");
 =======
+=======
+>>>>>>> premaster
     public sealed class QueryAccessor<TableKey> where TableKey : Table
     {
         private readonly Database _database;
@@ -38,7 +45,11 @@ namespace Inertia.ORM
         /// </summary>
         public QueryAccessor()
         {
+<<<<<<< HEAD
             var attachedTo = typeof(TableKey).GetCustomAttribute<AttachTo>();
+=======
+            var attachedTo = typeof(TableKey).GetCustomAttribute<TableLink>();
+>>>>>>> premaster
             if (attachedTo != null)
             {
                 if (!SqlManager.TrySearchDatabase(attachedTo.DatabaseType, out _database))
@@ -50,7 +61,10 @@ namespace Inertia.ORM
             {
                 var tableName = typeof(TableKey).Name;
                 throw new ArgumentNullException(tableName, $"No Database attached to { tableName } table.");
+<<<<<<< HEAD
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
+=======
+>>>>>>> premaster
             }
         }
 
@@ -136,7 +150,10 @@ namespace Inertia.ORM
             return _database.SelectAll<TableKey>(condition, distinct, columnsToSelect);
         }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> premaster
         /// <summary>
         /// Delete all the elements from the specified <see cref="Table"/> based on the specified <see cref="SqlCondition"/>
         /// </summary>
@@ -263,6 +280,7 @@ namespace Inertia.ORM
             return _database.Count<TableKey>(condition, distinct) > 0;
         }
 
+<<<<<<< HEAD
         /// <summary>
         /// 
         /// </summary>
@@ -278,11 +296,18 @@ namespace Inertia.ORM
         /// <param name="columnName"></param>
         /// <param name="condition"></param>
         /// <returns></returns>
+=======
+        public long Average(string columnName)
+        {
+            return Average(columnName, null);
+        }        
+>>>>>>> premaster
         public long Average(string columnName, SqlCondition condition)
         {
             return _database.Average<TableKey>(columnName, condition);
         }
 
+<<<<<<< HEAD
         /// <summary>
         /// 
         /// </summary>
@@ -298,11 +323,18 @@ namespace Inertia.ORM
         /// <param name="columnName"></param>
         /// <param name="condition"></param>
         /// <returns></returns>
+=======
+        public TableKey Max(string columnName)
+        {
+            return Max(columnName, null);
+        }        
+>>>>>>> premaster
         public TableKey Max(string columnName, SqlCondition condition)
         {
             return _database.Max<TableKey>(columnName, condition);
         }
 
+<<<<<<< HEAD
         /// <summary>
         /// 
         /// </summary>
@@ -318,60 +350,82 @@ namespace Inertia.ORM
         /// <param name="columnName"></param>
         /// <param name="condition"></param>
         /// <returns></returns>
+=======
+        public TableKey Min(string columnName)
+        {
+            return Min(columnName, null);
+        }        
+>>>>>>> premaster
         public TableKey Min(string columnName, SqlCondition condition)
         {
             return _database.Min<TableKey>(columnName, condition);
         }
 
+<<<<<<< HEAD
         /// <summary>
         /// 
         /// </summary>
         /// <param name="columnName"></param>
         /// <returns></returns>
+=======
+>>>>>>> premaster
         public decimal Sum(string columnName)
         {
             return Sum(columnName, null);
         }
+<<<<<<< HEAD
         /// <summary>
         /// 
         /// </summary>
         /// <param name="columnName"></param>
         /// <param name="condition"></param>
         /// <returns></returns>
+=======
+>>>>>>> premaster
         public decimal Sum(string columnName, SqlCondition condition)
         {
             return _database.Sum<TableKey>(columnName, condition);
         }
 
+<<<<<<< HEAD
         /// <summary>
         /// 
         /// </summary>
         /// <param name="onSelected"></param>
         /// <param name="columnsToSelect"></param>
+=======
+>>>>>>> premaster
         public void SelectAsync(BasicAction<TableKey> onSelected, params string[] columnsToSelect)
         {
             SelectAsync(null, onSelected, false, columnsToSelect);
         }
+<<<<<<< HEAD
         /// <summary>
         /// 
         /// </summary>
         /// <param name="onSelected"></param>
         /// <param name="distinct"></param>
         /// <param name="columnsToSelect"></param>
+=======
+>>>>>>> premaster
         public void SelectAsync(BasicAction<TableKey> onSelected, bool distinct, params string[] columnsToSelect)
         {
             SelectAsync(null, onSelected, distinct, columnsToSelect);
         }
+<<<<<<< HEAD
         /// <summary>
         /// 
         /// </summary>
         /// <param name="condition"></param>
         /// <param name="onSelected"></param>
         /// <param name="columnsToSelect"></param>
+=======
+>>>>>>> premaster
         public void SelectAsync(SqlCondition condition, BasicAction<TableKey> onSelected, params string[] columnsToSelect)
         {
             SelectAsync(condition, onSelected, false, columnsToSelect);
         }
+<<<<<<< HEAD
         /// <summary>
         /// 
         /// </summary>
@@ -382,40 +436,56 @@ namespace Inertia.ORM
         public void SelectAsync(SqlCondition condition, BasicAction<TableKey> onSelected, bool distinct, params string[] columnsToSelect)
         {
             SqlManager.EnqueueAsyncOperation(() => {
+=======
+        public void SelectAsync(SqlCondition condition, BasicAction<TableKey> onSelected, bool distinct, params string[] columnsToSelect)
+        {
+            SqlManager.PoolAsyncOperation(() => {
+>>>>>>> premaster
                 var table = _database.Select<TableKey>(condition, distinct, columnsToSelect);
                 onSelected?.Invoke(table);
             });
         }
 
+<<<<<<< HEAD
         /// <summary>
         /// 
         /// </summary>
         /// <param name="onSelected"></param>
         /// <param name="columnsToSelect"></param>
+=======
+>>>>>>> premaster
         public void SelectAllAsync(BasicAction<TableKey[]> onSelected, params string[] columnsToSelect)
         {
             SelectAllAsync(null, onSelected, false, columnsToSelect);
         }
+<<<<<<< HEAD
         /// <summary>
         /// 
         /// </summary>
         /// <param name="onSelected"></param>
         /// <param name="distinct"></param>
         /// <param name="columnsToSelect"></param>
+=======
+>>>>>>> premaster
         public void SelectAllAsync(BasicAction<TableKey[]> onSelected, bool distinct, params string[] columnsToSelect)
         {
             SelectAllAsync(null, onSelected, distinct, columnsToSelect);
         }
+<<<<<<< HEAD
         /// <summary>
         /// 
         /// </summary>
         /// <param name="condition"></param>
         /// <param name="onSelected"></param>
         /// <param name="columnsToSelect"></param>
+=======
+
+>>>>>>> premaster
         public void SelectAllAsync(SqlCondition condition, BasicAction<TableKey[]> onSelected, params string[] columnsToSelect)
         {
             SelectAllAsync(condition, onSelected, false, columnsToSelect);
         }
+<<<<<<< HEAD
         /// <summary>
         /// 
         /// </summary>
@@ -426,11 +496,17 @@ namespace Inertia.ORM
         public void SelectAllAsync(SqlCondition condition, BasicAction<TableKey[]> onSelected, bool distinct, params string[] columnsToSelect)
         {
             SqlManager.EnqueueAsyncOperation(() => {
+=======
+        public void SelectAllAsync(SqlCondition condition, BasicAction<TableKey[]> onSelected, bool distinct, params string[] columnsToSelect)
+        {
+            SqlManager.PoolAsyncOperation(() => {
+>>>>>>> premaster
                 var tables = _database.SelectAll<TableKey>(condition, distinct, columnsToSelect);
                 onSelected?.Invoke(tables);
             });
         }
 
+<<<<<<< HEAD
         /// <summary>
         /// 
         /// </summary>
@@ -439,6 +515,11 @@ namespace Inertia.ORM
         public void DeleteAsync(SqlCondition condition, BasicAction onDeleted)
         {
             SqlManager.EnqueueAsyncOperation(() => {
+=======
+        public void DeleteAsync(SqlCondition condition, BasicAction onDeleted)
+        {
+            SqlManager.PoolAsyncOperation(() => {
+>>>>>>> premaster
                 var deleted = _database.Delete<TableKey>(condition);
                 if (deleted)
                 {
@@ -446,6 +527,7 @@ namespace Inertia.ORM
                 }
             });
         }
+<<<<<<< HEAD
         /// <summary>
         /// 
         /// </summary>
@@ -453,6 +535,11 @@ namespace Inertia.ORM
         public void DeleteAllAsync(BasicAction onDeleted)
         {
             SqlManager.EnqueueAsyncOperation(() => {
+=======
+        public void DeleteAllAsync(BasicAction onDeleted)
+        {
+            SqlManager.PoolAsyncOperation(() => {
+>>>>>>> premaster
                 var deleted = _database.DeleteAll<TableKey>();
                 if (deleted)
                 {
@@ -461,6 +548,7 @@ namespace Inertia.ORM
             });
         }
 
+<<<<<<< HEAD
         /// <summary>
         /// 
         /// </summary>
@@ -470,6 +558,11 @@ namespace Inertia.ORM
         public void UpdateAllAsync(TableKey reference, BasicAction onUpdated, params string[] columnsToUpdate)
         {
             SqlManager.EnqueueAsyncOperation(() => {
+=======
+        public void UpdateAllAsync(TableKey reference, BasicAction onUpdated, params string[] columnsToUpdate)
+        {
+            SqlManager.PoolAsyncOperation(() => {
+>>>>>>> premaster
                 var updated = _database.UpdateAll(reference, columnsToUpdate);
                 if (updated)
                 {
@@ -478,61 +571,80 @@ namespace Inertia.ORM
             });
         }
 
+<<<<<<< HEAD
         /// <summary>
         /// 
         /// </summary>
         /// <param name="onCounted"></param>
+=======
+>>>>>>> premaster
         public void CountAsync(BasicAction<long> onCounted)
         {
             CountAsync(string.Empty, null, onCounted, false);
         }
+<<<<<<< HEAD
         /// <summary>
         /// 
         /// </summary>
         /// <param name="onCounted"></param>
         /// <param name="distinct"></param>
+=======
+>>>>>>> premaster
         public void CountAsync(BasicAction<long> onCounted, bool distinct)
         {
             CountAsync(string.Empty, null, onCounted, distinct);
         }
+<<<<<<< HEAD
         /// <summary>
         /// 
         /// </summary>
         /// <param name="condition"></param>
         /// <param name="onCounted"></param>
+=======
+>>>>>>> premaster
         public void CountAsync(SqlCondition condition, BasicAction<long> onCounted)
         {
             CountAsync(string.Empty, condition, onCounted, false);
         }
+<<<<<<< HEAD
         /// <summary>
         /// 
         /// </summary>
         /// <param name="condition"></param>
         /// <param name="onCounted"></param>
         /// <param name="distinct"></param>
+=======
+>>>>>>> premaster
         public void CountAsync(SqlCondition condition, BasicAction<long> onCounted, bool distinct)
         {
             CountAsync(string.Empty, condition, onCounted, distinct);
         }
+<<<<<<< HEAD
         /// <summary>
         /// 
         /// </summary>
         /// <param name="columnName"></param>
         /// <param name="onCounted"></param>
+=======
+>>>>>>> premaster
         public void CountAsync(string columnName, BasicAction<long> onCounted)
         {
             CountAsync(columnName, null, onCounted, false);
         }
+<<<<<<< HEAD
         /// <summary>
         /// 
         /// </summary>
         /// <param name="columnName"></param>
         /// <param name="onCounted"></param>
         /// <param name="distinct"></param>
+=======
+>>>>>>> premaster
         public void CountAsync(string columnName, BasicAction<long> onCounted, bool distinct)
         {
             CountAsync(columnName, null, onCounted, distinct);
         }
+<<<<<<< HEAD
         /// <summary>
         /// 
         /// </summary>
@@ -542,10 +654,13 @@ namespace Inertia.ORM
         /// <param name="distinct"></param>
 <<<<<<< HEAD
 =======
+=======
+>>>>>>> premaster
         public void CountAsync(string columnName, SqlCondition condition, BasicAction<long> onCounted)
         {
             CountAsync(columnName, condition, onCounted, false);
         }
+<<<<<<< HEAD
         /// <summary>
         /// 
         /// </summary>
@@ -557,11 +672,17 @@ namespace Inertia.ORM
         public void CountAsync(string columnName, SqlCondition condition, BasicAction<long> onCounted, bool distinct)
         {
             SqlManager.EnqueueAsyncOperation(() => {
+=======
+        public void CountAsync(string columnName, SqlCondition condition, BasicAction<long> onCounted, bool distinct)
+        {
+            SqlManager.PoolAsyncOperation(() => {
+>>>>>>> premaster
                 var count = _database.Count<TableKey>(columnName, condition, distinct);
                 onCounted?.Invoke(count);
             });
         }
 
+<<<<<<< HEAD
         /// <summary>
         /// 
         /// </summary>
@@ -570,10 +691,16 @@ namespace Inertia.ORM
         public void ExistAsync(SqlCondition condition, BasicAction<bool> onExist)
         {
             SqlManager.EnqueueAsyncOperation(() => {
+=======
+        public void ExistAsync(SqlCondition condition, BasicAction<bool> onExist)
+        {
+            SqlManager.PoolAsyncOperation(() => {
+>>>>>>> premaster
                 var count = _database.Count<TableKey>(condition, false);
                 onExist?.Invoke(count > 0);
             });
         }
+<<<<<<< HEAD
         /// <summary>
         /// 
         /// </summary>
@@ -583,20 +710,29 @@ namespace Inertia.ORM
         public void ExistAsync(SqlCondition condition, BasicAction<bool> onExist, bool distinct)
         {
             SqlManager.EnqueueAsyncOperation(() => {
+=======
+        public void ExistAsync(SqlCondition condition, BasicAction<bool> onExist, bool distinct)
+        {
+            SqlManager.PoolAsyncOperation(() => {
+>>>>>>> premaster
                 var count = _database.Count<TableKey>(condition, distinct);
                 onExist?.Invoke(count > 0);
             });
         }
 
+<<<<<<< HEAD
         /// <summary>
         /// 
         /// </summary>
         /// <param name="columnName"></param>
         /// <param name="onAverage"></param>
+=======
+>>>>>>> premaster
         public void AverageAsync(string columnName, BasicAction<long> onAverage)
         {
             AverageAsync(columnName, null, onAverage);
         }
+<<<<<<< HEAD
         /// <summary>
         /// 
         /// </summary>
@@ -606,20 +742,29 @@ namespace Inertia.ORM
         public void AverageAsync(string columnName, SqlCondition condition, BasicAction<long> onAverage)
         {
             SqlManager.EnqueueAsyncOperation(() => {
+=======
+        public void AverageAsync(string columnName, SqlCondition condition, BasicAction<long> onAverage)
+        {
+            SqlManager.PoolAsyncOperation(() => {
+>>>>>>> premaster
                 var average = _database.Average<TableKey>(columnName, condition);
                 onAverage?.Invoke(average);
             });
         }
 
+<<<<<<< HEAD
         /// <summary>
         /// 
         /// </summary>
         /// <param name="columnName"></param>
         /// <param name="onMax"></param>
+=======
+>>>>>>> premaster
         public void MaxAsync(string columnName, BasicAction<TableKey> onMax)
         {
             MaxAsync(columnName, null, onMax);
         }
+<<<<<<< HEAD
         /// <summary>
         /// 
         /// </summary>
@@ -629,20 +774,29 @@ namespace Inertia.ORM
         public void MaxAsync(string columnName, SqlCondition condition, BasicAction<TableKey> onMax)
         {
             SqlManager.EnqueueAsyncOperation(() => {
+=======
+        public void MaxAsync(string columnName, SqlCondition condition, BasicAction<TableKey> onMax)
+        {
+            SqlManager.PoolAsyncOperation(() => {
+>>>>>>> premaster
                 var max = _database.Max<TableKey>(columnName, condition);
                 onMax?.Invoke(max);
             });            
         }
 
+<<<<<<< HEAD
         /// <summary>
         /// 
         /// </summary>
         /// <param name="columnName"></param>
         /// <param name="onMin"></param>
+=======
+>>>>>>> premaster
         public void MinAsync(string columnName, BasicAction<TableKey> onMin)
         {
             MinAsync(columnName, null, onMin);
         }
+<<<<<<< HEAD
         /// <summary>
         /// 
         /// </summary>
@@ -652,20 +806,29 @@ namespace Inertia.ORM
         public void MinAsync(string columnName, SqlCondition condition, BasicAction<TableKey> onMin)
         {
             SqlManager.EnqueueAsyncOperation(() => {
+=======
+        public void MinAsync(string columnName, SqlCondition condition, BasicAction<TableKey> onMin)
+        {
+            SqlManager.PoolAsyncOperation(() => {
+>>>>>>> premaster
                 var min = _database.Min<TableKey>(columnName, condition);
                 onMin?.Invoke(min);
             });            
         }
 
+<<<<<<< HEAD
         /// <summary>
         /// 
         /// </summary>
         /// <param name="columnName"></param>
         /// <param name="onSum"></param>
+=======
+>>>>>>> premaster
         public void SumAsync(string columnName, BasicAction<decimal> onSum)
         {
             SumAsync(columnName, null, onSum);
         }
+<<<<<<< HEAD
         /// <summary>
         /// 
         /// </summary>
@@ -675,6 +838,11 @@ namespace Inertia.ORM
         public void SumAsync(string columnName, SqlCondition condition, BasicAction<decimal> onSum)
         {
             SqlManager.EnqueueAsyncOperation(() => {
+=======
+        public void SumAsync(string columnName, SqlCondition condition, BasicAction<decimal> onSum)
+        {
+            SqlManager.PoolAsyncOperation(() => {
+>>>>>>> premaster
                 var sum = _database.Sum<TableKey>(columnName, condition);
                 onSum?.Invoke(sum);
             });            

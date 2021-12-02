@@ -3,11 +3,14 @@
 namespace Inertia.Runtime
 {
 <<<<<<< HEAD
+<<<<<<< HEAD
     /// <summary>
     ///
     /// </summary>
 =======
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
+=======
+>>>>>>> premaster
     public abstract class Script : IDisposable
     {
         /// <summary>
@@ -15,6 +18,7 @@ namespace Inertia.Runtime
         /// </summary>
         public static float DeltaTime { get; internal set; }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
         /// <summary>
         /// Returns true is the current instance is destroyed.
@@ -42,6 +46,30 @@ namespace Inertia.Runtime
                 OnUpdate();
             }
         }
+=======
+        public bool IsDestroyed { get; private set; }
+
+        internal bool IsDisposed { get; private set; }
+
+        public void Destroy()
+        {
+            Dispose();
+        }
+        public void Dispose()
+        {
+            if (!IsDestroyed)
+            {
+                RuntimeManager.BeginUnregisterScript(this);
+                IsDisposed = true;
+            }
+        }
+
+        /// <summary>
+        /// Occurs each execution frame.
+        /// </summary>
+        internal protected abstract void OnUpdate();
+
+>>>>>>> premaster
         internal void PreDestroy()
         {
             if (!IsDestroyed)
@@ -49,7 +77,11 @@ namespace Inertia.Runtime
                 IsDestroyed = true;
 
                 OnDestroy();
+<<<<<<< HEAD
                 RuntimeManager.OnScriptPreDestroyed(this);
+=======
+                RuntimeManager.EndUnregisterScript(this);
+>>>>>>> premaster
             }
         }
 
@@ -57,6 +89,7 @@ namespace Inertia.Runtime
         /// Occurs when the script initializes.
         /// </summary>
         /// <param name="args"></param>
+<<<<<<< HEAD
         protected virtual void OnAwake(ScriptArgumentsCollection args) { }
         /// <summary>
         /// Occurs each execution frame.
@@ -105,3 +138,12 @@ namespace Inertia.Runtime
         }
     }
 }
+=======
+        internal protected virtual void OnInitialize(ScriptArguments args) { }
+        /// <summary>
+        /// Occurs before the script is destroyed.
+        /// </summary>
+        internal protected virtual void OnDestroy() { }
+    }
+}
+>>>>>>> premaster
