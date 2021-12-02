@@ -4,7 +4,6 @@
         <name>Inertia</name>
     </assembly>
     <members>
-<<<<<<< HEAD
         <member name="P:Inertia.TextCommand.Name">
             <summary>
             Returns the name of the command.
@@ -77,42 +76,15 @@
         <member name="M:Inertia.CustomDeserialization.#ctor(System.String)">
             <summary>
             Specify that the field with a <see cref="T:Inertia.CustomDeserialization"/> attribute will execute the specfied method to be deserialized
-=======
-        <member name="T:Inertia.CommandHooker">
-            <summary>
-            Core component for command line management and execution.
-            </summary>
-        </member>
-        <member name="T:Inertia.InertiaInitializationException">
-            <summary>
-            This exception is thrown in case an error occurs during the initialization of a core component.
-            </summary>
-        </member>
-        <member name="M:Inertia.CustomDeserialization.#ctor(System.String)">
-            <summary>
-            Specify that the value of the field will be deserialized by the method indicated in parameter.
->>>>>>> premaster
             </summary>
             <param name="methodName"></param>
         </member>
         <member name="M:Inertia.CustomSerialization.#ctor(System.String)">
             <summary>
-<<<<<<< HEAD
             Specify that the field with a <see cref="T:Inertia.CustomSerialization"/> attribute will execute the specfied method to be serialized
             </summary>
             <param name="methodName"></param>
         </member>
-=======
-            Specify that the value of the field will be serialized by the method indicated in parameter.
-            </summary>
-            <param name="methodName"></param>
-        </member>
-        <member name="T:Inertia.IgnoreField">
-            <summary>
-            Ignore a field during procedures involving instance fields
-            </summary>
-        </member>
->>>>>>> premaster
         <member name="P:Inertia.BasicReader.TotalLength">
             <summary>
             Returns the total length of the stream.
@@ -128,7 +100,6 @@
             Get or Set the position in the stream.
             </summary>
         </member>
-<<<<<<< HEAD
         <member name="M:Inertia.BasicReader.#ctor">
             <summary>
             Initialize a new instance with empty data
@@ -153,8 +124,6 @@
             <param name="data">Data to read</param>
             <param name="encoding"><see cref="T:System.Text.Encoding"/> for the reader</param>
         </member>
-=======
->>>>>>> premaster
         <member name="M:Inertia.BasicReader.Fill(System.Byte[])">
             <summary>
             Fill the current stream with the specified data
@@ -345,7 +314,6 @@
             Get or Set the position in the stream.
             </summary>
         </member>
-<<<<<<< HEAD
         <member name="M:Inertia.BasicWriter.#ctor">
             <summary>
             Initialize a new instance based on <see cref="P:System.Text.Encoding.UTF8"/> algorithm
@@ -357,8 +325,6 @@
             </summary>
             <param name="encoding"></param>
         </member>
-=======
->>>>>>> premaster
         <member name="M:Inertia.BasicWriter.SetEmpty(System.UInt32)">
             <summary>
             Write empty data of specified size
@@ -544,7 +510,6 @@
             Exception thrown when flag size limit is reached
             </summary>
         </member>
-<<<<<<< HEAD
         <member name="M:Inertia.LoaderManager.TryGetPlugin``1(``0@)">
             <summary>
             Returns the specified <see cref="T:Inertia.Runtime.IInertiaPlugin"/> loaded instance.
@@ -611,34 +576,12 @@
             </summary>
             <param name="ip"></param>
             <param name="port"></param>
-=======
-        <member name="T:Inertia.IAutoSerializable">
-            <summary>
-            Allows the system to automatically serialize or deserialize the fields of an instance (using the attributes <see cref="T:Inertia.CustomSerialization"/> and <see cref="T:Inertia.CustomDeserialization"/>)
-            </summary>
-        </member>
-        <member name="P:Inertia.AutoQueueExecutor.Count">
-            <summary>
-            Returns the number of actions currently queued.
-            </summary>
-        </member>
-        <member name="P:Inertia.ManualQueueExecutor.Count">
-            <summary>
-            Returns the number of actions currently queued.
-            </summary>
-        </member>
-        <member name="M:Inertia.ManualQueueExecutor.Execute">
-            <summary>
-            Execute all the actions queued and remove them from the queue.
-            </summary>
->>>>>>> premaster
         </member>
         <member name="P:Inertia.Network.UdpServerEntity.IsInitialized">
             <summary>
             Returns true if <see cref="M:Inertia.Network.UdpServerEntity.Start"/> was called successfully.
             </summary>
         </member>
-<<<<<<< HEAD
         <member name="M:Inertia.Network.UdpServerEntity.#ctor">
             <summary>
             Instantiate a new instance of the class <see cref="T:Inertia.Network.UdpServerEntity"/>
@@ -651,25 +594,18 @@
             <param name="ip"></param>
             <param name="port"></param>
         </member>
-=======
->>>>>>> premaster
         <member name="T:Inertia.Network.DefaultNetworkProtocol">
             <summary>
             Represents the default network protocol used by network entities.
             </summary>
         </member>
-<<<<<<< HEAD
         <member name="M:Inertia.Network.DefaultNetworkProtocol.OnParseMessage(Inertia.Network.NetworkMessage)">
-=======
-        <member name="M:Inertia.Network.DefaultNetworkProtocol.OnSerializeMessage(Inertia.Network.NetworkMessage)">
->>>>>>> premaster
             <summary>
             Occurs when a <see cref="T:Inertia.Network.NetworkMessage"/> is requested to be written before being sent.
             </summary>
             <param name="message"></param>
             <returns></returns>
         </member>
-<<<<<<< HEAD
         <member name="M:Inertia.Network.DefaultNetworkProtocol.OnReceiveData(Inertia.Network.TcpClientEntity,Inertia.BasicReader)">
             <summary>
             Occurs when data is received from a <see cref="T:Inertia.Network.TcpClientEntity"/>.
@@ -730,20 +666,12 @@
             <summary>
             Set to true for executing the tasks in multi threading
             </summary>
-=======
-        <member name="M:Inertia.Network.NetworkProtocol.GetCaller(System.Object)">
-            <summary>
-            Returns the instance of <see cref="T:Inertia.Network.NetworkMessageCaller"/> associated with the indicated <see cref="T:Inertia.Network.NetworkMessage"/> or null.
-            </summary>
-            <param name="receiver"></param>
->>>>>>> premaster
         </member>
         <member name="P:Inertia.Network.NetworkProtocol.NetworkBufferLength">
             <summary>
             The size of the buffer to be used for network communication.
             </summary>
         </member>
-<<<<<<< HEAD
         <member name="M:Inertia.Network.NetworkProtocol.GetCaller(Inertia.Network.NetworkMessage)">
             <summary>
             Returns the instance of <see cref="T:Inertia.Network.NetworkMessageCaller"/> associated with the indicated <see cref="T:Inertia.Network.NetworkMessage"/> or null.
@@ -751,16 +679,12 @@
             <param name="message"></param>
         </member>
         <member name="M:Inertia.Network.NetworkProtocol.OnParseMessage(Inertia.Network.NetworkMessage)">
-=======
-        <member name="M:Inertia.Network.NetworkProtocol.OnSerializeMessage(Inertia.Network.NetworkMessage)">
->>>>>>> premaster
             <summary>
             Occurs when a <see cref="T:Inertia.Network.NetworkMessage"/> is requested to be written before being sent.
             </summary>
             <param name="message"></param>
             <returns></returns>
         </member>
-<<<<<<< HEAD
         <member name="M:Inertia.Network.NetworkProtocol.OnReceiveData(Inertia.Network.TcpClientEntity,Inertia.BasicReader)">
             <summary>
             Occurs when data is received from a <see cref="T:Inertia.Network.TcpClientEntity"/>.
@@ -795,8 +719,6 @@
             </summary>
             <param name="exMessage"></param>
         </member>
-=======
->>>>>>> premaster
         <member name="T:Inertia.Network.UnknownMessageException">
             <summary>
             Thrown when using a <see cref="T:System.Type"/> that isn't a subclass of <see cref="T:Inertia.Network.NetworkMessage"/>
@@ -807,7 +729,6 @@
             Thrown when sending more than <see cref="F:System.UInt16.MaxValue"/> bytes from UDP protocol
             </summary>
         </member>
-<<<<<<< HEAD
         <member name="P:Inertia.Runtime.Script.DeltaTime">
             <summary>
             Returns the time elapsed since the last execution frame. 
@@ -818,24 +739,12 @@
             Occurs when the script initializes.
             </summary>
             <param name="args"></param>
-=======
-        <member name="T:Inertia.Network.IMessageHooker">
-            <summary>
-            Tells the network protocol that the object can contain static message hookers.
-            </summary>
-        </member>
-        <member name="P:Inertia.Runtime.Script.DeltaTime">
-            <summary>
-            Returns the time elapsed since the last execution frame. 
-            </summary>
->>>>>>> premaster
         </member>
         <member name="M:Inertia.Runtime.Script.OnUpdate">
             <summary>
             Occurs each execution frame.
             </summary>
         </member>
-<<<<<<< HEAD
         <member name="M:Inertia.Runtime.Script.OnDestroy">
             <summary>
             Occurs before the script is destroyed.
@@ -886,41 +795,22 @@
             <returns></returns>
         </member>
         <member name="P:Inertia.Runtime.ScriptArgumentsCollection.Count">
-=======
-        <member name="M:Inertia.Runtime.Script.OnInitialize(Inertia.Runtime.ScriptArguments)">
-            <summary>
-            Occurs when the script initializes.
-            </summary>
-            <param name="args"></param>
-        </member>
-        <member name="M:Inertia.Runtime.Script.OnDestroy">
-            <summary>
-            Occurs before the script is destroyed.
-            </summary>
-        </member>
-        <member name="P:Inertia.Runtime.ScriptArguments.Count">
->>>>>>> premaster
             <summary>
             Returns the number of arguments in the collection.
             </summary>
         </member>
-<<<<<<< HEAD
         <member name="P:Inertia.Runtime.ScriptArgumentsCollection.Position">
             <summary>
             Returns the next argument position in the collection.
             </summary>
         </member>
         <member name="P:Inertia.Runtime.ScriptArgumentsCollection.Item(System.Int32)">
-=======
-        <member name="P:Inertia.Runtime.ScriptArguments.Item(System.Int32)">
->>>>>>> premaster
             <summary>
             Returns the argument as object at the specified index in the collection.
             </summary>
             <param name="index"></param>
             <returns></returns>
         </member>
-<<<<<<< HEAD
         <member name="M:Inertia.Runtime.ScriptArgumentsCollection.GetNextArgument``1">
             <summary>
             Returns the next argument based on <see cref="P:Inertia.Runtime.ScriptArgumentsCollection.Position"/> field casted to <typeparamref name="T"/>.
@@ -928,8 +818,6 @@
             <typeparam name="T">Target <see cref="T:System.Type"/> of the argument</typeparam>
             <returns></returns>
         </member>
-=======
->>>>>>> premaster
         <member name="P:Inertia.Runtime.Run.ExecuteScriptIn.Permanent">
             <summary>
             Returns true if the current script run permanently.
@@ -940,7 +828,6 @@
             Execute the Runtime cycle manually.
             </summary>
         </member>
-<<<<<<< HEAD
         <member name="P:Inertia.AutoQueueExecutor.Count">
             <summary>
             Returns the number of actions currently queued.
@@ -961,8 +848,6 @@
             Execute all the actions queued and remove them from the queue.
             </summary>
         </member>
-=======
->>>>>>> premaster
         <member name="T:Inertia.CoreRequestHeaders">
             <summary>
             HTTP Headers

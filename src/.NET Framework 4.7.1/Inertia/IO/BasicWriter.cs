@@ -2,29 +2,21 @@
 using System.Collections.Generic;
 using System.IO;
 <<<<<<< HEAD
-<<<<<<< HEAD
 using System.Runtime.Serialization.Formatters.Binary;
 =======
 using System.Linq;
 using System.Reflection;
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
-using System.Linq;
-using System.Reflection;
->>>>>>> premaster
 using System.Text;
 
 namespace Inertia
 {
-<<<<<<< HEAD
 <<<<<<< HEAD
     /// <summary>
     ///
     /// </summary>
 =======
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
->>>>>>> premaster
     public class BasicWriter : IDisposable
     {
         private static Dictionary<Type, BasicAction<BasicWriter, object>> _typageDefinitions = new Dictionary<Type, BasicAction<BasicWriter, object>>
@@ -47,13 +39,10 @@ namespace Inertia
         };
 
 <<<<<<< HEAD
-<<<<<<< HEAD
         /// <summary>
         /// Returns true is the current instance is disposed.
         /// </summary>
 =======
-=======
->>>>>>> premaster
         public static void SetTypeSerialization(Type type, BasicAction<BasicWriter, object> serialization)
         {
             if (!_typageDefinitions.ContainsKey(type))
@@ -66,10 +55,7 @@ namespace Inertia
             }
         }
 
-<<<<<<< HEAD
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
->>>>>>> premaster
         public bool IsDisposed { get; private set; }
         /// <summary>
         /// Returns the total length of the stream.
@@ -109,7 +95,6 @@ namespace Inertia
         private BinaryWriter _writer;
         private readonly Encoding _encoding;
 
-<<<<<<< HEAD
         /// <summary>
         /// Initialize a new instance based on <see cref="Encoding.UTF8"/> algorithm
         /// </summary>
@@ -135,17 +120,6 @@ namespace Inertia
         }
 
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
-        public BasicWriter() : this(Encoding.UTF8)
-        {
-        }
-        public BasicWriter(Encoding encoding)
-        {
-            _encoding = encoding;
-            _writer = new BinaryWriter(new MemoryStream(), encoding);
-        }
-
->>>>>>> premaster
         public void Clear()
         {
             if (IsDisposed)
@@ -169,14 +143,10 @@ namespace Inertia
         public BasicWriter SetEmpty(uint size)
         {
 <<<<<<< HEAD
-<<<<<<< HEAD
             return SetBytes(new byte[size - 4]);
 =======
             return SetBytesWithoutHeader(new byte[size]);
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
-            return SetBytesWithoutHeader(new byte[size]);
->>>>>>> premaster
         }
         /// <summary>
         /// Write the specified value in the stream
@@ -342,14 +312,10 @@ namespace Inertia
         public BasicWriter SetBytes(byte[] value)
         {
 <<<<<<< HEAD
-<<<<<<< HEAD
             _writer.Write(value.LongLength);
 =======
             _writer.Write((uint)value.Length);
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
-            _writer.Write((uint)value.Length);
->>>>>>> premaster
             return SetBytesWithoutHeader(value);
         }
         /// <summary>
@@ -372,7 +338,6 @@ namespace Inertia
             return SetLong(value.Ticks);
         }
         /// <summary>
-<<<<<<< HEAD
 <<<<<<< HEAD
         /// Write customized serializable object in the stream
         /// </summary>
@@ -415,8 +380,6 @@ namespace Inertia
             return this;
         }
 =======
-=======
->>>>>>> premaster
         /// Write an instance of <see cref="ISerializableObject"/> in the stream
         /// </summary>
         /// <param name="value"><see cref="ISerializableObject"/> to serialize</param>
@@ -475,10 +438,7 @@ namespace Inertia
             return this;
         }
 
-<<<<<<< HEAD
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
->>>>>>> premaster
         /// <summary>
         /// Automatically write the specified value in the stream
         /// </summary>
@@ -494,11 +454,8 @@ namespace Inertia
             else
             {
 <<<<<<< HEAD
-<<<<<<< HEAD
                 SetObject(value);
 =======
-=======
->>>>>>> premaster
                 if (objType.GetInterface(nameof(IAutoSerializable)) != null)
                 {
                     SetAutoSerializable((IAutoSerializable)value);
@@ -507,10 +464,7 @@ namespace Inertia
                 {
                     SetSerializableObject((ISerializableObject)value);
                 }
-<<<<<<< HEAD
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
->>>>>>> premaster
             }
 
             return this;
@@ -569,7 +523,6 @@ namespace Inertia
         }
 
 <<<<<<< HEAD
-<<<<<<< HEAD
         /// <summary>
         ///
         /// </summary>
@@ -597,15 +550,6 @@ namespace Inertia
                     _writer.Close();
                     _writer.Dispose();
                 }
-=======
-        public void Dispose()
-        {
-            if (!IsDisposed)
-            {
-                _writer.Flush();
-                _writer.Close();
-                _writer.Dispose();
->>>>>>> premaster
 
                 IsDisposed = true;
             }

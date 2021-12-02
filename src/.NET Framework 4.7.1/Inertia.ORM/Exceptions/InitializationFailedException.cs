@@ -7,7 +7,6 @@ namespace Inertia.ORM
     /// </summary>
     public class InitializationFailedException : Exception
     {
-<<<<<<< HEAD
         /// <summary>
         ///
         /// </summary>
@@ -22,15 +21,6 @@ namespace Inertia.ORM
         public InitializationFailedException(string exMsg)
         {
             ExMessage = exMsg;
-=======
-        public override string Message => _exMessage;
-
-        private readonly string _exMessage;
-
-        public InitializationFailedException(string exMsg)
-        {
-            _exMessage = exMsg;
->>>>>>> premaster
         }
     }
 }

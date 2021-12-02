@@ -4,7 +4,6 @@
         <name>Inertia.ORM</name>
     </assembly>
     <members>
-<<<<<<< HEAD
         <member name="T:Inertia.ORM.AttachTo">
             <summary>
             Attach a <see cref="T:Inertia.ORM.Table"/> object to a <see cref="T:Inertia.ORM.Database"/>
@@ -134,11 +133,6 @@
         <member name="T:Inertia.ORM.Database">
             <summary>
             SQL Database
-=======
-        <member name="T:Inertia.ORM.TableLink">
-            <summary>
-            Link a <see cref="T:Inertia.ORM.Table"/> object to a <see cref="T:Inertia.ORM.Database"/>
->>>>>>> premaster
             </summary>
         </member>
         <member name="P:Inertia.ORM.Database.Name">
@@ -168,11 +162,7 @@
         </member>
         <member name="P:Inertia.ORM.Database.Ssl">
             <summary>
-<<<<<<< HEAD
             
-=======
-            Returns the SSL mode used by the MySql connection
->>>>>>> premaster
             </summary>
         </member>
         <member name="M:Inertia.ORM.Database.#ctor">
@@ -181,7 +171,6 @@
             </summary>
         </member>
 <<<<<<< HEAD
-<<<<<<< HEAD
 =======
         <member name="M:Inertia.ORM.Database.OnInitialized">
             <summary>
@@ -189,8 +178,6 @@
             </summary>
         </member>
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
->>>>>>> premaster
         <member name="M:Inertia.ORM.Database.TryExecuteQuery(System.String)">
             <summary>
             Execute a custom SQL query and returns true if the query was successfully executed.
@@ -393,7 +380,6 @@
             <param name="distinct"></param>
             <returns></returns>
         </member>
-<<<<<<< HEAD
         <member name="M:Inertia.ORM.Database.Average``1(System.String)">
             <summary>
             
@@ -467,14 +453,10 @@
 =======
         <member name="T:Inertia.ORM.QueryAccessor`1">
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
-        <member name="T:Inertia.ORM.QueryAccessor`1">
->>>>>>> premaster
             <summary>
             A help tool for faster access to queries
             </summary>
             <typeparam name="TableKey"></typeparam>
-<<<<<<< HEAD
 <<<<<<< HEAD
             <typeparam name="DatabaseKey"></typeparam>
         </member>
@@ -485,8 +467,6 @@
         </member>
         <member name="M:Inertia.ORM.QueryAccessor`2.Select(System.String[])">
 =======
-=======
->>>>>>> premaster
         </member>
         <member name="M:Inertia.ORM.QueryAccessor`1.#ctor">
             <summary>
@@ -494,25 +474,18 @@
             </summary>
         </member>
         <member name="M:Inertia.ORM.QueryAccessor`1.Select(System.String[])">
-<<<<<<< HEAD
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
->>>>>>> premaster
             <summary>
             Selects the first element from the specified <see cref="T:Inertia.ORM.Table"/> with the specified parameters and returns an instance of the <typeparamref name="TableKey"/>.
             </summary>
             <param name="columnsToSelect"></param>
             <returns></returns>
         </member>
-<<<<<<< HEAD
 <<<<<<< HEAD
         <member name="M:Inertia.ORM.QueryAccessor`2.Select(System.Boolean,System.String[])">
 =======
         <member name="M:Inertia.ORM.QueryAccessor`1.Select(System.Boolean,System.String[])">
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
-        <member name="M:Inertia.ORM.QueryAccessor`1.Select(System.Boolean,System.String[])">
->>>>>>> premaster
             <summary>
             Selects the first element from the specified <see cref="T:Inertia.ORM.Table"/> with the specified parameters and returns an instance of the <typeparamref name="TableKey"/>.
             </summary>
@@ -520,15 +493,11 @@
             <param name="distinct"></param>
             <returns></returns>
         </member>
-<<<<<<< HEAD
 <<<<<<< HEAD
         <member name="M:Inertia.ORM.QueryAccessor`2.Select(Inertia.ORM.SqlCondition,System.String[])">
 =======
         <member name="M:Inertia.ORM.QueryAccessor`1.Select(Inertia.ORM.SqlCondition,System.String[])">
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
-        <member name="M:Inertia.ORM.QueryAccessor`1.Select(Inertia.ORM.SqlCondition,System.String[])">
->>>>>>> premaster
             <summary>
             Selects the first element from the specified <see cref="T:Inertia.ORM.Table"/> with the specified parameters and returns an instance of the <typeparamref name="TableKey"/>.
             </summary>
@@ -536,15 +505,11 @@
             <param name="condition"></param>
             <returns></returns>
         </member>
-<<<<<<< HEAD
 <<<<<<< HEAD
         <member name="M:Inertia.ORM.QueryAccessor`2.Select(Inertia.ORM.SqlCondition,System.Boolean,System.String[])">
 =======
         <member name="M:Inertia.ORM.QueryAccessor`1.Select(Inertia.ORM.SqlCondition,System.Boolean,System.String[])">
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
-        <member name="M:Inertia.ORM.QueryAccessor`1.Select(Inertia.ORM.SqlCondition,System.Boolean,System.String[])">
->>>>>>> premaster
             <summary>
             Selects the first element from the specified <see cref="T:Inertia.ORM.Table"/> with the specified parameters and returns an instance of the <typeparamref name="TableKey"/>.
             </summary>
@@ -554,29 +519,21 @@
             <returns></returns>
         </member>
 <<<<<<< HEAD
-<<<<<<< HEAD
         <member name="M:Inertia.ORM.QueryAccessor`2.SelectAll(System.String[])">
 =======
         <member name="M:Inertia.ORM.QueryAccessor`1.SelectAll(System.String[])">
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
-        <member name="M:Inertia.ORM.QueryAccessor`1.SelectAll(System.String[])">
->>>>>>> premaster
             <summary>
             Selects all the elements from the specified <see cref="T:Inertia.ORM.Table"/> with the specified parameters and returns an instance of the <typeparamref name="TableKey"/>.
             </summary>
             <param name="columnsToSelect"></param>
             <returns></returns>
         </member>
-<<<<<<< HEAD
 <<<<<<< HEAD
         <member name="M:Inertia.ORM.QueryAccessor`2.SelectAll(System.Boolean,System.String[])">
 =======
         <member name="M:Inertia.ORM.QueryAccessor`1.SelectAll(System.Boolean,System.String[])">
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
-        <member name="M:Inertia.ORM.QueryAccessor`1.SelectAll(System.Boolean,System.String[])">
->>>>>>> premaster
             <summary>
             Selects all the elements from the specified <see cref="T:Inertia.ORM.Table"/> with the specified parameters and returns an instance of the <typeparamref name="TableKey"/>.
             </summary>
@@ -584,15 +541,11 @@
             <param name="distinct"></param>
             <returns></returns>
         </member>
-<<<<<<< HEAD
 <<<<<<< HEAD
         <member name="M:Inertia.ORM.QueryAccessor`2.SelectAll(Inertia.ORM.SqlCondition,System.String[])">
 =======
         <member name="M:Inertia.ORM.QueryAccessor`1.SelectAll(Inertia.ORM.SqlCondition,System.String[])">
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
-        <member name="M:Inertia.ORM.QueryAccessor`1.SelectAll(Inertia.ORM.SqlCondition,System.String[])">
->>>>>>> premaster
             <summary>
             Selects all the elements from the specified <see cref="T:Inertia.ORM.Table"/> with the specified parameters and returns an instance of the <typeparamref name="TableKey"/>.
             </summary>
@@ -601,14 +554,10 @@
             <returns></returns>
         </member>
 <<<<<<< HEAD
-<<<<<<< HEAD
         <member name="M:Inertia.ORM.QueryAccessor`2.SelectAll(Inertia.ORM.SqlCondition,System.Boolean,System.String[])">
 =======
         <member name="M:Inertia.ORM.QueryAccessor`1.SelectAll(Inertia.ORM.SqlCondition,System.Boolean,System.String[])">
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
-        <member name="M:Inertia.ORM.QueryAccessor`1.SelectAll(Inertia.ORM.SqlCondition,System.Boolean,System.String[])">
->>>>>>> premaster
             <summary>
             Selects all the elements from the specified <see cref="T:Inertia.ORM.Table"/> with the specified parameters and returns an instance of the <typeparamref name="TableKey"/>.
             </summary>
@@ -618,14 +567,10 @@
             <returns></returns>
         </member>
 <<<<<<< HEAD
-<<<<<<< HEAD
         <member name="M:Inertia.ORM.QueryAccessor`2.Delete(Inertia.ORM.SqlCondition)">
 =======
         <member name="M:Inertia.ORM.QueryAccessor`1.Delete(Inertia.ORM.SqlCondition)">
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
-        <member name="M:Inertia.ORM.QueryAccessor`1.Delete(Inertia.ORM.SqlCondition)">
->>>>>>> premaster
             <summary>
             Delete all the elements from the specified <see cref="T:Inertia.ORM.Table"/> based on the specified <see cref="T:Inertia.ORM.SqlCondition"/>
             </summary>
@@ -633,28 +578,20 @@
             <returns></returns>
         </member>
 <<<<<<< HEAD
-<<<<<<< HEAD
         <member name="M:Inertia.ORM.QueryAccessor`2.DeleteAll">
 =======
         <member name="M:Inertia.ORM.QueryAccessor`1.DeleteAll">
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
-        <member name="M:Inertia.ORM.QueryAccessor`1.DeleteAll">
->>>>>>> premaster
             <summary>
             Delete all the elements from the specified <see cref="T:Inertia.ORM.Table"/>
             </summary>
             <returns></returns>
         </member>
 <<<<<<< HEAD
-<<<<<<< HEAD
         <member name="M:Inertia.ORM.QueryAccessor`2.UpdateAll(`0,System.String[])">
 =======
         <member name="M:Inertia.ORM.QueryAccessor`1.UpdateAll(`0,System.String[])">
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
-        <member name="M:Inertia.ORM.QueryAccessor`1.UpdateAll(`0,System.String[])">
->>>>>>> premaster
             <summary>
             Update all the elements in the specified <see cref="T:Inertia.ORM.Table"/> with the reference's values
             </summary>
@@ -663,58 +600,42 @@
             <returns></returns>
         </member>
 <<<<<<< HEAD
-<<<<<<< HEAD
         <member name="M:Inertia.ORM.QueryAccessor`2.Count">
 =======
         <member name="M:Inertia.ORM.QueryAccessor`1.Count">
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
-        <member name="M:Inertia.ORM.QueryAccessor`1.Count">
->>>>>>> premaster
             <summary>
             Execute a COUNT query with the specified parameters and return the result.
             </summary>
             <returns></returns>
         </member>
-<<<<<<< HEAD
 <<<<<<< HEAD
         <member name="M:Inertia.ORM.QueryAccessor`2.Count(System.Boolean)">
 =======
         <member name="M:Inertia.ORM.QueryAccessor`1.Count(System.Boolean)">
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
-        <member name="M:Inertia.ORM.QueryAccessor`1.Count(System.Boolean)">
->>>>>>> premaster
             <summary>
             Execute a COUNT query with the specified parameters and return the result.
             </summary>
             <param name="distinct"></param>
             <returns></returns>
         </member>
-<<<<<<< HEAD
 <<<<<<< HEAD
         <member name="M:Inertia.ORM.QueryAccessor`2.Count(Inertia.ORM.SqlCondition)">
 =======
         <member name="M:Inertia.ORM.QueryAccessor`1.Count(Inertia.ORM.SqlCondition)">
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
-        <member name="M:Inertia.ORM.QueryAccessor`1.Count(Inertia.ORM.SqlCondition)">
->>>>>>> premaster
             <summary>
             Execute a COUNT query with the specified parameters and return the result.
             </summary>
             <param name="condition"></param>
             <returns></returns>
         </member>
-<<<<<<< HEAD
 <<<<<<< HEAD
         <member name="M:Inertia.ORM.QueryAccessor`2.Count(Inertia.ORM.SqlCondition,System.Boolean)">
 =======
         <member name="M:Inertia.ORM.QueryAccessor`1.Count(Inertia.ORM.SqlCondition,System.Boolean)">
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
-        <member name="M:Inertia.ORM.QueryAccessor`1.Count(Inertia.ORM.SqlCondition,System.Boolean)">
->>>>>>> premaster
             <summary>
             Execute a COUNT query with the specified parameters and return the result.
             </summary>
@@ -722,30 +643,22 @@
             <param name="distinct"></param>
             <returns></returns>
         </member>
-<<<<<<< HEAD
 <<<<<<< HEAD
         <member name="M:Inertia.ORM.QueryAccessor`2.Count(System.String)">
 =======
         <member name="M:Inertia.ORM.QueryAccessor`1.Count(System.String)">
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
-        <member name="M:Inertia.ORM.QueryAccessor`1.Count(System.String)">
->>>>>>> premaster
             <summary>
             Execute a COUNT query with the specified parameters and return the result.
             </summary>
             <param name="columnName"></param>
             <returns></returns>
         </member>
-<<<<<<< HEAD
 <<<<<<< HEAD
         <member name="M:Inertia.ORM.QueryAccessor`2.Count(System.String,System.Boolean)">
 =======
         <member name="M:Inertia.ORM.QueryAccessor`1.Count(System.String,System.Boolean)">
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
-        <member name="M:Inertia.ORM.QueryAccessor`1.Count(System.String,System.Boolean)">
->>>>>>> premaster
             <summary>
             Execute a COUNT query with the specified parameters and return the result.
             </summary>
@@ -753,15 +666,11 @@
             <param name="columnName"></param>
             <returns></returns>
         </member>
-<<<<<<< HEAD
 <<<<<<< HEAD
         <member name="M:Inertia.ORM.QueryAccessor`2.Count(System.String,Inertia.ORM.SqlCondition)">
 =======
         <member name="M:Inertia.ORM.QueryAccessor`1.Count(System.String,Inertia.ORM.SqlCondition)">
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
-        <member name="M:Inertia.ORM.QueryAccessor`1.Count(System.String,Inertia.ORM.SqlCondition)">
->>>>>>> premaster
             <summary>
             Execute a COUNT query with the specified parameters and return the result.
             </summary>
@@ -769,15 +678,11 @@
             <param name="condition"></param>
             <returns></returns>
         </member>
-<<<<<<< HEAD
 <<<<<<< HEAD
         <member name="M:Inertia.ORM.QueryAccessor`2.Count(System.String,Inertia.ORM.SqlCondition,System.Boolean)">
 =======
         <member name="M:Inertia.ORM.QueryAccessor`1.Count(System.String,Inertia.ORM.SqlCondition,System.Boolean)">
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
-        <member name="M:Inertia.ORM.QueryAccessor`1.Count(System.String,Inertia.ORM.SqlCondition,System.Boolean)">
->>>>>>> premaster
             <summary>
             Execute a COUNT query with the specified parameters and return the result.
             </summary>
@@ -787,14 +692,10 @@
             <returns></returns>
         </member>
 <<<<<<< HEAD
-<<<<<<< HEAD
         <member name="M:Inertia.ORM.QueryAccessor`2.Exist(Inertia.ORM.SqlCondition)">
 =======
         <member name="M:Inertia.ORM.QueryAccessor`1.Exist(Inertia.ORM.SqlCondition)">
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
-        <member name="M:Inertia.ORM.QueryAccessor`1.Exist(Inertia.ORM.SqlCondition)">
->>>>>>> premaster
             <summary>
             Return true if a row exist in the database based on the specified conditions
             </summary>
@@ -802,14 +703,10 @@
             <returns></returns>
         </member>
 <<<<<<< HEAD
-<<<<<<< HEAD
         <member name="M:Inertia.ORM.QueryAccessor`2.Exist(Inertia.ORM.SqlCondition,System.Boolean)">
 =======
         <member name="M:Inertia.ORM.QueryAccessor`1.Exist(Inertia.ORM.SqlCondition,System.Boolean)">
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
-        <member name="M:Inertia.ORM.QueryAccessor`1.Exist(Inertia.ORM.SqlCondition,System.Boolean)">
->>>>>>> premaster
             <summary>
             Return true if a row exist in the database based on the specified conditions
             </summary>
@@ -817,7 +714,6 @@
             <param name="distinct"></param>
             <returns></returns>
         </member>
-<<<<<<< HEAD
 <<<<<<< HEAD
         <member name="M:Inertia.ORM.QueryAccessor`2.Average(System.String)">
 =======
@@ -1253,21 +1149,16 @@
             Returns the name of the table
             </summary>
         </member>
-=======
->>>>>>> premaster
         <member name="P:Inertia.ORM.Table.Database">
             <summary>
             Returns the <see cref="P:Inertia.ORM.Table.Database"/> attached
             </summary>
         </member>
-<<<<<<< HEAD
         <member name="M:Inertia.ORM.Table.#ctor">
             <summary>
             Instantiate a new instance of class <see cref="T:Inertia.ORM.Table"/>
             </summary>
         </member>
-=======
->>>>>>> premaster
         <member name="M:Inertia.ORM.Table.Insert">
             <summary>
             Insert the current instance values in <see cref="P:Inertia.ORM.Table.Database"/>
@@ -1282,7 +1173,6 @@
             <param name="columnsToUpdate"></param>
             <returns></returns>
         </member>
-<<<<<<< HEAD
         <member name="T:Inertia.ORM.SqlCondition">
             <summary>
             
@@ -1293,8 +1183,6 @@
             
             </summary>
         </member>
-=======
->>>>>>> premaster
         <member name="M:Inertia.ORM.SqlCondition.#ctor">
             <summary>
             Initialize a new instance of the class <see cref="T:Inertia.ORM.SqlCondition"/>.
@@ -1393,20 +1281,16 @@
             <param name="limitValue"></param>
             <returns></returns>
         </member>
-<<<<<<< HEAD
         <member name="M:Inertia.ORM.SqlCondition.Dispose">
             <summary>
             
             </summary>
         </member>
-=======
->>>>>>> premaster
         <member name="T:Inertia.ORM.ConditionOperator">
             <summary>
             SQL conditonal operators
             </summary>
         </member>
-<<<<<<< HEAD
         <member name="F:Inertia.ORM.ConditionOperator.Equal">
             <summary>
             
@@ -1457,14 +1341,11 @@
             
             </summary>
         </member>
-=======
->>>>>>> premaster
         <member name="T:Inertia.ORM.ConditionType">
             <summary>
             SQL conditional types
             </summary>
         </member>
-<<<<<<< HEAD
         <member name="F:Inertia.ORM.ConditionType.AND">
             <summary>
             
@@ -1475,14 +1356,11 @@
             
             </summary>
         </member>
-=======
->>>>>>> premaster
         <member name="T:Inertia.ORM.DatabaseAlreadyInitializedException">
             <summary>
             Throw when a <see cref="T:Inertia.ORM.Database"/> is already registered
             </summary>
         </member>
-<<<<<<< HEAD
         <member name="P:Inertia.ORM.DatabaseAlreadyInitializedException.Message">
              <summary>
             
@@ -1499,14 +1377,11 @@
             </summary>
             <param name="dbName"></param>
         </member>
-=======
->>>>>>> premaster
         <member name="T:Inertia.ORM.DatabaseConnectionFailedException">
             <summary>
             Throw when failed to connect to a <see cref="F:Inertia.ORM.DatabaseConnectionFailedException._database"/>
             </summary>
         </member>
-<<<<<<< HEAD
         <member name="P:Inertia.ORM.DatabaseConnectionFailedException.Message">
              <summary>
             
@@ -1519,14 +1394,11 @@
             <param name="database"></param>
             <param name="ex"></param>
         </member>
-=======
->>>>>>> premaster
         <member name="T:Inertia.ORM.InitializationFailedException">
             <summary>
             Throw when <see cref="T:Inertia.ORM.SqlManager"/> failed to initialize
             </summary>
         </member>
-<<<<<<< HEAD
         <member name="P:Inertia.ORM.InitializationFailedException.Message">
              <summary>
             
@@ -1543,8 +1415,6 @@
             
              </summary>
         </member>
-=======
->>>>>>> premaster
         <member name="M:Inertia.ORM.SqlManager.TrySearchDatabase(System.String,Inertia.ORM.Database@)">
             <summary>
             Returns a <see cref="T:Inertia.ORM.Database"/> already registered.
@@ -1559,7 +1429,6 @@
             </summary>
             <returns></returns>
         </member>
-<<<<<<< HEAD
         <member name="M:Inertia.ORM.SqlManager.TrySearchDatabase(System.Type,Inertia.ORM.Database@)">
             <summary>
             
@@ -1575,7 +1444,5 @@
             <typeparam name="T"></typeparam>
             <param name="onDatabase"></param>
         </member>
-=======
->>>>>>> premaster
     </members>
 </doc>

@@ -23,13 +23,9 @@
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Debug\Inertia.xml</DocumentationFile>
 <<<<<<< HEAD
-<<<<<<< HEAD
 =======
     <NoWarn>1591</NoWarn>
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
-    <NoWarn>1591</NoWarn>
->>>>>>> premaster
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -50,7 +46,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-<<<<<<< HEAD
     <Compile Include="Command\CommandHooker.cs" />
     <Compile Include="Command\TextCommand.cs" />
     <Compile Include="Command\TextCommandArgs.cs" />
@@ -66,14 +61,6 @@
     <Compile Include="IO\IOHelper.cs" />
     <Compile Include="LoaderManager.cs" />
 =======
-=======
-    <Compile Include="Command\BasicCommand.cs" />
-    <Compile Include="Command\BasicCommandArguments.cs" />
-    <Compile Include="Command\CommandHooker.cs" />
-    <Compile Include="Delegates.cs" />
-    <Compile Include="Exceptions\InertiaInitializationException.cs" />
-    <Compile Include="Extensions.cs" />
->>>>>>> premaster
     <Compile Include="IO\Attributes\CustomDeserialization.cs" />
     <Compile Include="IO\Attributes\CustomSerialization.cs" />
     <Compile Include="IO\Attributes\IgnoreField.cs" />
@@ -84,15 +71,6 @@
     <Compile Include="IO\Interfaces\ISerializableObject.cs" />
     <Compile Include="IO\IOHelper.cs" />
     <Compile Include="LoaderManager.cs" />
-<<<<<<< HEAD
-=======
-    <Compile Include="Miscs\Clock.cs" />
-    <Compile Include="Miscs\Data\LogOptions.cs" />
-    <Compile Include="Miscs\IdProvider.cs" />
-    <Compile Include="Miscs\Log.cs" />
-    <Compile Include="Miscs\Queue\AutoQueueExecutor.cs" />
-    <Compile Include="Miscs\Queue\ManualQueueExecutor.cs" />
->>>>>>> premaster
     <Compile Include="Network\Core\Entities\NetworkClientEntity.cs" />
     <Compile Include="Network\Core\Entities\NetworkConnectionEntity.cs" />
     <Compile Include="Network\Core\Entities\NetworkServerEntity.cs" />
@@ -105,7 +83,6 @@
     <Compile Include="Network\Core\Instances\UdpConnectionEntity.cs" />
     <Compile Include="Network\Core\Protocol\NetworkMessage.cs" />
     <Compile Include="Network\Core\Protocol\NetworkMessageCaller.cs" />
-<<<<<<< HEAD
     <Compile Include="Network\Core\Protocol\NetworkMessageHandler.cs" />
     <Compile Include="Network\Core\Protocol\NetworkProtocol.cs" />
     <Compile Include="Network\Enums\NetworkDisconnectReason.cs" />
@@ -124,21 +101,6 @@
     <Compile Include="Tools\Log.cs" />
     <Compile Include="Tools\Queue\AutoQueueExecutor.cs" />
     <Compile Include="Tools\Queue\ManualQueueExecutor.cs" />
-=======
-    <Compile Include="Network\Core\Protocol\NetworkProtocol.cs" />
-    <Compile Include="Network\Data\MessageParsingOutput.cs" />
-    <Compile Include="Network\Enums\NetworkDisconnectReason.cs" />
-    <Compile Include="Network\Exceptions\DefaultProtocolFailedParsingMessageException.cs" />
-    <Compile Include="Network\Exceptions\UnknownMessageException.cs" />
-    <Compile Include="Network\Exceptions\UserDatagramDataLengthLimitException.cs" />
-    <Compile Include="Network\Interfaces\IMessageHooker.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Runtime\Core\Script.cs" />
-    <Compile Include="Runtime\Data\ScriptArguments.cs" />
-    <Compile Include="Runtime\Plugins\IPlugin.cs" />
-    <Compile Include="Runtime\Run.cs" />
-    <Compile Include="Runtime\RuntimeManager.cs" />
->>>>>>> premaster
     <Compile Include="Web\CoreRequestHeaders.cs" />
     <Compile Include="Web\RequestParameters.cs" />
     <Compile Include="Web\WebHelper.cs" />

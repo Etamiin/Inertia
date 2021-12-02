@@ -7,7 +7,6 @@ namespace Inertia.ORM
     /// </summary>
     public class DatabaseAlreadyInitializedException : Exception
     {
-<<<<<<< HEAD
         /// <summary>
         ///
         /// </summary>
@@ -22,12 +21,6 @@ namespace Inertia.ORM
         /// Instantiate a new instance of the class <see cref="DatabaseAlreadyInitializedException"/>
         /// </summary>
         /// <param name="dbName"></param>
-=======
-        public override string Message => "You can instantiate a Database only once.";
-
-        public readonly string DatabaseName;
-
->>>>>>> premaster
         public DatabaseAlreadyInitializedException(string dbName)
         {
             DatabaseName = dbName;

@@ -8,7 +8,6 @@ using System.Text;
 namespace Inertia
 {
 <<<<<<< HEAD
-<<<<<<< HEAD
     /// <summary>
     /// 
     /// </summary>
@@ -27,10 +26,6 @@ namespace Inertia
         /// <returns></returns>
 =======
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
-    public static class IOHelper
-    {
->>>>>>> premaster
         public static string[] GetFilesFromDirectory(string path, bool includeSubFolders)
         {
             if (!Directory.Exists(path))
@@ -64,7 +59,6 @@ namespace Inertia
             }
         }
 <<<<<<< HEAD
-<<<<<<< HEAD
         /// <summary>
         /// Appends Bytes to the end of the stream from the specified file.
         /// </summary>
@@ -72,8 +66,6 @@ namespace Inertia
         /// <param name="data"></param>
 =======
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
->>>>>>> premaster
         public static void AppendAllBytes(string filePath, byte[] data)
         {
             using (var stream = new FileStream(filePath, FileMode.Append))
@@ -83,7 +75,6 @@ namespace Inertia
         }
 
 <<<<<<< HEAD
-<<<<<<< HEAD
         /// <summary>
         /// Returns the SHA256 representation of the specified data.
         /// </summary>
@@ -91,8 +82,6 @@ namespace Inertia
         /// <returns></returns>
 =======
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
->>>>>>> premaster
         public static string GetSHA256(byte[] data)
         {
             string result = string.Empty;
@@ -110,7 +99,6 @@ namespace Inertia
 
             return result;
 <<<<<<< HEAD
-<<<<<<< HEAD
         }
         /// <summary>
         /// Returns the SHA256 representation of the specified <see cref="FileStream"/>.
@@ -120,14 +108,10 @@ namespace Inertia
 =======
         }        
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
-        }        
->>>>>>> premaster
         public static string GetSHA256(FileStream stream)
         {
             return GetSHA256(stream, ushort.MaxValue);
         }
-<<<<<<< HEAD
 <<<<<<< HEAD
         /// <summary>
         /// Returns the SHA256 representation of the specified <see cref="FileStream"/>.
@@ -137,8 +121,6 @@ namespace Inertia
         /// <returns></returns>
 =======
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
->>>>>>> premaster
         public static string GetSHA256(FileStream stream, int bufferLength)
         {
             using (stream)
@@ -166,7 +148,6 @@ namespace Inertia
         }
 
 <<<<<<< HEAD
-<<<<<<< HEAD
         /// <summary>
         /// Compress and return the specified data.
         /// </summary>
@@ -175,8 +156,6 @@ namespace Inertia
         /// <returns></returns>
 =======
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
->>>>>>> premaster
         public static byte[] GzipCompress(ref byte[] data, out bool hasBetterSize)
         {
             using (var ms = new MemoryStream())
@@ -193,7 +172,6 @@ namespace Inertia
             }
         }
 <<<<<<< HEAD
-<<<<<<< HEAD
         /// <summary>
         /// Decompress and return the specified data.
         /// </summary>
@@ -201,8 +179,6 @@ namespace Inertia
         /// <returns></returns>
 =======
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
->>>>>>> premaster
         public static byte[] GzipDecompress(byte[] compressedData)
         {
             using (var cms = new MemoryStream(compressedData))
@@ -220,7 +196,6 @@ namespace Inertia
         }
 
 <<<<<<< HEAD
-<<<<<<< HEAD
         /// <summary>
         /// Encrypts the specified data with the specified key.
         /// </summary>
@@ -229,8 +204,6 @@ namespace Inertia
         /// <returns></returns>
 =======
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
->>>>>>> premaster
         public static byte[] EncryptWithString(byte[] data, string key)
         {
             var pdb = new PasswordDeriveBytes(key, Encoding.ASCII.GetBytes(key));
@@ -249,7 +222,6 @@ namespace Inertia
 
             return ms.ToArray();
 <<<<<<< HEAD
-<<<<<<< HEAD
         }
         /// <summary>
         /// Decrypts the specified data with the specified key.
@@ -260,9 +232,6 @@ namespace Inertia
 =======
         }        
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
-        }        
->>>>>>> premaster
         public static byte[] DecryptWithString(byte[] encryptedData, string key)
         {
             var pdb = new PasswordDeriveBytes(key, Encoding.ASCII.GetBytes(key));

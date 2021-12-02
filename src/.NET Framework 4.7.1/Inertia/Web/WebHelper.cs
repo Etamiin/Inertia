@@ -7,14 +7,11 @@ using System.Net;
 namespace Inertia
 {
 <<<<<<< HEAD
-<<<<<<< HEAD
     /// <summary>
     ///
     /// </summary>
 =======
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
->>>>>>> premaster
     public static class WebHelper
     {
         /// <summary>

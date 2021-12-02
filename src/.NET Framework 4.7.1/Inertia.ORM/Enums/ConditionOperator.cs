@@ -5,7 +5,6 @@
     /// </summary>
     public enum ConditionOperator
     {
-<<<<<<< HEAD
         /// <summary>
         /// 
         /// </summary>
@@ -45,17 +44,6 @@
         /// <summary>
         /// 
         /// </summary>
-=======
-        Equal,
-        Greater,
-        Less,
-        GreaterOrEqual,
-        LessOrEqual,
-        NotEqual,
-        NotGreater,
-        NotLess,
-        In,
->>>>>>> premaster
         Like,
     }
 }

@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\obj\Debug\netcoreapp3.1\Inertia.ORM.csproj.AssemblyReference.cache
 C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\obj\Debug\netcoreapp3.1\Inertia.ORM.GeneratedMSBuildEditorConfig.editorconfig
 C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\obj\Debug\netcoreapp3.1\Inertia.ORM.AssemblyInfoInputs.cache
@@ -7,8 +6,6 @@ C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\obj
 C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\obj\Debug\netcoreapp3.1\Inertia.ORM.csproj.CopyComplete
 C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\obj\Debug\netcoreapp3.1\Inertia.ORM.dll
 C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\obj\Debug\netcoreapp3.1\Inertia.ORM.pdb
-=======
->>>>>>> premaster
 C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\bin\Debug\Inertia.ORM.deps.json
 C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\bin\Debug\Inertia.ORM.dll
 C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\bin\Debug\Inertia.ORM.pdb
@@ -35,14 +32,3 @@ C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\bin
 C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\bin\Debug\Inertia.dll
 C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\bin\Debug\Inertia.pdb
 C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\bin\Debug\Inertia.xml
-<<<<<<< HEAD
-=======
-C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\obj\Debug\netcoreapp3.1\Inertia.ORM.csproj.AssemblyReference.cache
-C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\obj\Debug\netcoreapp3.1\Inertia.ORM.GeneratedMSBuildEditorConfig.editorconfig
-C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\obj\Debug\netcoreapp3.1\Inertia.ORM.AssemblyInfoInputs.cache
-C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\obj\Debug\netcoreapp3.1\Inertia.ORM.AssemblyInfo.cs
-C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\obj\Debug\netcoreapp3.1\Inertia.ORM.csproj.CoreCompileInputs.cache
-C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\obj\Debug\netcoreapp3.1\Inertia.ORM.csproj.CopyComplete
-C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\obj\Debug\netcoreapp3.1\Inertia.ORM.dll
-C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia.ORM\obj\Debug\netcoreapp3.1\Inertia.ORM.pdb
->>>>>>> premaster

@@ -1,17 +1,12 @@
 ﻿using System;
 <<<<<<< HEAD
-<<<<<<< HEAD
 =======
 using System.Collections.Generic;
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
-using System.Collections.Generic;
->>>>>>> premaster
 using System.Linq;
 
 namespace Inertia
 {
-<<<<<<< HEAD
 <<<<<<< HEAD
     /// <summary>
     ///
@@ -48,18 +43,6 @@ namespace Inertia
         static CommandHooker()
         {
             _commands = new Dictionary<string, TextCommand>();
-=======
-    /// <summary>
-    /// Core component for command line management and execution.
-    /// </summary>
-    public static class CommandHooker
-    {
-        private static Dictionary<string, BasicCommand> _commands;
-
-        static CommandHooker()
-        {
-            _commands = new Dictionary<string, BasicCommand>();
->>>>>>> premaster
 
             var assemblys = AppDomain.CurrentDomain.GetAssemblies();
             foreach (var assembly in assemblys)
@@ -69,7 +52,6 @@ namespace Inertia
                 {
                     if (type.IsClass)
                     {
-<<<<<<< HEAD
                         if (type.IsSubclassOf(typeof(TextCommand)) && !type.IsAbstract)
                         {
                             var inertiaCommand = (TextCommand)type.GetConstructor(Type.EmptyTypes).Invoke(new object[] { });
@@ -77,40 +59,19 @@ namespace Inertia
                             {
                                 _commands.Add(inertiaCommand.Name, inertiaCommand);
                             }
-=======
-                        if (type.IsSubclassOf(typeof(BasicCommand)) && !type.IsAbstract)
-                        {
-                            try
-                            {
-                                var instance = (BasicCommand)Activator.CreateInstance(type);
-                                if (!_commands.ContainsKey(instance.Name))
-                                {
-                                    _commands.Add(instance.Name, instance);
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                throw new InertiaInitializationException(nameof(CommandHooker), ex);
-                            }                            
->>>>>>> premaster
                         }
                     }
                 }
             }
         }
 
-<<<<<<< HEAD
         public static TextCommand[] GetAllCommands()
-=======
-        public static BasicCommand[] GetCommandList()
->>>>>>> premaster
         {
             lock (_commands)
             {
                 return _commands.Values.ToArray();
             }
         }
-<<<<<<< HEAD
         public static TextCommand GetCommandByName(string commandName)
         {
             _commands.TryGetValue(commandName, out TextCommand command);
@@ -129,20 +90,11 @@ namespace Inertia
 =======
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
         public static bool TryExecuteCommandLine(string commandLine, params object[] dataCollection)
-=======
-        public static bool TryGetCommand(string commandName, out BasicCommand command)
-        {
-            return _commands.TryGetValue(commandName, out command);            
-        }
-
-        public static bool TryExecute(string commandLine, params object[] dataCollection)
->>>>>>> premaster
         {
             var args = commandLine.Split(' ');
             var others = new string[args.Length - 1];
             Array.Copy(args, 1, others, 0, others.Length);
 
-<<<<<<< HEAD
             return TryExecuteCommandByName(commandLine, args[0], dataCollection, others);
         }
         
@@ -156,16 +108,6 @@ namespace Inertia
 =======
                 command.OnExecute(new TextCommandArgs(commandLine, arguments, dataCollection));
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
-            return TryExecuteByName(args[0], dataCollection, commandLine.Contains('"'), others);
-        }
-        
-        private static bool TryExecuteByName(string commandName, object[] dataCollection, bool containsBlock, params string[] arguments)
-        {
-            if (TryGetCommand(commandName, out BasicCommand cmd))
-            {
-                cmd.PreExecute(arguments, dataCollection, containsBlock);
->>>>>>> premaster
                 return true;
             }
 

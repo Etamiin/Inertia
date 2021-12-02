@@ -5,7 +5,6 @@
     /// </summary>
     public enum ConditionType
     {
-<<<<<<< HEAD
         /// <summary>
         /// 
         /// </summary>
@@ -13,9 +12,6 @@
         /// <summary>
         /// 
         /// </summary>
-=======
-        AND,
->>>>>>> premaster
         OR
     }
 }

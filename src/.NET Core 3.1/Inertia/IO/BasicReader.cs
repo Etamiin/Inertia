@@ -3,19 +3,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 <<<<<<< HEAD
-<<<<<<< HEAD
 using System.Runtime.Serialization.Formatters.Binary;
 =======
 using System.Reflection;
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
-using System.Reflection;
->>>>>>> premaster
 using System.Text;
 
 namespace Inertia
 {
-<<<<<<< HEAD
 <<<<<<< HEAD
     /// <summary>
     ///
@@ -27,9 +22,6 @@ namespace Inertia
         /// </summary>
 =======
     public class BasicReader : IDisposable
-=======
-    public sealed class BasicReader : IDisposable
->>>>>>> premaster
     {
         private static Dictionary<Type, BasicReturnAction<BasicReader, object>> _typageDefinitions = new Dictionary<Type, BasicReturnAction<BasicReader, object>>
         {
@@ -62,10 +54,7 @@ namespace Inertia
             }
         }
 
-<<<<<<< HEAD
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
->>>>>>> premaster
         public bool IsDisposed { get; private set; }
         /// <summary>
         /// Returns the total length of the stream.
@@ -124,7 +113,6 @@ namespace Inertia
         private BinaryReader _reader;
         private readonly Encoding _encoding;
 
-<<<<<<< HEAD
         /// <summary>
         /// Initialize a new instance with empty data
         /// </summary>
@@ -135,17 +123,11 @@ namespace Inertia
         /// Initialize a new instance with empty data based on the specified <see cref="Encoding"/>
         /// </summary>
         /// <param name="encoding"><see cref="Encoding"/> for the reader</param>
-=======
-        public BasicReader() : this(Encoding.UTF8)
-        {
-        }
->>>>>>> premaster
         public BasicReader(Encoding encoding)
         {
             _encoding = encoding;
             _reader = new BinaryReader(new MemoryStream(), encoding);
         }
-<<<<<<< HEAD
         /// <summary>
         /// Initialize a new instance with the specified data
         /// </summary>
@@ -158,25 +140,17 @@ namespace Inertia
         /// </summary>
         /// <param name="data">Data to read</param>
         /// <param name="encoding"><see cref="Encoding"/> for the reader</param>
-=======
-        public BasicReader(byte[] data) : this(data, Encoding.UTF8)
-        {
-        }
->>>>>>> premaster
         public BasicReader(byte[] data, Encoding encoding) : this(encoding)
         {
             Fill(data);
         }
 
 <<<<<<< HEAD
-<<<<<<< HEAD
         /// <summary>
         /// Clear the current stream.
         /// </summary>
 =======
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
->>>>>>> premaster
         public void Clear()
         {
             if (!IsDisposed && _reader != null)
@@ -219,15 +193,12 @@ namespace Inertia
         }
 
 <<<<<<< HEAD
-<<<<<<< HEAD
         /// <summary>
         /// Remove all the readed data in the stream and refresh the stream with the non-readed data
         /// </summary>
         /// <returns></returns>
 =======
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
->>>>>>> premaster
         public BasicReader RemoveReadedBytes()
         {
             var available = GetBytes(UnreadedLength);
@@ -267,12 +238,9 @@ namespace Inertia
             return GetByte().GetBits(length);
         }
 <<<<<<< HEAD
-<<<<<<< HEAD
 
 =======
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
->>>>>>> premaster
         /// <summary>
         /// Read a <see cref="string"/> value with the current instance <see cref="Encoding"/> algorithm in the stream and change the position
         /// </summary>
@@ -476,7 +444,6 @@ namespace Inertia
         public byte[] GetBytes()
         {
 <<<<<<< HEAD
-<<<<<<< HEAD
             if (IsUpdatable(sizeof(long)))
             {
                 var length = GetLong();
@@ -485,11 +452,6 @@ namespace Inertia
             {
                 var length = GetUInt();
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
-            if (IsUpdatable(sizeof(uint)))
-            {
-                var length = GetUInt();
->>>>>>> premaster
                 return GetBytes(length);
             }
             else
@@ -526,7 +488,6 @@ namespace Inertia
         /// </summary>
         /// <returns>Returns a <see cref="ISerializableObject"/></returns>
 <<<<<<< HEAD
-<<<<<<< HEAD
         public T TryDeserializeObject<T>() where T : ISerializableObject
         {
             var parameters = typeof(T)
@@ -546,16 +507,10 @@ namespace Inertia
         {
             return (T)GetSerializableObject(typeof(T));
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
-        public T GetSerializableObject<T>() where T : ISerializableObject
-        {
-            return (T)GetSerializableObject(typeof(T));
->>>>>>> premaster
         }
         /// <summary>
         /// Create an instance of <typeparamref name="T"/> and return it after deserialization
         /// </summary>
-<<<<<<< HEAD
 <<<<<<< HEAD
         /// <returns>Returns a <see cref="ISerializableData"/></returns>
         public T TryDeserializeData<T>() where T : ISerializableData
@@ -606,8 +561,6 @@ namespace Inertia
         /// </summary>
         /// <param name="disposing"></param>
 =======
-=======
->>>>>>> premaster
         /// <returns>Returns a <see cref="ISerializableObject"/></returns>
         public object GetSerializableObject(Type type)
         {
@@ -738,7 +691,6 @@ namespace Inertia
 
         public void Dispose()
         {
-<<<<<<< HEAD
             Dispose(true);
         }
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
@@ -751,12 +703,6 @@ namespace Inertia
                     _reader.Close();
                     _reader.Dispose();
                 }
-=======
-            if (!IsDisposed)
-            {
-                _reader.Close();
-                _reader.Dispose();
->>>>>>> premaster
 
                 IsDisposed = true;
             }
@@ -773,11 +719,7 @@ namespace Inertia
         }
     }
 <<<<<<< HEAD
-<<<<<<< HEAD
 }
 =======
 }
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
-}
->>>>>>> premaster

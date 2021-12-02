@@ -8,7 +8,6 @@ namespace Inertia.Runtime
     internal static class RuntimeManager
     {
 <<<<<<< HEAD
-<<<<<<< HEAD
         internal static bool IsManuallyRunned { get; set; }
 
         internal static event BasicAction UpdatingSiT;
@@ -33,31 +32,18 @@ namespace Inertia.Runtime
             }
 
 =======
-=======
-        internal static event BasicAction RtUpdate = () => { };
-        private static event BasicAction Updating = () => { };
-        private static event BasicAction Destroying = () => { };
-
-        internal static bool IsManuallyRunning { get; set; }
-
->>>>>>> premaster
         static RuntimeManager()
         {
             var clock = new Clock();
 
             Task.Factory.StartNew(() => {
-<<<<<<< HEAD
                 while (!IsManuallyRunned)
-=======
-                while (!IsManuallyRunning)
->>>>>>> premaster
                 {
                     ExecuteCycle(clock);
                 }
             });
         }
 
-<<<<<<< HEAD
         internal static bool IsManuallyRunned { get; set; }
 
         internal static event BasicAction UpdatingSiT = () => { };
@@ -93,23 +79,6 @@ namespace Inertia.Runtime
 =======
         internal static void ExecuteCycle(Clock clock, float deltaTime = 0f)
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
-        internal static void RegisterScript(Script script)
-        {
-            Updating += script.OnUpdate;
-        }
-        internal static void BeginUnregisterScript(Script script)
-        {
-            Updating -= script.OnUpdate;
-            Destroying += script.PreDestroy;
-        }
-        internal static void EndUnregisterScript(Script script)
-        {
-            Destroying -= script.PreDestroy;
-        }
-
-        internal static void ExecuteCycle(Clock clock, float deltaTime = 0f)
->>>>>>> premaster
         {
             if (clock != null)
             {
@@ -124,26 +93,16 @@ namespace Inertia.Runtime
                 clock.Reset();
             }
 <<<<<<< HEAD
-<<<<<<< HEAD
 =======
-=======
->>>>>>> premaster
             else
             {
                 Script.DeltaTime = deltaTime;
             }
-<<<<<<< HEAD
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
 
             lock (UpdatingSiT)
             {
                 UpdatingSiT?.Invoke();
-=======
-
-            lock (RtUpdate)
-            {
-                RtUpdate?.Invoke();
->>>>>>> premaster
             }
             lock (Updating)
             {
@@ -154,7 +113,6 @@ namespace Inertia.Runtime
                 Destroying?.Invoke();
             }
         }
-<<<<<<< HEAD
 <<<<<<< HEAD
 
         private static void Initialize()
@@ -178,7 +136,5 @@ namespace Inertia.Runtime
         }
 =======
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
->>>>>>> premaster
     }
 }

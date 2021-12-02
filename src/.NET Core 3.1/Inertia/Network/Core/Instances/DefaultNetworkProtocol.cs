@@ -7,7 +7,6 @@ namespace Inertia.Network
     /// </summary>
     public sealed class DefaultNetworkProtocol : NetworkProtocol
     {
-<<<<<<< HEAD
         public static DefaultNetworkProtocol Instance { get; private set; }
 
         internal static void Initialize()
@@ -34,13 +33,6 @@ namespace Inertia.Network
             {
                 SetProtocol(this);
             }
-=======
-        public override bool PooledExecution => false;
-        public override int NetworkBufferLength => 8192;
-
-        internal DefaultNetworkProtocol() : base()
-        {
->>>>>>> premaster
         }
 
         /// <summary>
@@ -48,11 +40,7 @@ namespace Inertia.Network
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-<<<<<<< HEAD
         public override byte[] OnParseMessage(NetworkMessage message)
-=======
-        public override byte[] OnSerializeMessage(NetworkMessage message)
->>>>>>> premaster
         {
             using (var writer = new BasicWriter())
             {
@@ -71,7 +59,6 @@ namespace Inertia.Network
             }
         }
 
-<<<<<<< HEAD
         /// <summary>
         /// Occurs when data is received from a <see cref="TcpClientEntity"/>.
         /// </summary>
@@ -122,18 +109,6 @@ namespace Inertia.Network
                 {
                     break;
                 }
-=======
-        public override void OnParseMessage(object receiver, BasicReader reader, MessageParsingOutput output)
-        {
-            reader.Position = 0;
-
-            while (reader.UnreadedLength > 0)
-            {
-                var msgId = reader.GetUInt();
-                var msgSize = reader.GetLong();
-
-                if (reader.UnreadedLength < msgSize) break;
->>>>>>> premaster
 
                 try
                 {
@@ -144,7 +119,6 @@ namespace Inertia.Network
                     }
 
                     message.Deserialize(reader);
-<<<<<<< HEAD
 
                     if (_queue == null)
                     {
@@ -158,13 +132,6 @@ namespace Inertia.Network
                 catch (Exception ex)
                 {
                     throw new DefaultProtocolFailedParseNetworkMessageException(ex.Message);
-=======
-                    output.AddOutput(message);
-                }
-                catch (Exception ex)
-                {
-                    throw new DefaultProtocolFailedParsingMessageException(ex.Message);
->>>>>>> premaster
                 }
 
                 reader.RemoveReadedBytes();

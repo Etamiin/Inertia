@@ -7,11 +7,8 @@ namespace Inertia.Network
 {
     public class UdpServerEntity : NetworkServerEntity, IDisposable
     {
-<<<<<<< HEAD
         private BasicAction<UdpConnectionEntity> ConnectionAdded { get; set; }
 
-=======
->>>>>>> premaster
         /// <summary>
         /// Returns true if <see cref="Start"/> was called successfully.
         /// </summary>
@@ -26,7 +23,6 @@ namespace Inertia.Network
         private UdpClient _client;
         private Dictionary<IPEndPoint, UdpConnectionEntity> _connections;
 
-<<<<<<< HEAD
         /// <summary>
         /// Instantiate a new instance of the class <see cref="UdpServerEntity"/>
         /// </summary>
@@ -38,17 +34,11 @@ namespace Inertia.Network
         /// </summary>
         /// <param name="ip"></param>
         /// <param name="port"></param>
-=======
-        public UdpServerEntity(int port) : this(string.Empty, port)
-        {
-        }
->>>>>>> premaster
         public UdpServerEntity(string ip, int port) : base(ip, port)
         {
             _connections = new Dictionary<IPEndPoint, UdpConnectionEntity>();
         }
 
-<<<<<<< HEAD
         public UdpServerEntity CatchOnStarted(BasicAction callback)
         {
             Started = callback;
@@ -66,9 +56,6 @@ namespace Inertia.Network
         }
 
         public override void Start()
-=======
-        public sealed override void Start()
->>>>>>> premaster
         {
             if (IsDisposed)
             {
@@ -91,11 +78,7 @@ namespace Inertia.Network
                         _client = new UdpClient(new IPEndPoint(IPAddress.Parse(_targetIp), _targetPort));
                     }
 
-<<<<<<< HEAD
                     Started?.Invoke();
-=======
-                    OnStarted();
->>>>>>> premaster
                     _client.BeginReceive(new AsyncCallback(OnReceiveData), _client);
                 }
                 catch
@@ -104,11 +87,7 @@ namespace Inertia.Network
                 }
             }
         }        
-<<<<<<< HEAD
         public override void Close(NetworkDisconnectReason reason)
-=======
-        public sealed override void Close(NetworkDisconnectReason reason)
->>>>>>> premaster
         {
             if (IsDisposed)
             {
@@ -125,11 +104,7 @@ namespace Inertia.Network
                 _connections.Clear();
                 _closeNotified = true;
 
-<<<<<<< HEAD
                 Closed?.Invoke(reason);
-=======
-                OnClosed(reason);
->>>>>>> premaster
             }
         }
 
@@ -149,7 +124,6 @@ namespace Inertia.Network
                 throw new ObjectDisposedException(nameof(UdpConnectionEntity));
             }
 
-<<<<<<< HEAD
             SendTo(connection.EndPoint, NetworkProtocol.GetProtocol().OnParseMessage(message));
         }
 
@@ -166,22 +140,6 @@ namespace Inertia.Network
             }
 
             base.Dispose(disposing);
-=======
-            SendTo(connection.EndPoint, NetworkProtocol.GetCurrentProtocol().OnSerializeMessage(message));
-        }
-
-        public virtual void OnConnectionAdded(UdpConnectionEntity connection) { }
-
-        public void Dispose()
-        {
-            if (!IsDisposed)
-            {
-                Close();
-                _client?.Dispose();
-
-                IsDisposed = true;
-            }
->>>>>>> premaster
         }
 
         private void SendTo(IPEndPoint endPoint, byte[] data)
@@ -196,11 +154,7 @@ namespace Inertia.Network
                 throw new UserDatagramDataLengthLimitException();
             }
 
-<<<<<<< HEAD
             try { _client.Send(data, data.Length, endPoint); } catch { }
-=======
-            _client.Send(data, data.Length, endPoint);
->>>>>>> premaster
         }
         private void OnReceiveData(IAsyncResult iar)
         {
@@ -211,7 +165,6 @@ namespace Inertia.Network
 
                 if (!_connections.ContainsKey(endPoint))
                 {
-<<<<<<< HEAD
                     var connection = new UdpConnectionEntity(this, endPoint);
                     _connections.Add(endPoint, connection);
 
@@ -219,15 +172,6 @@ namespace Inertia.Network
                 }
 
                 NetworkProtocol.GetProtocol().OnReceiveData(_connections[endPoint], new BasicReader(data));
-=======
-                    var connection = new UdpConnectionEntity((uint)_idProvider.GetId(), this, endPoint);
-                    _connections.Add(endPoint, connection);
-
-                    OnConnectionAdded(connection);
-                }
-
-                NetworkProtocol.ProcessParsing(_connections[endPoint], new BasicReader(data));
->>>>>>> premaster
             }
             catch (Exception ex)
             {

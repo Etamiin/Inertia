@@ -5,12 +5,9 @@ using System.Linq;
 
 namespace Inertia.ORM
 {
-<<<<<<< HEAD
     /// <summary>
     /// SQL Database
     /// </summary>
-=======
->>>>>>> premaster
     public abstract class Database
     {
         /// <summary>
@@ -29,17 +26,11 @@ namespace Inertia.ORM
         /// Returns the ip used for the connection.
         /// </summary>
         public abstract string Host { get; }
-<<<<<<< HEAD
-=======
-        public abstract bool AutoGenerateTable { get; }
-
->>>>>>> premaster
         /// <summary>
         /// Returns the port used for the connection.
         /// </summary>
         public virtual int Port { get; } = 3306;
         /// <summary>
-<<<<<<< HEAD
         /// 
         /// </summary>
         public virtual MySqlSslMode Ssl { get; } = MySqlSslMode.None;
@@ -49,14 +40,6 @@ namespace Inertia.ORM
         internal bool IsInitialized { get; set; }
 
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
-        /// Returns the SSL mode used by the MySql connection
-        /// </summary>
-        public virtual MySqlSslMode Ssl { get; } = MySqlSslMode.None;
-
-        internal bool IsInitialized { get; set; }
-
->>>>>>> premaster
         private readonly string _connectionString;
 
         /// <summary>
@@ -68,7 +51,6 @@ namespace Inertia.ORM
         }
 
 <<<<<<< HEAD
-<<<<<<< HEAD
         internal void TryCreateItSelf()
         {
             var tempStrConn = $"server={ Host.Replace("localhost", "127.0.0.1") };uid={ User };pwd={ Password };port={ Port };SslMode={ Ssl }";
@@ -77,18 +59,13 @@ namespace Inertia.ORM
         /// <summary>
         /// 
         /// </summary>
-=======
->>>>>>> premaster
         public abstract void OnInitialized();
 
         internal void TryCreateItSelf()
         {
             var dbCreaStr = $"server={ Host.Replace("localhost", "127.0.0.1") };uid={ User };pwd={ Password };port={ Port };SslMode={ Ssl }";
             using (var conn = new MySqlConnection(dbCreaStr))
-<<<<<<< HEAD
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
->>>>>>> premaster
             {
                 conn.Open();
                 using (var cmd = new MySqlCommand($"CREATE DATABASE IF NOT EXISTS `{ Name }`", conn))
@@ -114,7 +91,6 @@ namespace Inertia.ORM
         }
 
 <<<<<<< HEAD
-<<<<<<< HEAD
         internal void ExecuteCommand(string query, BasicAction<MySqlCommand> onCommand)
         {
             using (var conn = CreateConnection())
@@ -134,8 +110,6 @@ namespace Inertia.ORM
                     cmd.Connection = conn;
                     onCommand(cmd);
 =======
-=======
->>>>>>> premaster
         internal void ExecuteCommand(string query, BasicAction<MySqlCommand> onCommand, bool force = false)
         {
             if (IsInitialized || force)
@@ -160,10 +134,7 @@ namespace Inertia.ORM
                         cmd.Connection = conn;
                         onCommand(cmd);
                     }
-<<<<<<< HEAD
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
->>>>>>> premaster
                 }
             }
         }
@@ -269,7 +240,6 @@ namespace Inertia.ORM
         public T Select<T>(SqlCondition condition, bool distinct, params string[] columnsToSelect) where T : Table
         {
 <<<<<<< HEAD
-<<<<<<< HEAD
             if (!SqlManager.CreateTableInstance(out T table))
             {
                 return table;
@@ -304,8 +274,6 @@ namespace Inertia.ORM
                     }
                 });
 =======
-=======
->>>>>>> premaster
             T table = null;
 
             ExecuteCommand((cmd) => {
@@ -342,10 +310,7 @@ namespace Inertia.ORM
                         }
                     });
                 }
-<<<<<<< HEAD
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
->>>>>>> premaster
             });
 
             return table;
@@ -394,7 +359,6 @@ namespace Inertia.ORM
         public T[] SelectAll<T>(SqlCondition condition, bool distinct, params string[] columnsToSelect) where T : Table
         {
 <<<<<<< HEAD
-<<<<<<< HEAD
             if (!SqlManager.CreateTableInstance(out T table))
             {
                 return new[] { table };
@@ -435,8 +399,6 @@ namespace Inertia.ORM
 
             return tables.ToArray();
 =======
-=======
->>>>>>> premaster
             var result = new T[0];
 
             ExecuteCommand((cmd) => {
@@ -478,10 +440,7 @@ namespace Inertia.ORM
             });
 
             return result;
-<<<<<<< HEAD
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
->>>>>>> premaster
         }
 
         /// <summary>
@@ -493,7 +452,6 @@ namespace Inertia.ORM
         public bool Delete<T>(SqlCondition condition) where T : Table
         {
 <<<<<<< HEAD
-<<<<<<< HEAD
             if (SqlManager.CreateTableInstance(out T table))
             {
                 var deleted = false;
@@ -510,8 +468,6 @@ namespace Inertia.ORM
                 return false;
             }
 =======
-=======
->>>>>>> premaster
             var deleted = false;
 
             ExecuteCommand((cmd) => {
@@ -523,10 +479,7 @@ namespace Inertia.ORM
             });
 
             return deleted;
-<<<<<<< HEAD
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
->>>>>>> premaster
         }
         /// <summary>
         /// Delete all the elements from the specified <see cref="Table"/>
@@ -536,7 +489,6 @@ namespace Inertia.ORM
         public bool DeleteAll<T>() where T : Table
         {
 <<<<<<< HEAD
-<<<<<<< HEAD
             if (SqlManager.CreateTableInstance(out T table))
             {
                 var deleted = false;
@@ -553,8 +505,6 @@ namespace Inertia.ORM
                 return false;
             }
 =======
-=======
->>>>>>> premaster
             var deleted = false;
 
             ExecuteCommand((cmd) => {
@@ -566,10 +516,7 @@ namespace Inertia.ORM
             });
 
             return deleted;
-<<<<<<< HEAD
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
->>>>>>> premaster
         }
 
         /// <summary>
@@ -585,13 +532,9 @@ namespace Inertia.ORM
             {
                 var updated = false;
 <<<<<<< HEAD
-<<<<<<< HEAD
 =======
 
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
-
->>>>>>> premaster
                 ExecuteCommand((cmd) => {
                     cmd.SetQuery(QueryBuilder.GetUpdateQuery(reference, cmd, null, columnsToUpdate));
                     updated = cmd.ExecuteNonQuery() > 0;
@@ -688,29 +631,22 @@ namespace Inertia.ORM
         public long Count<T>(string columnName, SqlCondition condition, bool distinct) where T : Table
         {
 <<<<<<< HEAD
-<<<<<<< HEAD
             if (SqlManager.CreateTableInstance(out T table))
             {
                 long count = 0;
 
                 ExecuteCommand((cmd) => {
 =======
-=======
->>>>>>> premaster
             long count = 0;
 
             ExecuteCommand((cmd) => {
                 if (SqlManager.CreateTableInstance(out T table))
                 {
-<<<<<<< HEAD
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
->>>>>>> premaster
                     cmd.SetQuery(QueryBuilder.GetCountQuery(table, columnName, condition, distinct), condition);
                     cmd.OnReader((reader) => {
                         count = reader.GetInt64(0);
                     });
-<<<<<<< HEAD
 <<<<<<< HEAD
                 });
 
@@ -721,17 +657,12 @@ namespace Inertia.ORM
                 return -1;
             }
 =======
-=======
->>>>>>> premaster
                 }
 
             });
 
             return count;
-<<<<<<< HEAD
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
->>>>>>> premaster
         }
 
         /// <summary>
@@ -756,20 +687,16 @@ namespace Inertia.ORM
             return Count<T>(condition, distinct) > 0;
         }
 
-<<<<<<< HEAD
         /// <summary>
         /// 
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="columnName"></param>
         /// <returns></returns>
-=======
->>>>>>> premaster
         public long Average<T>(string columnName) where T : Table
         {
             return Average<T>(columnName, null);
         }
-<<<<<<< HEAD
         /// <summary>
         /// 
         /// </summary>
@@ -785,24 +712,16 @@ namespace Inertia.ORM
                 long avg = 0;
                 ExecuteCommand((cmd) => {
 =======
-=======
-        public long Average<T>(string columnName, SqlCondition condition) where T : Table
-        {
->>>>>>> premaster
             long avg = -1;
 
             ExecuteCommand((cmd) => {
                 if (SqlManager.CreateTableInstance(out T table))
                 {
-<<<<<<< HEAD
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
->>>>>>> premaster
                     cmd.SetQuery(QueryBuilder.GetAvgQuery(table, columnName, condition), condition);
                     cmd.OnReader((reader) => {
                         avg = reader.GetInt64(0);
                     });
-<<<<<<< HEAD
 <<<<<<< HEAD
                 });
 
@@ -813,13 +732,10 @@ namespace Inertia.ORM
                 return -1;
             }
 =======
-=======
->>>>>>> premaster
                 }
             });
 
             return avg;
-<<<<<<< HEAD
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
         }
 
@@ -829,15 +745,10 @@ namespace Inertia.ORM
         /// <typeparam name="T"></typeparam>
         /// <param name="columnName"></param>
         /// <returns></returns>
-=======
-        }
-
->>>>>>> premaster
         public T Max<T>(string columnName) where T : Table
         {
             return Max<T>(columnName, null);
         }
-<<<<<<< HEAD
         /// <summary>
         /// 
         /// </summary>
@@ -852,19 +763,12 @@ namespace Inertia.ORM
             {
                 ExecuteCommand((cmd) => {
 =======
-=======
-        public T Max<T>(string columnName, SqlCondition condition) where T : Table
-        {
->>>>>>> premaster
             T table = null;
 
             ExecuteCommand((cmd) => {
                 if (!SqlManager.CreateTableInstance(out table))
                 {
-<<<<<<< HEAD
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
->>>>>>> premaster
                     cmd.SetQuery(QueryBuilder.GetMaxQuery(table, columnName, condition), condition);
                     cmd.OnReader((reader) => {
                         var field = Table.GetFields<T>().FirstOrDefault((f) => f.Name == columnName);
@@ -873,7 +777,6 @@ namespace Inertia.ORM
                             field.SetValue(table, reader.GetValue(0));
                         }
                     });
-<<<<<<< HEAD
 <<<<<<< HEAD
                 });
 
@@ -884,13 +787,10 @@ namespace Inertia.ORM
                 return default;
             }
 =======
-=======
->>>>>>> premaster
                 }                
             });
 
             return table;
-<<<<<<< HEAD
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
         }
         
@@ -900,15 +800,10 @@ namespace Inertia.ORM
         /// <typeparam name="T"></typeparam>
         /// <param name="columnName"></param>
         /// <returns></returns>
-=======
-        }
-        
->>>>>>> premaster
         public T Min<T>(string columnName) where T : Table
         {
             return Min<T>(columnName, null);
         }
-<<<<<<< HEAD
         /// <summary>
         /// 
         /// </summary>
@@ -923,19 +818,12 @@ namespace Inertia.ORM
             {
                 ExecuteCommand((cmd) => {
 =======
-=======
-        public T Min<T>(string columnName, SqlCondition condition) where T : Table
-        {
->>>>>>> premaster
             T table = null;
 
             ExecuteCommand((cmd) => {
                 if (SqlManager.CreateTableInstance(out table))
                 {
-<<<<<<< HEAD
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
->>>>>>> premaster
                     cmd.SetQuery(QueryBuilder.GetMinQuery(table, columnName, condition), condition);
                     cmd.OnReader((reader) => {
                         var field = Table.GetFields<T>().FirstOrDefault((f) => f.Name == columnName);
@@ -944,7 +832,6 @@ namespace Inertia.ORM
                             field.SetValue(table, reader.GetValue(0));
                         }
                     });
-<<<<<<< HEAD
 <<<<<<< HEAD
                 });
 
@@ -955,13 +842,10 @@ namespace Inertia.ORM
                 return default;
             }
 =======
-=======
->>>>>>> premaster
                 }
             });
 
             return table;
-<<<<<<< HEAD
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
         }
 
@@ -971,15 +855,10 @@ namespace Inertia.ORM
         /// <typeparam name="T"></typeparam>
         /// <param name="columnName"></param>
         /// <returns></returns>
-=======
-        }
-
->>>>>>> premaster
         public decimal Sum<T>(string columnName) where T : Table
         {
             return Sum<T>(columnName, null);
         }
-<<<<<<< HEAD
         /// <summary>
         /// 
         /// </summary>
@@ -995,18 +874,11 @@ namespace Inertia.ORM
                 decimal sum = 0;
                 ExecuteCommand((cmd) => {
 =======
-=======
-        public decimal Sum<T>(string columnName, SqlCondition condition) where T : Table
-        {
->>>>>>> premaster
             decimal sum = -1;
             ExecuteCommand((cmd) => {
                 if (SqlManager.CreateTableInstance(out T table))
                 {
-<<<<<<< HEAD
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
->>>>>>> premaster
                     cmd.SetQuery(QueryBuilder.GetSumQuery(table, columnName, condition), condition);
                     cmd.OnReader((reader) => {
                         if (!reader.IsDBNull(0))
@@ -1014,7 +886,6 @@ namespace Inertia.ORM
                             sum = reader.GetDecimal(0);
                         }
                     });
-<<<<<<< HEAD
 <<<<<<< HEAD
                 });
 
@@ -1025,16 +896,11 @@ namespace Inertia.ORM
                 return default;
             }
 =======
-=======
->>>>>>> premaster
                 }
             });
 
             return sum;
-<<<<<<< HEAD
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
->>>>>>> premaster
         }
 
         internal bool Create(Table table)
@@ -1044,14 +910,10 @@ namespace Inertia.ORM
                 ExecuteCommand(QueryBuilder.GetCreateQuery(table), (cmd) => {
                     cmd.ExecuteNonQuery();
 <<<<<<< HEAD
-<<<<<<< HEAD
                 });
 =======
                 }, force: true);
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
-                }, force: true);
->>>>>>> premaster
 
                 return true;
             }

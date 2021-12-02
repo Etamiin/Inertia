@@ -5,7 +5,6 @@ using System.Text;
 namespace Inertia.Runtime
 {
 <<<<<<< HEAD
-<<<<<<< HEAD
     /// <summary>
     /// 
     /// </summary>
@@ -18,10 +17,6 @@ namespace Inertia.Runtime
     public static class Run
     {
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
-    public static class Run
-    {
->>>>>>> premaster
         public sealed class ExecuteScriptIn
         {
             /// <summary>
@@ -29,16 +24,12 @@ namespace Inertia.Runtime
             /// </summary>
             public bool Permanent { get; set; }
 <<<<<<< HEAD
-<<<<<<< HEAD
             /// <summary>
             /// Returns true if the current script is running.
             /// </summary>
 =======
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
             public bool IsRunning { get; set; }
-=======
-            public bool IsRunning { get; private set; }
->>>>>>> premaster
 
             private readonly BasicAction<ExecuteScriptIn> _action;
             private readonly float _time;
@@ -53,15 +44,11 @@ namespace Inertia.Runtime
                 _time = time;
                 Permanent = permanent;
 
-<<<<<<< HEAD
                 RuntimeManager.UpdatingSiT += Update;
 <<<<<<< HEAD
                 RuntimeManager.OnRegisterExtends();
 =======
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
-                RuntimeManager.RtUpdate += Update;
->>>>>>> premaster
 
                 IsRunning = true;
             }
@@ -71,23 +58,16 @@ namespace Inertia.Runtime
             }
 
 <<<<<<< HEAD
-<<<<<<< HEAD
             /// <summary>
             /// Stop the current script
             /// </summary>
 =======
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
->>>>>>> premaster
             public void Stop()
             {
                 if (IsRunning)
                 {
-<<<<<<< HEAD
                     RuntimeManager.UpdatingSiT -= Update;
-=======
-                    RuntimeManager.RtUpdate -= Update;
->>>>>>> premaster
                     IsRunning = false;
                 }
             }
@@ -124,33 +104,24 @@ namespace Inertia.Runtime
                 {
                     _action = action;
 
-<<<<<<< HEAD
                     RuntimeManager.UpdatingSiT += Execute;
 <<<<<<< HEAD
                     RuntimeManager.OnRegisterExtends();
 =======
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
-                    RuntimeManager.RtUpdate += Execute;
->>>>>>> premaster
                 }
             }
 
             private void Execute()
             {
                 _action?.Invoke();
-<<<<<<< HEAD
                 RuntimeManager.UpdatingSiT -= Execute;
-=======
-                RuntimeManager.RtUpdate -= Execute;
->>>>>>> premaster
             }
         }
 
         /// <summary>
         /// Execute the Runtime cycle manually.
         /// </summary>
-<<<<<<< HEAD
 <<<<<<< HEAD
         public static void ManualUpdate()
         {
@@ -212,48 +183,9 @@ namespace Inertia.Runtime
 =======
         
 >>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-=======
-        public static void ManualUpdate(float deltaTime)
-        {
-            RuntimeManager.IsManuallyRunning = true;
-            RuntimeManager.ExecuteCycle(null, deltaTime);
-        }
-
-        public static void Delayed(float delayInSeconds, BasicAction<ExecuteScriptIn> callback)
-        {
-            new ExecuteScriptIn(delayInSeconds, callback);
-        }
-        public static void Delayed(float delayInSeconds, BasicAction<ExecuteScriptIn> callback, float runningTime)
-        {
-            new ExecuteScriptIn(delayInSeconds, callback, runningTime);
-        }
-        public static void DelayedLoop(float delayInSeconds, BasicAction<ExecuteScriptIn> callback)
-        {
-            new ExecuteScriptIn(delayInSeconds, callback, true);
-        }
->>>>>>> premaster
         public static void ToNextFrame(BasicAction callback)
         {
             new NextFrameExecution(callback);
         }
-<<<<<<< HEAD
-=======
-        
-        public static T CreateScript<T>(params object[] dataCollection) where T : Script
-        {
-            var scriptType = typeof(T);
-            var cstr = scriptType.GetConstructor(Type.EmptyTypes);
-            if (cstr != null)
-            {
-                var instance = Activator.CreateInstance<T>();
-                instance.OnInitialize(new ScriptArguments(dataCollection));
-
-                RuntimeManager.RegisterScript(instance);
-                return instance;
-            }
-
-            return null;
-        }
->>>>>>> premaster
     }
 }

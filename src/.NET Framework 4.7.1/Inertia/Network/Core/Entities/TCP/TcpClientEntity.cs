@@ -4,11 +4,7 @@ using System.Net.Sockets;
 
 namespace Inertia.Network
 {
-<<<<<<< HEAD
     public sealed class TcpClientEntity : NetworkClientEntity, IDisposable
-=======
-    public abstract class TcpClientEntity : NetworkClientEntity, IDisposable
->>>>>>> premaster
     {
         public override bool IsConnected => _socket != null && _socket.Connected;
 
@@ -16,7 +12,6 @@ namespace Inertia.Network
         private readonly BasicReader _reader;
         private Socket _socket;
 
-<<<<<<< HEAD
         /// <summary>
         /// Instantiate a new instance of the class <see cref="TcpClientEntity"/>
         /// </summary>
@@ -40,15 +35,6 @@ namespace Inertia.Network
         }
 
         public override void Connect()
-=======
-        public TcpClientEntity(string ip, int port) : base(ip, port)
-        {
-            _buffer = new byte[NetworkProtocol.GetCurrentProtocol().NetworkBufferLength];
-            _reader = new BasicReader();
-        }
-        
-        public sealed override void Connect()
->>>>>>> premaster
         {
             if (IsDisposed)
             {
@@ -63,12 +49,8 @@ namespace Inertia.Network
                     _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                     _socket.Connect(new IPEndPoint(IPAddress.Parse(_targetIp), _targetPort));
 
-<<<<<<< HEAD
                     Connected?.Invoke();
 
-=======
-                    OnConnected();
->>>>>>> premaster
                     _socket.BeginReceive(_buffer, 0, _buffer.Length, SocketFlags.None, OnReceiveData, _socket);
                 }
                 catch
@@ -77,11 +59,7 @@ namespace Inertia.Network
                 }
             }
         }
-<<<<<<< HEAD
         public override void Disconnect(NetworkDisconnectReason reason)
-=======
-        public sealed override void Disconnect(NetworkDisconnectReason reason)
->>>>>>> premaster
         {
             if (IsDisposed)
             {
@@ -102,25 +80,17 @@ namespace Inertia.Network
             {
                 _reader.Clear();
                 _disconnectNotified = true;
-<<<<<<< HEAD
                 Disconnected?.Invoke(reason);
             }
         }
         
         public override void Send(byte[] data)
-=======
-                OnDisconnected(reason);
-            }
-        }
-        public sealed override void Send(byte[] data)
->>>>>>> premaster
         {
             if (IsDisposed)
             {
                 throw new NotImplementedException(nameof(TcpClientEntity));
             }
 
-<<<<<<< HEAD
             try { _socket.Send(data); } catch { }
         }
 
@@ -134,25 +104,6 @@ namespace Inertia.Network
             }
 
             base.Dispose(disposing);
-=======
-            if (IsConnected)
-            {
-                _socket.Send(data);
-            }
-        }
-
-        public void Dispose()
-        {
-            if (!IsDisposed)
-            {
-                BeforeDispose();
-                Disconnect(NetworkDisconnectReason.Manual);
-                _reader.Dispose();
-                _socket?.Dispose();
-
-                IsDisposed = true;
-            }
->>>>>>> premaster
         }
 
         private void OnReceiveData(IAsyncResult iar)
@@ -168,11 +119,7 @@ namespace Inertia.Network
                 var data = new byte[received];
                 Array.Copy(_buffer, data, received);
 
-<<<<<<< HEAD
                 NetworkProtocol.GetProtocol().OnReceiveData(this, _reader.Fill(data));
-=======
-                NetworkProtocol.ProcessParsing(this, _reader.Fill(data));
->>>>>>> premaster
             }
             catch (Exception e)
             {

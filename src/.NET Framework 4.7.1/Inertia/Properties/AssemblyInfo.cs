@@ -8,11 +8,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Inertia")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-<<<<<<< HEAD
 [assembly: AssemblyCompany("owA!studio")]
-=======
-[assembly: AssemblyCompany("Etamiin")]
->>>>>>> premaster
 [assembly: AssemblyProduct("Inertia")]
 [assembly: AssemblyCopyright("Copyright ©  2021")]
 [assembly: AssemblyTrademark("")]
@@ -36,10 +32,5 @@ using System.Runtime.InteropServices;
 // Vous pouvez spécifier toutes les valeurs ou indiquer les numéros de build et de révision par défaut
 // en utilisant '*', comme indiqué ci-dessous :
 // [assembly: AssemblyVersion("1.0.*")]
-<<<<<<< HEAD
 [assembly: AssemblyVersion("2.108.27.1515")]
 [assembly: AssemblyFileVersion("2.108.27.1515")]
-=======
-[assembly: AssemblyVersion("1.12")]
-[assembly: AssemblyFileVersion("1.12")]
->>>>>>> premaster
