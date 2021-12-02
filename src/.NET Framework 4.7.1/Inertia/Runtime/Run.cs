@@ -12,7 +12,7 @@ namespace Inertia.Runtime
             /// Returns true if the current script run permanently.
             /// </summary>
             public bool Permanent { get; set; }
-            public bool IsRunning { get; set; }
+            public bool IsRunning { get; private set; }
 
             private readonly BasicAction<ExecuteScriptIn> _action;
             private readonly float _time;
@@ -27,7 +27,7 @@ namespace Inertia.Runtime
                 _time = time;
                 Permanent = permanent;
 
-                RuntimeManager.UpdatingSiT += Update;
+                RuntimeManager.RtUpdate += Update;
 
                 IsRunning = true;
             }
@@ -40,7 +40,7 @@ namespace Inertia.Runtime
             {
                 if (IsRunning)
                 {
-                    RuntimeManager.UpdatingSiT -= Update;
+                    RuntimeManager.RtUpdate -= Update;
                     IsRunning = false;
                 }
             }
@@ -77,14 +77,14 @@ namespace Inertia.Runtime
                 {
                     _action = action;
 
-                    RuntimeManager.UpdatingSiT += Execute;
+                    RuntimeManager.RtUpdate += Execute;
                 }
             }
 
             private void Execute()
             {
                 _action?.Invoke();
-                RuntimeManager.UpdatingSiT -= Execute;
+                RuntimeManager.RtUpdate -= Execute;
             }
         }
 
@@ -93,26 +93,41 @@ namespace Inertia.Runtime
         /// </summary>
         public static void ManualUpdate(float deltaTime)
         {
-            RuntimeManager.IsManuallyRunned = true;
+            RuntimeManager.IsManuallyRunning = true;
             RuntimeManager.ExecuteCycle(null, deltaTime);
         }
 
-        public static ExecuteScriptIn Delayed(float delayInSeconds, BasicAction<ExecuteScriptIn> callback)
+        public static void Delayed(float delayInSeconds, BasicAction<ExecuteScriptIn> callback)
         {
-            return new ExecuteScriptIn(delayInSeconds, callback);
+            new ExecuteScriptIn(delayInSeconds, callback);
         }
-        public static ExecuteScriptIn Delayed(float delayInSeconds, BasicAction<ExecuteScriptIn> callback, bool permanent)
+        public static void Delayed(float delayInSeconds, BasicAction<ExecuteScriptIn> callback, float runningTime)
         {
-            return new ExecuteScriptIn(delayInSeconds, callback, permanent);
+            new ExecuteScriptIn(delayInSeconds, callback, runningTime);
         }
-        public static ExecuteScriptIn Delayed(float delayInSeconds, BasicAction<ExecuteScriptIn> callback, float runningTime)
+        public static void DelayedLoop(float delayInSeconds, BasicAction<ExecuteScriptIn> callback)
         {
-            return new ExecuteScriptIn(delayInSeconds, callback, runningTime);
+            new ExecuteScriptIn(delayInSeconds, callback, true);
         }
-        
         public static void ToNextFrame(BasicAction callback)
         {
             new NextFrameExecution(callback);
+        }
+        
+        public static T CreateScript<T>(params object[] dataCollection) where T : Script
+        {
+            var scriptType = typeof(T);
+            var cstr = scriptType.GetConstructor(Type.EmptyTypes);
+            if (cstr != null)
+            {
+                var instance = Activator.CreateInstance<T>();
+                instance.OnInitialize(new ScriptArguments(dataCollection));
+
+                RuntimeManager.RegisterScript(instance);
+                return instance;
+            }
+
+            return null;
         }
     }
 }

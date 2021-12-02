@@ -11,25 +11,26 @@ namespace Inertia.Runtime
 
         public bool IsDestroyed { get; private set; }
 
-        internal ScriptCollection Parent;
         internal bool IsDisposed { get; private set; }
 
-        private bool _canUpdate;
-
-        internal void Awake(object[] args)
+        public void Destroy()
         {
-            RuntimeManager.OnScriptCreated(this);
-            OnAwake(new ScriptArgumentsCollection(args));
-
-            _canUpdate = true;
+            Dispose();
         }
-        internal void Update()
+        public void Dispose()
         {
-            if (_canUpdate)
+            if (!IsDestroyed)
             {
-                OnUpdate();
+                RuntimeManager.BeginUnregisterScript(this);
+                IsDisposed = true;
             }
         }
+
+        /// <summary>
+        /// Occurs each execution frame.
+        /// </summary>
+        internal protected abstract void OnUpdate();
+
         internal void PreDestroy()
         {
             if (!IsDestroyed)
@@ -37,7 +38,7 @@ namespace Inertia.Runtime
                 IsDestroyed = true;
 
                 OnDestroy();
-                RuntimeManager.OnScriptPreDestroyed(this);
+                RuntimeManager.EndUnregisterScript(this);
             }
         }
 
@@ -45,31 +46,10 @@ namespace Inertia.Runtime
         /// Occurs when the script initializes.
         /// </summary>
         /// <param name="args"></param>
-        protected virtual void OnAwake(ScriptArgumentsCollection args) { }
-        /// <summary>
-        /// Occurs each execution frame.
-        /// </summary>
-        protected virtual void OnUpdate() { }
+        internal protected virtual void OnInitialize(ScriptArguments args) { }
         /// <summary>
         /// Occurs before the script is destroyed.
         /// </summary>
-        protected virtual void OnDestroy() { }
-
-        public void Destroy()
-        {
-            Dispose(true);
-        }        
-        public void Dispose()
-        {
-            Dispose(true);
-        }
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!IsDestroyed && !IsDisposed)
-            {
-                RuntimeManager.OnScriptDestroyed(this);
-                IsDisposed = true;
-            }
-        }
+        internal protected virtual void OnDestroy() { }
     }
 }

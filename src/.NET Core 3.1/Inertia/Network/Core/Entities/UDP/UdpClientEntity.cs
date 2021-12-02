@@ -76,9 +76,14 @@ namespace Inertia.Network
 
         public void Dispose()
         {
-            BeforeDispose();
-            Disconnect(NetworkDisconnectReason.Manual);
-            _client?.Dispose();
+            if (!IsDisposed)
+            {
+                BeforeDispose();
+                Disconnect(NetworkDisconnectReason.Manual);
+                _client?.Dispose();
+
+                IsDisposed = true;
+            }
         }
 
         private void OnReceiveData(IAsyncResult iar)
@@ -90,7 +95,7 @@ namespace Inertia.Network
                     IPEndPoint endPoint = null;
                     var data = ((UdpClient)iar.AsyncState).EndReceive(iar, ref endPoint);
 
-                    NetworkProtocol.GetProtocol().OnReceiveData(this, new BasicReader(data));
+                    NetworkProtocol.ProcessParsing(this, new BasicReader(data));
                 }
                 catch (Exception e)
                 {

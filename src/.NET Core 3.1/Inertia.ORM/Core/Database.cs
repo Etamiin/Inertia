@@ -5,9 +5,6 @@ using System.Linq;
 
 namespace Inertia.ORM
 {
-    /// <summary>
-    /// SQL Database
-    /// </summary>
     public abstract class Database
     {
         /// <summary>
@@ -26,12 +23,14 @@ namespace Inertia.ORM
         /// Returns the ip used for the connection.
         /// </summary>
         public abstract string Host { get; }
+        public abstract bool AutoGenerateTable { get; }
+
         /// <summary>
         /// Returns the port used for the connection.
         /// </summary>
         public virtual int Port { get; } = 3306;
         /// <summary>
-        /// 
+        /// Returns the SSL mode used by the MySql connection
         /// </summary>
         public virtual MySqlSslMode Ssl { get; } = MySqlSslMode.None;
 
@@ -47,9 +46,6 @@ namespace Inertia.ORM
             _connectionString = $"server={ Host.Replace("localhost", "127.0.0.1") };uid={ User };pwd={ Password };database={ Name };port={ Port };SslMode={ Ssl }";
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         public abstract void OnInitialized();
 
         internal void TryCreateItSelf()
@@ -520,23 +516,10 @@ namespace Inertia.ORM
             return Count<T>(condition, distinct) > 0;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="columnName"></param>
-        /// <returns></returns>
         public long Average<T>(string columnName) where T : Table
         {
             return Average<T>(columnName, null);
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="columnName"></param>
-        /// <param name="condition"></param>
-        /// <returns></returns>
         public long Average<T>(string columnName, SqlCondition condition) where T : Table
         {
             long avg = -1;
@@ -554,23 +537,10 @@ namespace Inertia.ORM
             return avg;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="columnName"></param>
-        /// <returns></returns>
         public T Max<T>(string columnName) where T : Table
         {
             return Max<T>(columnName, null);
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="columnName"></param>
-        /// <param name="condition"></param>
-        /// <returns></returns>
         public T Max<T>(string columnName, SqlCondition condition) where T : Table
         {
             T table = null;
@@ -592,23 +562,10 @@ namespace Inertia.ORM
             return table;
         }
         
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="columnName"></param>
-        /// <returns></returns>
         public T Min<T>(string columnName) where T : Table
         {
             return Min<T>(columnName, null);
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="columnName"></param>
-        /// <param name="condition"></param>
-        /// <returns></returns>
         public T Min<T>(string columnName, SqlCondition condition) where T : Table
         {
             T table = null;
@@ -630,23 +587,10 @@ namespace Inertia.ORM
             return table;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="columnName"></param>
-        /// <returns></returns>
         public decimal Sum<T>(string columnName) where T : Table
         {
             return Sum<T>(columnName, null);
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="columnName"></param>
-        /// <param name="condition"></param>
-        /// <returns></returns>
         public decimal Sum<T>(string columnName, SqlCondition condition) where T : Table
         {
             decimal sum = -1;

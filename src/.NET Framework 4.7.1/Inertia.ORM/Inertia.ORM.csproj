@@ -52,11 +52,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Attributes\AttachTo.cs" />
-    <Compile Include="Attributes\AutoGenerateTables.cs" />
+    <Compile Include="Attributes\BlobSpecifier.cs" />
     <Compile Include="Attributes\DecimalPrecision.cs" />
     <Compile Include="Attributes\NotNull.cs" />
     <Compile Include="Attributes\PrimaryKey.cs" />
+    <Compile Include="Attributes\TableLink.cs" />
     <Compile Include="Attributes\VarChar.cs" />
     <Compile Include="Core\Database.cs" />
     <Compile Include="Core\QueryAccessor.cs" />
@@ -64,6 +64,7 @@
     <Compile Include="Core\Table.cs" />
     <Compile Include="Data\FieldType.cs" />
     <Compile Include="Data\SqlCondition.cs" />
+    <Compile Include="Enums\BlobSize.cs" />
     <Compile Include="Enums\ConditionOperator.cs" />
     <Compile Include="Enums\ConditionType.cs" />
     <Compile Include="Enums\QueryType.cs" />

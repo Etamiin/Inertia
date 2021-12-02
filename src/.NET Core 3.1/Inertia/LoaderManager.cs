@@ -7,11 +7,13 @@ using Inertia.Runtime;
 
 namespace Inertia
 {
+    [Obsolete]
     public static class LoaderManager
     {
-        private static List<IInertiaPlugin> _plugins;
+        private static List<IPlugin> _plugins;
         private static bool _pluginLoaded => _plugins != null;
 
+        [Obsolete]
         public static void LoadPlugins()
         {
             if (_pluginLoaded || !Directory.Exists("Plugins"))
@@ -19,7 +21,7 @@ namespace Inertia
                 return;
             }
 
-            _plugins = new List<IInertiaPlugin>();
+            _plugins = new List<IPlugin>();
 
             var files = IOHelper.GetFilesFromDirectory("Plugins", false);
             foreach (var file in files)
@@ -31,9 +33,9 @@ namespace Inertia
 
                     foreach (var type in pluginAssembly.GetExportedTypes())
                     {
-                        if (type.GetInterface(nameof(IInertiaPlugin)) != null)
+                        if (type.GetInterface(nameof(IPlugin)) != null)
                         {
-                            var instance = (IInertiaPlugin)Activator.CreateInstance(type);
+                            var instance = (IPlugin)Activator.CreateInstance(type);
                             instance.OnInitialize();
 
                             _plugins.Add(instance);
@@ -48,12 +50,13 @@ namespace Inertia
             }
         }
 
+        [Obsolete]
         /// <summary>
-        /// Returns the specified <see cref="IInertiaPlugin"/> loaded instance.
+        /// Returns the specified <see cref="IPlugin"/> loaded instance.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static bool TryGetPlugin<T>(out T plugin) where T : IInertiaPlugin
+        public static bool TryGetPlugin<T>(out T plugin) where T : IPlugin
         {
             var pl = _plugins.FirstOrDefault((p) => p.GetType() == typeof(T));
             if (pl != null)

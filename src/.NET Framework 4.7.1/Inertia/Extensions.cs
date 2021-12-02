@@ -1,10 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using Inertia;
 
 public static class Extensions
 {
+    private readonly static Random Randomizer = new Random();
+
     public static void Shuffle<T>(this IList<T> collection)
     {
         var iStart = 0;
@@ -12,7 +15,7 @@ public static class Extensions
 
         while (iStart < collection.Count - 1)
         {
-            int iRand = IOHelper.Randomizer.Next(iStart, collection.Count);
+            int iRand = Randomizer.Next(iStart, collection.Count);
             savedValue = collection[iStart];
             collection[iStart++] = collection[iRand];
             collection[iRand] = savedValue;
@@ -85,6 +88,7 @@ public static class Extensions
     }
 
     /* INTERNAL EXTENSIONS */
+    [Obsolete]
     internal static string ConventionFolderPath(this string folderPath)
     {
         if (string.IsNullOrEmpty(folderPath))

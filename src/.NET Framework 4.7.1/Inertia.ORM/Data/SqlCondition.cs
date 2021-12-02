@@ -6,9 +6,6 @@ using System.Text;
 
 namespace Inertia.ORM
 {
-    /// <summary>
-    /// 
-    /// </summary>
     public sealed class SqlCondition : IDisposable
     {
         private static Dictionary<ConditionOperator, string> _operators = new Dictionary<ConditionOperator, string>
@@ -18,9 +15,6 @@ namespace Inertia.ORM
             { ConditionOperator.NotGreater, "!>" }, { ConditionOperator.NotLess, "!<" }, { ConditionOperator.In, " IN " }
         };
 
-        /// <summary>
-        /// 
-        /// </summary>
         public bool IsDisposed { get; private set; }
 
         internal int ParamIndex;
@@ -298,18 +292,6 @@ namespace Inertia.ORM
             return this;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public void Dispose()
-        {
-            if (!IsDisposed)
-            {
-                _params.Clear();
-                IsDisposed = true;
-            }
-        }
-
         internal void ApplyToCmd(MySqlCommand command)
         {
             foreach (var param in _params)
@@ -324,10 +306,19 @@ namespace Inertia.ORM
                 EndBrackets();
             }
 
-            return 
+            return
                 $"{ (_builder.Length > 0 ? "WHERE " : string.Empty)}{ _builder }" +
                 $"{ (_orderBuilder != null ? _orderBuilder.ToString() : string.Empty) }" +
                 $"{ (_limit > 0 ? $" LIMIT { _limit }" : string.Empty)}";
+        }
+
+        public void Dispose()
+        {
+            if (!IsDisposed)
+            {
+                _params.Clear();
+                IsDisposed = true;
+            }
         }
 
         private void OrderBy(string type, params string[] columns)

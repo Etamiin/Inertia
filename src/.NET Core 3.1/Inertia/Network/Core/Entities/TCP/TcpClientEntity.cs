@@ -14,7 +14,7 @@ namespace Inertia.Network
 
         public TcpClientEntity(string ip, int port) : base(ip, port)
         {
-            _buffer = new byte[NetworkProtocol.NetworkBufferLength];
+            _buffer = new byte[NetworkProtocol.GetCurrentProtocol().NetworkBufferLength];
             _reader = new BasicReader();
         }
         
@@ -81,10 +81,15 @@ namespace Inertia.Network
 
         public void Dispose()
         {
-            BeforeDispose();
-            Disconnect(NetworkDisconnectReason.Manual);
-            _reader.Dispose();
-            _socket?.Dispose();
+            if (!IsDisposed)
+            {
+                BeforeDispose();
+                Disconnect(NetworkDisconnectReason.Manual);
+                _reader.Dispose();
+                _socket?.Dispose();
+
+                IsDisposed = true;
+            }
         }
 
         private void OnReceiveData(IAsyncResult iar)
@@ -100,7 +105,7 @@ namespace Inertia.Network
                 var data = new byte[received];
                 Array.Copy(_buffer, data, received);
 
-                NetworkProtocol.GetProtocol().OnReceiveData(this, _reader.Fill(data));
+                NetworkProtocol.ProcessParsing(this, _reader.Fill(data));
             }
             catch (Exception e)
             {

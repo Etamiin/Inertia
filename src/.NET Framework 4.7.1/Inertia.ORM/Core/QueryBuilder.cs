@@ -35,7 +35,17 @@ namespace Inertia.ORM
                     }
                     else
                     {
-                        sb.Append($"{ fieldType.SqlType.ToUpper() }{(fieldType.Unsigned ? " UNSIGNED" : string.Empty)}");
+                        var sqlType = fieldType.SqlType;
+                        if (sqlType.Equals("BLOB"))
+                        {
+                            var specifier = field.GetCustomAttribute<BlobSpecifier>();
+                            if (specifier != null)
+                            {
+                                sqlType = specifier.Size.ToString();
+                            }
+                        }
+
+                        sb.Append($"{ sqlType }{(fieldType.Unsigned ? " UNSIGNED" : string.Empty)}");
                         if (fieldType.Code == TypeCode.Decimal)
                         {
                             var precision = field.GetCustomAttribute<DecimalPrecision>();

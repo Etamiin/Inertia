@@ -9,8 +9,6 @@ namespace Inertia
 {
     public static class IOHelper
     {
-        internal readonly static Random Randomizer = new Random();
-
         public static string[] GetFilesFromDirectory(string path, bool includeSubFolders)
         {
             if (!Directory.Exists(path))

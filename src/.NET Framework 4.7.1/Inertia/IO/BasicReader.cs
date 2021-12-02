@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Inertia
 {
-    public class BasicReader : IDisposable
+    public sealed class BasicReader : IDisposable
     {
         private static Dictionary<Type, BasicReturnAction<BasicReader, object>> _typageDefinitions = new Dictionary<Type, BasicReturnAction<BasicReader, object>>
         {
@@ -98,33 +98,17 @@ namespace Inertia
         private BinaryReader _reader;
         private readonly Encoding _encoding;
 
-        /// <summary>
-        /// Initialize a new instance with empty data
-        /// </summary>
         public BasicReader() : this(Encoding.UTF8)
         {
         }
-        /// <summary>
-        /// Initialize a new instance with empty data based on the specified <see cref="Encoding"/>
-        /// </summary>
-        /// <param name="encoding"><see cref="Encoding"/> for the reader</param>
         public BasicReader(Encoding encoding)
         {
             _encoding = encoding;
             _reader = new BinaryReader(new MemoryStream(), encoding);
         }
-        /// <summary>
-        /// Initialize a new instance with the specified data
-        /// </summary>
-        /// <param name="data">The target byte array</param>
         public BasicReader(byte[] data) : this(data, Encoding.UTF8)
         {
         }
-        /// <summary>
-        /// Initialize a new instance with the specified data based on the specified <see cref="Encoding"/>
-        /// </summary>
-        /// <param name="data">Data to read</param>
-        /// <param name="encoding"><see cref="Encoding"/> for the reader</param>
         public BasicReader(byte[] data, Encoding encoding) : this(encoding)
         {
             Fill(data);
@@ -454,7 +438,7 @@ namespace Inertia
             return (T)GetSerializableObject(typeof(T));
         }
         /// <summary>
-        /// Create an instance of <typeparamref name="T"/> and return it after deserialization
+        /// Create an instance of <paramref name="type"/> and return it after deserialization
         /// </summary>
         /// <returns>Returns a <see cref="ISerializableObject"/></returns>
         public object GetSerializableObject(Type type)
@@ -493,7 +477,6 @@ namespace Inertia
         /// <summary>
         /// Create an instance of specified <see cref="IAutoSerializable"/> deserialize it and then return it
         /// </summary>
-        /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         public IAutoSerializable GetAutoSerializable(Type type)
         {
@@ -508,7 +491,7 @@ namespace Inertia
         /// <summary>
         /// Deserialize the specified instance of <see cref="IAutoSerializable"/>
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <param name="instance"></param>
         /// <returns></returns>
         public IAutoSerializable GetAutoSerializable(IAutoSerializable instance)
         {
@@ -559,7 +542,7 @@ namespace Inertia
         /// <summary>
         /// Read the next object in the stream based on the specified <see cref="Type"/>
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <param name="type"></param>
         /// <returns></returns>
         public object GetValue(Type type)
         {
@@ -586,17 +569,10 @@ namespace Inertia
 
         public void Dispose()
         {
-            Dispose(true);
-        }
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!IsDisposed && disposing)
+            if (!IsDisposed)
             {
-                if (disposing)
-                {
-                    _reader.Close();
-                    _reader.Dispose();
-                }
+                _reader.Close();
+                _reader.Dispose();
 
                 IsDisposed = true;
             }

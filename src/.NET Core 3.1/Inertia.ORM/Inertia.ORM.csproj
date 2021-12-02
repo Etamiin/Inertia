@@ -6,8 +6,8 @@
     <Authors>Etamiin</Authors>
     <Company />
     <Product />
-    <AssemblyVersion>2.108.27.1515</AssemblyVersion>
-    <FileVersion>2.108.27.1515</FileVersion>
+    <AssemblyVersion>1.12</AssemblyVersion>
+    <FileVersion>1.12</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

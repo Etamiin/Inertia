@@ -6,9 +6,6 @@ using System.Linq;
 
 namespace Inertia.ORM
 {
-    /// <summary>
-    ///
-    /// </summary>
     public static class SqlManager
     {
         private static Dictionary<string, Database> _databases;
@@ -17,17 +14,11 @@ namespace Inertia.ORM
 
         static SqlManager()
         {
-            if (_databases == null)
-            {
-                _databases = new Dictionary<string, Database>();
-            }
-            if (_queue == null)
-            {
-                _queue = new AutoQueueExecutor();
-            }
+            _databases = new Dictionary<string, Database>();
+            _queue = new AutoQueueExecutor();
 
-            var namedDbDict = new Dictionary<string, List<Type>>();
-            var typedDbDict = new Dictionary<Type, List<Type>>();
+            var namedDb = new Dictionary<string, List<Type>>();
+            var typedDb = new Dictionary<Type, List<Type>>();
 
             try
             {
@@ -56,29 +47,29 @@ namespace Inertia.ORM
                         }
                         else if (type.IsSubclassOf(typeof(Table)))
                         {
-                            var attachTo = type.GetCustomAttribute<AttachTo>(false);
-                            if (attachTo != null)
+                            var link = type.GetCustomAttribute<TableLink>(false);
+                            if (link != null)
                             {
-                                if (!string.IsNullOrEmpty(attachTo.DatabaseName))
+                                if (!string.IsNullOrEmpty(link.DatabaseName))
                                 {
-                                    if (namedDbDict.TryGetValue(attachTo.DatabaseName, out List<Type> types))
+                                    if (namedDb.TryGetValue(link.DatabaseName, out List<Type> types))
                                     {
                                         types.Add(type);
                                     }
                                     else
                                     {
-                                        namedDbDict.Add(attachTo.DatabaseName, new List<Type> { type });
+                                        namedDb.Add(link.DatabaseName, new List<Type> { type });
                                     }
                                 }
-                                else if (attachTo.DatabaseType != null)
+                                else if (link.DatabaseType != null)
                                 {
-                                    if (typedDbDict.TryGetValue(attachTo.DatabaseType, out List<Type> types))
+                                    if (typedDb.TryGetValue(link.DatabaseType, out List<Type> types))
                                     {
                                         types.Add(type);
                                     }
                                     else
                                     {
-                                        typedDbDict.Add(attachTo.DatabaseType, new List<Type> { type });
+                                        typedDb.Add(link.DatabaseType, new List<Type> { type });
                                     }
                                 }
                             }
@@ -86,11 +77,11 @@ namespace Inertia.ORM
                     }
                 }
 
-                foreach (var pair in namedDbDict)
+                foreach (var pair in namedDb)
                 {
                     TryRegisterDb(pair.Value, dbName: pair.Key);
                 }
-                foreach (var pair in typedDbDict)
+                foreach (var pair in typedDb)
                 {
                     TryRegisterDb(pair.Value, dbType: pair.Key);
                 }
@@ -107,7 +98,7 @@ namespace Inertia.ORM
                         TrySearchDatabase(dbType, out db);
                     }
 
-                    if (db != null && db.GetType().GetCustomAttribute<AutoGenerateTables>() != null)
+                    if (db != null && db.AutoGenerateTable)
                     {
                         RegisterTablesTo(db, tables);
                     }
@@ -131,7 +122,7 @@ namespace Inertia.ORM
             }
         }
 
-        internal static void EnqueueAsyncOperation(BasicAction action)
+        internal static void PoolAsyncOperation(BasicAction action)
         {
             _queue.Enqueue(action);
         }
@@ -161,29 +152,10 @@ namespace Inertia.ORM
             database = default;
             return false;
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="databaseType"></param>
-        /// <param name="database"></param>
-        /// <returns></returns>
         public static bool TrySearchDatabase(Type databaseType, out Database database)
         {
             database = _databases.Values.FirstOrDefault((db) => db.GetType() == databaseType);
             return database != null;
-        }
-
-        /// <summary>
-        /// Try to find the specified <typeparamref name="T"/> <see cref="Database"/> and execute the specified action with it
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="onDatabase"></param>
-        public static void TryUseDatabase<T>(BasicAction<T> onDatabase) where T : Database
-        {
-            if (TrySearchDatabase(out T db))
-            {
-                onDatabase?.Invoke(db);
-            }
         }
 
         internal static bool CreateTableInstance<T>(out T instance) where T : Table

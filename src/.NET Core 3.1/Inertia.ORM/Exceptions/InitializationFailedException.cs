@@ -7,20 +7,13 @@ namespace Inertia.ORM
     /// </summary>
     public class InitializationFailedException : Exception
     {
-        /// <summary>
-        ///
-        /// </summary>
-        public override string Message => ExMessage;
+        public override string Message => _exMessage;
 
-        private readonly string ExMessage;
+        private readonly string _exMessage;
 
-        /// <summary>
-        /// Instantiate a new instance of the class <see cref="InitializationFailedException"/>
-        /// </summary>
-        /// <param name="exMsg"></param>
         public InitializationFailedException(string exMsg)
         {
-            ExMessage = exMsg;
+            _exMessage = exMsg;
         }
     }
 }

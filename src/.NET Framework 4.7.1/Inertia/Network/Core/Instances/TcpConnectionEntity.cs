@@ -3,24 +3,21 @@ using System.Net.Sockets;
 
 namespace Inertia.Network
 {
-    public sealed class TcpConnectionEntity : NetworkConnectionEntity
+    public sealed class TcpConnectionEntity : NetworkConnectionEntity, IDisposable
     {
-        internal BasicAction<NetworkDisconnectReason> Disconnected { get; set; }
+        internal event BasicAction<NetworkDisconnectReason> Disconnected;
 
         public bool IsConnected => _socket != null && _socket.Connected;
-
-        internal readonly uint Id;
 
         private byte[] _buffer;
         private Socket _socket;
         private BasicReader _reader;
         private bool _disconnectionNotified;
         
-        internal TcpConnectionEntity(Socket socket, uint id)
+        internal TcpConnectionEntity(Socket socket, uint id) : base(id)
         {
-            Id = id;
             _socket = socket;
-            _buffer = new byte[NetworkProtocol.NetworkBufferLength];
+            _buffer = new byte[NetworkProtocol.GetCurrentProtocol().NetworkBufferLength];
             _reader = new BasicReader();
         }
 
@@ -39,11 +36,11 @@ namespace Inertia.Network
                 throw new ObjectDisposedException(nameof(TcpConnectionEntity));
             }
 
-            try { _socket?.Send(data); } catch { }
+            _socket?.Send(data);
         }
         public override void Send(NetworkMessage message)
         {
-            Send(NetworkProtocol.GetProtocol().OnParseMessage(message));
+            Send(NetworkProtocol.GetCurrentProtocol().OnSerializeMessage(message));
         }
 
         public void Disconnect()
@@ -68,29 +65,25 @@ namespace Inertia.Network
                 _socket?.Disconnect(false);
                 _reader?.Dispose();
             }
+
             if (!_disconnectionNotified)
             {
-
-                _reader = null;
                 _buffer = null;
                 _socket = null;
                 _disconnectionNotified = true;
                 Disconnected?.Invoke(reason);
+                Disconnected = null;
             }
         }
 
-        protected override void Dispose(bool disposing)
+        public void Dispose()
         {
             if (!IsDisposed)
             {
-                if (disposing)
-                {
-                    Disconnect();
-                    Disconnected = null;
-                }
-            }
+                Disconnect();
 
-            base.Dispose(disposing);
+                IsDisposed = true;
+            }
         }
 
         private void OnReceiveData(IAsyncResult iar)
@@ -108,7 +101,7 @@ namespace Inertia.Network
                     var data = new byte[received];
                     Array.Copy(_buffer, data, received);
 
-                    NetworkProtocol.GetProtocol().OnReceiveData(this, _reader.Fill(data));
+                    NetworkProtocol.ProcessParsing(this, _reader.Fill(data));
                 }
                 catch (Exception ex)
                 {

@@ -7,37 +7,36 @@ namespace Inertia.Runtime
 {
     internal static class RuntimeManager
     {
+        internal static event BasicAction RtUpdate = () => { };
+        private static event BasicAction Updating = () => { };
+        private static event BasicAction Destroying = () => { };
+
+        internal static bool IsManuallyRunning { get; set; }
+
         static RuntimeManager()
         {
             var clock = new Clock();
 
             Task.Factory.StartNew(() => {
-                while (!IsManuallyRunned)
+                while (!IsManuallyRunning)
                 {
                     ExecuteCycle(clock);
                 }
             });
         }
 
-        internal static bool IsManuallyRunned { get; set; }
-
-        internal static event BasicAction UpdatingSiT = () => { };
-        private static event BasicAction Updating = () => { };
-        private static event BasicAction Destroying = () => { };
-
-        internal static void OnScriptCreated(Script script)
+        internal static void RegisterScript(Script script)
         {
-            Updating += script.Update;
+            Updating += script.OnUpdate;
         }
-        internal static void OnScriptDestroyed(Script script)
+        internal static void BeginUnregisterScript(Script script)
         {
-            Updating -= script.Update;
+            Updating -= script.OnUpdate;
             Destroying += script.PreDestroy;
         }
-        internal static void OnScriptPreDestroyed(Script script)
+        internal static void EndUnregisterScript(Script script)
         {
             Destroying -= script.PreDestroy;
-            script.Parent.FinalizeRemove(script);
         }
 
         internal static void ExecuteCycle(Clock clock, float deltaTime = 0f)
@@ -59,9 +58,9 @@ namespace Inertia.Runtime
                 Script.DeltaTime = deltaTime;
             }
 
-            lock (UpdatingSiT)
+            lock (RtUpdate)
             {
-                UpdatingSiT?.Invoke();
+                RtUpdate?.Invoke();
             }
             lock (Updating)
             {

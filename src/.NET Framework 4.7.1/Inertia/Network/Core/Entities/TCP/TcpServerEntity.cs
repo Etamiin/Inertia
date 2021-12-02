@@ -6,56 +6,22 @@ using System.Net.Sockets;
 
 namespace Inertia.Network
 {
-    public sealed class TcpServerEntity : NetworkServerEntity, IDisposable
+    public abstract class TcpServerEntity : NetworkServerEntity, IDisposable
     {
-        private static uint _ids;
-
-        private BasicAction<TcpConnectionEntity> ClientConnected { get; set; }
-        private BasicAction<TcpConnectionEntity, NetworkDisconnectReason> ClientDisconnected { get; set; }
-
         public bool IsRunning => _socket != null && _socket.IsBound && !_closeNotified;
 
         private readonly Dictionary<uint, TcpConnectionEntity> _connections;
         private Socket _socket;
 
-        /// <summary>
-        /// Instantiate a new instance of the class <see cref="TcpServerEntity"/>
-        /// </summary>
-        public TcpServerEntity() : this(string.Empty, 0)
+        public TcpServerEntity(int port) : this(string.Empty, port)
         {
         }
-        /// <summary>
-        /// Instantiate a new instance of the class <see cref="TcpServerEntity"/>
-        /// </summary>
-        /// <param name="ip"></param>
-        /// <param name="port"></param>
         public TcpServerEntity(string ip, int port) : base(ip, port)
         {
             _connections = new Dictionary<uint, TcpConnectionEntity>();
         }
 
-        public TcpServerEntity CatchOnStarted(BasicAction callback)
-        {
-            Started = callback;
-            return this;
-        }
-        public TcpServerEntity CatchOnClosed(BasicAction<NetworkDisconnectReason> callback)
-        {
-            Closed = callback;
-            return this;
-        }
-        public TcpServerEntity CatchOnClientConnected(BasicAction<TcpConnectionEntity> callback)
-        {
-            ClientConnected = callback;
-            return this;
-        }
-        public TcpServerEntity CatchOnClientDisconnected(BasicAction<TcpConnectionEntity, NetworkDisconnectReason> callback)
-        {
-            ClientDisconnected = callback;
-            return this;
-        }
-
-        public override void Start()
+        public sealed override void Start()
         {
             if (IsDisposed)
             {
@@ -69,17 +35,11 @@ namespace Inertia.Network
                     _connections.Clear();
                     _closeNotified = false;
                     _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                    if (string.IsNullOrEmpty(_targetIp) || _targetPort == 0)
-                    {
-                        _socket.Bind(new IPEndPoint(IPAddress.Any, 0));
-                    }
-                    else
-                    {
-                        _socket.Bind(new IPEndPoint(IPAddress.Parse(_targetIp), _targetPort));
-                    }
+                    _socket.Bind(new IPEndPoint(string.IsNullOrEmpty(_targetIp) ? IPAddress.Any : IPAddress.Parse(_targetIp), _targetPort));
 
                     _socket.Listen(1000);
-                    Started?.Invoke();
+
+                    OnStarted();
                     _socket.BeginAccept(new AsyncCallback(OnAcceptConnection), _socket);
                 }
                 catch
@@ -88,7 +48,7 @@ namespace Inertia.Network
                 }
             }
         }
-        public override void Close(NetworkDisconnectReason reason)
+        public sealed override void Close(NetworkDisconnectReason reason)
         {
             if (IsDisposed)
             {
@@ -114,26 +74,22 @@ namespace Inertia.Network
                 }
 
                 _closeNotified = true;
-                Closed?.Invoke(reason);
+                OnClosed(reason);
             }
         }
 
-        protected override void Dispose(bool disposing)
+        public virtual void OnClientConnected(TcpConnectionEntity connection) { }
+        public virtual void OnClientDisconnected(TcpConnectionEntity connection, NetworkDisconnectReason reason) { }
+            
+        public void Dispose()
         {
             if (!IsDisposed)
             {
-                if (disposing)
-                {
-                    Close();
+                BeforeDispose();
+                Close();
 
-                    ClientConnected = null;
-                    ClientDisconnected = null;
-
-                    _connections.Clear();
-                }
+                IsDisposed = true;
             }
-
-            base.Dispose(disposing);
         }
 
         private void OnAcceptConnection(IAsyncResult iar)
@@ -145,18 +101,18 @@ namespace Inertia.Network
                     var socket = ((Socket)iar.AsyncState).EndAccept(iar);
                     lock (_connections)
                     {
-                        var connection = new TcpConnectionEntity(socket, _ids++);
+                        var connection = new TcpConnectionEntity(socket, (uint)_idProvider.GetId());
 
-                        connection.Disconnected = (reason) =>
+                        connection.Disconnected += (reason) =>
                         {
                             _connections.Remove(connection.Id);
-                            ClientDisconnected?.Invoke(connection, reason);
+                            OnClientDisconnected(connection, reason);
                         };
 
                         _connections.Add(connection.Id, connection);
-                        ClientConnected?.Invoke(connection);
 
                         connection.StartReception();
+                        OnClientConnected(connection);
                     }
                 }
                 catch (Exception e)

@@ -10,70 +10,31 @@ namespace Inertia.Network
 {
     public sealed class NetworkMessageCaller
     {
-        private event BasicAction<NetworkMessage, TcpClientEntity> OnTcpClient;
-        private event BasicAction<NetworkMessage, UdpClientEntity> OnUdpClient;
-        private event BasicAction<NetworkMessage, TcpConnectionEntity> OnTcpConnection;
-        private event BasicAction<NetworkMessage, UdpConnectionEntity> OnUdpConnection;
+        private Dictionary<Type, MethodInfo> _references;
 
         internal NetworkMessageCaller()
         {
+            _references = new Dictionary<Type, MethodInfo>();
         }
 
-        internal void RegisterReference(MethodInfo method, Type networkParamType)
+        internal void RegisterReference(Type messageType, MethodInfo method)
         {
-            if (networkParamType == typeof(TcpClientEntity))
+            if (!_references.ContainsKey(messageType))
             {
-                OnTcpClient += (msg, client) => method.Invoke(null, new object[] { msg, client });
+                _references.Add(messageType, method);
             }
-            else if (networkParamType == typeof(UdpClientEntity))
+            else
             {
-                OnUdpClient += (msg, client) => method.Invoke(null, new object[] { msg, client });
-            }
-            else if (networkParamType == typeof(TcpConnectionEntity))
-            {
-                OnTcpConnection += (msg, conn) => method.Invoke(null, new object[] { msg, conn });
-            }
-            else if (networkParamType == typeof(UdpConnectionEntity))
-            {
-                OnUdpConnection += (msg, conn) => method.Invoke(null, new object[] { msg, conn });
+                _references[messageType] = method;
             }
         }
 
-        /// <summary>
-        /// Attempts to execute the specified NetworkMessage.
-        /// </summary>
-        /// <param name="message"></param>
-        /// <param name="client"></param>
-        public void TryCall(NetworkMessage message, TcpClientEntity client)
+        public void CallReferences(NetworkMessage message, object receiver)
         {
-            OnTcpClient?.Invoke(message, client);
-        }
-        /// <summary>
-        /// Attempts to execute the specified NetworkMessage.
-        /// </summary>
-        /// <param name="message"></param>
-        /// <param name="client"></param>
-        public void TryCall(NetworkMessage message, UdpClientEntity client)
-        {
-            OnUdpClient?.Invoke(message, client);
-        }
-        /// <summary>
-        /// Attempts to execute the specified NetworkMessage.
-        /// </summary>
-        /// <param name="message"></param>
-        /// <param name="connection"></param>
-        public void TryCall(NetworkMessage message, TcpConnectionEntity connection)
-        {
-            OnTcpConnection?.Invoke(message, connection);
-        }
-        /// <summary>
-        /// Attempts to execute the specified NetworkMessage.
-        /// </summary>
-        /// <param name="message"></param>
-        /// <param name="connection"></param>
-        public void TryCall(NetworkMessage message, UdpConnectionEntity connection)
-        {
-            OnUdpConnection?.Invoke(message, connection);
+            foreach (var reference in _references)
+            {
+                reference.Value.Invoke(null, new object[] { message, receiver });
+            }
         }
     }
 }
