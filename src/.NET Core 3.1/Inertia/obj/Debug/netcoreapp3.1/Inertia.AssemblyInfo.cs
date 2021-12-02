@@ -13,11 +13,12 @@ using System.Reflection;
 
 [assembly: System.Reflection.AssemblyCompanyAttribute("Etamiin")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
-[assembly: System.Reflection.AssemblyFileVersionAttribute("2.108.27.1515")]
+[assembly: System.Reflection.AssemblyFileVersionAttribute("1.12")]
 [assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
 [assembly: System.Reflection.AssemblyProductAttribute("Inertia")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Inertia")]
-[assembly: System.Reflection.AssemblyVersionAttribute("2.108.27.1515")]
+[assembly: System.Reflection.AssemblyVersionAttribute("1.12")]
+[assembly: System.Reflection.AssemblyMetadataAttribute("RepositoryUrl", "https://github.com/Etamiin/Inertia")]
 
 // Généré par la classe MSBuild WriteCodeFragment.
 

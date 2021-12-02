@@ -1,14 +1,15 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 
 namespace Inertia.Network
 {
-    public sealed class UdpConnectionEntity : NetworkConnectionEntity
+    public sealed class UdpConnectionEntity : NetworkConnectionEntity, IDisposable
     {
         internal IPEndPoint EndPoint { get; set; }
 
         private UdpServerEntity _server;
 
-        internal UdpConnectionEntity(UdpServerEntity server, IPEndPoint endPoint)
+        internal UdpConnectionEntity(uint id, UdpServerEntity server, IPEndPoint endPoint) : base(id)
         {
             _server = server;
             EndPoint = endPoint;
@@ -23,14 +24,14 @@ namespace Inertia.Network
             _server.SendTo(this, message);
         }
 
-        protected override void Dispose(bool disposing)
+        public void Dispose()
         {
-            base.Dispose(disposing);
-
-            if (disposing)
+            if (!IsDisposed)
             {
                 EndPoint = null;
                 _server = null;
+
+                IsDisposed = true;
             }
         }
     }

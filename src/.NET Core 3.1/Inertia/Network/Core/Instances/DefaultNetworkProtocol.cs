@@ -7,32 +7,11 @@ namespace Inertia.Network
     /// </summary>
     public sealed class DefaultNetworkProtocol : NetworkProtocol
     {
-        public static DefaultNetworkProtocol Instance { get; private set; }
+        public override bool PooledExecution => false;
+        public override int NetworkBufferLength => 8192;
 
-        internal static void Initialize()
+        internal DefaultNetworkProtocol() : base()
         {
-            if (Instance == null)
-            {
-                new DefaultNetworkProtocol();
-            }
-        }
-
-        public override ushort ProtocolVersion => 1;
-
-        private readonly AutoQueueExecutor _queue;
-
-        internal DefaultNetworkProtocol()
-        {
-            Instance = this;
-            if (MultiThreadedExecution)
-            {
-                _queue = new AutoQueueExecutor();
-            }
-
-            if (GetProtocol() == null)
-            {
-                SetProtocol(this);
-            }
         }
 
         /// <summary>
@@ -40,7 +19,7 @@ namespace Inertia.Network
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        public override byte[] OnParseMessage(NetworkMessage message)
+        public override byte[] OnSerializeMessage(NetworkMessage message)
         {
             using (var writer = new BasicWriter())
             {
@@ -59,56 +38,16 @@ namespace Inertia.Network
             }
         }
 
-        /// <summary>
-        /// Occurs when data is received from a <see cref="TcpClientEntity"/>.
-        /// </summary>
-        /// <param name="client"></param>
-        /// <param name="reader"></param>
-        public override void OnReceiveData(TcpClientEntity client, BasicReader reader)
+        public override void OnParseMessage(object receiver, BasicReader reader, MessageParsingOutput output)
         {
-            DefaultParseData(reader, (message) => GetCaller(message)?.TryCall(message, client));
-        }
-        /// <summary>
-        /// Occurs when data is received from a <see cref="UdpClientEntity"/>.
-        /// </summary>
-        /// <param name="client"></param>
-        /// <param name="reader"></param>
-        public override void OnReceiveData(UdpClientEntity client, BasicReader reader)
-        {
-            DefaultParseData(reader, (message) => GetCaller(message)?.TryCall(message, client));
-        }
-        /// <summary>
-        /// Occurs when data is received from a <see cref="TcpConnectionEntity"/>.
-        /// </summary>
-        /// <param name="connection"></param>
-        /// <param name="reader"></param>
-        public override void OnReceiveData(TcpConnectionEntity connection, BasicReader reader)
-        {
-            DefaultParseData(reader, (message) => GetCaller(message)?.TryCall(message, connection));
-        }
-        /// <summary>
-        /// Occurs when data is received from a <see cref="UdpConnectionEntity"/>.
-        /// </summary>
-        /// <param name="connection"></param>
-        /// <param name="reader"></param>
-        public override void OnReceiveData(UdpConnectionEntity connection, BasicReader reader)
-        {
-            DefaultParseData(reader, (message) => GetCaller(message)?.TryCall(message, connection));
-        }
+            reader.Position = 0;
 
-        private void DefaultParseData(BasicReader reader, BasicAction<NetworkMessage> onMessageParsed)
-        {
             while (reader.UnreadedLength > 0)
             {
-                reader.Position = 0;
-
                 var msgId = reader.GetUInt();
                 var msgSize = reader.GetLong();
 
-                if (reader.UnreadedLength < msgSize)
-                {
-                    break;
-                }
+                if (reader.UnreadedLength < msgSize) break;
 
                 try
                 {
@@ -119,19 +58,11 @@ namespace Inertia.Network
                     }
 
                     message.Deserialize(reader);
-
-                    if (_queue == null)
-                    {
-                        onMessageParsed(message);
-                    }
-                    else
-                    {
-                        _queue.Enqueue(() => onMessageParsed(message));
-                    }
+                    output.AddOutput(message);
                 }
                 catch (Exception ex)
                 {
-                    throw new DefaultProtocolFailedParseNetworkMessageException(ex.Message);
+                    throw new DefaultProtocolFailedParsingMessageException(ex.Message);
                 }
 
                 reader.RemoveReadedBytes();

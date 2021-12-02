@@ -1,48 +1,19 @@
 ﻿using System;
-<<<<<<< HEAD
-=======
 using System.Collections.Generic;
->>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
 using System.Linq;
 
 namespace Inertia
 {
-<<<<<<< HEAD
     /// <summary>
-    ///
+    /// Core component for command line management and execution.
     /// </summary>
     public static class CommandHooker
     {
-        /// <summary>
-        /// Returns all loaded textual commands.
-        /// </summary>
-        /// <returns></returns>
-        public static TextCommand[] GetAllCommands()
-        {
-            LoaderManager.DefaultLoadCommands();
-
-            lock (LoaderManager.Commands)
-            {
-                return LoaderManager.Commands.Values.ToArray();
-            }
-        }
-        /// <summary>
-        /// Returns the <see cref="TextCommand"/> associated with the specified name.
-        /// </summary>
-        /// <param name="commandName"></param>
-        /// <returns></returns>
-        public static TextCommand GetCommandByName(string commandName)
-        {
-            LoaderManager.DefaultLoadCommands();
-            LoaderManager.Commands.TryGetValue(commandName, out TextCommand command);
-=======
-    public static class CommandHooker
-    {
-        internal static Dictionary<string, TextCommand> _commands;
+        private static Dictionary<string, BasicCommand> _commands;
 
         static CommandHooker()
         {
-            _commands = new Dictionary<string, TextCommand>();
+            _commands = new Dictionary<string, BasicCommand>();
 
             var assemblys = AppDomain.CurrentDomain.GetAssemblies();
             foreach (var assembly in assemblys)
@@ -52,62 +23,52 @@ namespace Inertia
                 {
                     if (type.IsClass)
                     {
-                        if (type.IsSubclassOf(typeof(TextCommand)) && !type.IsAbstract)
+                        if (type.IsSubclassOf(typeof(BasicCommand)) && !type.IsAbstract)
                         {
-                            var inertiaCommand = (TextCommand)type.GetConstructor(Type.EmptyTypes).Invoke(new object[] { });
-                            if (!_commands.ContainsKey(inertiaCommand.Name))
+                            try
                             {
-                                _commands.Add(inertiaCommand.Name, inertiaCommand);
+                                var instance = (BasicCommand)Activator.CreateInstance(type);
+                                if (!_commands.ContainsKey(instance.Name))
+                                {
+                                    _commands.Add(instance.Name, instance);
+                                }
                             }
+                            catch (Exception ex)
+                            {
+                                throw new InertiaInitializationException(nameof(CommandHooker), ex);
+                            }                            
                         }
                     }
                 }
             }
         }
 
-        public static TextCommand[] GetAllCommands()
+        public static BasicCommand[] GetCommandList()
         {
             lock (_commands)
             {
                 return _commands.Values.ToArray();
             }
         }
-        public static TextCommand GetCommandByName(string commandName)
+        public static bool TryGetCommand(string commandName, out BasicCommand command)
         {
-            _commands.TryGetValue(commandName, out TextCommand command);
->>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-
-            return command;
+            return _commands.TryGetValue(commandName, out command);            
         }
 
-<<<<<<< HEAD
-        /// <summary>
-        /// Executes a command line and returns the associated <see cref="TextCommandArgs"/> instance.
-        /// </summary>
-        /// <param name="commandLine"></param>
-        /// <param name="dataCollection">The list of objects to be associated with the command</param>
-        /// <returns></returns>
-=======
->>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-        public static bool TryExecuteCommandLine(string commandLine, params object[] dataCollection)
+        public static bool TryExecute(string commandLine, params object[] dataCollection)
         {
             var args = commandLine.Split(' ');
             var others = new string[args.Length - 1];
             Array.Copy(args, 1, others, 0, others.Length);
 
-            return TryExecuteCommandByName(commandLine, args[0], dataCollection, others);
+            return TryExecuteByName(args[0], dataCollection, commandLine.Contains('"'), others);
         }
         
-        private static bool TryExecuteCommandByName(string commandLine, string commandName, object[] dataCollection = null, params string[] arguments)
+        private static bool TryExecuteByName(string commandName, object[] dataCollection, bool containsBlock, params string[] arguments)
         {
-            var command = GetCommandByName(commandName);
-            if (command != null)
+            if (TryGetCommand(commandName, out BasicCommand cmd))
             {
-<<<<<<< HEAD
-                command.Execute(new TextCommandArgs(commandLine, commandName, arguments, dataCollection));
-=======
-                command.OnExecute(new TextCommandArgs(commandLine, arguments, dataCollection));
->>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
+                cmd.PreExecute(arguments, dataCollection, containsBlock);
                 return true;
             }
 

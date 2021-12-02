@@ -1,22 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-<<<<<<< HEAD
-using System.Runtime.Serialization.Formatters.Binary;
-=======
 using System.Linq;
 using System.Reflection;
->>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
 using System.Text;
 
 namespace Inertia
 {
-<<<<<<< HEAD
-    /// <summary>
-    ///
-    /// </summary>
-=======
->>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
     public class BasicWriter : IDisposable
     {
         private static Dictionary<Type, BasicAction<BasicWriter, object>> _typageDefinitions = new Dictionary<Type, BasicAction<BasicWriter, object>>
@@ -38,11 +28,6 @@ namespace Inertia
             { typeof(byte[]), (writer, value) => writer.SetBytes((byte[])value) }
         };
 
-<<<<<<< HEAD
-        /// <summary>
-        /// Returns true is the current instance is disposed.
-        /// </summary>
-=======
         public static void SetTypeSerialization(Type type, BasicAction<BasicWriter, object> serialization)
         {
             if (!_typageDefinitions.ContainsKey(type))
@@ -55,7 +40,6 @@ namespace Inertia
             }
         }
 
->>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
         public bool IsDisposed { get; private set; }
         /// <summary>
         /// Returns the total length of the stream.
@@ -95,31 +79,15 @@ namespace Inertia
         private BinaryWriter _writer;
         private readonly Encoding _encoding;
 
-        /// <summary>
-        /// Initialize a new instance based on <see cref="Encoding.UTF8"/> algorithm
-        /// </summary>
         public BasicWriter() : this(Encoding.UTF8)
         {
         }
-        /// <summary>
-        /// Initialize a new instance based on the specified <see cref="Encoding"/> algorithm
-        /// </summary>
-        /// <param name="encoding"></param>
         public BasicWriter(Encoding encoding)
         {
             _encoding = encoding;
-<<<<<<< HEAD
-            _writer = new BinaryWriter(new MemoryStream(), encoding);            
-        }
-
-        /// <summary>
-        /// Clear the current stream.
-        /// </summary>
-=======
             _writer = new BinaryWriter(new MemoryStream(), encoding);
         }
 
->>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
         public void Clear()
         {
             if (IsDisposed)
@@ -142,11 +110,7 @@ namespace Inertia
         /// <returns>Returns the current instance</returns>
         public BasicWriter SetEmpty(uint size)
         {
-<<<<<<< HEAD
-            return SetBytes(new byte[size - 4]);
-=======
             return SetBytesWithoutHeader(new byte[size]);
->>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
         }
         /// <summary>
         /// Write the specified value in the stream
@@ -311,11 +275,7 @@ namespace Inertia
         /// <returns>Returns the current instance</returns>
         public BasicWriter SetBytes(byte[] value)
         {
-<<<<<<< HEAD
-            _writer.Write(value.LongLength);
-=======
             _writer.Write((uint)value.Length);
->>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
             return SetBytesWithoutHeader(value);
         }
         /// <summary>
@@ -338,48 +298,6 @@ namespace Inertia
             return SetLong(value.Ticks);
         }
         /// <summary>
-<<<<<<< HEAD
-        /// Write customized serializable object in the stream
-        /// </summary>
-        /// <param name="obj"><see cref="ISerializableObject"/> to serialize</param>
-        /// <returns>Returns the current instance</returns>
-        public BasicWriter SetSerializableObject(ISerializableObject obj)
-        {
-            obj.Serialize(this);
-            return this;
-        }
-        /// <summary>
-        /// Write customized serializable object in the stream
-        /// </summary>
-        /// <param name="data"><see cref="ISerializableData"/> to serialize</param>
-        /// <returns>Returns the current instance</returns>
-        public BasicWriter SetSerializableData(ISerializableData data)
-        {
-            return SetBytes(data.Serialize());
-        }
-        /// <summary>
-        /// Write the specified serializable value in the stream
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="value">The object to serialize</param>
-        /// <returns></returns>
-        /// <exception cref="TypeNonSerializableException"></exception>
-        public BasicWriter SetObject<T>(T value)
-        {
-            if (!value.GetType().IsSerializable)
-            {
-                throw new TypeNonSerializableException(typeof(T));
-            }
-
-            var binaryFormatter = new BinaryFormatter
-            {
-                TypeFormat = System.Runtime.Serialization.Formatters.FormatterTypeStyle.TypesWhenNeeded
-            };
-
-            binaryFormatter.Serialize(_writer.BaseStream, value);
-            return this;
-        }
-=======
         /// Write an instance of <see cref="ISerializableObject"/> in the stream
         /// </summary>
         /// <param name="value"><see cref="ISerializableObject"/> to serialize</param>
@@ -438,7 +356,6 @@ namespace Inertia
             return this;
         }
 
->>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
         /// <summary>
         /// Automatically write the specified value in the stream
         /// </summary>
@@ -453,9 +370,6 @@ namespace Inertia
             }
             else
             {
-<<<<<<< HEAD
-                SetObject(value);
-=======
                 if (objType.GetInterface(nameof(IAutoSerializable)) != null)
                 {
                     SetAutoSerializable((IAutoSerializable)value);
@@ -464,7 +378,6 @@ namespace Inertia
                 {
                     SetSerializableObject((ISerializableObject)value);
                 }
->>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
             }
 
             return this;
@@ -522,34 +435,13 @@ namespace Inertia
             return data;
         }
 
-<<<<<<< HEAD
-        /// <summary>
-        ///
-        /// </summary>
         public void Dispose()
         {
-            Dispose(true);
-        }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="disposing"></param>
-=======
-        public void Dispose()
-        {
-            Dispose(true);
-        }        
->>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!IsDisposed && disposing)
+            if (!IsDisposed)
             {
-                if (disposing)
-                {
-                    _writer.Flush();
-                    _writer.Close();
-                    _writer.Dispose();
-                }
+                _writer.Flush();
+                _writer.Close();
+                _writer.Dispose();
 
                 IsDisposed = true;
             }

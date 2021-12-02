@@ -7,78 +7,39 @@ namespace Inertia.Runtime
 {
     internal static class RuntimeManager
     {
-<<<<<<< HEAD
-        internal static bool IsManuallyRunned { get; set; }
+        internal static event BasicAction RtUpdate = () => { };
+        private static event BasicAction Updating = () => { };
+        private static event BasicAction Destroying = () => { };
 
-        internal static event BasicAction UpdatingSiT;
-        private static event BasicAction Updating;
-        private static event BasicAction Destroying;
+        internal static bool IsManuallyRunning { get; set; }
 
-        private static bool _isInitialized;
-
-        internal static void OnRegisterExtends()
-        {
-            if (!_isInitialized)
-            {
-                Initialize();
-            }
-        }
-
-        internal static void OnScriptCreated(Script script)
-        {
-            if (!_isInitialized)
-            {
-                Initialize();
-            }
-
-=======
         static RuntimeManager()
         {
             var clock = new Clock();
 
             Task.Factory.StartNew(() => {
-                while (!IsManuallyRunned)
+                while (!IsManuallyRunning)
                 {
                     ExecuteCycle(clock);
                 }
             });
         }
 
-        internal static bool IsManuallyRunned { get; set; }
-
-        internal static event BasicAction UpdatingSiT = () => { };
-        private static event BasicAction Updating = () => { };
-        private static event BasicAction Destroying = () => { };
-
-        internal static void OnScriptCreated(Script script)
+        internal static void RegisterScript(Script script)
         {
->>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-            Updating += script.Update;
+            Updating += script.OnUpdate;
         }
-        internal static void OnScriptDestroyed(Script script)
+        internal static void BeginUnregisterScript(Script script)
         {
-<<<<<<< HEAD
-            if (!_isInitialized)
-            {
-                Initialize();
-            }
-
-=======
->>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
-            Updating -= script.Update;
+            Updating -= script.OnUpdate;
             Destroying += script.PreDestroy;
         }
-        internal static void OnScriptPreDestroyed(Script script)
+        internal static void EndUnregisterScript(Script script)
         {
             Destroying -= script.PreDestroy;
-            script.Parent.FinalizeRemove(script);
         }
 
-<<<<<<< HEAD
-        internal static void ExecuteCycle(Clock clock)
-=======
         internal static void ExecuteCycle(Clock clock, float deltaTime = 0f)
->>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
         {
             if (clock != null)
             {
@@ -88,13 +49,7 @@ namespace Inertia.Runtime
                     Thread.Sleep(1);
                     currentMsUpdate = clock.GetElapsedSeconds();
                 }
-<<<<<<< HEAD
 
-                Script.DeltaTime = (float)currentMsUpdate;
-                clock.Reset();
-            }
-=======
-                
                 Script.DeltaTime = (float)currentMsUpdate;
                 clock.Reset();
             }
@@ -102,11 +57,10 @@ namespace Inertia.Runtime
             {
                 Script.DeltaTime = deltaTime;
             }
->>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
 
-            lock (UpdatingSiT)
+            lock (RtUpdate)
             {
-                UpdatingSiT?.Invoke();
+                RtUpdate?.Invoke();
             }
             lock (Updating)
             {
@@ -117,28 +71,5 @@ namespace Inertia.Runtime
                 Destroying?.Invoke();
             }
         }
-<<<<<<< HEAD
-
-        private static void Initialize()
-        {
-            if (!_isInitialized)
-            {
-                _isInitialized = true;
-                ExecuteLogic();
-            }
-        }
-        private static void ExecuteLogic()
-        {
-            var clock = new Clock();
-
-            Task.Factory.StartNew(() => {
-                while (!IsManuallyRunned)
-                {
-                    ExecuteCycle(clock);
-                }
-            });
-        }
-=======
->>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
     }
 }

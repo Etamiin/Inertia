@@ -6,32 +6,16 @@ using System.Net.Sockets;
 
 namespace Inertia.Network
 {
-    public class UdpClientEntity : NetworkClientEntity, IDisposable
+    public abstract class UdpClientEntity : NetworkClientEntity, IDisposable
     {
         public override bool IsConnected => (_client?.Client) != null && _client.Client.Connected;
         private UdpClient _client;
 
-        /// <summary>
-        /// Instantiate a new instance of the class <see cref="UdpClientEntity"/>
-        /// </summary>
-        /// <param name="ip"></param>
-        /// <param name="port"></param>
         public UdpClientEntity(string ip, int port) : base(ip, port)
         {
         }
         
-        public UdpClientEntity CatchOnConnected(BasicAction callback)
-        {
-            Connected = callback;
-            return this;
-        }
-        public UdpClientEntity CatchOnDisconnected(BasicAction<NetworkDisconnectReason> callback)
-        {
-            Disconnected = callback;
-            return this;
-        }
-
-        public override void Connect()
+        public sealed override void Connect()
         {
             if (IsDisposed)
             {
@@ -46,7 +30,7 @@ namespace Inertia.Network
                     _client = new UdpClient();
                     _client.Connect(new IPEndPoint(IPAddress.Parse(_targetIp), _targetPort));
 
-                    Connected?.Invoke();
+                    OnConnected();
                     _client.BeginReceive(new AsyncCallback(OnReceiveData), _client);
                 }
                 catch
@@ -55,7 +39,7 @@ namespace Inertia.Network
                 }
             }
         }        
-        public override void Disconnect(NetworkDisconnectReason reason)
+        public sealed override void Disconnect(NetworkDisconnectReason reason)
         {
             if (IsDisposed)
             {
@@ -69,34 +53,37 @@ namespace Inertia.Network
             if (!_disconnectNotified)
             {
                 _disconnectNotified = true;
-                Disconnected.Invoke(reason);
+                OnDisconnected(reason);
             }
         }
-        
-        public override void Send(byte[] data)
+        public sealed override void Send(byte[] data)
         {
             if (IsDisposed)
             {
                 throw new ObjectDisposedException(nameof(UdpClientEntity));
             }
 
-            if (data.Length > ushort.MaxValue)
+            if (IsConnected)
             {
-                throw new UserDatagramDataLengthLimitException();
-            }
+                if (data.Length > ushort.MaxValue)
+                {
+                    throw new UserDatagramDataLengthLimitException();
+                }
 
-            try { _client.SendAsync(data, data.Length); } catch { }
+                _client.SendAsync(data, data.Length);
+            }
         }
 
-        protected override void Dispose(bool disposing)
+        public void Dispose()
         {
-            if (disposing)
+            if (!IsDisposed)
             {
+                BeforeDispose();
                 Disconnect(NetworkDisconnectReason.Manual);
                 _client?.Dispose();
-            }
 
-            base.Dispose(disposing);
+                IsDisposed = true;
+            }
         }
 
         private void OnReceiveData(IAsyncResult iar)
@@ -108,7 +95,7 @@ namespace Inertia.Network
                     IPEndPoint endPoint = null;
                     var data = ((UdpClient)iar.AsyncState).EndReceive(iar, ref endPoint);
 
-                    NetworkProtocol.GetProtocol().OnReceiveData(this, new BasicReader(data));
+                    NetworkProtocol.ProcessParsing(this, new BasicReader(data));
                 }
                 catch (Exception e)
                 {

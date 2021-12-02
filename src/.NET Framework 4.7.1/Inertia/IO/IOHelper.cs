@@ -7,25 +7,8 @@ using System.Text;
 
 namespace Inertia
 {
-<<<<<<< HEAD
-    /// <summary>
-    /// 
-    /// </summary>
-=======
->>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
     public static class IOHelper
     {
-        internal readonly static Random Randomizer = new Random();
-
-<<<<<<< HEAD
-        /// <summary>
-        /// Returns the paths to the files contained in the specified location.
-        /// </summary>
-        /// <param name="path">Folder path</param>
-        /// <param name="includeSubFolders"></param>
-        /// <returns></returns>
-=======
->>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
         public static string[] GetFilesFromDirectory(string path, bool includeSubFolders)
         {
             if (!Directory.Exists(path))
@@ -58,14 +41,6 @@ namespace Inertia
                 }
             }
         }
-<<<<<<< HEAD
-        /// <summary>
-        /// Appends Bytes to the end of the stream from the specified file.
-        /// </summary>
-        /// <param name="filePath"></param>
-        /// <param name="data"></param>
-=======
->>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
         public static void AppendAllBytes(string filePath, byte[] data)
         {
             using (var stream = new FileStream(filePath, FileMode.Append))
@@ -74,14 +49,6 @@ namespace Inertia
             }
         }
 
-<<<<<<< HEAD
-        /// <summary>
-        /// Returns the SHA256 representation of the specified data.
-        /// </summary>
-        /// <param name="data"></param>
-        /// <returns></returns>
-=======
->>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
         public static string GetSHA256(byte[] data)
         {
             string result = string.Empty;
@@ -98,29 +65,11 @@ namespace Inertia
             }
 
             return result;
-<<<<<<< HEAD
-        }
-        /// <summary>
-        /// Returns the SHA256 representation of the specified <see cref="FileStream"/>.
-        /// </summary>
-        /// <param name="stream"></param>
-        /// <returns></returns>
-=======
         }        
->>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
         public static string GetSHA256(FileStream stream)
         {
             return GetSHA256(stream, ushort.MaxValue);
         }
-<<<<<<< HEAD
-        /// <summary>
-        /// Returns the SHA256 representation of the specified <see cref="FileStream"/>.
-        /// </summary>
-        /// <param name="stream"></param>
-        /// <param name="bufferLength"></param>
-        /// <returns></returns>
-=======
->>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
         public static string GetSHA256(FileStream stream, int bufferLength)
         {
             using (stream)
@@ -147,15 +96,6 @@ namespace Inertia
             }
         }
 
-<<<<<<< HEAD
-        /// <summary>
-        /// Compress and return the specified data.
-        /// </summary>
-        /// <param name="data"></param>
-        /// <param name="hasBetterSize">Returns true if the returned data is lower in length than the non-compressed data</param>
-        /// <returns></returns>
-=======
->>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
         public static byte[] GzipCompress(ref byte[] data, out bool hasBetterSize)
         {
             using (var ms = new MemoryStream())
@@ -171,14 +111,6 @@ namespace Inertia
                 return compressedData;
             }
         }
-<<<<<<< HEAD
-        /// <summary>
-        /// Decompress and return the specified data.
-        /// </summary>
-        /// <param name="compressedData"></param>
-        /// <returns></returns>
-=======
->>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
         public static byte[] GzipDecompress(byte[] compressedData)
         {
             using (var cms = new MemoryStream(compressedData))
@@ -195,15 +127,6 @@ namespace Inertia
             }
         }
 
-<<<<<<< HEAD
-        /// <summary>
-        /// Encrypts the specified data with the specified key.
-        /// </summary>
-        /// <param name="data"></param>
-        /// <param name="key"></param>
-        /// <returns></returns>
-=======
->>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
         public static byte[] EncryptWithString(byte[] data, string key)
         {
             var pdb = new PasswordDeriveBytes(key, Encoding.ASCII.GetBytes(key));
@@ -221,17 +144,7 @@ namespace Inertia
             pdb.Dispose();
 
             return ms.ToArray();
-<<<<<<< HEAD
-        }
-        /// <summary>
-        /// Decrypts the specified data with the specified key.
-        /// </summary>
-        /// <param name="encryptedData"></param>
-        /// <param name="key"></param>
-        /// <returns></returns>
-=======
         }        
->>>>>>> 9bfc85f6784b254a10c65f104446a83c8b195c40
         public static byte[] DecryptWithString(byte[] encryptedData, string key)
         {
             var pdb = new PasswordDeriveBytes(key, Encoding.ASCII.GetBytes(key));

@@ -5,13 +5,7 @@
     /// </summary>
     public enum ConditionType
     {
-        /// <summary>
-        /// 
-        /// </summary>
         AND,
-        /// <summary>
-        /// 
-        /// </summary>
         OR
     }
 }
