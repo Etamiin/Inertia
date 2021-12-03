@@ -436,6 +436,31 @@
             <param name="columnsToUpdate"></param>
             <returns></returns>
         </member>
+        <member name="T:Inertia.ORM.ConditionOperator">
+            <summary>
+            SQL conditonal operators
+            </summary>
+        </member>
+        <member name="T:Inertia.ORM.ConditionType">
+            <summary>
+            SQL conditional types
+            </summary>
+        </member>
+        <member name="T:Inertia.ORM.DatabaseAlreadyInitializedException">
+            <summary>
+            Throw when a <see cref="T:Inertia.ORM.Database"/> is already registered
+            </summary>
+        </member>
+        <member name="T:Inertia.ORM.DatabaseConnectionFailedException">
+            <summary>
+            Throw when failed to connect to a <see cref="F:Inertia.ORM.DatabaseConnectionFailedException._database"/>
+            </summary>
+        </member>
+        <member name="T:Inertia.ORM.InitializationFailedException">
+            <summary>
+            Throw when <see cref="T:Inertia.ORM.SqlManager"/> failed to initialize
+            </summary>
+        </member>
         <member name="M:Inertia.ORM.SqlCondition.#ctor">
             <summary>
             Initialize a new instance of the class <see cref="T:Inertia.ORM.SqlCondition"/>.
@@ -533,31 +558,6 @@
             </summary>
             <param name="limitValue"></param>
             <returns></returns>
-        </member>
-        <member name="T:Inertia.ORM.ConditionOperator">
-            <summary>
-            SQL conditonal operators
-            </summary>
-        </member>
-        <member name="T:Inertia.ORM.ConditionType">
-            <summary>
-            SQL conditional types
-            </summary>
-        </member>
-        <member name="T:Inertia.ORM.DatabaseAlreadyInitializedException">
-            <summary>
-            Throw when a <see cref="T:Inertia.ORM.Database"/> is already registered
-            </summary>
-        </member>
-        <member name="T:Inertia.ORM.DatabaseConnectionFailedException">
-            <summary>
-            Throw when failed to connect to a <see cref="F:Inertia.ORM.DatabaseConnectionFailedException._database"/>
-            </summary>
-        </member>
-        <member name="T:Inertia.ORM.InitializationFailedException">
-            <summary>
-            Throw when <see cref="T:Inertia.ORM.SqlManager"/> failed to initialize
-            </summary>
         </member>
         <member name="M:Inertia.ORM.SqlManager.TrySearchDatabase(System.String,Inertia.ORM.Database@)">
             <summary>

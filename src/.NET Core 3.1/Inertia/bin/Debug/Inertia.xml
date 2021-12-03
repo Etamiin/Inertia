@@ -4,11 +4,6 @@
         <name>Inertia</name>
     </assembly>
     <members>
-        <member name="T:Inertia.CommandHooker">
-            <summary>
-            Core component for command line management and execution.
-            </summary>
-        </member>
         <member name="T:Inertia.InertiaInitializationException">
             <summary>
             This exception is thrown in case an error occurs during the initialization of a core component.
@@ -424,6 +419,11 @@
         <member name="T:Inertia.IAutoSerializable">
             <summary>
             Allows the system to automatically serialize or deserialize the fields of an instance (using the attributes <see cref="T:Inertia.CustomSerialization"/> and <see cref="T:Inertia.CustomDeserialization"/>)
+            </summary>
+        </member>
+        <member name="T:Inertia.CommandHooker">
+            <summary>
+            Core component for command line management and execution.
             </summary>
         </member>
         <member name="P:Inertia.AutoQueueExecutor.Count">
