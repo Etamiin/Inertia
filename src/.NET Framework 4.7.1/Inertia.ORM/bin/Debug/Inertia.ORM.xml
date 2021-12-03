@@ -1,0 +1,577 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Inertia.ORM</name>
+    </assembly>
+    <members>
+        <member name="T:Inertia.ORM.TableLink">
+            <summary>
+            Link a <see cref="T:Inertia.ORM.Table"/> object to a <see cref="T:Inertia.ORM.Database"/>
+            </summary>
+        </member>
+        <member name="P:Inertia.ORM.Database.Name">
+            <summary>
+            Returns the name of the database.
+            </summary>
+        </member>
+        <member name="P:Inertia.ORM.Database.User">
+            <summary>
+            Returns the username used for the authentification.
+            </summary>
+        </member>
+        <member name="P:Inertia.ORM.Database.Password">
+            <summary>
+            Returns the password used for the authentification.
+            </summary>
+        </member>
+        <member name="P:Inertia.ORM.Database.Host">
+            <summary>
+            Returns the ip used for the connection.
+            </summary>
+        </member>
+        <member name="P:Inertia.ORM.Database.Port">
+            <summary>
+            Returns the port used for the connection.
+            </summary>
+        </member>
+        <member name="P:Inertia.ORM.Database.Ssl">
+            <summary>
+            Returns the SSL mode used by the MySql connection
+            </summary>
+        </member>
+        <member name="M:Inertia.ORM.Database.#ctor">
+            <summary>
+            Initialize a new instance of class <see cref="T:Inertia.ORM.Database"/>
+            </summary>
+        </member>
+        <member name="M:Inertia.ORM.Database.TryExecuteQuery(System.String)">
+            <summary>
+            Execute a custom SQL query and returns true if the query was successfully executed.
+            </summary>
+            <param name="query"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.Database.Create``1">
+            <summary>
+            Create the specified <see cref="T:Inertia.ORM.Table"/> and returns true if the creation (or if the table already exists) was a success.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.Database.Drop``1">
+            <summary>
+            Drop the specified <see cref="T:Inertia.ORM.Table"/> and returns true if the deletion was a success.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.Database.Select``1(System.String[])">
+            <summary>
+            Selects the first element from the specified <see cref="T:Inertia.ORM.Table"/> with the specified parameters and returns an instance of the <typeparamref name="T"/>.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="columnsToSelect"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.Database.Select``1(System.Boolean,System.String[])">
+            <summary>
+            Selects the first element from the specified <see cref="T:Inertia.ORM.Table"/> with the specified parameters and returns an instance of the <typeparamref name="T"/>.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="columnsToSelect"></param>
+            <param name="distinct"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.Database.Select``1(Inertia.ORM.SqlCondition,System.String[])">
+            <summary>
+            Selects the first element from the specified <see cref="T:Inertia.ORM.Table"/> with the specified parameters and returns an instance of the <typeparamref name="T"/>.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="columnsToSelect"></param>
+            <param name="condition"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.Database.Select``1(Inertia.ORM.SqlCondition,System.Boolean,System.String[])">
+            <summary>
+            Selects the first element from the specified <see cref="T:Inertia.ORM.Table"/> with the specified parameters and returns an instance of the <typeparamref name="T"/>.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="columnsToSelect"></param>
+            <param name="condition"></param>
+            <param name="distinct"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.Database.SelectAll``1(System.String[])">
+            <summary>
+            Selects all the elements from the specified <see cref="T:Inertia.ORM.Table"/> with the specified parameters and returns an instance of the <typeparamref name="T"/>.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="columnsToSelect"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.Database.SelectAll``1(System.Boolean,System.String[])">
+            <summary>
+            Selects all the elements from the specified <see cref="T:Inertia.ORM.Table"/> with the specified parameters and returns an instance of the <typeparamref name="T"/>.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="columnsToSelect"></param>
+            <param name="distinct"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.Database.SelectAll``1(Inertia.ORM.SqlCondition,System.String[])">
+            <summary>
+            Selects all the elements from the specified <see cref="T:Inertia.ORM.Table"/> with the specified parameters and returns an instance of the <typeparamref name="T"/>.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="columnsToSelect"></param>
+            <param name="condition"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.Database.SelectAll``1(Inertia.ORM.SqlCondition,System.Boolean,System.String[])">
+            <summary>
+            Selects all the elements from the specified <see cref="T:Inertia.ORM.Table"/> with the specified parameters and returns an instance of the <typeparamref name="T"/>.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="columnsToSelect"></param>
+            <param name="condition"></param>
+            <param name="distinct"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.Database.Delete``1(Inertia.ORM.SqlCondition)">
+            <summary>
+            Delete all the elements from the specified <see cref="T:Inertia.ORM.Table"/> based on the specified <see cref="T:Inertia.ORM.SqlCondition"/>
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="condition"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.Database.DeleteAll``1">
+            <summary>
+            Delete all the elements from the specified <see cref="T:Inertia.ORM.Table"/>
+            </summary>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.Database.UpdateAll``1(``0,System.String[])">
+            <summary>
+            Update all the elements in the specified <see cref="T:Inertia.ORM.Table"/> with the reference's values
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="reference"></param>
+            <param name="columnsToUpdate"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.Database.Count``1">
+            <summary>
+            Execute a COUNT query with the specified parameters and return the result.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.Database.Count``1(System.Boolean)">
+            <summary>
+            Execute a COUNT query with the specified parameters and return the result.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="distinct"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.Database.Count``1(Inertia.ORM.SqlCondition)">
+            <summary>
+            Execute a COUNT query with the specified parameters and return the result.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="condition"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.Database.Count``1(Inertia.ORM.SqlCondition,System.Boolean)">
+            <summary>
+            Execute a COUNT query with the specified parameters and return the result.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="condition"></param>
+            <param name="distinct"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.Database.Count``1(System.String)">
+            <summary>
+            Execute a COUNT query with the specified parameters and return the result.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="columnName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.Database.Count``1(System.String,System.Boolean)">
+            <summary>
+            Execute a COUNT query with the specified parameters and return the result.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="distinct"></param>
+            <param name="columnName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.Database.Count``1(System.String,Inertia.ORM.SqlCondition)">
+            <summary>
+            Execute a COUNT query with the specified parameters and return the result.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="columnName"></param>
+            <param name="condition"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.Database.Count``1(System.String,Inertia.ORM.SqlCondition,System.Boolean)">
+            <summary>
+            Execute a COUNT query with the specified parameters and return the result.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="distinct"></param>
+            <param name="columnName"></param>
+            <param name="condition"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.Database.Exist``1(Inertia.ORM.SqlCondition)">
+            <summary>
+            Return true if a row exist in the database based on the specified conditions
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="condition"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.Database.Exist``1(Inertia.ORM.SqlCondition,System.Boolean)">
+            <summary>
+            Return true if a row exist in the database based on the specified conditions
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="condition"></param>
+            <param name="distinct"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Inertia.ORM.QueryAccessor`1">
+            <summary>
+            A help tool for faster access to queries
+            </summary>
+            <typeparam name="TableKey"></typeparam>
+        </member>
+        <member name="M:Inertia.ORM.QueryAccessor`1.#ctor">
+            <summary>
+            Initialize a new instance of the class <see cref="T:Inertia.ORM.QueryAccessor`1"/>
+            </summary>
+        </member>
+        <member name="M:Inertia.ORM.QueryAccessor`1.Select(System.String[])">
+            <summary>
+            Selects the first element from the specified <see cref="T:Inertia.ORM.Table"/> with the specified parameters and returns an instance of the <typeparamref name="TableKey"/>.
+            </summary>
+            <param name="columnsToSelect"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.QueryAccessor`1.Select(System.Boolean,System.String[])">
+            <summary>
+            Selects the first element from the specified <see cref="T:Inertia.ORM.Table"/> with the specified parameters and returns an instance of the <typeparamref name="TableKey"/>.
+            </summary>
+            <param name="columnsToSelect"></param>
+            <param name="distinct"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.QueryAccessor`1.Select(Inertia.ORM.SqlCondition,System.String[])">
+            <summary>
+            Selects the first element from the specified <see cref="T:Inertia.ORM.Table"/> with the specified parameters and returns an instance of the <typeparamref name="TableKey"/>.
+            </summary>
+            <param name="columnsToSelect"></param>
+            <param name="condition"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.QueryAccessor`1.Select(Inertia.ORM.SqlCondition,System.Boolean,System.String[])">
+            <summary>
+            Selects the first element from the specified <see cref="T:Inertia.ORM.Table"/> with the specified parameters and returns an instance of the <typeparamref name="TableKey"/>.
+            </summary>
+            <param name="columnsToSelect"></param>
+            <param name="condition"></param>
+            <param name="distinct"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.QueryAccessor`1.SelectAll(System.String[])">
+            <summary>
+            Selects all the elements from the specified <see cref="T:Inertia.ORM.Table"/> with the specified parameters and returns an instance of the <typeparamref name="TableKey"/>.
+            </summary>
+            <param name="columnsToSelect"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.QueryAccessor`1.SelectAll(System.Boolean,System.String[])">
+            <summary>
+            Selects all the elements from the specified <see cref="T:Inertia.ORM.Table"/> with the specified parameters and returns an instance of the <typeparamref name="TableKey"/>.
+            </summary>
+            <param name="columnsToSelect"></param>
+            <param name="distinct"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.QueryAccessor`1.SelectAll(Inertia.ORM.SqlCondition,System.String[])">
+            <summary>
+            Selects all the elements from the specified <see cref="T:Inertia.ORM.Table"/> with the specified parameters and returns an instance of the <typeparamref name="TableKey"/>.
+            </summary>
+            <param name="columnsToSelect"></param>
+            <param name="condition"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.QueryAccessor`1.SelectAll(Inertia.ORM.SqlCondition,System.Boolean,System.String[])">
+            <summary>
+            Selects all the elements from the specified <see cref="T:Inertia.ORM.Table"/> with the specified parameters and returns an instance of the <typeparamref name="TableKey"/>.
+            </summary>
+            <param name="columnsToSelect"></param>
+            <param name="condition"></param>
+            <param name="distinct"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.QueryAccessor`1.Delete(Inertia.ORM.SqlCondition)">
+            <summary>
+            Delete all the elements from the specified <see cref="T:Inertia.ORM.Table"/> based on the specified <see cref="T:Inertia.ORM.SqlCondition"/>
+            </summary>
+            <param name="condition"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.QueryAccessor`1.DeleteAll">
+            <summary>
+            Delete all the elements from the specified <see cref="T:Inertia.ORM.Table"/>
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.QueryAccessor`1.UpdateAll(`0,System.String[])">
+            <summary>
+            Update all the elements in the specified <see cref="T:Inertia.ORM.Table"/> with the reference's values
+            </summary>
+            <param name="reference"></param>
+            <param name="columnsToUpdate"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.QueryAccessor`1.Count">
+            <summary>
+            Execute a COUNT query with the specified parameters and return the result.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.QueryAccessor`1.Count(System.Boolean)">
+            <summary>
+            Execute a COUNT query with the specified parameters and return the result.
+            </summary>
+            <param name="distinct"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.QueryAccessor`1.Count(Inertia.ORM.SqlCondition)">
+            <summary>
+            Execute a COUNT query with the specified parameters and return the result.
+            </summary>
+            <param name="condition"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.QueryAccessor`1.Count(Inertia.ORM.SqlCondition,System.Boolean)">
+            <summary>
+            Execute a COUNT query with the specified parameters and return the result.
+            </summary>
+            <param name="condition"></param>
+            <param name="distinct"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.QueryAccessor`1.Count(System.String)">
+            <summary>
+            Execute a COUNT query with the specified parameters and return the result.
+            </summary>
+            <param name="columnName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.QueryAccessor`1.Count(System.String,System.Boolean)">
+            <summary>
+            Execute a COUNT query with the specified parameters and return the result.
+            </summary>
+            <param name="distinct"></param>
+            <param name="columnName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.QueryAccessor`1.Count(System.String,Inertia.ORM.SqlCondition)">
+            <summary>
+            Execute a COUNT query with the specified parameters and return the result.
+            </summary>
+            <param name="columnName"></param>
+            <param name="condition"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.QueryAccessor`1.Count(System.String,Inertia.ORM.SqlCondition,System.Boolean)">
+            <summary>
+            Execute a COUNT query with the specified parameters and return the result.
+            </summary>
+            <param name="distinct"></param>
+            <param name="columnName"></param>
+            <param name="condition"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.QueryAccessor`1.Exist(Inertia.ORM.SqlCondition)">
+            <summary>
+            Return true if a row exist in the database based on the specified conditions
+            </summary>
+            <param name="condition"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.QueryAccessor`1.Exist(Inertia.ORM.SqlCondition,System.Boolean)">
+            <summary>
+            Return true if a row exist in the database based on the specified conditions
+            </summary>
+            <param name="condition"></param>
+            <param name="distinct"></param>
+            <returns></returns>
+        </member>
+        <member name="P:Inertia.ORM.Table.Database">
+            <summary>
+            Returns the <see cref="P:Inertia.ORM.Table.Database"/> attached
+            </summary>
+        </member>
+        <member name="M:Inertia.ORM.Table.Insert">
+            <summary>
+            Insert the current instance values in <see cref="P:Inertia.ORM.Table.Database"/>
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.Table.Update(Inertia.ORM.SqlCondition,System.String[])">
+            <summary>
+            Update all elements in the <see cref="P:Inertia.ORM.Table.Database"/> with current instance's values using the specified <see cref="T:Inertia.ORM.SqlCondition"/>
+            </summary>
+            <param name="condition"></param>
+            <param name="columnsToUpdate"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.SqlCondition.#ctor">
+            <summary>
+            Initialize a new instance of the class <see cref="T:Inertia.ORM.SqlCondition"/>.
+            </summary>
+        </member>
+        <member name="M:Inertia.ORM.SqlCondition.BeginBrackets">
+            <summary>
+            Open a new bracket in the query (ex: "(").
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.SqlCondition.BeginBrackets(Inertia.ORM.ConditionType)">
+            <summary>
+            Open a new bracket in the query (ex: "(").
+            </summary>
+            <param name="type"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.SqlCondition.EndBrackets">
+            <summary>
+            End a bracket in the query (ex: ")").
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.SqlCondition.Add(System.String,System.Object,Inertia.ORM.ConditionOperator)">
+            <summary>
+            Add a new condition with specified parameters.
+            </summary>
+            <param name="fieldName">Field name to check</param>
+            <param name="value"></param>
+            <param name="conditionOperator">SQL operator</param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.SqlCondition.Add(System.String,System.Object,Inertia.ORM.ConditionOperator,Inertia.ORM.ConditionType)">
+            <summary>
+            Add a new condition with specified parameters.
+            </summary>
+            <param name="fieldName">Field name to check</param>
+            <param name="value"></param>
+            <param name="conditionOperator">SQL operator</param>
+            <param name="type">SQL condition type</param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.SqlCondition.AddBetween(System.String,System.Object,System.Object)">
+            <summary>
+            Add a SQL "BETWEEN" condition with specified parameters.
+            </summary>
+            <param name="fieldName">Field name to check</param>
+            <param name="value1"></param>
+            <param name="value2"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.SqlCondition.AddBetween(System.String,System.Object,System.Object,Inertia.ORM.ConditionType)">
+            <summary>
+            Add a SQL "BETWEEN" condition with specified parameters.
+            </summary>
+            <param name="fieldName">Field name to check</param>
+            <param name="value1"></param>
+            <param name="value2"></param>
+            <param name="type">SQL condition type</param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.SqlCondition.AddStringPattern(System.String)">
+            <summary>
+            Add a custom string condition (ex: "id >= 2 OR value >= 5") to the current instance.
+            </summary>
+            <param name="strQuery"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.SqlCondition.AddStringPattern(System.String,Inertia.ORM.ConditionType)">
+            <summary>
+            Add a custom string condition (ex: "id >= 2 OR value >= 5") to the current instance.
+            </summary>
+            <param name="strQuery"></param>
+            <param name="type">SQL condition type</param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.SqlCondition.OrderAscending(System.String[])">
+            <summary>
+            Add a SQL "ORDER BY" condition by ascending.
+            </summary>
+            <param name="columns">Columns to order</param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.SqlCondition.OrderDescending(System.String[])">
+            <summary>
+            Add a SQL "ORDER BY" condition by descending.
+            </summary>
+            <param name="columns">Columns to order</param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.SqlCondition.Limit(System.Int32)">
+            <summary>
+            Add a SQL "LIMIT" condition.
+            </summary>
+            <param name="limitValue"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Inertia.ORM.ConditionOperator">
+            <summary>
+            SQL conditonal operators
+            </summary>
+        </member>
+        <member name="T:Inertia.ORM.ConditionType">
+            <summary>
+            SQL conditional types
+            </summary>
+        </member>
+        <member name="T:Inertia.ORM.DatabaseAlreadyInitializedException">
+            <summary>
+            Throw when a <see cref="T:Inertia.ORM.Database"/> is already registered
+            </summary>
+        </member>
+        <member name="T:Inertia.ORM.DatabaseConnectionFailedException">
+            <summary>
+            Throw when failed to connect to a <see cref="F:Inertia.ORM.DatabaseConnectionFailedException._database"/>
+            </summary>
+        </member>
+        <member name="T:Inertia.ORM.InitializationFailedException">
+            <summary>
+            Throw when <see cref="T:Inertia.ORM.SqlManager"/> failed to initialize
+            </summary>
+        </member>
+        <member name="M:Inertia.ORM.SqlManager.TrySearchDatabase(System.String,Inertia.ORM.Database@)">
+            <summary>
+            Returns a <see cref="T:Inertia.ORM.Database"/> already registered.
+            </summary>
+            <param name="name"></param>
+            <param name="database"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.SqlManager.TrySearchDatabase``1(``0@)">
+            <summary>
+            Returns a <typeparamref name="T"/> already registered.
+            </summary>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

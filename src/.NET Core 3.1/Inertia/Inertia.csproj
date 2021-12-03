@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <Authors>Etamiin</Authors>
+    <Company />
+    <Product />
+    <AssemblyVersion>1.12</AssemblyVersion>
+    <FileVersion>1.12</FileVersion>
+    <SignAssembly>false</SignAssembly>
+    <Version>1.0.0</Version>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>C:\Users\abdel\Desktop\VS Projects\Git\Inertia\src\.NET Core 3.1\Inertia\Inertia.xml</DocumentationFile>
+    <NoWarn>1701;1702;1591</NoWarn>
+    <Optimize>false</Optimize>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <OutDir>$(SolutionDir).NET Core 3.1\Inertia\bin\$(Configuration)</OutDir>
+    <PackageProjectUrl></PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Etamiin/Inertia</RepositoryUrl>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <None Remove="Inertia.xml" />
+  </ItemGroup>
+
+</Project>
