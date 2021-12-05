@@ -36,11 +36,6 @@
             Returns the total unreaded length of the stream.
             </summary>
         </member>
-        <member name="P:Inertia.BasicReader.Position">
-            <summary>
-            Get or Set the position in the stream.
-            </summary>
-        </member>
         <member name="M:Inertia.BasicReader.Fill(System.Byte[])">
             <summary>
             Fill the current stream with the specified data
@@ -224,11 +219,6 @@
         <member name="P:Inertia.BasicWriter.TotalLength">
             <summary>
             Returns the total length of the stream.
-            </summary>
-        </member>
-        <member name="P:Inertia.BasicWriter.Position">
-            <summary>
-            Get or Set the position in the stream.
             </summary>
         </member>
         <member name="M:Inertia.BasicWriter.SetEmpty(System.UInt32)">

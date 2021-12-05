@@ -11,7 +11,7 @@ namespace Inertia.Network
         public override bool IsConnected => (_client?.Client) != null && _client.Client.Connected;
         private UdpClient _client;
 
-        public UdpClientEntity(string ip, int port) : base(ip, port)
+        protected UdpClientEntity(string ip, int port) : base(ip, port)
         {
         }
         

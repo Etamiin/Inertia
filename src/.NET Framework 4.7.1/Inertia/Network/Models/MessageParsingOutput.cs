@@ -8,7 +8,7 @@ namespace Inertia.Network
     {
         internal List<NetworkMessage> Messages { get; private set; }
 
-        private bool _outputReaded = false;
+        private bool _outputReaded;
 
         internal MessageParsingOutput()
         {

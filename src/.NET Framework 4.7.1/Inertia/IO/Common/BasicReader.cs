@@ -65,33 +65,10 @@ namespace Inertia
             {
                 if (_reader != null)
                 {
-                    return TotalLength - Position;
+                    return TotalLength - GetPosition();
                 }
 
                 return 0;
-            }
-        }
-        /// <summary>
-        /// Get or Set the position in the stream.
-        /// </summary>
-        public long Position
-        {
-            get
-            {
-                if (_reader != null)
-                {
-                    return _reader.BaseStream.Position;
-                }
-                return 0;
-            }
-            set
-            {
-                if (_reader == null || value < 0 || value > _reader.BaseStream.Length)
-                {
-                    return;
-                }
-
-                _reader.BaseStream.Position = value;
             }
         }
 
@@ -112,6 +89,26 @@ namespace Inertia
         public BasicReader(byte[] data, Encoding encoding) : this(encoding)
         {
             Fill(data);
+        }
+
+        public BasicReader SetPosition(long position)
+        {
+            if (_reader == null || position < 0 || position > _reader.BaseStream.Length)
+            {
+                return this;
+            }
+
+            _reader.BaseStream.Position = position;
+            return this;
+        }
+        public long GetPosition()
+        {
+            if (_reader != null)
+            {
+                return _reader.BaseStream.Position;
+            }
+
+            return 0;
         }
 
         public void Clear()
@@ -146,11 +143,11 @@ namespace Inertia
                 throw new ObjectDisposedException(nameof(BasicReader));
             }
 
-            var oldPosition = Position;
+            var oldPosition = GetPosition();
 
-            Position = startIndex;
+            SetPosition(startIndex);
             _reader.BaseStream.Write(data, 0, data.Length);
-            Position = oldPosition;
+            SetPosition(oldPosition);
 
             return this;
         }
@@ -163,7 +160,7 @@ namespace Inertia
             if (available.Length > 0)
             {
                 Fill(available, 0);
-                Position = 0;
+                SetPosition(0);
             }
 
             return this;
@@ -438,7 +435,7 @@ namespace Inertia
             return (T)GetSerializableObject(typeof(T));
         }
         /// <summary>
-        /// Create an instance of <paramref name="type"/> and return it after deserialization
+        /// Create an instance of <typeparamref name="T"/> and return it after deserialization
         /// </summary>
         /// <returns>Returns a <see cref="ISerializableObject"/></returns>
         public object GetSerializableObject(Type type)
@@ -477,10 +474,11 @@ namespace Inertia
         /// <summary>
         /// Create an instance of specified <see cref="IAutoSerializable"/> deserialize it and then return it
         /// </summary>
+        /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         public IAutoSerializable GetAutoSerializable(Type type)
         {
-            if (type.GetInterface(nameof(IAutoSerializable)) == null)
+            if (!typeof(IAutoSerializable).IsAssignableFrom(type))
             {
                 throw new Exception($"Type '{ type.Name }' isn't '{ nameof(IAutoSerializable) }'");
             }
@@ -491,7 +489,7 @@ namespace Inertia
         /// <summary>
         /// Deserialize the specified instance of <see cref="IAutoSerializable"/>
         /// </summary>
-        /// <param name="instance"></param>
+        /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         public IAutoSerializable GetAutoSerializable(IAutoSerializable instance)
         {
@@ -542,7 +540,7 @@ namespace Inertia
         /// <summary>
         /// Read the next object in the stream based on the specified <see cref="Type"/>
         /// </summary>
-        /// <param name="type"></param>
+        /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         public object GetValue(Type type)
         {

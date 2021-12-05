@@ -12,7 +12,7 @@ namespace Inertia.Network
         protected private readonly int _targetPort;
         protected private bool _closeNotified;
         
-        protected NetworkServerEntity(string ip, int port)
+        protected internal NetworkServerEntity(string ip, int port)
         {
             _idProvider = IdProvider.CreateNew();
             _targetIp = ip.Replace("localhost", "127.0.0.1");

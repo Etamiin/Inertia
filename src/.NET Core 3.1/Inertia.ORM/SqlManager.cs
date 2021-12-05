@@ -8,17 +8,16 @@ namespace Inertia.ORM
 {
     public static class SqlManager
     {
-        private static Dictionary<string, Database> _databases;
+        private static Dictionary<Type, Database> _databases;
 
         private static AutoQueueExecutor _queue;
 
         static SqlManager()
         {
-            _databases = new Dictionary<string, Database>();
+            _databases = new Dictionary<Type, Database>();
             _queue = new AutoQueueExecutor();
 
-            var namedDb = new Dictionary<string, List<Type>>();
-            var typedDb = new Dictionary<Type, List<Type>>();
+            var typedTb = new Dictionary<Type, List<Type>>();
 
             try
             {
@@ -35,9 +34,9 @@ namespace Inertia.ORM
                         if (type.IsSubclassOf(typeof(Database)))
                         {
                             var db = (Database)Activator.CreateInstance(type);
-                            if (!_databases.ContainsKey(db.Name))
+                            if (!_databases.ContainsKey(type))
                             {
-                                _databases.Add(db.Name, db);
+                                _databases.Add(type, db);
                                 db.TryCreateItSelf();
                             }
                             else
@@ -50,26 +49,15 @@ namespace Inertia.ORM
                             var link = type.GetCustomAttribute<TableLink>(false);
                             if (link != null)
                             {
-                                if (!string.IsNullOrEmpty(link.DatabaseName))
+                                if (link.DatabaseType != null)
                                 {
-                                    if (namedDb.TryGetValue(link.DatabaseName, out List<Type> types))
+                                    if (typedTb.TryGetValue(link.DatabaseType, out List<Type> types))
                                     {
                                         types.Add(type);
                                     }
                                     else
                                     {
-                                        namedDb.Add(link.DatabaseName, new List<Type> { type });
-                                    }
-                                }
-                                else if (link.DatabaseType != null)
-                                {
-                                    if (typedDb.TryGetValue(link.DatabaseType, out List<Type> types))
-                                    {
-                                        types.Add(type);
-                                    }
-                                    else
-                                    {
-                                        typedDb.Add(link.DatabaseType, new List<Type> { type });
+                                        typedTb.Add(link.DatabaseType, new List<Type> { type });
                                     }
                                 }
                             }
@@ -77,32 +65,14 @@ namespace Inertia.ORM
                     }
                 }
 
-                foreach (var pair in namedDb)
+                foreach (var pair in typedTb)
                 {
-                    TryRegisterDb(pair.Value, dbName: pair.Key);
-                }
-                foreach (var pair in typedDb)
-                {
-                    TryRegisterDb(pair.Value, dbType: pair.Key);
+                    if (TrySearchDatabase(pair.Key, out Database db) && db.AutoGenerateTable)
+                    {
+                        RegisterTablesTo(db, pair.Value);
+                    }
                 }
 
-                void TryRegisterDb(List<Type> tables, string dbName = "", Type dbType = null)
-                {
-                    Database db = null;
-                    if (!string.IsNullOrEmpty(dbName))
-                    {
-                        TrySearchDatabase(dbName, out db);
-                    }
-                    else if (dbType != null)
-                    {
-                        TrySearchDatabase(dbType, out db);
-                    }
-
-                    if (db != null && db.AutoGenerateTable)
-                    {
-                        RegisterTablesTo(db, tables);
-                    }
-                }
                 void RegisterTablesTo(Database db, List<Type> types)
                 {
                     foreach (var type in types)
@@ -128,16 +98,6 @@ namespace Inertia.ORM
         }
 
         /// <summary>
-        /// Returns a <see cref="Database"/> already registered.
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="database"></param>
-        /// <returns></returns>
-        public static bool TrySearchDatabase(string name, out Database database)
-        {
-            return _databases.TryGetValue(name, out database);
-        }
-        /// <summary>
         /// Returns a <typeparamref name="T"/> already registered.
         /// </summary>
         /// <returns></returns>
@@ -154,8 +114,7 @@ namespace Inertia.ORM
         }
         public static bool TrySearchDatabase(Type databaseType, out Database database)
         {
-            database = _databases.Values.FirstOrDefault((db) => db.GetType() == databaseType);
-            return database != null;
+            return _databases.TryGetValue(databaseType, out database);
         }
 
         internal static bool CreateTableInstance<T>(out T instance) where T : Table

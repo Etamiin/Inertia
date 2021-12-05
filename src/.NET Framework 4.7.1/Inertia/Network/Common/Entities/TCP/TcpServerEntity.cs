@@ -13,10 +13,10 @@ namespace Inertia.Network
         private readonly Dictionary<uint, TcpConnectionEntity> _connections;
         private Socket _socket;
 
-        public TcpServerEntity(int port) : this(string.Empty, port)
+        protected TcpServerEntity(int port) : this(string.Empty, port)
         {
         }
-        public TcpServerEntity(string ip, int port) : base(ip, port)
+        protected TcpServerEntity(string ip, int port) : base(ip, port)
         {
             _connections = new Dictionary<uint, TcpConnectionEntity>();
         }

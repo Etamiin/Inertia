@@ -9,9 +9,9 @@ namespace Inertia.Network
 
         public bool IsConnected => _socket != null && _socket.Connected;
 
+        private readonly BasicReader _reader;
         private byte[] _buffer;
         private Socket _socket;
-        private BasicReader _reader;
         private bool _disconnectionNotified;
         
         internal TcpConnectionEntity(Socket socket, uint id) : base(id)
@@ -68,10 +68,11 @@ namespace Inertia.Network
 
             if (!_disconnectionNotified)
             {
-                _buffer = null;
-                _socket = null;
                 _disconnectionNotified = true;
                 Disconnected?.Invoke(reason);
+
+                _buffer = null;
+                _socket = null;
                 Disconnected = null;
             }
         }

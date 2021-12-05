@@ -13,7 +13,7 @@ namespace Inertia.Network
         protected private readonly int _targetPort;
         protected private bool _disconnectNotified;
 
-        internal NetworkClientEntity(string ip, int port)
+        protected internal NetworkClientEntity(string ip, int port)
         {
             _targetIp = ip.Replace("localhost", "127.0.0.1");
             _targetPort = port;

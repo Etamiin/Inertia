@@ -62,8 +62,6 @@
     <Compile Include="Common\QueryAccessor.cs" />
     <Compile Include="Common\QueryBuilder.cs" />
     <Compile Include="Common\Table.cs" />
-    <Compile Include="Models\FieldType.cs" />
-    <Compile Include="Models\SqlCondition.cs" />
     <Compile Include="Enums\BlobSize.cs" />
     <Compile Include="Enums\ConditionOperator.cs" />
     <Compile Include="Enums\ConditionType.cs" />
@@ -71,6 +69,8 @@
     <Compile Include="Exceptions\DatabaseAlreadyInitializedException.cs" />
     <Compile Include="Exceptions\DatabaseConnectionFailedException.cs" />
     <Compile Include="Exceptions\InitializationFailedException.cs" />
+    <Compile Include="Models\FieldType.cs" />
+    <Compile Include="Models\SqlCondition.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SqlManager.cs" />
   </ItemGroup>

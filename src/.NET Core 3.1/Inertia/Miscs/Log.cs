@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using Inertia;
 
 public static class Log
@@ -23,6 +23,9 @@ public static class Log
     {
         SetOptions(LogOptions.Default);
         _lastSaveTime = DateTime.Now;
+
+        AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+        TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
     }
 
     public static void SetOptions(LogOptions options)
@@ -55,10 +58,16 @@ public static class Log
     }
     public static void SaveNow()
     {
-        File.AppendAllTextAsync($"logs/log { _lastSaveTime: yyyy MM dd}.txt", _log.ToString());
+        if (_log != null)
+        {
+            lock (_log)
+            {
+                File.AppendAllTextAsync($"logs/log { _lastSaveTime: yyyy MM dd}.txt", _log.ToString());
 
-        _lastSaveTime = DateTime.Now;
-        _log.Clear();
+                _lastSaveTime = DateTime.Now;
+                _log.Clear();
+            }
+        }
     }
 
     public static void Line(object content, params object[] args)
@@ -87,7 +96,8 @@ public static class Log
 
         void Finalize()
         {
-            var log = $"{ title }{ content }";
+            var time = _options.IncludeTime ? $"[{DateTime.Now.ToShortTimeString()}]" : string.Empty;
+            var log = $"{time}{ title }{ content }";
 
             Console.ForegroundColor = textColor;
             Console.WriteLine(log);
@@ -107,6 +117,22 @@ public static class Log
                     SaveNow();
                 }
             }
+        }
+    }
+
+    private static void TaskScheduler_UnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
+    {
+        Error(e.Exception);
+        e.SetObserved();
+    }
+    private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+    {
+        Error((Exception)e.ExceptionObject);
+
+        if (e.IsTerminating)
+        {
+            _queue?.ForceExecute();
+            SaveNow();
         }
     }
 }

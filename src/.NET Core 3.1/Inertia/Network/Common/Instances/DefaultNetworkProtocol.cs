@@ -10,7 +10,7 @@ namespace Inertia.Network
         public override bool PooledExecution => false;
         public override int NetworkBufferLength => 8192;
 
-        internal DefaultNetworkProtocol() : base()
+        internal DefaultNetworkProtocol()
         {
         }
 
@@ -27,12 +27,13 @@ namespace Inertia.Network
                     .SetUInt(message.MessageId)
                     .SetEmpty(sizeof(long));
 
-                var cPos = writer.Position;
+                var cPos = writer.GetPosition();
 
                 message.Serialize(writer);
 
-                writer.Position = cPos - sizeof(long);
-                writer.SetLong(writer.TotalLength - cPos);
+                writer
+                    .SetPosition(cPos - sizeof(long))
+                    .SetLong(writer.TotalLength - cPos);
 
                 return writer.ToArrayAndDispose();
             }
@@ -40,7 +41,7 @@ namespace Inertia.Network
 
         public override void OnParseMessage(object receiver, BasicReader reader, MessageParsingOutput output)
         {
-            reader.Position = 0;
+            reader.SetPosition(0);
 
             while (reader.UnreadedLength > 0)
             {

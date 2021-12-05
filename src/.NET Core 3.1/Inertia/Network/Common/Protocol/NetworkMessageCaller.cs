@@ -10,12 +10,7 @@ namespace Inertia.Network
 {
     public sealed class NetworkMessageCaller
     {
-        private event BasicAction<NetworkMessage, TcpClientEntity> OnTcpClient;
-        private event BasicAction<NetworkMessage, UdpClientEntity> OnUdpClient;
-        private event BasicAction<NetworkMessage, TcpConnectionEntity> OnTcpConnection;
-        private event BasicAction<NetworkMessage, UdpConnectionEntity> OnUdpConnection;
-
-        private Dictionary<Type, MethodInfo> _references;
+        private readonly Dictionary<Type, MethodInfo> _references;
 
         internal NetworkMessageCaller()
         {

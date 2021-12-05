@@ -7,102 +7,25 @@ namespace Inertia.ORM
 {
     public abstract class Database
     {
-        /// <summary>
-        /// Returns the name of the database.
-        /// </summary>
         public abstract string Name { get; }
-        /// <summary>
-        /// Returns the username used for the authentification.
-        /// </summary>
         public abstract string User { get; }
-        /// <summary>
-        /// Returns the password used for the authentification.
-        /// </summary>
         public abstract string Password { get; }
-        /// <summary>
-        /// Returns the ip used for the connection.
-        /// </summary>
         public abstract string Host { get; }
         public abstract bool AutoGenerateTable { get; }
 
-        /// <summary>
-        /// Returns the port used for the connection.
-        /// </summary>
         public virtual int Port { get; } = 3306;
-        /// <summary>
-        /// Returns the SSL mode used by the MySql connection
-        /// </summary>
         public virtual MySqlSslMode Ssl { get; } = MySqlSslMode.None;
 
         internal bool IsInitialized { get; set; }
 
         private readonly string _connectionString;
 
-        /// <summary>
-        /// Initialize a new instance of class <see cref="Database"/>
-        /// </summary>
         protected Database()
         {
             _connectionString = $"server={ Host.Replace("localhost", "127.0.0.1") };uid={ User };pwd={ Password };database={ Name };port={ Port };SslMode={ Ssl }";
         }
 
         public abstract void OnInitialized();
-
-        internal void TryCreateItSelf()
-        {
-            var dbCreaStr = $"server={ Host.Replace("localhost", "127.0.0.1") };uid={ User };pwd={ Password };port={ Port };SslMode={ Ssl }";
-            using (var conn = new MySqlConnection(dbCreaStr))
-            {
-                conn.Open();
-                using (var cmd = new MySqlCommand($"CREATE DATABASE IF NOT EXISTS `{ Name }`", conn))
-                {
-                    cmd.ExecuteNonQuery();
-                }
-            }
-        }
-
-        internal MySqlConnection CreateConnection()
-        {
-            try
-            {
-                var conn = new MySqlConnection(_connectionString);
-                conn.Open();
-
-                return conn;
-            }
-            catch (Exception ex)
-            {
-                throw new DatabaseConnectionFailedException(this, ex);
-            }
-        }
-
-        internal void ExecuteCommand(string query, BasicAction<MySqlCommand> onCommand, bool force = false)
-        {
-            if (IsInitialized || force)
-            {
-                using (var conn = CreateConnection())
-                {
-                    using (var cmd = new MySqlCommand(query, conn))
-                    {
-                        onCommand(cmd);
-                    }
-                }
-            }
-        }
-        internal void ExecuteCommand(BasicAction<MySqlCommand> onCommand, bool force = false)
-        {
-            if (IsInitialized || force)
-            {
-                using (var conn = CreateConnection())
-                {
-                    using (var cmd = new MySqlCommand())
-                    {
-                        cmd.Connection = conn;
-                        onCommand(cmd);
-                    }
-                }
-            }
-        }
 
         /// <summary>
         /// Execute a custom SQL query and returns true if the query was successfully executed.
@@ -297,30 +220,26 @@ namespace Inertia.ORM
 
                     cmd.SetQuery(QueryBuilder.GetSelectQuery(table, condition, columnsToSelect, distinct), condition);
                     cmd.OnReader((reader) => {
-                        var created = SqlManager.CreateTableInstance(out T instance);
-                        if (created)
+                        for (var i = 0; i < reader.FieldCount; i++)
                         {
-                            for (var i = 0; i < reader.FieldCount; i++)
+                            var field = fields.FirstOrDefault((f) => f.Name == reader.GetName(i));
+                            if (field != null)
                             {
-                                var field = fields.FirstOrDefault((f) => f.Name == reader.GetName(i));
-                                if (field != null)
+                                object value = null;
+                                if (field.FieldType == typeof(bool))
                                 {
-                                    object value = null;
-                                    if (field.FieldType == typeof(bool))
-                                    {
-                                        value = reader.GetBoolean(i);
-                                    }
-                                    else if (!reader.IsDBNull(i))
-                                    {
-                                        value = reader.GetValue(i);
-                                    }
-
-                                    field.SetValue(instance, value);
+                                    value = reader.GetBoolean(i);
                                 }
+                                else if (!reader.IsDBNull(i))
+                                {
+                                    value = reader.GetValue(i);
+                                }
+
+                                field.SetValue(table, value);
                             }
                         }
 
-                        tables.Add(instance);
+                        tables.Add(table);
                     });
 
                     result = tables.ToArray();
@@ -338,6 +257,11 @@ namespace Inertia.ORM
         /// <returns></returns>
         public bool Delete<T>(SqlCondition condition) where T : Table
         {
+            if (condition == null)
+            {
+                throw new ArgumentNullException("condition", "A valid SqlCondition is required.");
+            }
+
             var deleted = false;
 
             ExecuteCommand((cmd) => {
@@ -610,6 +534,59 @@ namespace Inertia.ORM
             return sum;
         }
 
+        internal void TryCreateItSelf()
+        {
+            var dbCreaStr = $"server={ Host.Replace("localhost", "127.0.0.1") };uid={ User };pwd={ Password };port={ Port };SslMode={ Ssl }";
+            using (var conn = new MySqlConnection(dbCreaStr))
+            {
+                conn.Open();
+                using (var cmd = new MySqlCommand($"CREATE DATABASE IF NOT EXISTS `{ Name }`", conn))
+                {
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+        internal MySqlConnection CreateConnection()
+        {
+            try
+            {
+                var conn = new MySqlConnection(_connectionString);
+                conn.Open();
+
+                return conn;
+            }
+            catch (Exception ex)
+            {
+                throw new DatabaseConnectionFailedException(this, ex);
+            }
+        }
+        internal void ExecuteCommand(string query, BasicAction<MySqlCommand> onCommand, bool force = false)
+        {
+            if (IsInitialized || force)
+            {
+                using (var conn = CreateConnection())
+                {
+                    using (var cmd = new MySqlCommand(query, conn))
+                    {
+                        onCommand(cmd);
+                    }
+                }
+            }
+        }
+        internal void ExecuteCommand(BasicAction<MySqlCommand> onCommand, bool force = false)
+        {
+            if (IsInitialized || force)
+            {
+                using (var conn = CreateConnection())
+                {
+                    using (var cmd = new MySqlCommand())
+                    {
+                        cmd.Connection = conn;
+                        onCommand(cmd);
+                    }
+                }
+            }
+        }
         internal bool Create(Table table)
         {
             if (table != null)

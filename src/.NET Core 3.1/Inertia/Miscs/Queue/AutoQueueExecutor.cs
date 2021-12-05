@@ -13,7 +13,7 @@ namespace Inertia
         /// </summary>
         public int Count => _executor.Count;
 
-        private ManualQueueExecutor _executor;
+        private readonly ManualQueueExecutor _executor;
 
         public AutoQueueExecutor()
         {
@@ -31,6 +31,16 @@ namespace Inertia
             _executor.Dispose();
         }
 
+        internal void ForceExecute()
+        {
+            if (IsDisposed) return;
+
+            lock (_executor)
+            {
+                _executor.Execute();
+            }
+        }
+
         private async Task Execute()
         {
             try
@@ -46,10 +56,7 @@ namespace Inertia
                     _executor.Execute();
                 }
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-            }            
+            catch { }        
         }
     }
 }

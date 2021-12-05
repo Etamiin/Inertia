@@ -4,31 +4,9 @@
         <name>Inertia</name>
     </assembly>
     <members>
-        <member name="T:Inertia.CommandHooker">
-            <summary>
-            Core component for command line management and execution.
-            </summary>
-        </member>
         <member name="T:Inertia.InertiaInitializationException">
             <summary>
             This exception is thrown in case an error occurs during the initialization of a core component.
-            </summary>
-        </member>
-        <member name="M:Inertia.CustomDeserialization.#ctor(System.String)">
-            <summary>
-            Specify that the value of the field will be deserialized by the method indicated in parameter.
-            </summary>
-            <param name="methodName"></param>
-        </member>
-        <member name="M:Inertia.CustomSerialization.#ctor(System.String)">
-            <summary>
-            Specify that the value of the field will be serialized by the method indicated in parameter.
-            </summary>
-            <param name="methodName"></param>
-        </member>
-        <member name="T:Inertia.IgnoreField">
-            <summary>
-            Ignore a field during procedures involving instance fields
             </summary>
         </member>
         <member name="P:Inertia.BasicReader.TotalLength">
@@ -39,11 +17,6 @@
         <member name="P:Inertia.BasicReader.UnreadedLength">
             <summary>
             Returns the total unreaded length of the stream.
-            </summary>
-        </member>
-        <member name="P:Inertia.BasicReader.Position">
-            <summary>
-            Get or Set the position in the stream.
             </summary>
         </member>
         <member name="M:Inertia.BasicReader.Fill(System.Byte[])">
@@ -180,7 +153,7 @@
         </member>
         <member name="M:Inertia.BasicReader.GetSerializableObject(System.Type)">
             <summary>
-            Create an instance of <paramref name="type"/> and return it after deserialization
+            Create an instance of <typeparamref name="T"/> and return it after deserialization
             </summary>
             <returns>Returns a <see cref="T:Inertia.ISerializableObject"/></returns>
         </member>
@@ -202,13 +175,14 @@
             <summary>
             Create an instance of specified <see cref="T:Inertia.IAutoSerializable"/> deserialize it and then return it
             </summary>
+            <typeparam name="T"></typeparam>
             <returns></returns>
         </member>
         <member name="M:Inertia.BasicReader.GetAutoSerializable(Inertia.IAutoSerializable)">
             <summary>
             Deserialize the specified instance of <see cref="T:Inertia.IAutoSerializable"/>
             </summary>
-            <param name="instance"></param>
+            <typeparam name="T"></typeparam>
             <returns></returns>
         </member>
         <member name="M:Inertia.BasicReader.GetValue``1">
@@ -222,17 +196,12 @@
             <summary>
             Read the next object in the stream based on the specified <see cref="T:System.Type"/>
             </summary>
-            <param name="type"></param>
+            <typeparam name="T"></typeparam>
             <returns></returns>
         </member>
         <member name="P:Inertia.BasicWriter.TotalLength">
             <summary>
             Returns the total length of the stream.
-            </summary>
-        </member>
-        <member name="P:Inertia.BasicWriter.Position">
-            <summary>
-            Get or Set the position in the stream.
             </summary>
         </member>
         <member name="M:Inertia.BasicWriter.SetEmpty(System.UInt32)">
@@ -415,6 +384,23 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:Inertia.CustomDeserialization.#ctor(System.String)">
+            <summary>
+            Specify that the value of the field will be deserialized by the method indicated in parameter.
+            </summary>
+            <param name="methodName"></param>
+        </member>
+        <member name="M:Inertia.CustomSerialization.#ctor(System.String)">
+            <summary>
+            Specify that the value of the field will be serialized by the method indicated in parameter.
+            </summary>
+            <param name="methodName"></param>
+        </member>
+        <member name="T:Inertia.IgnoreField">
+            <summary>
+            Ignore a field during procedures involving instance fields
+            </summary>
+        </member>
         <member name="T:Inertia.BoolFlagTooLargeException">
             <summary>
             Exception thrown when flag size limit is reached
@@ -431,6 +417,11 @@
             </summary>
             <typeparam name="T"></typeparam>
             <returns></returns>
+        </member>
+        <member name="T:Inertia.CommandHooker">
+            <summary>
+            Core component for command line management and execution.
+            </summary>
         </member>
         <member name="P:Inertia.AutoQueueExecutor.Count">
             <summary>

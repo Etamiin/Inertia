@@ -8,19 +8,16 @@ namespace Inertia.ORM
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
     public class TableLink : Attribute
     {
-        public readonly string DatabaseName;
-        public readonly string TableName;
-        public readonly Type DatabaseType;
-        
-        public TableLink(string tableName, string databaseName)
-        {
-            DatabaseName = databaseName;
-            TableName = tableName;
-        }
+        public string TableName => _tbName;
+        public Type DatabaseType => _dbType;
+
+        private string _tbName;
+        private Type _dbType;
+
         public TableLink(string tableName, Type databaseType)
         {
-            DatabaseType = databaseType;
-            TableName = tableName;
+            _tbName = tableName;
+            _dbType = databaseType;
         }
     }
 }

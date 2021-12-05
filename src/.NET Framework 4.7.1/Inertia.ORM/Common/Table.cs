@@ -36,19 +36,9 @@ namespace Inertia.ORM
             {
                 Identifier = link.TableName;
 
-                if (!string.IsNullOrEmpty(link.DatabaseName))
+                if (link.DatabaseType != null && SqlManager.TrySearchDatabase(link.DatabaseType, out Database db))
                 {
-                    if (SqlManager.TrySearchDatabase(link.DatabaseName, out Database db))
-                    {
-                        Database = db;
-                    }
-                }
-                else if (link.DatabaseType != null)
-                {
-                    if (SqlManager.TrySearchDatabase(link.DatabaseType, out Database db))
-                    {
-                        Database = db;
-                    }
+                    Database = db;
                 }
 
                 if (Database == null)
@@ -76,6 +66,16 @@ namespace Inertia.ORM
             return id;
         }
         /// <summary>
+        /// Insert the current instance values in <see cref="Database"/>
+        /// </summary>
+        /// <returns></returns>
+        public void InsertAsync(BasicAction<long> onResult)
+        {
+            SqlManager.PoolAsyncOperation(() => {
+                onResult(Insert());
+            });
+        }
+        /// <summary>
         /// Update all elements in the <see cref="Database"/> with current instance's values using the specified <see cref="SqlCondition"/>
         /// </summary>
         /// <param name="condition"></param>
@@ -91,6 +91,18 @@ namespace Inertia.ORM
             });
 
             return updated;
+        }
+        /// <summary>
+        /// Update all elements in the <see cref="Database"/> with current instance's values using the specified <see cref="SqlCondition"/>
+        /// </summary>
+        /// <param name="condition"></param>
+        /// <param name="onUpdated"></param>
+        /// <param name="columnsToUpdate"></param>
+        public void UpdateAsync(SqlCondition condition, BasicAction<bool> onUpdated, params string[] columnsToUpdate)
+        {
+            SqlManager.PoolAsyncOperation(() => {
+                onUpdated(Update(condition, columnsToUpdate));
+            });
         }
     }
 }

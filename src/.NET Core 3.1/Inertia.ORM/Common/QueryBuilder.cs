@@ -133,7 +133,7 @@ namespace Inertia.ORM
         }
         internal static string GetDeleteQuery(Table table, SqlCondition condition)
         {
-            return UseBuilder($"DELETE FROM `{ table.Identifier }`", condition, (sb) => { });
+            return UseBuilder($"DELETE FROM `{ table.Identifier }`", condition, null);
         }
         internal static string GetUpdateQuery(Table table, MySqlCommand command, SqlCondition condition, string[] columns)
         {

@@ -7,7 +7,7 @@ namespace Inertia.Network
         public bool IsDisposed { get; protected private set; }
         public uint Id { get; internal set; }
 
-        public NetworkConnectionEntity(uint id)
+        protected internal NetworkConnectionEntity(uint id)
         {
             Id = id;
         }

@@ -5,7 +5,7 @@ using System.Net.Sockets;
 
 namespace Inertia.Network
 {
-    public class UdpServerEntity : NetworkServerEntity, IDisposable
+    public abstract class UdpServerEntity : NetworkServerEntity, IDisposable
     {
         /// <summary>
         /// Returns true if <see cref="Start"/> was called successfully.
@@ -19,12 +19,12 @@ namespace Inertia.Network
         }
 
         private UdpClient _client;
-        private Dictionary<IPEndPoint, UdpConnectionEntity> _connections;
+        private readonly Dictionary<IPEndPoint, UdpConnectionEntity> _connections;
 
-        public UdpServerEntity(int port) : this(string.Empty, port)
+        protected UdpServerEntity(int port) : this(string.Empty, port)
         {
         }
-        public UdpServerEntity(string ip, int port) : base(ip, port)
+        protected UdpServerEntity(string ip, int port) : base(ip, port)
         {
             _connections = new Dictionary<IPEndPoint, UdpConnectionEntity>();
         }

@@ -43,26 +43,26 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Miscs\Command\BasicCommand.cs" />
-    <Compile Include="Miscs\Command\BasicCommandArguments.cs" />
-    <Compile Include="Miscs\Command\CommandHooker.cs" />
-    <Compile Include="Delegates.cs" />
     <Compile Include="Exceptions\InertiaInitializationException.cs" />
+    <Compile Include="IO\Common\BasicReader.cs" />
+    <Compile Include="IO\Common\BasicWriter.cs" />
+    <Compile Include="Delegates.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="IO\Attributes\CustomDeserialization.cs" />
     <Compile Include="IO\Attributes\CustomSerialization.cs" />
     <Compile Include="IO\Attributes\IgnoreField.cs" />
-    <Compile Include="IO\Common\BasicReader.cs" />
-    <Compile Include="IO\Common\BasicWriter.cs" />
     <Compile Include="IO\Exceptions\BoolFlagTooLargeException.cs" />
     <Compile Include="IO\Interfaces\IAutoSerializable.cs" />
     <Compile Include="IO\Interfaces\ISerializableObject.cs" />
     <Compile Include="IO\IOHelper.cs" />
     <Compile Include="LoaderManager.cs" />
     <Compile Include="Miscs\Clock.cs" />
-    <Compile Include="Miscs\Models\LogOptions.cs" />
+    <Compile Include="Miscs\Command\BasicCommand.cs" />
+    <Compile Include="Miscs\Command\BasicCommandArguments.cs" />
+    <Compile Include="Miscs\Command\CommandHooker.cs" />
     <Compile Include="Miscs\IdProvider.cs" />
     <Compile Include="Miscs\Log.cs" />
+    <Compile Include="Miscs\Models\LogOptions.cs" />
     <Compile Include="Miscs\Queue\AutoQueueExecutor.cs" />
     <Compile Include="Miscs\Queue\ManualQueueExecutor.cs" />
     <Compile Include="Network\Common\Entities\NetworkClientEntity.cs" />
@@ -78,12 +78,12 @@
     <Compile Include="Network\Common\Protocol\NetworkMessage.cs" />
     <Compile Include="Network\Common\Protocol\NetworkMessageCaller.cs" />
     <Compile Include="Network\Common\Protocol\NetworkProtocol.cs" />
-    <Compile Include="Network\Models\MessageParsingOutput.cs" />
     <Compile Include="Network\Enums\NetworkDisconnectReason.cs" />
     <Compile Include="Network\Exceptions\DefaultProtocolFailedParsingMessageException.cs" />
     <Compile Include="Network\Exceptions\UnknownMessageException.cs" />
     <Compile Include="Network\Exceptions\UserDatagramDataLengthLimitException.cs" />
     <Compile Include="Network\Interfaces\IMessageHooker.cs" />
+    <Compile Include="Network\Models\MessageParsingOutput.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Runtime\Common\Script.cs" />
     <Compile Include="Runtime\Models\ScriptArguments.cs" />

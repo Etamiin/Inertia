@@ -11,21 +11,19 @@ namespace Inertia.ORM
     /// A help tool for faster access to queries
     /// </summary>
     /// <typeparam name="TableKey"></typeparam>
-    public sealed class QueryAccessor<TableKey> where TableKey : Table
+    public sealed class QueryAccessor<TableKey> : IDisposable where TableKey : Table
     {
-        private readonly Database _database;
+        private Database _database;
+        private SqlCondition _cd;
 
-        /// <summary>
-        /// Initialize a new instance of the class <see cref="QueryAccessor{TableKey}"/>
-        /// </summary>
         public QueryAccessor()
         {
-            var attachedTo = typeof(TableKey).GetCustomAttribute<TableLink>();
-            if (attachedTo != null)
+            var link = typeof(TableKey).GetCustomAttribute<TableLink>();
+            if (link != null)
             {
-                if (!SqlManager.TrySearchDatabase(attachedTo.DatabaseType, out _database))
+                if (!SqlManager.TrySearchDatabase(link.DatabaseType, out _database))
                 {
-                    throw new ArgumentNullException(attachedTo.DatabaseType.Name, "Invalid Database for the QueryAccessor.");
+                    throw new ArgumentNullException(link.DatabaseType.Name, "Invalid Database for the QueryAccessor.");
                 }
             }
             else
@@ -36,13 +34,38 @@ namespace Inertia.ORM
         }
 
         /// <summary>
+        /// Create a new instance of <see cref="SqlCondition"/> and attach to the current instance of <see cref="QueryAccessor{TableKey}"/>
+        /// </summary>
+        /// <param name="onCondition"></param>
+        /// <returns></returns>
+        public QueryAccessor<TableKey> UseCondition(BasicAction<SqlCondition> onCondition)
+        {
+            if (_cd == null)
+            {
+                _cd = new SqlCondition();
+            }
+
+            onCondition(_cd);
+            return this;
+        }
+        /// <summary>
+        /// If any <see cref="SqlCondition"/> attached, remove it and return the current instance
+        /// </summary>
+        /// <returns></returns>
+        public QueryAccessor<TableKey> ClearCondition()
+        {
+            _cd = null;
+            return this;
+        }
+
+        /// <summary>
         /// Selects the first element from the specified <see cref="Table"/> with the specified parameters and returns an instance of the <typeparamref name="TableKey"/>.
         /// </summary>
         /// <param name="columnsToSelect"></param>
         /// <returns></returns>
         public TableKey Select(params string[] columnsToSelect)
         {
-            return Select(null, false, columnsToSelect);
+            return Select(_cd, false, columnsToSelect);
         }
         /// <summary>
         /// Selects the first element from the specified <see cref="Table"/> with the specified parameters and returns an instance of the <typeparamref name="TableKey"/>.
@@ -52,7 +75,7 @@ namespace Inertia.ORM
         /// <returns></returns>
         public TableKey Select(bool distinct, params string[] columnsToSelect)
         {
-            return Select(null, distinct, columnsToSelect);
+            return Select(_cd, distinct, columnsToSelect);
         }
         /// <summary>
         /// Selects the first element from the specified <see cref="Table"/> with the specified parameters and returns an instance of the <typeparamref name="TableKey"/>.
@@ -83,7 +106,7 @@ namespace Inertia.ORM
         /// <returns></returns>
         public TableKey[] SelectAll(params string[] columnsToSelect)
         {
-            return SelectAll(null, false, columnsToSelect);
+            return SelectAll(_cd, false, columnsToSelect);
         }
         /// <summary>
         /// Selects all the elements from the specified <see cref="Table"/> with the specified parameters and returns an instance of the <typeparamref name="TableKey"/>.
@@ -93,7 +116,7 @@ namespace Inertia.ORM
         /// <returns></returns>
         public TableKey[] SelectAll(bool distinct, params string[] columnsToSelect)
         {
-            return SelectAll(null, distinct, columnsToSelect);
+            return SelectAll(_cd, distinct, columnsToSelect);
         }
         /// <summary>
         /// Selects all the elements from the specified <see cref="Table"/> with the specified parameters and returns an instance of the <typeparamref name="TableKey"/>.
@@ -117,6 +140,14 @@ namespace Inertia.ORM
             return _database.SelectAll<TableKey>(condition, distinct, columnsToSelect);
         }
 
+        /// <summary>
+        /// Delete all the elements from the specified <see cref="Table"/> based on the linked <see cref="SqlCondition"/>
+        /// </summary>
+        /// <returns></returns>
+        public bool Delete()
+        {
+            return _database.Delete<TableKey>(_cd);
+        }
         /// <summary>
         /// Delete all the elements from the specified <see cref="Table"/> based on the specified <see cref="SqlCondition"/>
         /// </summary>
@@ -152,7 +183,7 @@ namespace Inertia.ORM
         /// <returns></returns>
         public long Count()
         {
-            return Count(string.Empty, null, false);
+            return Count(string.Empty, _cd, false);
         }
         /// <summary>
         /// Execute a COUNT query with the specified parameters and return the result.
@@ -161,7 +192,7 @@ namespace Inertia.ORM
         /// <returns></returns>
         public long Count(bool distinct)
         {
-            return Count(string.Empty, null, distinct);
+            return Count(string.Empty, _cd, distinct);
         }
         /// <summary>
         /// Execute a COUNT query with the specified parameters and return the result.
@@ -189,7 +220,7 @@ namespace Inertia.ORM
         /// <returns></returns>
         public long Count(string columnName)
         {
-            return Count(columnName, null, false);
+            return Count(columnName, _cd, false);
         }
         /// <summary>
         /// Execute a COUNT query with the specified parameters and return the result.
@@ -199,7 +230,7 @@ namespace Inertia.ORM
         /// <returns></returns>
         public long Count(string columnName, bool distinct)
         {
-            return Count(columnName, null, distinct);
+            return Count(columnName, _cd, distinct);
         }
         /// <summary>
         /// Execute a COUNT query with the specified parameters and return the result.
@@ -224,6 +255,23 @@ namespace Inertia.ORM
         }
 
         /// <summary>
+        /// Return true if a row exist in the database based on the linked conditions
+        /// </summary>
+        /// <returns></returns>
+        public bool Exist()
+        {
+            return Exist(_cd);
+        }
+        /// <summary>
+        /// Return true if a row exist in the database based on the linked conditions
+        /// </summary>
+        /// <param name="distinct"></param>
+        /// <returns></returns>
+        public bool Exist(bool distinct)
+        {
+            return Exist(_cd, distinct);
+        }
+        /// <summary>
         /// Return true if a row exist in the database based on the specified conditions
         /// </summary>
         /// <param name="condition"></param>
@@ -245,7 +293,7 @@ namespace Inertia.ORM
 
         public long Average(string columnName)
         {
-            return Average(columnName, null);
+            return Average(columnName, _cd);
         }        
         public long Average(string columnName, SqlCondition condition)
         {
@@ -254,7 +302,7 @@ namespace Inertia.ORM
 
         public TableKey Max(string columnName)
         {
-            return Max(columnName, null);
+            return Max(columnName, _cd);
         }        
         public TableKey Max(string columnName, SqlCondition condition)
         {
@@ -263,7 +311,7 @@ namespace Inertia.ORM
 
         public TableKey Min(string columnName)
         {
-            return Min(columnName, null);
+            return Min(columnName, _cd);
         }        
         public TableKey Min(string columnName, SqlCondition condition)
         {
@@ -272,7 +320,7 @@ namespace Inertia.ORM
 
         public decimal Sum(string columnName)
         {
-            return Sum(columnName, null);
+            return Sum(columnName, _cd);
         }
         public decimal Sum(string columnName, SqlCondition condition)
         {
@@ -281,11 +329,11 @@ namespace Inertia.ORM
 
         public void SelectAsync(BasicAction<TableKey> onSelected, params string[] columnsToSelect)
         {
-            SelectAsync(null, onSelected, false, columnsToSelect);
+            SelectAsync(_cd, onSelected, false, columnsToSelect);
         }
         public void SelectAsync(BasicAction<TableKey> onSelected, bool distinct, params string[] columnsToSelect)
         {
-            SelectAsync(null, onSelected, distinct, columnsToSelect);
+            SelectAsync(_cd, onSelected, distinct, columnsToSelect);
         }
         public void SelectAsync(SqlCondition condition, BasicAction<TableKey> onSelected, params string[] columnsToSelect)
         {
@@ -301,13 +349,12 @@ namespace Inertia.ORM
 
         public void SelectAllAsync(BasicAction<TableKey[]> onSelected, params string[] columnsToSelect)
         {
-            SelectAllAsync(null, onSelected, false, columnsToSelect);
+            SelectAllAsync(_cd, onSelected, false, columnsToSelect);
         }
         public void SelectAllAsync(BasicAction<TableKey[]> onSelected, bool distinct, params string[] columnsToSelect)
         {
-            SelectAllAsync(null, onSelected, distinct, columnsToSelect);
+            SelectAllAsync(_cd, onSelected, distinct, columnsToSelect);
         }
-
         public void SelectAllAsync(SqlCondition condition, BasicAction<TableKey[]> onSelected, params string[] columnsToSelect)
         {
             SelectAllAsync(condition, onSelected, false, columnsToSelect);
@@ -320,6 +367,10 @@ namespace Inertia.ORM
             });
         }
 
+        public void DeleteAsync(BasicAction onDeleted)
+        {
+            DeleteAsync(_cd, onDeleted);
+        }
         public void DeleteAsync(SqlCondition condition, BasicAction onDeleted)
         {
             SqlManager.PoolAsyncOperation(() => {
@@ -354,11 +405,11 @@ namespace Inertia.ORM
 
         public void CountAsync(BasicAction<long> onCounted)
         {
-            CountAsync(string.Empty, null, onCounted, false);
+            CountAsync(string.Empty, _cd, onCounted, false);
         }
         public void CountAsync(BasicAction<long> onCounted, bool distinct)
         {
-            CountAsync(string.Empty, null, onCounted, distinct);
+            CountAsync(string.Empty, _cd, onCounted, distinct);
         }
         public void CountAsync(SqlCondition condition, BasicAction<long> onCounted)
         {
@@ -370,11 +421,11 @@ namespace Inertia.ORM
         }
         public void CountAsync(string columnName, BasicAction<long> onCounted)
         {
-            CountAsync(columnName, null, onCounted, false);
+            CountAsync(columnName, _cd, onCounted, false);
         }
         public void CountAsync(string columnName, BasicAction<long> onCounted, bool distinct)
         {
-            CountAsync(columnName, null, onCounted, distinct);
+            CountAsync(columnName, _cd, onCounted, distinct);
         }
         public void CountAsync(string columnName, SqlCondition condition, BasicAction<long> onCounted)
         {
@@ -388,6 +439,14 @@ namespace Inertia.ORM
             });
         }
 
+        public void ExistAsync(BasicAction<bool> onExist)
+        {
+            ExistAsync(_cd, onExist);
+        }
+        public void ExistAsync(BasicAction<bool> onExist, bool distinct)
+        {
+            ExistAsync(_cd, onExist, distinct);
+        }
         public void ExistAsync(SqlCondition condition, BasicAction<bool> onExist)
         {
             SqlManager.PoolAsyncOperation(() => {
@@ -417,7 +476,7 @@ namespace Inertia.ORM
 
         public void MaxAsync(string columnName, BasicAction<TableKey> onMax)
         {
-            MaxAsync(columnName, null, onMax);
+            MaxAsync(columnName, _cd, onMax);
         }
         public void MaxAsync(string columnName, SqlCondition condition, BasicAction<TableKey> onMax)
         {
@@ -429,7 +488,7 @@ namespace Inertia.ORM
 
         public void MinAsync(string columnName, BasicAction<TableKey> onMin)
         {
-            MinAsync(columnName, null, onMin);
+            MinAsync(columnName, _cd, onMin);
         }
         public void MinAsync(string columnName, SqlCondition condition, BasicAction<TableKey> onMin)
         {
@@ -441,7 +500,7 @@ namespace Inertia.ORM
 
         public void SumAsync(string columnName, BasicAction<decimal> onSum)
         {
-            SumAsync(columnName, null, onSum);
+            SumAsync(columnName, _cd, onSum);
         }
         public void SumAsync(string columnName, SqlCondition condition, BasicAction<decimal> onSum)
         {
@@ -449,6 +508,12 @@ namespace Inertia.ORM
                 var sum = _database.Sum<TableKey>(columnName, condition);
                 onSum?.Invoke(sum);
             });            
+        }
+    
+        public void Dispose()
+        {
+            _database = null;
+            _cd.Dispose();
         }
     }
 }

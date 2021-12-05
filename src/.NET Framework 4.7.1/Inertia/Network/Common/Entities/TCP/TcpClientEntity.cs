@@ -12,7 +12,7 @@ namespace Inertia.Network
         private readonly BasicReader _reader;
         private Socket _socket;
 
-        public TcpClientEntity(string ip, int port) : base(ip, port)
+        protected TcpClientEntity(string ip, int port) : base(ip, port)
         {
             _buffer = new byte[NetworkProtocol.GetCurrentProtocol().NetworkBufferLength];
             _reader = new BasicReader();

@@ -10,7 +10,7 @@ namespace Inertia.Network
 {
     public sealed class NetworkMessageCaller
     {
-        private Dictionary<Type, MethodInfo> _references;
+        private readonly Dictionary<Type, MethodInfo> _references;
 
         internal NetworkMessageCaller()
         {

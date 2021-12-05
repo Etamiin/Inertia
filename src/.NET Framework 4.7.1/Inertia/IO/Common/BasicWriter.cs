@@ -51,31 +51,7 @@ namespace Inertia
                 return _writer.BaseStream.Length;
             }
         }
-        /// <summary>
-        /// Get or Set the position in the stream.
-        /// </summary>
-        public long Position
-        {
-            get
-            {
-                if (_writer != null)
-                {
-                    return _writer.BaseStream.Position;
-                }
-                else
-                { 
-                    return 0; 
-                }
-            }
-            set
-            {
-                if (_writer != null)
-                {
-                    _writer.BaseStream.Position = value;
-                }                
-            }
-        }
-
+        
         private BinaryWriter _writer;
         private readonly Encoding _encoding;
 
@@ -86,6 +62,25 @@ namespace Inertia
         {
             _encoding = encoding;
             _writer = new BinaryWriter(new MemoryStream(), encoding);
+        }
+
+        public BasicWriter SetPosition(long position)
+        {
+            if (_writer != null)
+            {
+                _writer.BaseStream.Position = position;
+            }
+
+            return this;
+        }
+        public long GetPosition()
+        {
+            if (_writer != null)
+            {
+                return _writer.BaseStream.Position;
+            }
+
+            return 0;
         }
 
         public void Clear()

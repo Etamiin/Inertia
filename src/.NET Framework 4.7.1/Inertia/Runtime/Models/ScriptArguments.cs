@@ -37,14 +37,18 @@ namespace Inertia.Runtime
 
         public T GetAt<T>(int index)
         {
-            if (index >= 0 && index < Count)
+            if (index < 0 || index >= Count)
             {
-                return (T)this[index];
+                throw new Exception("Index out of range");
             }
-            else
+
+            var argument = this[index];
+            if (typeof(T) == argument.GetType())
             {
-                throw new ArgumentNullException();
+                return (T)argument;
             }
+
+            throw new Exception("Types mismatch");
         }
 
         public void Dispose()

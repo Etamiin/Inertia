@@ -7,13 +7,13 @@ namespace Inertia.ORM
     /// </summary>
     public class DatabaseAlreadyInitializedException : Exception
     {
-        public override string Message => "You can instantiate a Database only once.";
+        public override string Message => $"You can instantiate a Database only once (Name: {_dbName}).";
 
-        public readonly string DatabaseName;
+        private string _dbName;
 
         public DatabaseAlreadyInitializedException(string dbName)
         {
-            DatabaseName = dbName;
+            _dbName = dbName;
         }
     }
 }
