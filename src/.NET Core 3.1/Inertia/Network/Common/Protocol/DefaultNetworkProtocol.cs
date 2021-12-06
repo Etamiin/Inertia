@@ -24,7 +24,7 @@ namespace Inertia.Network
             using (var writer = new BasicWriter())
             {
                 writer
-                    .SetUInt(message.MessageId)
+                    .SetUShort(message.MessageId)
                     .SetEmpty(sizeof(long));
 
                 var cPos = writer.GetPosition();
@@ -45,7 +45,7 @@ namespace Inertia.Network
 
             while (reader.UnreadedLength > 0)
             {
-                var msgId = reader.GetUInt();
+                var msgId = reader.GetUShort();
                 var msgSize = reader.GetLong();
 
                 if (reader.UnreadedLength < msgSize) break;

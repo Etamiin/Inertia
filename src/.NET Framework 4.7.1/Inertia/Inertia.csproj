@@ -72,9 +72,9 @@
     <Compile Include="Network\Common\Entities\TCP\TcpServerEntity.cs" />
     <Compile Include="Network\Common\Entities\UDP\UdpClientEntity.cs" />
     <Compile Include="Network\Common\Entities\UDP\UdpServerEntity.cs" />
-    <Compile Include="Network\Common\Instances\DefaultNetworkProtocol.cs" />
-    <Compile Include="Network\Common\Instances\TcpConnectionEntity.cs" />
-    <Compile Include="Network\Common\Instances\UdpConnectionEntity.cs" />
+    <Compile Include="Network\Common\Protocol\DefaultNetworkProtocol.cs" />
+    <Compile Include="Network\Common\Entities\TCP\TcpConnectionEntity.cs" />
+    <Compile Include="Network\Common\Entities\UDP\UdpConnectionEntity.cs" />
     <Compile Include="Network\Common\Protocol\NetworkMessage.cs" />
     <Compile Include="Network\Common\Protocol\NetworkMessageCaller.cs" />
     <Compile Include="Network\Common\Protocol\NetworkProtocol.cs" />

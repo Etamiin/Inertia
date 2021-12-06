@@ -7,7 +7,7 @@ namespace Inertia.Network
     public abstract class NetworkProtocol
     {
         private static NetworkProtocol _current;
-        private static Dictionary<uint, Type> _messageTypes;
+        private static Dictionary<ushort, Type> _messageTypes;
         private static Dictionary<Type, NetworkMessageCaller> _messageHookers;
         
         public static NetworkProtocol GetCurrentProtocol()
@@ -32,7 +32,7 @@ namespace Inertia.Network
         {
             return CreateMessage(typeof(T));
         }
-        public static NetworkMessage CreateMessage(uint messageId)
+        public static NetworkMessage CreateMessage(ushort messageId)
         {
             if (_messageTypes.ContainsKey(messageId))
             {
@@ -97,7 +97,7 @@ namespace Inertia.Network
 
         static NetworkProtocol()
         {
-            _messageTypes = new Dictionary<uint, Type>();
+            _messageTypes = new Dictionary<ushort, Type>();
             _messageHookers = new Dictionary<Type, NetworkMessageCaller>();
 
             var assemblys = AppDomain.CurrentDomain.GetAssemblies();

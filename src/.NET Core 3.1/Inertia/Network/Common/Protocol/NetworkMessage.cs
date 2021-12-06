@@ -4,7 +4,7 @@ namespace Inertia.Network
 {
     public abstract class NetworkMessage : IAutoSerializable, ISerializableObject
     {
-        public abstract uint MessageId { get; }
+        public abstract ushort MessageId { get; }
 
         public virtual bool UseAutoSerialization { get; } = true;
 
