@@ -31,9 +31,9 @@ namespace Inertia.Network
 
         public void CallReferences(NetworkMessage message, object receiver)
         {
-            foreach (var reference in _references)
+            if (_references.TryGetValue(message.GetType(), out MethodInfo method))
             {
-                reference.Value.Invoke(null, new object[] { message, receiver });
+                method.Invoke(null, new object[] { message, receiver });
             }
         }
     }

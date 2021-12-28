@@ -1,7 +1,7 @@
-﻿using MySql.Data.MySqlClient;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using MySqlConnector;
 
 namespace Inertia.ORM
 {
@@ -25,7 +25,7 @@ namespace Inertia.ORM
             _connectionString = $"server={ Host.Replace("localhost", "127.0.0.1") };uid={ User };pwd={ Password };database={ Name };port={ Port };SslMode={ Ssl }";
         }
 
-        public abstract void OnInitialized();
+        public virtual void OnInitialized() { }
 
         /// <summary>
         /// Execute a custom SQL query and returns true if the query was successfully executed.
@@ -215,34 +215,37 @@ namespace Inertia.ORM
             ExecuteCommand((cmd) => {
                 if (SqlManager.CreateTableInstance(out T table))
                 {
-                    var tables = new List<T>();
+                    var records = new List<T>();
                     var fields = Table.GetFields<T>();
 
                     cmd.SetQuery(QueryBuilder.GetSelectQuery(table, condition, columnsToSelect, distinct), condition);
                     cmd.OnReader((reader) => {
-                        for (var i = 0; i < reader.FieldCount; i++)
+                        if (SqlManager.CreateTableInstance(out T instance))
                         {
-                            var field = fields.FirstOrDefault((f) => f.Name == reader.GetName(i));
-                            if (field != null)
+                            for (var i = 0; i < reader.FieldCount; i++)
                             {
-                                object value = null;
-                                if (field.FieldType == typeof(bool))
+                                var field = fields.FirstOrDefault((f) => f.Name == reader.GetName(i));
+                                if (field != null)
                                 {
-                                    value = reader.GetBoolean(i);
-                                }
-                                else if (!reader.IsDBNull(i))
-                                {
-                                    value = reader.GetValue(i);
-                                }
+                                    object value = null;
+                                    if (field.FieldType == typeof(bool))
+                                    {
+                                        value = reader.GetBoolean(i);
+                                    }
+                                    else if (!reader.IsDBNull(i))
+                                    {
+                                        value = reader.GetValue(i);
+                                    }
 
-                                field.SetValue(table, value);
+                                    field.SetValue(instance, value);
+                                }
                             }
-                        }
 
-                        tables.Add(table);
+                            records.Add(instance);
+                        }                        
                     });
 
-                    result = tables.ToArray();
+                    result = records.ToArray();
                 }
             });
 

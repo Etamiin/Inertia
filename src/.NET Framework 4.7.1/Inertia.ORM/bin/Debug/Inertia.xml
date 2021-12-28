@@ -9,6 +9,23 @@
             This exception is thrown in case an error occurs during the initialization of a core component.
             </summary>
         </member>
+        <member name="M:Inertia.CustomDeserialization.#ctor(System.String)">
+            <summary>
+            Specify that the value of the field will be deserialized by the method indicated in parameter.
+            </summary>
+            <param name="methodName"></param>
+        </member>
+        <member name="M:Inertia.CustomSerialization.#ctor(System.String)">
+            <summary>
+            Specify that the value of the field will be serialized by the method indicated in parameter.
+            </summary>
+            <param name="methodName"></param>
+        </member>
+        <member name="T:Inertia.IgnoreField">
+            <summary>
+            Ignore a field during procedures involving instance fields
+            </summary>
+        </member>
         <member name="P:Inertia.BasicReader.TotalLength">
             <summary>
             Returns the total length of the stream.
@@ -153,7 +170,7 @@
         </member>
         <member name="M:Inertia.BasicReader.GetSerializableObject(System.Type)">
             <summary>
-            Create an instance of <typeparamref name="T"/> and return it after deserialization
+            Create an instance of specified Type and return it after deserialization
             </summary>
             <returns>Returns a <see cref="T:Inertia.ISerializableObject"/></returns>
         </member>
@@ -384,23 +401,6 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Inertia.CustomDeserialization.#ctor(System.String)">
-            <summary>
-            Specify that the value of the field will be deserialized by the method indicated in parameter.
-            </summary>
-            <param name="methodName"></param>
-        </member>
-        <member name="M:Inertia.CustomSerialization.#ctor(System.String)">
-            <summary>
-            Specify that the value of the field will be serialized by the method indicated in parameter.
-            </summary>
-            <param name="methodName"></param>
-        </member>
-        <member name="T:Inertia.IgnoreField">
-            <summary>
-            Ignore a field during procedures involving instance fields
-            </summary>
-        </member>
         <member name="T:Inertia.BoolFlagTooLargeException">
             <summary>
             Exception thrown when flag size limit is reached
@@ -410,13 +410,6 @@
             <summary>
             Allows the system to automatically serialize or deserialize the fields of an instance (using the attributes <see cref="T:Inertia.CustomSerialization"/> and <see cref="T:Inertia.CustomDeserialization"/>)
             </summary>
-        </member>
-        <member name="M:Inertia.LoaderManager.TryGetPlugin``1(``0@)">
-            <summary>
-            Returns the specified <see cref="T:Inertia.Runtime.IPlugin"/> loaded instance.
-            </summary>
-            <typeparam name="T"></typeparam>
-            <returns></returns>
         </member>
         <member name="T:Inertia.CommandHooker">
             <summary>

@@ -513,7 +513,7 @@ namespace Inertia.ORM
         public void Dispose()
         {
             _database = null;
-            _cd.Dispose();
+            _cd?.Dispose();
         }
     }
 }

@@ -26,5 +26,13 @@ namespace Inertia
         public bool SaveLog { get; set; }
         public bool IncludeTime { get; set; }
         public int SaveLogTimerMs { get; set; }
+
+        public ConsoleColor DefaultColor { get; set; } = ConsoleColor.White;
+        public ConsoleColor WarnColor { get; set; } = ConsoleColor.Yellow;
+        public ConsoleColor ErrorColor { get; set; } = ConsoleColor.Red;
+
+        public string DefaultTitle { get; set; } = "[INFO]: ";
+        public string WarnTitle { get; set; } = "[WARN]: ";
+        public string ErrorTitle { get; set; } = "[ERROR]: ";
     }
 }

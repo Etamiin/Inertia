@@ -78,8 +78,8 @@ namespace Inertia.Network
             }
         }
 
-        public virtual void OnClientConnected(TcpConnectionEntity connection) { }
-        public virtual void OnClientDisconnected(TcpConnectionEntity connection, NetworkDisconnectReason reason) { }
+        protected virtual void OnClientConnected(TcpConnectionEntity connection) { }
+        protected virtual void OnClientDisconnected(TcpConnectionEntity connection, NetworkDisconnectReason reason) { }
             
         public void Dispose()
         {

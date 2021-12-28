@@ -48,7 +48,7 @@ namespace Inertia
                 while (Count > 0)
                 {
                     var action = _queue.Dequeue();
-                    action?.Invoke();
+                    action.Invoke();
                 }
             }
         }

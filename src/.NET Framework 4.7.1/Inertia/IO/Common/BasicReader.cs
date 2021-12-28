@@ -435,7 +435,7 @@ namespace Inertia
             return (T)GetSerializableObject(typeof(T));
         }
         /// <summary>
-        /// Create an instance of <typeparamref name="T"/> and return it after deserialization
+        /// Create an instance of specified Type and return it after deserialization
         /// </summary>
         /// <returns>Returns a <see cref="ISerializableObject"/></returns>
         public object GetSerializableObject(Type type)

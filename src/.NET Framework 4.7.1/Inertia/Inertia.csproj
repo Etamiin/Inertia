@@ -43,14 +43,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Exceptions\InertiaInitializationException.cs" />
-    <Compile Include="IO\Common\BasicReader.cs" />
-    <Compile Include="IO\Common\BasicWriter.cs" />
     <Compile Include="Delegates.cs" />
+    <Compile Include="Exceptions\InertiaInitializationException.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="IO\Attributes\CustomDeserialization.cs" />
     <Compile Include="IO\Attributes\CustomSerialization.cs" />
     <Compile Include="IO\Attributes\IgnoreField.cs" />
+    <Compile Include="IO\Common\BasicReader.cs" />
+    <Compile Include="IO\Common\BasicWriter.cs" />
     <Compile Include="IO\Exceptions\BoolFlagTooLargeException.cs" />
     <Compile Include="IO\Interfaces\IAutoSerializable.cs" />
     <Compile Include="IO\Interfaces\ISerializableObject.cs" />
@@ -69,12 +69,12 @@
     <Compile Include="Network\Common\Entities\NetworkConnectionEntity.cs" />
     <Compile Include="Network\Common\Entities\NetworkServerEntity.cs" />
     <Compile Include="Network\Common\Entities\TCP\TcpClientEntity.cs" />
+    <Compile Include="Network\Common\Entities\TCP\TcpConnectionEntity.cs" />
     <Compile Include="Network\Common\Entities\TCP\TcpServerEntity.cs" />
     <Compile Include="Network\Common\Entities\UDP\UdpClientEntity.cs" />
+    <Compile Include="Network\Common\Entities\UDP\UdpConnectionEntity.cs" />
     <Compile Include="Network\Common\Entities\UDP\UdpServerEntity.cs" />
     <Compile Include="Network\Common\Protocol\DefaultNetworkProtocol.cs" />
-    <Compile Include="Network\Common\Entities\TCP\TcpConnectionEntity.cs" />
-    <Compile Include="Network\Common\Entities\UDP\UdpConnectionEntity.cs" />
     <Compile Include="Network\Common\Protocol\NetworkMessage.cs" />
     <Compile Include="Network\Common\Protocol\NetworkMessageCaller.cs" />
     <Compile Include="Network\Common\Protocol\NetworkProtocol.cs" />

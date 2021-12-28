@@ -6,14 +6,6 @@ using Inertia;
 
 public static class Log
 {
-    public static ConsoleColor DefaultColor { get; set; } = ConsoleColor.White;
-    public static ConsoleColor WarnColor { get; set; } = ConsoleColor.Yellow;    
-    public static ConsoleColor ErrorColor { get; set; } = ConsoleColor.Red;
-
-    public static string DefaultTitle { get; set; } = "[INFO]: ";
-    public static string WarnTitle { get; set; } = "[WARN]: ";
-    public static string ErrorTitle { get; set; } = "[ERROR]: ";
-
     private static LogOptions _options;
     private static AutoQueueExecutor _queue;
     private static StringBuilder _log;
@@ -72,15 +64,15 @@ public static class Log
 
     public static void Line(object content, params object[] args)
     {
-        Line(content, DefaultTitle, DefaultColor);
+        Line(content, _options.DefaultTitle, _options.DefaultColor);
     }    
     public static void Warn(object content, params object[] args)
     {
-        Line(content, WarnTitle, WarnColor);
+        Line(content, _options.WarnTitle, _options.WarnColor);
     }    
     public static void Error(object content, params object[] args)
     {
-        Line(content, ErrorTitle, ErrorColor);
+        Line(content, _options.ErrorTitle, _options.ErrorColor);
     }
 
     private static void Line(object content, string title, ConsoleColor textColor)
@@ -102,9 +94,9 @@ public static class Log
             Console.ForegroundColor = textColor;
             Console.WriteLine(log);
 
-            if (textColor != DefaultColor)
+            if (textColor != _options.DefaultColor)
             {
-                Console.ForegroundColor = DefaultColor;
+                Console.ForegroundColor = _options.DefaultColor;
             }
 
             if (_options.SaveLog)

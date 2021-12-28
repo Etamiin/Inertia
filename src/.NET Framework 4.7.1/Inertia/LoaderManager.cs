@@ -50,12 +50,12 @@ namespace Inertia
             }
         }
 
+        [Obsolete]
         /// <summary>
         /// Returns the specified <see cref="IPlugin"/> loaded instance.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        [Obsolete]
         public static bool TryGetPlugin<T>(out T plugin) where T : IPlugin
         {
             var pl = _plugins.FirstOrDefault((p) => p.GetType() == typeof(T));

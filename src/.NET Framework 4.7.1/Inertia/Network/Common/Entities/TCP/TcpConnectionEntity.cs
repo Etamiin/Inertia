@@ -36,7 +36,10 @@ namespace Inertia.Network
                 throw new ObjectDisposedException(nameof(TcpConnectionEntity));
             }
 
-            _socket?.Send(data);
+            if (IsConnected)
+            {
+                _socket?.Send(data);
+            }
         }
         public override void Send(NetworkMessage message)
         {
