@@ -20,7 +20,7 @@ namespace Inertia
             return clock.GetElapsedSeconds();
         }
 
-        private Stopwatch _cw;
+        private readonly Stopwatch _cw;
 
         public Clock()
         {

@@ -5,8 +5,8 @@ namespace Inertia.ORM
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = false, Inherited = false)]
     public class DecimalPrecision : Attribute
     {
-        public readonly byte FieldPrecision;
-        public readonly byte FieldScale;
+        public byte FieldPrecision { get; private set; }
+        public byte FieldScale { get; private set; }
 
         public DecimalPrecision()
         {

@@ -9,41 +9,6 @@
             Link a <see cref="T:Inertia.ORM.Table"/> object to a <see cref="T:Inertia.ORM.Database"/>
             </summary>
         </member>
-        <member name="P:Inertia.ORM.Database.Name">
-            <summary>
-            Returns the name of the database.
-            </summary>
-        </member>
-        <member name="P:Inertia.ORM.Database.User">
-            <summary>
-            Returns the username used for the authentification.
-            </summary>
-        </member>
-        <member name="P:Inertia.ORM.Database.Password">
-            <summary>
-            Returns the password used for the authentification.
-            </summary>
-        </member>
-        <member name="P:Inertia.ORM.Database.Host">
-            <summary>
-            Returns the ip used for the connection.
-            </summary>
-        </member>
-        <member name="P:Inertia.ORM.Database.Port">
-            <summary>
-            Returns the port used for the connection.
-            </summary>
-        </member>
-        <member name="P:Inertia.ORM.Database.Ssl">
-            <summary>
-            Returns the SSL mode used by the MySql connection
-            </summary>
-        </member>
-        <member name="M:Inertia.ORM.Database.#ctor">
-            <summary>
-            Initialize a new instance of class <see cref="T:Inertia.ORM.Database"/>
-            </summary>
-        </member>
         <member name="M:Inertia.ORM.Database.TryExecuteQuery(System.String)">
             <summary>
             Execute a custom SQL query and returns true if the query was successfully executed.
@@ -252,10 +217,18 @@
             </summary>
             <typeparam name="TableKey"></typeparam>
         </member>
-        <member name="M:Inertia.ORM.QueryAccessor`1.#ctor">
+        <member name="M:Inertia.ORM.QueryAccessor`1.UseCondition(BasicAction{Inertia.ORM.SqlCondition})">
             <summary>
-            Initialize a new instance of the class <see cref="T:Inertia.ORM.QueryAccessor`1"/>
+            Create a new instance of <see cref="T:Inertia.ORM.SqlCondition"/> and attach to the current instance of <see cref="T:Inertia.ORM.QueryAccessor`1"/>
             </summary>
+            <param name="onCondition"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.QueryAccessor`1.ClearCondition">
+            <summary>
+            If any <see cref="T:Inertia.ORM.SqlCondition"/> attached, remove it and return the current instance
+            </summary>
+            <returns></returns>
         </member>
         <member name="M:Inertia.ORM.QueryAccessor`1.Select(System.String[])">
             <summary>
@@ -319,6 +292,12 @@
             <param name="columnsToSelect"></param>
             <param name="condition"></param>
             <param name="distinct"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.QueryAccessor`1.Delete">
+            <summary>
+            Delete all the elements from the specified <see cref="T:Inertia.ORM.Table"/> based on the linked <see cref="T:Inertia.ORM.SqlCondition"/>
+            </summary>
             <returns></returns>
         </member>
         <member name="M:Inertia.ORM.QueryAccessor`1.Delete(Inertia.ORM.SqlCondition)">
@@ -402,6 +381,19 @@
             <param name="condition"></param>
             <returns></returns>
         </member>
+        <member name="M:Inertia.ORM.QueryAccessor`1.Exist">
+            <summary>
+            Return true if a row exist in the database based on the linked conditions
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.QueryAccessor`1.Exist(System.Boolean)">
+            <summary>
+            Return true if a row exist in the database based on the linked conditions
+            </summary>
+            <param name="distinct"></param>
+            <returns></returns>
+        </member>
         <member name="M:Inertia.ORM.QueryAccessor`1.Exist(Inertia.ORM.SqlCondition)">
             <summary>
             Return true if a row exist in the database based on the specified conditions
@@ -428,6 +420,12 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:Inertia.ORM.Table.InsertAsync(BasicAction{System.Int64})">
+            <summary>
+            Insert the current instance values in <see cref="P:Inertia.ORM.Table.Database"/>
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:Inertia.ORM.Table.Update(Inertia.ORM.SqlCondition,System.String[])">
             <summary>
             Update all elements in the <see cref="P:Inertia.ORM.Table.Database"/> with current instance's values using the specified <see cref="T:Inertia.ORM.SqlCondition"/>
@@ -435,6 +433,39 @@
             <param name="condition"></param>
             <param name="columnsToUpdate"></param>
             <returns></returns>
+        </member>
+        <member name="M:Inertia.ORM.Table.UpdateAsync(Inertia.ORM.SqlCondition,BasicAction{System.Boolean},System.String[])">
+            <summary>
+            Update all elements in the <see cref="P:Inertia.ORM.Table.Database"/> with current instance's values using the specified <see cref="T:Inertia.ORM.SqlCondition"/>
+            </summary>
+            <param name="condition"></param>
+            <param name="onUpdated"></param>
+            <param name="columnsToUpdate"></param>
+        </member>
+        <member name="T:Inertia.ORM.ConditionOperator">
+            <summary>
+            SQL conditonal operators
+            </summary>
+        </member>
+        <member name="T:Inertia.ORM.ConditionType">
+            <summary>
+            SQL conditional types
+            </summary>
+        </member>
+        <member name="T:Inertia.ORM.DatabaseAlreadyInitializedException">
+            <summary>
+            Throw when a <see cref="T:Inertia.ORM.Database"/> is already registered
+            </summary>
+        </member>
+        <member name="T:Inertia.ORM.DatabaseConnectionFailedException">
+            <summary>
+            Throw when failed to connect to a <see cref="F:Inertia.ORM.DatabaseConnectionFailedException._database"/>
+            </summary>
+        </member>
+        <member name="T:Inertia.ORM.InitializationFailedException">
+            <summary>
+            Throw when <see cref="T:Inertia.ORM.SqlManager"/> failed to initialize
+            </summary>
         </member>
         <member name="M:Inertia.ORM.SqlCondition.#ctor">
             <summary>
@@ -532,39 +563,6 @@
             Add a SQL "LIMIT" condition.
             </summary>
             <param name="limitValue"></param>
-            <returns></returns>
-        </member>
-        <member name="T:Inertia.ORM.ConditionOperator">
-            <summary>
-            SQL conditonal operators
-            </summary>
-        </member>
-        <member name="T:Inertia.ORM.ConditionType">
-            <summary>
-            SQL conditional types
-            </summary>
-        </member>
-        <member name="T:Inertia.ORM.DatabaseAlreadyInitializedException">
-            <summary>
-            Throw when a <see cref="T:Inertia.ORM.Database"/> is already registered
-            </summary>
-        </member>
-        <member name="T:Inertia.ORM.DatabaseConnectionFailedException">
-            <summary>
-            Throw when failed to connect to a <see cref="F:Inertia.ORM.DatabaseConnectionFailedException._database"/>
-            </summary>
-        </member>
-        <member name="T:Inertia.ORM.InitializationFailedException">
-            <summary>
-            Throw when <see cref="T:Inertia.ORM.SqlManager"/> failed to initialize
-            </summary>
-        </member>
-        <member name="M:Inertia.ORM.SqlManager.TrySearchDatabase(System.String,Inertia.ORM.Database@)">
-            <summary>
-            Returns a <see cref="T:Inertia.ORM.Database"/> already registered.
-            </summary>
-            <param name="name"></param>
-            <param name="database"></param>
             <returns></returns>
         </member>
         <member name="M:Inertia.ORM.SqlManager.TrySearchDatabase``1(``0@)">

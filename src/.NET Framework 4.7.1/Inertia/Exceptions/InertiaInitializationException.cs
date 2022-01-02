@@ -9,13 +9,16 @@ namespace Inertia
     /// </summary>
     public class InertiaInitializationException : Exception
     {
-        public readonly string ComponentName;
-        public readonly Exception GeneratedException;
+        public string ComponentName => _component;
+        public Exception Exception => _ex;
+        
+        private string _component;
+        private Exception _ex;
 
         public InertiaInitializationException(string componentName, Exception ex)
         {
-            ComponentName = componentName;
-            GeneratedException = ex;
+            _component = componentName;
+            _ex = ex;
         }
     }
 }

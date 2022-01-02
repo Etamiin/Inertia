@@ -96,7 +96,7 @@ namespace Inertia
             }
         }
 
-        public static byte[] GzipCompress(ref byte[] data, out bool hasBetterSize)
+        public static byte[] GzipCompress(byte[] data, out bool hasBetterSize)
         {
             using (var ms = new MemoryStream())
             {

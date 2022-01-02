@@ -11,7 +11,7 @@ namespace Inertia
         /// </summary>
         public int Count => _queue.Count;
 
-        private Queue<BasicAction> _queue;
+        private readonly Queue<BasicAction> _queue;
 
         public ManualQueueExecutor()
         {
@@ -48,7 +48,7 @@ namespace Inertia
                 while (Count > 0)
                 {
                     var action = _queue.Dequeue();
-                    action?.Invoke();
+                    action.Invoke();
                 }
             }
         }
