@@ -44,7 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Delegates.cs" />
-    <Compile Include="Exceptions\InertiaInitializationException.cs" />
+    <Compile Include="Exceptions\InitializationException.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="IO\Attributes\CustomDeserialization.cs" />
     <Compile Include="IO\Attributes\CustomSerialization.cs" />
@@ -63,7 +63,7 @@
     <Compile Include="Miscs\IdProvider.cs" />
     <Compile Include="Miscs\Log.cs" />
     <Compile Include="Miscs\Models\LogOptions.cs" />
-    <Compile Include="Miscs\Queue\AutoQueueExecutor.cs" />
+    <Compile Include="Miscs\Queue\ExecutorPool.cs" />
     <Compile Include="Miscs\Queue\ManualQueueExecutor.cs" />
     <Compile Include="Network\Common\Entities\NetworkClientEntity.cs" />
     <Compile Include="Network\Common\Entities\NetworkConnectionEntity.cs" />

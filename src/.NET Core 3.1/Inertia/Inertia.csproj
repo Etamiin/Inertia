@@ -5,10 +5,10 @@
     <Authors>Etamiin</Authors>
     <Company />
     <Product />
-    <AssemblyVersion>1.12</AssemblyVersion>
-    <FileVersion>1.12</FileVersion>
+    <AssemblyVersion>1.13</AssemblyVersion>
+    <FileVersion>1.13</FileVersion>
     <SignAssembly>false</SignAssembly>
-    <Version>1.0.0</Version>
+    <Version>1.13</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

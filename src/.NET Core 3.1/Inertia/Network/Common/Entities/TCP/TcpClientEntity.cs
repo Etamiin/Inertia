@@ -9,13 +9,12 @@ namespace Inertia.Network
         public override bool IsConnected => _socket != null && _socket.Connected;
 
         private readonly byte[] _buffer;
-        private readonly BasicReader _reader;
+        private BasicReader _reader;
         private Socket _socket;
 
         protected TcpClientEntity(string ip, int port) : base(ip, port)
         {
             _buffer = new byte[NetworkProtocol.GetCurrentProtocol().NetworkBufferLength];
-            _reader = new BasicReader();
         }
         
         public sealed override void Connect()
@@ -30,6 +29,7 @@ namespace Inertia.Network
                 try
                 {
                     _disconnectNotified = false;
+                    _reader = new BasicReader();
                     _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                     _socket.Connect(new IPEndPoint(IPAddress.Parse(_targetIp), _targetPort));
 
@@ -57,11 +57,12 @@ namespace Inertia.Network
                 }
                 catch { }
 
+                _reader?.Dispose();
                 _socket?.Disconnect(false);
             }
+
             if (!_disconnectNotified)
             {
-                _reader.Clear();
                 _disconnectNotified = true;
                 OnDisconnected(reason);
             }
@@ -73,10 +74,7 @@ namespace Inertia.Network
                 throw new NotImplementedException(nameof(TcpClientEntity));
             }
 
-            if (IsConnected)
-            {
-                _socket.Send(data);
-            }
+            try { _socket.Send(data); } catch { }
         }
 
         public void Dispose()
@@ -97,15 +95,9 @@ namespace Inertia.Network
             try
             {
                 int received = ((Socket)iar.AsyncState).EndReceive(iar);
-                if (received == 0)
-                {
-                    throw new SocketException();
-                }
+                if (received == 0) throw new SocketException();
 
-                var data = new byte[received];
-                Array.Copy(_buffer, data, received);
-
-                NetworkProtocol.ProcessParsing(this, _reader.Fill(data));
+                NetworkProtocol.ProcessParsing(this, _reader.Fill(_buffer, received));
             }
             catch (Exception e)
             {

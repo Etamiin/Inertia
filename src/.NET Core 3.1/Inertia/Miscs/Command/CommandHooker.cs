@@ -35,7 +35,7 @@ namespace Inertia
                             }
                             catch (Exception ex)
                             {
-                                throw new InertiaInitializationException(nameof(CommandHooker), ex);
+                                throw new InitializationException(nameof(CommandHooker), ex);
                             }                            
                         }
                     }

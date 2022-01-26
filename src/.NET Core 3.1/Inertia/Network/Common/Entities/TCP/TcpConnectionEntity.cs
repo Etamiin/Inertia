@@ -36,13 +36,11 @@ namespace Inertia.Network
                 throw new ObjectDisposedException(nameof(TcpConnectionEntity));
             }
 
-            if (IsConnected)
-            {
-                _socket?.Send(data);
-            }
+            try { _socket.Send(data); } catch { }
         }
         public override void Send(NetworkMessage message)
         {
+            if (!IsConnected) return;
             Send(NetworkProtocol.GetCurrentProtocol().OnSerializeMessage(message));
         }
 
@@ -65,8 +63,8 @@ namespace Inertia.Network
                 }
                 catch { }
 
-                _socket?.Disconnect(false);
                 _reader?.Dispose();
+                _socket?.Disconnect(false);
             }
 
             if (!_disconnectionNotified)
@@ -85,44 +83,34 @@ namespace Inertia.Network
             if (!IsDisposed)
             {
                 Disconnect();
-
                 IsDisposed = true;
             }
         }
 
         private void OnReceiveData(IAsyncResult iar)
         {
+            try
+            {
+                var received = ((Socket)iar.AsyncState).EndReceive(iar);
+                if (received == 0) throw new SocketException();
+                                
+                NetworkProtocol.ProcessParsing(this, _reader.Fill(_buffer, received));
+            }
+            catch (Exception ex)
+            {
+                if (ex is SocketException || ex is ObjectDisposedException)
+                {
+                    if (!IsDisposed)
+                    {
+                        Disconnect(NetworkDisconnectReason.ConnectionLost);
+                        return;
+                    }
+                }
+            }
+
             if (IsConnected)
             {
-                try
-                {
-                    var received = ((Socket)iar.AsyncState).EndReceive(iar);
-                    if (received == 0)
-                    {
-                        throw new SocketException();
-                    }
-
-                    var data = new byte[received];
-                    Array.Copy(_buffer, data, received);
-
-                    NetworkProtocol.ProcessParsing(this, _reader.Fill(data));
-                }
-                catch (Exception ex)
-                {
-                    if (ex is SocketException || ex is ObjectDisposedException)
-                    {
-                        if (!IsDisposed)
-                        {
-                            Disconnect(NetworkDisconnectReason.ConnectionLost);
-                            return;
-                        }
-                    }
-                }
-
-                if (IsConnected)
-                {
-                    _socket.BeginReceive(_buffer, 0, _buffer.Length, SocketFlags.None, new AsyncCallback(OnReceiveData), _socket);
-                }
+                _socket.BeginReceive(_buffer, 0, _buffer.Length, SocketFlags.None, new AsyncCallback(OnReceiveData), _socket);
             }
         }
     }

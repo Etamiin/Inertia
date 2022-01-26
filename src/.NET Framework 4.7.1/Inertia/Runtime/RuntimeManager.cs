@@ -11,18 +11,25 @@ namespace Inertia.Runtime
         private static event BasicAction Updating = () => { };
         private static event BasicAction Destroying = () => { };
 
-        internal static bool IsManuallyRunning { get; set; }
+        internal static bool IsManuallyRunning
+        {
+            get
+            {
+                return _manuallyRunning;
+            }
+            set
+            {
+                _manuallyRunning = value;
+                if (!_manuallyRunning && !_isInCycle) RunCycleLoop();
+            }
+        }
+
+        private static bool _isInCycle;
+        private static bool _manuallyRunning;
 
         static RuntimeManager()
         {
-            var clock = new Clock();
-
-            Task.Factory.StartNew(() => {
-                while (!IsManuallyRunning)
-                {
-                    ExecuteCycle(clock);
-                }
-            });
+            RunCycleLoop();
         }
 
         internal static void RegisterScript(Script script)
@@ -39,6 +46,19 @@ namespace Inertia.Runtime
             Destroying -= script.PreDestroy;
         }
 
+        internal static void RunCycleLoop()
+        {
+            var currentState = _manuallyRunning;
+            var clock = new Clock();
+            Task.Factory.StartNew(() => {
+                while (currentState == _manuallyRunning)
+                {
+                    _isInCycle = true;
+                    ExecuteCycle(clock);
+                    _isInCycle = false;
+                }
+            });
+        }
         internal static void ExecuteCycle(Clock clock, float deltaTime = 0f)
         {
             if (clock != null)
@@ -58,18 +78,9 @@ namespace Inertia.Runtime
                 Script.DeltaTime = deltaTime;
             }
 
-            lock (RtUpdate)
-            {
-                RtUpdate?.Invoke();
-            }
-            lock (Updating)
-            {
-                Updating?.Invoke();
-            }
-            lock (Destroying)
-            {
-                Destroying?.Invoke();
-            }
+            RtUpdate?.Invoke();
+            Updating?.Invoke();
+            Destroying?.Invoke();
         }
     }
 }

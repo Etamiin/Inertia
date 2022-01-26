@@ -28,7 +28,7 @@ namespace Inertia
             { typeof(byte[]), (reader) => reader.GetBytes() },
         };
 
-        public static void SetTypeDeserialization(Type type, BasicReturnAction<BasicReader, object> deserialization)
+        public static void SetDeserializableType(Type type, BasicReturnAction<BasicReader, object> deserialization)
         {
             if (!_typageDefinitions.ContainsKey(type))
             {
@@ -41,17 +41,11 @@ namespace Inertia
         }
 
         public bool IsDisposed { get; private set; }
-        /// <summary>
-        /// Returns the total length of the stream.
-        /// </summary>
         public long TotalLength
         {
             get
             {
-                if (_reader != null)
-                {
-                    return _reader.BaseStream.Length;
-                }
+                if (_reader != null) return _reader.BaseStream.Length;
 
                 return 0;
             }
@@ -63,10 +57,7 @@ namespace Inertia
         {
             get
             {
-                if (_reader != null)
-                {
-                    return TotalLength - GetPosition();
-                }
+                if (_reader != null) return _reader.BaseStream.Length - _reader.BaseStream.Position;
 
                 return 0;
             }
@@ -81,7 +72,7 @@ namespace Inertia
         public BasicReader(Encoding encoding)
         {
             _encoding = encoding;
-            _reader = new BinaryReader(new MemoryStream(), encoding);
+            _reader = new BinaryReader(new MemoryStream(), encoding, false);
         }
         public BasicReader(byte[] data) : this(data, Encoding.UTF8)
         {
@@ -93,20 +84,14 @@ namespace Inertia
 
         public BasicReader SetPosition(long position)
         {
-            if (_reader == null || position < 0 || position > _reader.BaseStream.Length)
-            {
-                return this;
-            }
+            if (position < 0 || position >= TotalLength) return this;
 
             _reader.BaseStream.Position = position;
             return this;
         }
         public long GetPosition()
         {
-            if (_reader != null)
-            {
-                return _reader.BaseStream.Position;
-            }
+            if (_reader != null) return _reader.BaseStream.Position;
 
             return 0;
         }
@@ -120,33 +105,31 @@ namespace Inertia
             }
         }
 
-        /// <summary>
-        /// Fill the current stream with the specified data
-        /// </summary>
-        /// <param name="data">Data to add</param>
-        /// <returns></returns>
-        public BasicReader Fill(byte[] data)
+        public BasicReader Fill(byte[] buffer)
         {
-            return Fill(data, TotalLength);
+            return Fill(buffer, TotalLength, buffer.Length);
         }
-        /// <summary>
-        /// Fill the current stream with the specified data starting at the specified index
-        /// </summary>
-        /// <param name="data">Data to add</param>
-        /// <param name="startIndex">Start index in current stream</param>
-        /// <returns></returns>
-        /// <exception cref="ObjectDisposedException"></exception>
-        public BasicReader Fill(byte[] data, long startIndex)
+        public BasicReader Fill(byte[] buffer, int length)
+        {
+            return Fill(buffer, TotalLength, length);
+        }
+        public BasicReader Fill(byte[] buffer, long offset, int length)
         {
             if (IsDisposed)
             {
                 throw new ObjectDisposedException(nameof(BasicReader));
             }
 
+            var newLength = offset + length;
+            if (newLength > _reader.BaseStream.Length)
+            {
+                _reader.BaseStream.SetLength(newLength);
+            }
+
             var oldPosition = GetPosition();
 
-            SetPosition(startIndex);
-            _reader.BaseStream.Write(data, 0, data.Length);
+            SetPosition(offset);
+            _reader.BaseStream.Write(buffer, 0, length);
             SetPosition(oldPosition);
 
             return this;
@@ -154,12 +137,17 @@ namespace Inertia
 
         public BasicReader RemoveReadedBytes()
         {
+            if (IsDisposed)
+            {
+                throw new ObjectDisposedException("BasicReader");
+            }
+
             var available = GetBytes(UnreadedLength);
             _reader.BaseStream.SetLength(available.Length);
 
             if (available.Length > 0)
             {
-                Fill(available, 0);
+                Fill(available, 0, available.Length);
                 SetPosition(0);
             }
 
@@ -176,10 +164,7 @@ namespace Inertia
             {
                 return _reader.ReadBoolean();
             }
-            else
-            {
-                return default;
-            }
+            else return default;
         }
         /// <summary>
         /// Read a bool flag based on specified length
@@ -201,10 +186,7 @@ namespace Inertia
             {
                 return _encoding.GetString(b);
             }
-            else
-            {
-                return string.Empty;
-            }
+            else return string.Empty;
         }
         /// <summary>
         /// Read a <see cref="byte"/> value in the stream and change the position
@@ -216,10 +198,7 @@ namespace Inertia
             {
                 return _reader.ReadByte();
             }
-            else
-            {
-                return default;
-            }            
+            else return default;          
         }
         /// <summary>
         /// Read a <see cref="sbyte"/> value in the stream and change the position
@@ -231,10 +210,7 @@ namespace Inertia
             {
                 return _reader.ReadSByte();
             }
-            else
-            {
-                return default;
-            }
+            else return default;
         }
         /// <summary>
         /// Read a <see cref="char"/> value in the stream and change the position
@@ -246,10 +222,7 @@ namespace Inertia
             {
                 return _reader.ReadChar();
             }
-            else
-            {
-                return default;
-            }
+            else return default;
         }
         /// <summary>
         /// Read a <see cref="float"/> value in the stream and change the position
@@ -261,10 +234,7 @@ namespace Inertia
             {
                 return _reader.ReadSingle();
             }
-            else
-            {
-                return default;
-            }
+            else return default;
         }
         /// <summary>
         /// Read a <see cref="double"/> value in the stream and change the position
@@ -276,10 +246,7 @@ namespace Inertia
             {
                 return _reader.ReadDouble();
             }
-            else
-            {
-                return default;
-            }
+            else return default;
         }
         /// <summary>
         /// Read a <see cref="decimal"/> value in the stream and change the position
@@ -291,10 +258,7 @@ namespace Inertia
             {
                 return _reader.ReadDecimal();
             }
-            else
-            {
-                return default;
-            }
+            else return default;
         }
         /// <summary>
         /// Read a <see cref="short"/> value in the stream and change the position
@@ -306,10 +270,7 @@ namespace Inertia
             {
                 return _reader.ReadInt16();
             }
-            else
-            {
-                return default;
-            }
+            else return default;
         }
         /// <summary>
         /// Read a <see cref="ushort"/> value in the stream and change the position
@@ -321,10 +282,7 @@ namespace Inertia
             {
                 return _reader.ReadUInt16();
             }
-            else
-            {
-                return default;
-            }
+            else return default;
         }
         /// <summary>
         /// Read a <see cref="int"/> value in the stream and change the position
@@ -336,10 +294,7 @@ namespace Inertia
             {
                 return _reader.ReadInt32();
             }
-            else
-            {
-                return default;
-            }
+            else return default;
         }
         /// <summary>
         /// Read a <see cref="uint"/> value in the stream and change the position
@@ -351,10 +306,7 @@ namespace Inertia
             {
                 return _reader.ReadUInt32();
             }
-            else
-            {
-                return default;
-            }            
+            else return default;
         }
         /// <summary>
         /// Read a <see cref="long"/> value in the stream and change the position
@@ -366,10 +318,7 @@ namespace Inertia
             {
                 return _reader.ReadInt64();
             }
-            else
-            {
-                return default;
-            }            
+            else return default;
         }
         /// <summary>
         /// Read a <see cref="ulong"/> value in the stream and change the position
@@ -381,10 +330,7 @@ namespace Inertia
             {
                 return _reader.ReadUInt64();
             }
-            else
-            {
-                return default;
-            }            
+            else return default;
         }
         /// <summary>
         /// Read a byte array (with an <see cref="long"/> length header) in the stream and change the position
@@ -397,10 +343,7 @@ namespace Inertia
                 var length = GetUInt();
                 return GetBytes(length);
             }
-            else
-            {
-                return new byte[0];
-            }
+            return new byte[0];
         }
         /// <summary>
         /// Read specified number of <see cref="byte"/> in the stream and change the position
@@ -413,10 +356,7 @@ namespace Inertia
             {
                 return _reader.ReadBytes((int)length);
             }
-            else
-            {
-                return new byte[0];
-            }
+            else return new byte[0];
         }
         /// <summary>
         /// Read DateTime in the stream and change the position
@@ -498,7 +438,7 @@ namespace Inertia
 
             foreach (var field in fields)
             {
-                if (field.GetCustomAttribute<IgnoreField>() == null)
+                if (field.GetCustomAttribute<IgnoreInProcess>() == null)
                 {
                     if (!typeof(IAutoSerializable).IsAssignableFrom(field.FieldType))
                     {
@@ -558,10 +498,7 @@ namespace Inertia
                 {
                     return GetSerializableObject(type);
                 }
-                else
-                {
-                    return null;
-                }
+                else return null;
             }
         }
 

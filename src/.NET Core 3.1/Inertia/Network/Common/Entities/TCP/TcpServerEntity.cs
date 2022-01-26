@@ -10,6 +10,7 @@ namespace Inertia.Network
     {
         public bool IsRunning => _socket != null && _socket.IsBound && !_closeNotified;
 
+        private object _locker;
         private readonly Dictionary<uint, TcpConnectionEntity> _connections;
         private Socket _socket;
 
@@ -18,6 +19,7 @@ namespace Inertia.Network
         }
         protected TcpServerEntity(string ip, int port) : base(ip, port)
         {
+            _locker = new object();
             _connections = new Dictionary<uint, TcpConnectionEntity>();
         }
 
@@ -36,7 +38,6 @@ namespace Inertia.Network
                     _closeNotified = false;
                     _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                     _socket.Bind(new IPEndPoint(string.IsNullOrEmpty(_targetIp) ? IPAddress.Any : IPAddress.Parse(_targetIp), _targetPort));
-
                     _socket.Listen(1000);
 
                     OnStarted();
@@ -62,10 +63,9 @@ namespace Inertia.Network
             if (!_closeNotified)
             {
                 TcpConnectionEntity[] entities;
-                lock (_connections)
+                lock (_locker)
                 {
                     entities = _connections.Values.ToArray();
-                    _connections.Clear();
                 }
 
                 foreach (var connection in entities)
@@ -94,40 +94,41 @@ namespace Inertia.Network
 
         private void OnAcceptConnection(IAsyncResult iar)
         {
+            try
+            {
+                var socket = ((Socket)iar.AsyncState).EndAccept(iar);
+                var connection = new TcpConnectionEntity(socket, (uint)_idProvider.NextId());
+
+                connection.Disconnected += (reason) =>
+                {
+                    lock (_locker)
+                    {
+                        _connections.Remove(connection.Id);
+                    }
+
+                    OnClientDisconnected(connection, reason);
+                };
+
+                lock (_locker)
+                {
+                    _connections.Add(connection.Id, connection);
+                }
+
+                connection.StartReception();
+                OnClientConnected(connection);
+            }
+            catch (Exception e)
+            {
+                if (e is SocketException || e is ObjectDisposedException)
+                {
+                    return;
+                }
+            }
+
             if (IsRunning)
             {
-                try
-                {
-                    var socket = ((Socket)iar.AsyncState).EndAccept(iar);
-                    lock (_connections)
-                    {
-                        var connection = new TcpConnectionEntity(socket, (uint)_idProvider.GetId());
-
-                        connection.Disconnected += (reason) =>
-                        {
-                            _connections.Remove(connection.Id);
-                            OnClientDisconnected(connection, reason);
-                        };
-
-                        _connections.Add(connection.Id, connection);
-
-                        connection.StartReception();
-                        OnClientConnected(connection);
-                    }
-                }
-                catch (Exception e)
-                {
-                    if (e is SocketException || e is ObjectDisposedException)
-                    {
-                        return;
-                    }
-                }
-
-                if (IsRunning)
-                {
-                    _socket.BeginAccept(new AsyncCallback(OnAcceptConnection), _socket);
-                }
-            }            
+                _socket.BeginAccept(new AsyncCallback(OnAcceptConnection), _socket);
+            }
         }
     }
 }

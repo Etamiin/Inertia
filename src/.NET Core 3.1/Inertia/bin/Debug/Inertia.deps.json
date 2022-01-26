@@ -6,7 +6,7 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v3.1": {
-      "Inertia/1.0.0": {
+      "Inertia/1.13": {
         "runtime": {
           "Inertia.dll": {}
         }
@@ -14,7 +14,7 @@
     }
   },
   "libraries": {
-    "Inertia/1.0.0": {
+    "Inertia/1.13": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

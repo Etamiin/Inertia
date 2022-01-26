@@ -4,53 +4,15 @@
         <name>Inertia</name>
     </assembly>
     <members>
-        <member name="T:Inertia.InertiaInitializationException">
+        <member name="T:Inertia.InitializationException">
             <summary>
             This exception is thrown in case an error occurs during the initialization of a core component.
-            </summary>
-        </member>
-        <member name="M:Inertia.CustomDeserialization.#ctor(System.String)">
-            <summary>
-            Specify that the value of the field will be deserialized by the method indicated in parameter.
-            </summary>
-            <param name="methodName"></param>
-        </member>
-        <member name="M:Inertia.CustomSerialization.#ctor(System.String)">
-            <summary>
-            Specify that the value of the field will be serialized by the method indicated in parameter.
-            </summary>
-            <param name="methodName"></param>
-        </member>
-        <member name="T:Inertia.IgnoreField">
-            <summary>
-            Ignore a field during procedures involving instance fields
-            </summary>
-        </member>
-        <member name="P:Inertia.BasicReader.TotalLength">
-            <summary>
-            Returns the total length of the stream.
             </summary>
         </member>
         <member name="P:Inertia.BasicReader.UnreadedLength">
             <summary>
             Returns the total unreaded length of the stream.
             </summary>
-        </member>
-        <member name="M:Inertia.BasicReader.Fill(System.Byte[])">
-            <summary>
-            Fill the current stream with the specified data
-            </summary>
-            <param name="data">Data to add</param>
-            <returns></returns>
-        </member>
-        <member name="M:Inertia.BasicReader.Fill(System.Byte[],System.Int64)">
-            <summary>
-            Fill the current stream with the specified data starting at the specified index
-            </summary>
-            <param name="data">Data to add</param>
-            <param name="startIndex">Start index in current stream</param>
-            <returns></returns>
-            <exception cref="T:System.ObjectDisposedException"></exception>
         </member>
         <member name="M:Inertia.BasicReader.GetBool">
             <summary>
@@ -216,12 +178,7 @@
             <typeparam name="T"></typeparam>
             <returns></returns>
         </member>
-        <member name="P:Inertia.BasicWriter.TotalLength">
-            <summary>
-            Returns the total length of the stream.
-            </summary>
-        </member>
-        <member name="M:Inertia.BasicWriter.SetEmpty(System.UInt32)">
+        <member name="M:Inertia.BasicWriter.SetEmpty(System.Int32)">
             <summary>
             Write empty data of specified size
             </summary>
@@ -389,12 +346,6 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Inertia.BasicWriter.ToArrayAndClear">
-            <summary>
-            Export all writed data as byte array and clear the current instance's data
-            </summary>
-            <returns></returns>
-        </member>
         <member name="M:Inertia.BasicWriter.ToArrayAndDispose">
             <summary>
             Export all writed data as byte array and dispose the current instance
@@ -414,11 +365,6 @@
         <member name="T:Inertia.CommandHooker">
             <summary>
             Core component for command line management and execution.
-            </summary>
-        </member>
-        <member name="P:Inertia.AutoQueueExecutor.Count">
-            <summary>
-            Returns the number of actions currently queued.
             </summary>
         </member>
         <member name="P:Inertia.ManualQueueExecutor.Count">
@@ -447,6 +393,16 @@
             </summary>
             <param name="message"></param>
             <returns></returns>
+        </member>
+        <member name="M:Inertia.Network.DefaultNetworkProtocol.OnParseMessage(System.Object,Inertia.BasicReader,Inertia.Network.MessageParsingOutput)">
+            <summary>
+            Occurs when data are received and have to be parsed
+            </summary>
+            <param name="receiver"></param>
+            <param name="reader"></param>
+            <param name="output"></param>
+            <returns></returns>
+            <exception cref="T:Inertia.Network.DefaultProtocolFailedParsingMessageException"></exception>
         </member>
         <member name="M:Inertia.Network.NetworkProtocol.GetCaller(System.Object)">
             <summary>
@@ -519,7 +475,7 @@
             Returns true if the current script run permanently.
             </summary>
         </member>
-        <member name="M:Inertia.Runtime.Run.ManualUpdate(System.Single)">
+        <member name="M:Inertia.Runtime.Run.ManualCall(System.Single)">
             <summary>
             Execute the Runtime cycle manually.
             </summary>

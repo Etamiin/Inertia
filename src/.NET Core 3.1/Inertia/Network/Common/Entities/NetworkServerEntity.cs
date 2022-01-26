@@ -14,7 +14,7 @@ namespace Inertia.Network
         
         protected internal NetworkServerEntity(string ip, int port)
         {
-            _idProvider = IdProvider.CreateNew();
+            _idProvider = new IdProvider();
             _targetIp = ip.Replace("localhost", "127.0.0.1");
             _targetPort = port;
         }

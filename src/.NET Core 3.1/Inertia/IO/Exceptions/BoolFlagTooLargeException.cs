@@ -7,6 +7,6 @@ namespace Inertia
     /// </summary>
     public class BoolFlagTooLargeException : Exception
     {
-        public override string Message => "Can't serialize more than 8 booleans in the flag";
+        public override string Message => "Can't serialize more than 8 booleans in a flag";
     }
 }

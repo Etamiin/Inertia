@@ -88,12 +88,22 @@ namespace Inertia.Runtime
             }
         }
 
+        public static void EnterManualMode()
+        {
+            RuntimeManager.IsManuallyRunning = true;
+        }
+        public static void LeaveManualMode()
+        {
+            RuntimeManager.IsManuallyRunning = false;
+        }
+
         /// <summary>
         /// Execute the Runtime cycle manually.
         /// </summary>
-        public static void ManualUpdate(float deltaTime)
+        public static void ManualCall(float deltaTime)
         {
-            RuntimeManager.IsManuallyRunning = true;
+            if (!RuntimeManager.IsManuallyRunning) return;
+
             RuntimeManager.ExecuteCycle(null, deltaTime);
         }
 
@@ -114,14 +124,14 @@ namespace Inertia.Runtime
             new NextFrameExecution(callback);
         }
         
-        public static T CreateScript<T>(params object[] dataCollection) where T : Script
+        public static T CreateScript<T>(params object[] parameters) where T : Script
         {
             var scriptType = typeof(T);
             var cstr = scriptType.GetConstructor(Type.EmptyTypes);
             if (cstr != null)
             {
                 var instance = Activator.CreateInstance<T>();
-                instance.OnInitialize(new ScriptArguments(dataCollection));
+                instance.OnInitialize(new ScriptArguments(parameters));
 
                 RuntimeManager.RegisterScript(instance);
                 return instance;

@@ -7,7 +7,7 @@ using Inertia;
 public static class Log
 {
     private static LogOptions _options;
-    private static AutoQueueExecutor _queue;
+    private static ExecutorPool _pool;
     private static StringBuilder _log;
     private static DateTime _lastSaveTime;
 
@@ -26,12 +26,12 @@ public static class Log
 
         if (options.ExecuteAsync)
         {
-            _queue = new AutoQueueExecutor();
+            _pool = new ExecutorPool(100, true);
         }
-        else if (_queue != null)
+        else if (_pool != null)
         {
-            _queue.Dispose();
-            _queue = null;
+            _pool.Dispose();
+            _pool = null;
         }
 
         if (options.SaveLog)
@@ -79,7 +79,7 @@ public static class Log
     {
         if (_options.ExecuteAsync)
         {
-            _queue.Enqueue(Finalize);
+            _pool.Enqueue(Finalize);
         }
         else
         {
@@ -88,7 +88,7 @@ public static class Log
 
         void Finalize()
         {
-            var time = _options.IncludeTime ? $"[{DateTime.Now.ToShortTimeString()}]" : string.Empty;
+            var time = _options.IncludeTime ? $"[{DateTime.Now.ToLongTimeString()}]" : string.Empty;
             var log = $"{time}{ title }{ content }";
 
             Console.ForegroundColor = textColor;
@@ -123,7 +123,7 @@ public static class Log
 
         if (e.IsTerminating)
         {
-            _queue?.ForceExecute();
+            _pool?.ForceExecution();
             SaveNow();
         }
     }

@@ -28,7 +28,7 @@ namespace Inertia
             { typeof(byte[]), (writer, value) => writer.SetBytes((byte[])value) }
         };
 
-        public static void SetTypeSerialization(Type type, BasicAction<BasicWriter, object> serialization)
+        public static void SetSerializableType(Type type, BasicAction<BasicWriter, object> serialization)
         {
             if (!_typageDefinitions.ContainsKey(type))
             {
@@ -41,9 +41,6 @@ namespace Inertia
         }
 
         public bool IsDisposed { get; private set; }
-        /// <summary>
-        /// Returns the total length of the stream.
-        /// </summary>
         public long TotalLength
         {
             get
@@ -75,27 +72,9 @@ namespace Inertia
         }
         public long GetPosition()
         {
-            if (_writer != null)
-            {
-                return _writer.BaseStream.Position;
-            }
+            if (_writer != null) return _writer.BaseStream.Position;
 
             return 0;
-        }
-
-        public void Clear()
-        {
-            if (IsDisposed)
-            {
-                throw new ObjectDisposedException(nameof(BasicWriter));
-            }
-
-            if (_writer != null)
-            {
-                _writer.Dispose();
-            }
-
-            _writer = new BinaryWriter(new MemoryStream(), _encoding);
         }
 
         /// <summary>
@@ -103,7 +82,7 @@ namespace Inertia
         /// </summary>
         /// <param name="size">Target byte array size</param>
         /// <returns>Returns the current instance</returns>
-        public BasicWriter SetEmpty(uint size)
+        public BasicWriter SetEmpty(int size)
         {
             return SetBytesWithoutHeader(new byte[size]);
         }
@@ -314,7 +293,7 @@ namespace Inertia
 
             foreach (var field in fields)
             {
-                if (field.GetCustomAttribute<IgnoreField>() == null)
+                if (field.GetCustomAttribute<IgnoreInProcess>() == null)
                 {
                     var fieldValue = field.GetValue(value);
 
@@ -406,17 +385,6 @@ namespace Inertia
             {
                 throw new ObjectDisposedException(nameof(BasicWriter));
             }
-        }
-        /// <summary>
-        /// Export all writed data as byte array and clear the current instance's data
-        /// </summary>
-        /// <returns></returns>
-        public byte[] ToArrayAndClear()
-        {
-            var data = ToArray();
-            Clear();
-
-            return data;
         }
         /// <summary>
         /// Export all writed data as byte array and dispose the current instance

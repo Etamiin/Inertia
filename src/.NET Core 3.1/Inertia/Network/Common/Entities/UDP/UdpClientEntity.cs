@@ -10,6 +10,7 @@ namespace Inertia.Network
     {
         public override bool IsConnected => (_client?.Client) != null && _client.Client.Connected;
         private UdpClient _client;
+        private BasicReader _reader;
 
         protected UdpClientEntity(string ip, int port) : base(ip, port)
         {
@@ -27,6 +28,7 @@ namespace Inertia.Network
                 try
                 {
                     _disconnectNotified = false;
+                    _reader = new BasicReader();
                     _client = new UdpClient();
                     _client.Connect(new IPEndPoint(IPAddress.Parse(_targetIp), _targetPort));
 
@@ -48,8 +50,10 @@ namespace Inertia.Network
 
             if (IsConnected)
             {
+                _reader?.Dispose();
                 _client?.Close();
             }
+
             if (!_disconnectNotified)
             {
                 _disconnectNotified = true;
@@ -62,16 +66,16 @@ namespace Inertia.Network
             {
                 throw new ObjectDisposedException(nameof(UdpClientEntity));
             }
-
-            if (IsConnected)
+            if (data.Length > ushort.MaxValue)
             {
-                if (data.Length > ushort.MaxValue)
-                {
-                    throw new UserDatagramDataLengthLimitException();
-                }
-
-                _client.SendAsync(data, data.Length);
+                throw new UserDatagramDataLengthLimitException();
             }
+
+            try
+            {
+                _client.Send(data, data.Length);
+            }
+            catch { }
         }
 
         public void Dispose()
@@ -88,28 +92,25 @@ namespace Inertia.Network
 
         private void OnReceiveData(IAsyncResult iar)
         {
+            try
+            {
+                IPEndPoint endPoint = null;
+                var data = ((UdpClient)iar.AsyncState).EndReceive(iar, ref endPoint);
+
+                NetworkProtocol.ProcessParsing(this, _reader.Fill(data, data.Length));
+            }
+            catch (Exception e)
+            {
+                if (e is SocketException || e is ObjectDisposedException)
+                {
+                    Disconnect(NetworkDisconnectReason.ConnectionLost);
+                    return;
+                }
+            }
+
             if (IsConnected)
             {
-                try
-                {
-                    IPEndPoint endPoint = null;
-                    var data = ((UdpClient)iar.AsyncState).EndReceive(iar, ref endPoint);
-
-                    NetworkProtocol.ProcessParsing(this, new BasicReader(data));
-                }
-                catch (Exception e)
-                {
-                    if (e is SocketException || e is ObjectDisposedException)
-                    {
-                        Disconnect(NetworkDisconnectReason.ConnectionLost);
-                        return;
-                    }
-                }
-
-                if (IsConnected)
-                {
-                    _client.BeginReceive(new AsyncCallback(OnReceiveData), _client);
-                }
+                _client.BeginReceive(new AsyncCallback(OnReceiveData), _client);
             }
         }
     }

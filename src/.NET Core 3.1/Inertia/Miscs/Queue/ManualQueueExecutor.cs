@@ -11,21 +11,26 @@ namespace Inertia
         /// </summary>
         public int Count => _queue.Count;
 
+        private object _locker;
         private readonly Queue<BasicAction> _queue;
 
-        public ManualQueueExecutor()
+        public ManualQueueExecutor() : this(0)
         {
-            _queue = new Queue<BasicAction>();
+        }
+        public ManualQueueExecutor(int capacity)
+        {
+            _locker = new object();
+            _queue = new Queue<BasicAction>(capacity);
         }
 
-        public ManualQueueExecutor Enqueue(params BasicAction[] actions)
+        public ManualQueueExecutor Enqueue(BasicAction action)
         {
             if (IsDisposed)
             {
                 throw new ObjectDisposedException(nameof(ManualQueueExecutor));
             }
 
-            foreach (var action in actions)
+            lock (_locker)
             {
                 _queue.Enqueue(action);
             }
@@ -43,15 +48,9 @@ namespace Inertia
                 throw new ObjectDisposedException(nameof(ManualQueueExecutor));
             }
 
-            lock (_queue)
+            while (_queue.TryDequeue(out BasicAction action))
             {
-                while (Count > 0)
-                {
-                    if (_queue.TryDequeue(out BasicAction action))
-                    {
-                        action?.Invoke();
-                    }
-                }
+                action?.Invoke();
             }
         }
 

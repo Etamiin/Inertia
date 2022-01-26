@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Reflection;
 
 namespace Inertia.Network
@@ -34,30 +36,21 @@ namespace Inertia.Network
         }
         public static NetworkMessage CreateMessage(ushort messageId)
         {
-            if (_messageTypes.ContainsKey(messageId))
+            if (_messageTypes.TryGetValue(messageId, out Type messageType))
             {
-                return CreateMessage(_messageTypes[messageId]);
+                return CreateMessage(messageType);
             }
 
             return null;
         }
         public static NetworkMessage CreateMessage(Type messageType)
         {
-            if (messageType.IsAbstract || !messageType.IsSubclassOf(typeof(NetworkMessage)))
-            {
-                return null;
-            }
+            if (messageType.IsAbstract || !messageType.IsSubclassOf(typeof(NetworkMessage))) return null;
 
             var constr = messageType.GetConstructors()[0];
             var parameters = constr.GetParameters();
-            var objs = new object[parameters.Length];
-
-            for (var i = 0; i < parameters.Length; i++)
-            {
-                objs[i] = null;
-            }
-
-            return (NetworkMessage)constr.Invoke(objs);
+            
+            return (NetworkMessage)constr.Invoke(new object[parameters.Length]);
         }
 
         internal static void ProcessParsing(object receiver, BasicReader reader)
@@ -65,19 +58,18 @@ namespace Inertia.Network
             var output = new MessageParsingOutput();
             var caller = GetCaller(receiver);
 
-            _current.OnParseMessage(receiver, reader, output);
-            
-            if (caller != null)
+            var canBeParsed = _current.OnParseMessage(receiver, reader, output);
+            if (canBeParsed && caller != null)
             {
                 foreach (var message in output.Messages)
                 {
                     if (_current.PooledExecution)
                     {
-                        _current.AsyncQueue.Enqueue(() => caller.CallReferences(message, receiver));
+                        _current.AsyncPool.Enqueue(() => caller.CallReference(message, receiver));
                     }
                     else
                     {
-                        caller.CallReferences(message, receiver);
+                        caller.CallReference(message, receiver);
                     }
                 }
             }
@@ -93,23 +85,19 @@ namespace Inertia.Network
         /// </summary>
         public abstract int NetworkBufferLength { get; }
 
-        private protected AutoQueueExecutor AsyncQueue { get; private set; }
+        private protected ExecutorPool AsyncPool { get; private set; }
 
         static NetworkProtocol()
         {
             _messageTypes = new Dictionary<ushort, Type>();
             _messageHookers = new Dictionary<Type, NetworkMessageCaller>();
 
-            var assemblys = AppDomain.CurrentDomain.GetAssemblies();
-            foreach (var assembly in assemblys)
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
                 var types = assembly.GetTypes();
                 foreach (var type in types)
                 {
-                    if (!type.IsClass || type.IsAbstract)
-                    {
-                        continue;
-                    }
+                    if (!type.IsClass || type.IsAbstract) continue;
 
                     if (type.IsSubclassOf(typeof(NetworkMessage)))
                     {
@@ -121,7 +109,7 @@ namespace Inertia.Network
                             VerifyReceivers(type);
                         }
                     }
-                    else if (type.IsSealed && typeof(IMessageHooker).IsAssignableFrom(type))
+                    else if (typeof(IMessageHooker).IsAssignableFrom(type))
                     {
                         VerifyReceivers(type);
                     }
@@ -142,6 +130,7 @@ namespace Inertia.Network
                         {
                             var msgType = ps[0].ParameterType;
                             var entityType = ps[1].ParameterType;
+
                             if (!_messageHookers.ContainsKey(entityType))
                             {
                                 _messageHookers.Add(entityType, new NetworkMessageCaller());
@@ -157,7 +146,7 @@ namespace Inertia.Network
         {
             if (PooledExecution)
             {
-                AsyncQueue = new AutoQueueExecutor();
+                AsyncPool = new ExecutorPool(100, true);
             }
         }
 
@@ -167,6 +156,6 @@ namespace Inertia.Network
         /// <param name="message"></param>
         /// <returns></returns>
         public abstract byte[] OnSerializeMessage(NetworkMessage message);
-        public abstract void OnParseMessage(object receiver, BasicReader reader, MessageParsingOutput output);
+        public abstract bool OnParseMessage(object receiver, BasicReader reader, MessageParsingOutput output);
     }
 }

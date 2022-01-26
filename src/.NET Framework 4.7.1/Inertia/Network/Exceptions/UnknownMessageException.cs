@@ -11,13 +11,13 @@ namespace Inertia.Network
     /// </summary>
     public class UnknownMessageException : Exception
     {
-        public override string Message => $"Invalid Message ID({ _packetId })";
+        public override string Message => $"Invalid NetworkMessage ID({ _messageId })";
 
-        private readonly uint _packetId;
+        private readonly ushort _messageId;
 
-        public UnknownMessageException(uint packetId)
+        public UnknownMessageException(ushort messageId)
         {
-            _packetId = packetId;
+            _messageId = messageId;
         }
     }
 }

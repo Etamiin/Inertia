@@ -18,7 +18,7 @@ namespace Inertia.ORM
             }
 
             return Array.FindAll(fields, (f) => {
-                return !f.IsStatic && f.GetCustomAttribute<IgnoreField>() == null && FieldType.GetFieldType(f.FieldType).Code != TypeCode.Object;
+                return !f.IsStatic && f.GetCustomAttribute<IgnoreInProcess>() == null && FieldType.GetFieldType(f.FieldType).Code != TypeCode.Object;
             });
         }
 

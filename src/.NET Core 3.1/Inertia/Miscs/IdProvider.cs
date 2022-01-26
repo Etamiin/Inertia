@@ -7,23 +7,17 @@ namespace Inertia
 {
     public sealed class IdProvider
     {
-        public static IdProvider CreateNew()
-        {
-            return new IdProvider(0);
-        }
-        public static IdProvider CreateFrom(int startId)
-        {
-            return new IdProvider(startId);
-        }
-
         private int _currentId;
 
-        internal IdProvider(int startId)
+        public IdProvider()
+        {
+        }
+        public IdProvider(int startId)
         {
             _currentId = startId;
         }
 
-        public int GetId()
+        public int NextId()
         {
             return Interlocked.Increment(ref _currentId);
         }

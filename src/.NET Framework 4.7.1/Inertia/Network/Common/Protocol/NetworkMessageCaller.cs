@@ -29,7 +29,7 @@ namespace Inertia.Network
             }
         }
 
-        public void CallReferences(NetworkMessage message, object receiver)
+        public void CallReference(NetworkMessage message, object receiver)
         {
             if (_references.TryGetValue(message.GetType(), out MethodInfo method))
             {

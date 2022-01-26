@@ -5,17 +5,17 @@ namespace Inertia
 {
     public sealed class Clock
     {
-        public static double GetElapsedMilliseconds(BasicAction handler)
+        public static double GetElapsedMilliseconds(BasicAction action)
         {
             var clock = new Clock();
-            handler();
+            action();
 
             return clock.GetElapsedMilliseconds();
         }   
-        public static double GetElapsedSeconds(BasicAction handler)
+        public static double GetElapsedSeconds(BasicAction action)
         {
             var clock = new Clock();
-            handler();
+            action();
 
             return clock.GetElapsedSeconds();
         }
@@ -25,6 +25,7 @@ namespace Inertia
         public Clock()
         {
             _cw = new Stopwatch();
+            _cw.Start();
         }
         
         public Clock Reset()

@@ -25,30 +25,35 @@ namespace Inertia.Network
             {
                 writer
                     .SetUShort(message.MessageId)
-                    .SetEmpty(sizeof(long));
+                    .SetEmpty(sizeof(uint));
 
                 var cPos = writer.GetPosition();
 
                 message.Serialize(writer);
-
                 writer
-                    .SetPosition(cPos - sizeof(long))
-                    .SetLong(writer.TotalLength - cPos);
+                    .SetPosition(cPos - sizeof(uint))
+                    .SetUInt((uint)(writer.TotalLength - cPos));
 
                 return writer.ToArrayAndDispose();
             }
         }
-
-        public override void OnParseMessage(object receiver, BasicReader reader, MessageParsingOutput output)
+        /// <summary>
+        /// Occurs when data are received and have to be parsed
+        /// </summary>
+        /// <param name="receiver"></param>
+        /// <param name="reader"></param>
+        /// <param name="output"></param>
+        /// <returns></returns>
+        /// <exception cref="DefaultProtocolFailedParsingMessageException"></exception>
+        public override bool OnParseMessage(object receiver, BasicReader reader, MessageParsingOutput output)
         {
             reader.SetPosition(0);
-
             while (reader.UnreadedLength > 0)
             {
                 var msgId = reader.GetUShort();
-                var msgSize = reader.GetLong();
+                var msgSize = reader.GetUInt();
 
-                if (reader.UnreadedLength < msgSize) break;
+                if (reader.UnreadedLength < msgSize) return false;
 
                 try
                 {
@@ -68,6 +73,8 @@ namespace Inertia.Network
 
                 reader.RemoveReadedBytes();
             }
+
+            return true;
         }
     }
 }

@@ -18,8 +18,9 @@ namespace Inertia.Network
             }
         }
 
-        private UdpClient _client;
         private readonly Dictionary<IPEndPoint, UdpConnectionEntity> _connections;
+        private UdpClient _client;
+        private BasicReader _reader;
 
         protected UdpServerEntity(int port) : this(string.Empty, port)
         {
@@ -41,16 +42,9 @@ namespace Inertia.Network
                 try
                 {
                     _closeNotified = false;
+                    _reader = new BasicReader();
                     _connections.Clear();
-
-                    if (string.IsNullOrEmpty(_targetIp) || _targetPort == 0)
-                    {
-                        _client = new UdpClient(new IPEndPoint(IPAddress.Any, _targetPort));
-                    }
-                    else
-                    {
-                        _client = new UdpClient(new IPEndPoint(IPAddress.Parse(_targetIp), _targetPort));
-                    }
+                    _client = new UdpClient(new IPEndPoint(string.IsNullOrEmpty(_targetIp) ? IPAddress.Any : IPAddress.Parse(_targetIp), _targetPort));
 
                     OnStarted();
                     _client.BeginReceive(new AsyncCallback(OnReceiveData), _client);
@@ -70,6 +64,7 @@ namespace Inertia.Network
 
             if (IsInitialized)
             {
+                _reader?.Dispose();
                 _client?.Close();
                 _client = null;
             }
@@ -126,7 +121,11 @@ namespace Inertia.Network
                 throw new UserDatagramDataLengthLimitException();
             }
 
-            _client.Send(data, data.Length, endPoint);
+            try
+            {
+                _client.Send(data, data.Length, endPoint);
+            }
+            catch { }
         }
         private void OnReceiveData(IAsyncResult iar)
         {
@@ -137,13 +136,13 @@ namespace Inertia.Network
 
                 if (!_connections.ContainsKey(endPoint))
                 {
-                    var connection = new UdpConnectionEntity((uint)_idProvider.GetId(), this, endPoint);
+                    var connection = new UdpConnectionEntity((uint)_idProvider.NextId(), this, endPoint);
                     _connections.Add(endPoint, connection);
 
                     OnConnectionAdded(connection);
                 }
 
-                NetworkProtocol.ProcessParsing(_connections[endPoint], new BasicReader(data));
+                NetworkProtocol.ProcessParsing(_connections[endPoint], _reader.Fill(data, data.Length));
             }
             catch (Exception ex)
             {
