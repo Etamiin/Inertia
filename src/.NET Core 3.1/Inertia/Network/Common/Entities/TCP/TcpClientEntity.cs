@@ -97,7 +97,7 @@ namespace Inertia.Network
                 int received = ((Socket)iar.AsyncState).EndReceive(iar);
                 if (received == 0) throw new SocketException();
 
-                NetworkProtocol.ProcessParsing(this, _reader.Fill(_buffer, received));
+                NetworkProtocol.ProcessParsing(this, _reader.Fill(new ReadOnlySpan<byte>(_buffer, 0, received)));
             }
             catch (Exception e)
             {

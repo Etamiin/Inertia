@@ -30,9 +30,9 @@ namespace Inertia.Network
             return caller;
         }
 
-        public static NetworkMessage CreateMessage<T>() where T : NetworkMessage
+        public static T CreateMessage<T>() where T : NetworkMessage
         {
-            return CreateMessage(typeof(T));
+            return (T)CreateMessage(typeof(T));
         }
         public static NetworkMessage CreateMessage(ushort messageId)
         {

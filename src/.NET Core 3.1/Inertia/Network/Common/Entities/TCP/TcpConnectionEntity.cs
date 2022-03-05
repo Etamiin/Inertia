@@ -50,32 +50,34 @@ namespace Inertia.Network
         }
         public void Disconnect(NetworkDisconnectReason reason)
         {
-            if (IsDisposed)
-            {
-                throw new ObjectDisposedException(nameof(TcpConnectionEntity));
-            }
-
-            if (IsConnected)
-            {
-                try
+            System.Threading.Tasks.Task.Run(() => {
+                if (IsDisposed)
                 {
-                    _socket.Shutdown(SocketShutdown.Both);
+                    throw new ObjectDisposedException(nameof(TcpConnectionEntity));
                 }
-                catch { }
 
-                _reader?.Dispose();
-                _socket?.Disconnect(false);
-            }
+                if (IsConnected)
+                {
+                    try
+                    {
+                        _socket.Shutdown(SocketShutdown.Both);
+                    }
+                    catch { }
 
-            if (!_disconnectionNotified)
-            {
-                _disconnectionNotified = true;
-                Disconnected?.Invoke(reason);
+                    _reader?.Dispose();
+                    _socket?.Disconnect(false);
+                }
 
-                _buffer = null;
-                _socket = null;
-                Disconnected = null;
-            }
+                if (!_disconnectionNotified)
+                {
+                    _disconnectionNotified = true;
+                    Disconnected?.Invoke(reason);
+
+                    _buffer = null;
+                    _socket = null;
+                    Disconnected = null;
+                }
+            });
         }
 
         public void Dispose()
@@ -93,8 +95,8 @@ namespace Inertia.Network
             {
                 var received = ((Socket)iar.AsyncState).EndReceive(iar);
                 if (received == 0) throw new SocketException();
-                                
-                NetworkProtocol.ProcessParsing(this, _reader.Fill(_buffer, received));
+
+                NetworkProtocol.ProcessParsing(this, _reader.Fill(new ReadOnlySpan<byte>(_buffer, 0, received)));
             }
             catch (Exception ex)
             {

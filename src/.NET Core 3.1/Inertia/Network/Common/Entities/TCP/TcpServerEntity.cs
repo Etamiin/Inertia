@@ -23,6 +23,27 @@ namespace Inertia.Network
             _connections = new Dictionary<uint, TcpConnectionEntity>();
         }
 
+        public TcpConnectionGroup CreateConnectionGroup(Predicate<TcpConnectionEntity> predicate)
+        {
+            var group = new TcpConnectionGroup();
+
+            lock (_locker)
+            {
+                var targets = new List<TcpConnectionEntity>();
+                foreach (var c in _connections.Values)
+                {
+                    if (predicate(c))
+                    {
+                        targets.Add(c);
+                    }
+                }
+
+                group.AddConnections(targets);
+            }
+
+            return group;
+        }
+
         public sealed override void Start()
         {
             if (IsDisposed)
@@ -80,7 +101,7 @@ namespace Inertia.Network
 
         protected virtual void OnClientConnected(TcpConnectionEntity connection) { }
         protected virtual void OnClientDisconnected(TcpConnectionEntity connection, NetworkDisconnectReason reason) { }
-            
+
         public void Dispose()
         {
             if (!IsDisposed)

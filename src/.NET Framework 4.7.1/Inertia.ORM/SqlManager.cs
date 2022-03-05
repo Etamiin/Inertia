@@ -10,12 +10,12 @@ namespace Inertia.ORM
     {
         private static Dictionary<Type, Database> _databases;
 
-        private static AutoQueueExecutor _queue;
+        private static ExecutorPool _queue;
 
         static SqlManager()
         {
             _databases = new Dictionary<Type, Database>();
-            _queue = new AutoQueueExecutor();
+            _queue = new ExecutorPool(100, true);
 
             var typedTb = new Dictionary<Type, List<Type>>();
 

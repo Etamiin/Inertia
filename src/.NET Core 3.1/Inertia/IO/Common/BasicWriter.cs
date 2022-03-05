@@ -45,247 +45,139 @@ namespace Inertia
         {
             get
             {
-                return _writer.BaseStream.Length;
+                return _writer.Length;
             }
         }
         
-        private BinaryWriter _writer;
+        private MemoryStream _writer;
         private readonly Encoding _encoding;
 
         public BasicWriter() : this(Encoding.UTF8)
         {
         }
-        public BasicWriter(Encoding encoding)
+        public BasicWriter(int size) : this(size, Encoding.UTF8)
+        {
+        }
+        public BasicWriter(Encoding encoding) : this(256, encoding)
+        {
+        }
+        public BasicWriter(int size, Encoding encoding)
         {
             _encoding = encoding;
-            _writer = new BinaryWriter(new MemoryStream(), encoding);
+            _writer = new MemoryStream(size);
         }
 
         public BasicWriter SetPosition(long position)
         {
             if (_writer != null)
             {
-                _writer.BaseStream.Position = position;
+                _writer.Position = position;
             }
 
             return this;
         }
         public long GetPosition()
         {
-            if (_writer != null) return _writer.BaseStream.Position;
+            if (_writer != null) return _writer.Position;
 
             return 0;
         }
 
-        /// <summary>
-        /// Write empty data of specified size
-        /// </summary>
-        /// <param name="size">Target byte array size</param>
-        /// <returns>Returns the current instance</returns>
         public BasicWriter SetEmpty(int size)
         {
             return SetBytesWithoutHeader(new byte[size]);
         }
-        /// <summary>
-        /// Write the specified value in the stream
-        /// </summary>
-        /// <param name="value">Value to write</param>
-        /// <returns>Returns the current instance</returns>
         public BasicWriter SetBool(bool value)
         {
-            _writer.Write(value);
+            _writer.WriteByte(Convert.ToByte(value));
             return this;
         }
-        /// <summary>
-        /// Write a bool flag
-        /// </summary>
-        /// <param name="values"></param>
-        /// <returns></returns>
-        /// <exception cref="BoolFlagTooLargeException"></exception>
         public BasicWriter SetBoolFlag(params bool[] values)
         {
             return SetByte(values.CreateFlag());
         }
-        /// <summary>
-        /// Write the specified value in the stream
-        /// </summary>
-        /// <param name="value">Value to write</param>
-        /// <returns>Returns the current instance</returns>
         public BasicWriter SetString(string value)
         {
-            if (string.IsNullOrEmpty(value))
-            {
-                return SetBytes(new byte[] { });
-            }
-            else
-            {
-                return SetBytes(_encoding.GetBytes(value));
-            }
+            return SetBytes(!string.IsNullOrEmpty(value) ? _encoding.GetBytes(value) : new byte[0]);
         }
-        /// <summary>
-        /// Write the specified value in the stream
-        /// </summary>
-        /// <param name="value">Value to write</param>
-        /// <returns>Returns the current instance</returns>
         public BasicWriter SetFloat(float value)
         {
-            _writer.Write(value);
+            _writer.Write(BitConverter.GetBytes(value));
             return this;
         }
-        /// <summary>
-        /// Write the specified value in the stream
-        /// </summary>
-        /// <param name="value">Value to write</param>
-        /// <returns>Returns the current instance</returns>
         public BasicWriter SetDecimal(decimal value)
         {
-            _writer.Write(value);
-            return this;
+            return SetDouble((double)value);
         }
-        /// <summary>
-        /// Write the specified value in the stream
-        /// </summary>
-        /// <param name="value">Value to write</param>
-        /// <returns>Returns the current instance</returns>
         public BasicWriter SetDouble(double value)
         {
-            _writer.Write(value);
+            _writer.Write(BitConverter.GetBytes(value));
             return this;
         }
-        /// <summary>
-        /// Write the specified value in the stream
-        /// </summary>
-        /// <param name="value">Value to write</param>
-        /// <returns>Returns the current instance</returns>
         public BasicWriter SetByte(byte value)
         {
-            _writer.Write(value);
+            _writer.WriteByte(value);
             return this;
         }
-        /// <summary>
-        /// Write the specified value in the stream
-        /// </summary>
-        /// <param name="value">Value to write</param>
-        /// <returns>Returns the current instance</returns>
         public BasicWriter SetSByte(sbyte value)
         {
-            _writer.Write(value);
+            _writer.WriteByte(unchecked((byte)value));
             return this;
         }
-        /// <summary>
-        /// Write the specified value in the stream
-        /// </summary>
-        /// <param name="value">Value to write</param>
-        /// <returns>Returns the current instance</returns>
         public BasicWriter SetChar(char value)
         {
-            _writer.Write(value);
+            _writer.Write(BitConverter.GetBytes(value));
             return this;
         }
-        /// <summary>
-        /// Write the specified value in the stream
-        /// </summary>
-        /// <param name="value">Value to write</param>
-        /// <returns>Returns the current instance</returns>
         public BasicWriter SetShort(short value)
         {
-            _writer.Write(value);
+            _writer.Write(BitConverter.GetBytes(value));
             return this;
         }
-        /// <summary>
-        /// Write the specified value in the stream
-        /// </summary>
-        /// <param name="value">Value to write</param>
-        /// <returns>Returns the current instance</returns>
         public BasicWriter SetUShort(ushort value)
         {
-            _writer.Write(value);
+            _writer.Write(BitConverter.GetBytes(value));
             return this;
         }
-        /// <summary>
-        /// Write the specified value in the stream
-        /// </summary>
-        /// <param name="value">Value to write</param>
-        /// <returns>Returns the current instance</returns>
         public BasicWriter SetInt(int value)
         {
-            _writer.Write(value);
+            _writer.Write(BitConverter.GetBytes(value));
             return this;
         }
-        /// <summary>
-        /// Write the specified value in the stream
-        /// </summary>
-        /// <param name="value">Value to write</param>
-        /// <returns>Returns the current instance</returns>
         public BasicWriter SetUInt(uint value)
         {
-            _writer.Write(value);
+            _writer.Write(BitConverter.GetBytes(value));
             return this;
         }
-        /// <summary>
-        /// Write the specified value in the stream
-        /// </summary>
-        /// <param name="value">Value to write</param>
-        /// <returns>Returns the current instance</returns>
         public BasicWriter SetLong(long value)
         {
-            _writer.Write(value);
+            _writer.Write(BitConverter.GetBytes(value));
             return this;
         }
-        /// <summary>
-        /// Write the specified value in the stream
-        /// </summary>
-        /// <param name="value">Value to write</param>
-        /// <returns>Returns the current instance</returns>
         public BasicWriter SetULong(ulong value)
         {
-            _writer.Write(value);
+            _writer.Write(BitConverter.GetBytes(value));
             return this;
         }
-        /// <summary>
-        /// Write the specified value in the stream
-        /// </summary>
-        /// <param name="value">Value to write</param>
-        /// <returns>Returns the current instance</returns>
+        public BasicWriter SetDateTime(DateTime value)
+        {
+            return SetLong(value.Ticks);
+        }
         public BasicWriter SetBytes(byte[] value)
         {
-            _writer.Write((uint)value.Length);
+            _writer.Write(BitConverter.GetBytes(value.Length));
             return SetBytesWithoutHeader(value);
         }
-        /// <summary>
-        /// Write the specified value in the stream
-        /// </summary>
-        /// <param name="value">Value to write</param>
-        /// <returns>Returns the current instance</returns>
         public BasicWriter SetBytesWithoutHeader(byte[] value)
         {
             _writer.Write(value);
             return this;
         }
-        /// <summary>
-        /// Write the specified value in the stream
-        /// </summary>
-        /// <param name="value">Value to write</param>
-        /// <returns>Returns the current instance</returns>
-        public BasicWriter SetDateTime(DateTime value)
-        {
-            return SetLong(value.Ticks);
-        }
-        /// <summary>
-        /// Write an instance of <see cref="ISerializableObject"/> in the stream
-        /// </summary>
-        /// <param name="value"><see cref="ISerializableObject"/> to serialize</param>
-        /// <returns>Returns the current instance</returns>
         public BasicWriter SetSerializableObject(ISerializableObject value)
         {
             value.Serialize(this);
             return this;
         }
-        /// <summary>
-        /// Write an instance of <see cref="IAutoSerializable"/> in the stream
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
         public BasicWriter SetAutoSerializable(IAutoSerializable value)
         {
             var type = value.GetType();
@@ -330,11 +222,6 @@ namespace Inertia
             return this;
         }
 
-        /// <summary>
-        /// Automatically write the specified value in the stream
-        /// </summary>
-        /// <param name="value">Serializable value</param>
-        /// <returns>Returns the current instance</returns>
         public BasicWriter SetValue(object value)
         {
             var objType = value.GetType();
@@ -355,12 +242,7 @@ namespace Inertia
             }
 
             return this;
-        }
-        /// <summary>
-        /// Automatically write the specified values in the stream
-        /// </summary>
-        /// <param name="values">Serializable values to write</param>
-        /// <returns>Returns the current instance</returns>
+        }        
         public BasicWriter SetValues(params object[] values)
         {
             foreach (var obj in values)
@@ -370,26 +252,18 @@ namespace Inertia
 
             return this;
         }
-
-        /// <summary>
-        /// Export all writed data as byte array
-        /// </summary>
-        /// <returns></returns>
+        
         public byte[] ToArray()
         {
             if (!IsDisposed && _writer != null)
             {
-                return ((MemoryStream)_writer.BaseStream).ToArray();
+                return _writer.ToArray();
             }
             else
             {
                 throw new ObjectDisposedException(nameof(BasicWriter));
             }
         }
-        /// <summary>
-        /// Export all writed data as byte array and dispose the current instance
-        /// </summary>
-        /// <returns></returns>
         public byte[] ToArrayAndDispose()
         {
             var data = ToArray();

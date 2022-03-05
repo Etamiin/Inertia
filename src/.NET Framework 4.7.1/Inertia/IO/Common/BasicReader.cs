@@ -127,7 +127,6 @@ namespace Inertia
             }
 
             var oldPosition = GetPosition();
-
             SetPosition(offset);
             _reader.BaseStream.Write(buffer, 0, length);
             SetPosition(oldPosition);

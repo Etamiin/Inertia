@@ -142,7 +142,7 @@ namespace Inertia.Network
                     OnConnectionAdded(connection);
                 }
 
-                NetworkProtocol.ProcessParsing(_connections[endPoint], _reader.Fill(data, data.Length));
+                NetworkProtocol.ProcessParsing(_connections[endPoint], _reader.Fill(data));
             }
             catch (Exception ex)
             {

@@ -11,6 +11,10 @@ namespace Inertia
     {
         public static string[] GetFilesFromDirectory(string path, bool includeSubFolders)
         {
+            return GetFilesFromDirectory(path, includeSubFolders, null);
+        }
+        public static string[] GetFilesFromDirectory(string path, bool includeSubFolders, Predicate<DirectoryInfo> ignoreDirectory)
+        {
             if (!Directory.Exists(path))
             {
                 throw new DirectoryNotFoundException();
@@ -23,9 +27,12 @@ namespace Inertia
 
             return result.ToArray();
 
-            void FindPaths(string currentFolder)
+            void FindPaths(string folderPath)
             {
-                var files = Directory.GetFiles(currentFolder);
+                var info = new DirectoryInfo(folderPath);
+                if (ignoreDirectory != null && ignoreDirectory(info)) return;
+
+                var files = Directory.GetFiles(folderPath);
                 foreach (var file in files)
                 {
                     result.Add(file);
@@ -33,7 +40,7 @@ namespace Inertia
 
                 if (includeSubFolders)
                 {
-                    var directories = Directory.GetDirectories(currentFolder);
+                    var directories = Directory.GetDirectories(folderPath);
                     foreach (var dir in directories)
                     {
                         FindPaths(dir);
@@ -51,7 +58,6 @@ namespace Inertia
 
         public static string GetSHA256(byte[] data)
         {
-            string result = string.Empty;
             using (var sha256 = SHA256.Create())
             {
                 var sha256Bytes = sha256.ComputeHash(data);
@@ -61,38 +67,21 @@ namespace Inertia
                     sBuilder.Append(byteVal.ToString("x2"));
                 }
 
-                result = sBuilder.ToString();
+                return sBuilder.ToString();
             }
-
-            return result;
-        }        
+        }
         public static string GetSHA256(FileStream stream)
         {
-            return GetSHA256(stream, ushort.MaxValue);
-        }
-        public static string GetSHA256(FileStream stream, int bufferLength)
-        {
-            using (stream)
+            using (var sha256 = SHA256.Create())
             {
-                var sha256 = new StringBuilder();
-                long totalLength = 0;
-
-                while (stream.Length > totalLength)
+                var sha256Bytes = sha256.ComputeHash(stream);
+                var sBuilder = new StringBuilder();
+                foreach (var byteVal in sha256Bytes)
                 {
-                    var v = stream.Length - totalLength;
-                    var length = v >= bufferLength ? bufferLength : v;
-
-                    var data = new byte[length];
-                    for (int x = 0; x < data.Length; x++)
-                    {
-                        data[x] = (byte)stream.ReadByte();
-                    }
-
-                    totalLength += length;
-                    sha256.Append(GetSHA256(data));
+                    sBuilder.Append(byteVal.ToString("x2"));
                 }
 
-                return sha256.ToString();
+                return sBuilder.ToString();
             }
         }
 

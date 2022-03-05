@@ -34,13 +34,13 @@ namespace Inertia
             return this;
         }
 
-        public long GetElapsedMilliseconds()
+        public double GetElapsedMilliseconds()
         {
-            return _cw.ElapsedMilliseconds;
+            return _cw.Elapsed.TotalMilliseconds;
         }
-        public long GetElapsedMillisecondsAndReset()
+        public double GetElapsedMillisecondsAndReset()
         {
-            var ms = GetElapsedMilliseconds();
+            var ms = _cw.Elapsed.TotalMilliseconds;
             Reset();
 
             return ms;
@@ -48,11 +48,14 @@ namespace Inertia
 
         public double GetElapsedSeconds()
         {
-            return GetElapsedMilliseconds() / 1000d;
+            return _cw.Elapsed.TotalSeconds;
         }        
         public double GetElapsedSecondsAndReset()
         {
-            return GetElapsedMillisecondsAndReset() / 1000d;
+            var seconds = GetElapsedMillisecondsAndReset();
+            Reset();
+
+            return seconds;
         }
     }
 }
