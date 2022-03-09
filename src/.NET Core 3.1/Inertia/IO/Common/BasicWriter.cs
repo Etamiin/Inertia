@@ -25,6 +25,7 @@ namespace Inertia
             { typeof(uint), (writer, value) => writer.SetUInt((uint)value) },
             { typeof(long), (writer, value) => writer.SetLong((long)value) },
             { typeof(ulong), (writer, value) => writer.SetULong((ulong)value) },
+            { typeof(DateTime), (writer, value) => writer.SetDateTime((DateTime)value) },
             { typeof(byte[]), (writer, value) => writer.SetBytes((byte[])value) }
         };
 
@@ -69,18 +70,22 @@ namespace Inertia
 
         public BasicWriter SetPosition(long position)
         {
-            if (_writer != null)
+            if (IsDisposed)
             {
-                _writer.Position = position;
+                throw new ObjectDisposedException(nameof(BasicWriter));
             }
 
+            _writer.Position = position;
             return this;
         }
         public long GetPosition()
         {
-            if (_writer != null) return _writer.Position;
+            if (IsDisposed)
+            {
+                throw new ObjectDisposedException(nameof(BasicWriter));
+            }
 
-            return 0;
+            return _writer.Position;
         }
 
         public BasicWriter SetEmpty(int size)
@@ -161,10 +166,20 @@ namespace Inertia
         }
         public BasicWriter SetDateTime(DateTime value)
         {
+            if (value == null)
+            {
+                value = DateTime.Now;
+            }
+
             return SetLong(value.Ticks);
         }
         public BasicWriter SetBytes(byte[] value)
         {
+            if (value == null)
+            {
+                value = new byte[0];
+            }
+
             _writer.Write(BitConverter.GetBytes(value.Length));
             return SetBytesWithoutHeader(value);
         }
@@ -180,62 +195,35 @@ namespace Inertia
         }
         public BasicWriter SetAutoSerializable(IAutoSerializable value)
         {
-            var type = value.GetType();
-            var fields = type.GetFields(BindingFlags.Public | BindingFlags.Instance).OrderBy((x) => x.MetadataToken);
-
-            foreach (var field in fields)
+            if (ReflectionProvider.TryGetFields(value.GetType(), out ReflectionProvider.SerializableFieldMemory[] fields))
             {
-                if (field.GetCustomAttribute<IgnoreInProcess>() == null)
+                foreach (var field in fields)
                 {
-                    var fieldValue = field.GetValue(value);
-
-                    if (!typeof(IAutoSerializable).IsAssignableFrom(field.FieldType))
-                    {
-                        var customization = field.GetCustomAttribute<CustomSerialization>();
-                        if (customization == null)
-                        {
-                            SetValue(fieldValue);
-                        }
-                        else
-                        {
-                            var method = type.GetMethod(customization.MethodName, BindingFlags.NonPublic | BindingFlags.Instance);
-                            var parameters = method?.GetParameters();
-
-                            if (parameters.Length == 1 && parameters[0].ParameterType == typeof(BasicWriter))
-                            {
-                                method.Invoke(value, new object[] { this });
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (fieldValue == null)
-                        {
-                            throw new MissingFieldException($"{ field.Name } is null");
-                        } 
-                        
-                        SetAutoSerializable(fieldValue as IAutoSerializable);
-                    }
+                    field.Write(value, this);
                 }
             }
 
             return this;
         }
 
-        public BasicWriter SetValue(object value)
+        public BasicWriter SetValue(object value, Type specifyType = null)
         {
-            var objType = value.GetType();
-            if (_typageDefinitions.ContainsKey(objType))
+            if (specifyType == null && value != null)
             {
-                _typageDefinitions[objType](this, value);
+                specifyType = value.GetType();
+            }
+
+            if (_typageDefinitions.TryGetValue(specifyType, out BasicAction<BasicWriter, object> action))
+            {
+                action(this, value);
             }
             else
             {
-                if (objType.GetInterface(nameof(IAutoSerializable)) != null)
+                if (specifyType.GetInterface(nameof(IAutoSerializable)) != null)
                 {
                     SetAutoSerializable((IAutoSerializable)value);
                 }
-                else if (objType.GetInterface(nameof(ISerializableObject)) != null)
+                else if (specifyType.GetInterface(nameof(ISerializableObject)) != null)
                 {
                     SetSerializableObject((ISerializableObject)value);
                 }

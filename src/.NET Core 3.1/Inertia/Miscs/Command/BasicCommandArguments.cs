@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
@@ -30,9 +31,25 @@ namespace Inertia
         {
             return _data[index];
         }
-        public T GetDataObject<T>(int index)
+        public bool TryGetDataObject<T>(int index, out T data)
         {
-            return (T)GetDataObject(index);
+            var obj = GetDataObject(index);
+            if (obj is T)
+            {
+                data = (T)obj;
+                return true;
+            }
+
+            data = default(T);
+            return false;
+        }
+
+        public void ForEach(BasicAction<string> onArgument)
+        {
+            foreach (var s in _arguments)
+            {
+                onArgument(s);
+            }
         }
     }
 }

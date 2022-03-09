@@ -9,22 +9,29 @@ namespace Inertia
 {
     public class ExecutorPool : IDisposable
     {
-        public int PoolLength => _executors.Count;
         public bool IsDisposed { get; private set; }
         public bool IsRunning { get; private set; }
+
+        public int PoolLength => _executors.Count;
 
         private event BasicAction Executing = () => { };
 
         private List<ManualQueueExecutor> _executors;
+        private ManualQueueExecutor _currentQueue;
         private object _locker;
-        private int _executorMaxSize;
+        private int _executorCapacity, _executionCount, _clearTick;
 
-        public ExecutorPool(int maximumExecutorSize, bool autoStart)
+        public ExecutorPool(int executorCapacity, bool autoStart) : this(executorCapacity, 100, autoStart)
+        {
+        }
+        public ExecutorPool(int executorCapacity, int clearTick, bool autoStart)
         {
             _executors = new List<ManualQueueExecutor>();
             _locker = new object();
-            _executorMaxSize = maximumExecutorSize;
+            _executorCapacity = executorCapacity;
+            _clearTick = clearTick;
 
+            ResetCurrentQueue();
             if (autoStart) Start();
         }
 
@@ -36,7 +43,20 @@ namespace Inertia
             }
 
             IsRunning = true;
-            Run();
+            Task.Factory.StartNew(async () => {
+                while (IsRunning)
+                {
+                    if (PoolLength == 0)
+                    {
+                        CheckForClearing(true);
+
+                        await Task.Delay(10);
+                        continue;
+                    }
+
+                    Execute();
+                }
+            });
 
             return this;
         }
@@ -53,27 +73,18 @@ namespace Inertia
                 throw new ObjectDisposedException(nameof(ExecutorPool));
             }
 
-            ManualQueueExecutor? best = null;
-
-            lock (_locker)
+            if (_currentQueue.Count >= _executorCapacity)
             {
-                best = _executors.FirstOrDefault((e) => !e.IsDisposed && e.Count < _executorMaxSize);
-
-                if (best == null)
-                {
-                    best = new ManualQueueExecutor(_executorMaxSize);
-                    Register(best);
-                }
-
-                best.Enqueue(action);
+                ResetCurrentQueue();
             }
 
+            _currentQueue.Enqueue(action);
             return this;
         }
-        public ExecutorPool ForceExecution()
+        public void ExecuteAllAndDispose()
         {
             Execute();
-            return this;
+            Dispose();
         }
 
         public void Dispose()
@@ -100,33 +111,47 @@ namespace Inertia
             Executing -= queue.Execute;
             _executors.Remove(queue);
         }
-        private void Run()
-        {
-            Task.Factory.StartNew(async () => {
-                while (IsRunning)
-                {
-                    if (PoolLength == 0)
-                    {
-                        await Task.Delay(20);
-                        continue;
-                    }
-
-                    Execute();
-                }
-            });
-        }
+        
         private void Execute()
         {
-            Executing();
+            _executionCount++;
 
+            Executing();
+            CheckForClearing(false);
+        }
+        private void ResetCurrentQueue()
+        {
             lock (_locker)
             {
-                var toRemove = _executors.FindAll((x) => x.Count == 0 || x.IsDisposed).ToArray();
-                foreach (var trash in toRemove)
+                _currentQueue = _executors.FirstOrDefault((e) => !e.IsDisposed && e.Count < _executorCapacity);
+
+                if (_currentQueue == null)
                 {
-                    Unregister(trash);
-                    trash.Dispose();
+                    _currentQueue = new ManualQueueExecutor(_executorCapacity);
+                    Register(_currentQueue);
                 }
+            }
+        }
+        private void CheckForClearing(bool force)
+        {
+            if ((force || _executionCount >= _clearTick) && _executors.Count > 1)
+            {
+                lock (_locker)
+                {
+                    var toRemove = _executors.FindAll((x) => x.Count == 0 || x.IsDisposed).ToArray();
+                    foreach (var trash in toRemove)
+                    {
+                        Unregister(trash);
+                        trash.Dispose();
+                    }
+                }
+
+                if (_currentQueue.IsDisposed)
+                {
+                    ResetCurrentQueue();
+                }
+
+                _executionCount = 0;
             }
         }
     }

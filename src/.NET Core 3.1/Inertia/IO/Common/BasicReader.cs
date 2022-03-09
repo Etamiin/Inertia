@@ -25,6 +25,7 @@ namespace Inertia
             { typeof(uint), (reader) => reader.GetUInt() },
             { typeof(long), (reader) => reader.GetLong() },
             { typeof(ulong), (reader) => reader.GetULong() },
+            { typeof(DateTime), (reader) => reader.GetDateTime() },
             { typeof(byte[]), (reader) => reader.GetBytes() },
         };
 
@@ -81,6 +82,11 @@ namespace Inertia
 
         public BasicReader SetPosition(long position)
         {
+            if (IsDisposed)
+            {
+                throw new ObjectDisposedException("BasicReader");
+            }
+
             if (position < 0 || position >= TotalLength) return this;
 
             _reader.Position = position;
@@ -88,9 +94,12 @@ namespace Inertia
         }
         public long GetPosition()
         {
-            if (_reader != null) return _reader.Position;
+            if (IsDisposed)
+            {
+                throw new ObjectDisposedException("BasicReader");
+            }
 
-            return 0;
+            return _reader.Position;
         }
 
         public void Clear()
@@ -129,6 +138,10 @@ namespace Inertia
             return this;
         }
 
+        public BasicReader Skip(int length)
+        {
+            return SetPosition(GetPosition() + length);
+        }
         public BasicReader RemoveReadedBytes()
         {
             if (IsDisposed)
@@ -258,7 +271,7 @@ namespace Inertia
         {
             if (IsUpdatable(8))
             {
-                return BitConverter.ToUInt64(ReadSize(4));
+                return BitConverter.ToUInt64(ReadSize(8));
             }
             else return default;
         }
@@ -322,35 +335,11 @@ namespace Inertia
         }
         public IAutoSerializable GetAutoSerializable(IAutoSerializable instance)
         {
-            var type = instance.GetType();
-            var fields = instance.GetType().GetFields(BindingFlags.Public | BindingFlags.Instance).OrderBy((x) => x.MetadataToken);
-
-            foreach (var field in fields)
+            if (ReflectionProvider.TryGetFields(instance.GetType(), out ReflectionProvider.SerializableFieldMemory[] fields))
             {
-                if (field.GetCustomAttribute<IgnoreInProcess>() == null)
+                foreach (var field in fields)
                 {
-                    if (!typeof(IAutoSerializable).IsAssignableFrom(field.FieldType))
-                    {
-                        var customization = field.GetCustomAttribute<CustomDeserialization>();
-                        if (customization == null)
-                        {
-                            field.SetValue(instance, GetValue(field.FieldType));
-                        }
-                        else
-                        {
-                            var method = type.GetMethod(customization.MethodName, BindingFlags.NonPublic | BindingFlags.Instance);
-                            var parameters = method?.GetParameters();
-
-                            if (parameters.Length == 1 && parameters[0].ParameterType == typeof(BasicReader))
-                            {
-                                method.Invoke(instance, new object[] { this });
-                            }
-                        }
-                    }
-                    else
-                    {
-                        field.SetValue(instance, GetAutoSerializable(field.FieldType));
-                    }
+                    field.Read(instance, this);
                 }
             }
 
@@ -363,9 +352,9 @@ namespace Inertia
         }
         public object GetValue(Type type)
         {
-            if (_typageDefinitions.ContainsKey(type))
+            if (_typageDefinitions.TryGetValue(type, out BasicReturnAction<BasicReader, object> action))
             {
-                return _typageDefinitions[type](this);
+                return action(this);
             }
             else
             {

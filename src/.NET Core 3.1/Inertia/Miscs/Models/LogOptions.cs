@@ -6,7 +6,17 @@ namespace Inertia
 {
     public sealed class LogOptions
     {
-        public static int MinimumSaveTimer { get; } = 10000;
+        public struct LogType
+        {
+            public readonly string Title;
+            public readonly ConsoleColor Color;
+
+            public LogType(string title, ConsoleColor color)
+            {
+                Title = title;
+                Color = color;
+            }
+        }
 
         public static LogOptions Default
         {
@@ -16,23 +26,19 @@ namespace Inertia
                 {
                     ExecuteAsync = true,
                     IncludeTime = false,
-                    SaveLog = false,
-                    SaveLogTimerMs = MinimumSaveTimer
+                    OutputFileName = string.Empty,
+                    OutputInConsole = true
                 };
             }
         }
 
         public bool ExecuteAsync { get; set; }
-        public bool SaveLog { get; set; }
+        public string OutputFileName { get; set; }
         public bool IncludeTime { get; set; }
-        public int SaveLogTimerMs { get; set; }
+        public bool OutputInConsole { get; set; }
 
-        public ConsoleColor DefaultColor { get; set; } = ConsoleColor.White;
-        public ConsoleColor WarnColor { get; set; } = ConsoleColor.Yellow;
-        public ConsoleColor ErrorColor { get; set; } = ConsoleColor.Red;
-
-        public string DefaultTitle { get; set; } = "[INFO]: ";
-        public string WarnTitle { get; set; } = "[WARN]: ";
-        public string ErrorTitle { get; set; } = "[ERROR]: ";
+        public LogType Line { get; set; } = new LogType("[INFO]:", ConsoleColor.White);
+        public LogType Warn { get; set; } = new LogType("[WARN]:", ConsoleColor.Yellow);
+        public LogType Error { get; set; } = new LogType("[ERROR]:", ConsoleColor.Red);
     }
 }

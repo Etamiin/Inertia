@@ -11,7 +11,54 @@ namespace Inertia.Network
         private static NetworkProtocol _current;
         private static Dictionary<ushort, Type> _messageTypes;
         private static Dictionary<Type, NetworkMessageCaller> _messageHookers;
-        
+
+        internal static bool TryRegisterMessage(Type type)
+        {
+            var message = CreateMessage(type);
+
+            if (!_messageTypes.ContainsKey(message.MessageId))
+            {
+                _messageTypes.Add(message.MessageId, type);
+                return true;
+            }
+
+            return false;
+        }
+        internal static NetworkMessageCaller RegisterHooker(Type type)
+        {
+            if (!_messageHookers.ContainsKey(type))
+            {
+                _messageHookers.Add(type, new NetworkMessageCaller());
+            }
+
+            return _messageHookers[type];
+        }
+        internal static void ProcessParsing(object receiver, BasicReader reader)
+        {
+            var output = new MessageParsingOutput();
+            var caller = GetCaller(receiver);
+
+            var canBeParsed = _current.OnParseMessage(receiver, reader, output);
+            if (canBeParsed && caller != null)
+            {
+                foreach (var message in output.Messages)
+                {
+                    if (_current.PooledExecution)
+                    {
+                        _current.AsyncPool.Enqueue(() => caller.CallReference(message, receiver));
+                    }
+                    else
+                    {
+                        caller.CallReference(message, receiver);
+                    }
+                }
+            }
+
+            output
+                .SetAsReaded()
+                .Dispose();
+        }
+
         public static NetworkProtocol GetCurrentProtocol()
         {
             return _current;
@@ -53,32 +100,6 @@ namespace Inertia.Network
             return (NetworkMessage)constr.Invoke(new object[parameters.Length]);
         }
 
-        internal static void ProcessParsing(object receiver, BasicReader reader)
-        {
-            var output = new MessageParsingOutput();
-            var caller = GetCaller(receiver);
-
-            var canBeParsed = _current.OnParseMessage(receiver, reader, output);
-            if (canBeParsed && caller != null)
-            {
-                foreach (var message in output.Messages)
-                {
-                    if (_current.PooledExecution)
-                    {
-                        _current.AsyncPool.Enqueue(() => caller.CallReference(message, receiver));
-                    }
-                    else
-                    {
-                        caller.CallReference(message, receiver);
-                    }
-                }
-            }
-
-            output
-                .SetAsReaded()
-                .Dispose();
-        }
-
         public abstract bool PooledExecution { get; }
         /// <summary>
         /// The size of the buffer to be used for network communication.
@@ -91,56 +112,7 @@ namespace Inertia.Network
         {
             _messageTypes = new Dictionary<ushort, Type>();
             _messageHookers = new Dictionary<Type, NetworkMessageCaller>();
-
-            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
-            {
-                var types = assembly.GetTypes();
-                foreach (var type in types)
-                {
-                    if (!type.IsClass || type.IsAbstract) continue;
-
-                    if (type.IsSubclassOf(typeof(NetworkMessage)))
-                    {
-                        var message = CreateMessage(type);
-
-                        if (!_messageTypes.ContainsKey(message.MessageId))
-                        {
-                            _messageTypes.Add(message.MessageId, type);
-                            VerifyReceivers(type);
-                        }
-                    }
-                    else if (typeof(IMessageHooker).IsAssignableFrom(type))
-                    {
-                        VerifyReceivers(type);
-                    }
-                }
-            }
-
             _current = new DefaultNetworkProtocol();
-
-            void VerifyReceivers(Type type)
-            {
-                var sMethods = type.GetMethods(BindingFlags.Static | BindingFlags.NonPublic);
-                if (sMethods.Length > 0)
-                {
-                    foreach (var smethod in sMethods)
-                    {
-                        var ps = smethod.GetParameters();
-                        if (ps.Length >= 2 && ps[0].ParameterType.IsSubclassOf(typeof(NetworkMessage)) && (ps[1].ParameterType.IsSubclassOf(typeof(NetworkClientEntity)) || ps[1].ParameterType.IsSubclassOf(typeof(NetworkConnectionEntity))))
-                        {
-                            var msgType = ps[0].ParameterType;
-                            var entityType = ps[1].ParameterType;
-
-                            if (!_messageHookers.ContainsKey(entityType))
-                            {
-                                _messageHookers.Add(entityType, new NetworkMessageCaller());
-                            }
-
-                            _messageHookers[entityType].RegisterReference(msgType, smethod);
-                        }
-                    }
-                }
-            }
         }
         protected NetworkProtocol()
         {
