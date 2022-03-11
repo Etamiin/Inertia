@@ -9,6 +9,7 @@ namespace Inertia.Network
     public abstract class UdpClientEntity : NetworkClientEntity, IDisposable
     {
         public override bool IsConnected => (_client?.Client) != null && _client.Client.Connected;
+
         private UdpClient _client;
         private BasicReader _reader;
 
@@ -82,7 +83,6 @@ namespace Inertia.Network
         {
             if (!IsDisposed)
             {
-                BeforeDispose();
                 Disconnect(NetworkDisconnectReason.Manual);
                 _client?.Dispose();
 

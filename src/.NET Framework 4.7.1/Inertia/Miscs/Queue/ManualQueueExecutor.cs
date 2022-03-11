@@ -48,11 +48,8 @@ namespace Inertia
                 throw new ObjectDisposedException(nameof(ManualQueueExecutor));
             }
 
-            while (_queue.Count > 0)
-            {
-                var action = _queue.Dequeue();
-                action?.Invoke();
-            }
+            var action = _queue.Dequeue();
+            action?.Invoke();
         }
 
         public void Dispose()

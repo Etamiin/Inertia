@@ -7,8 +7,8 @@ namespace Inertia.Network
     /// </summary>
     public sealed class DefaultNetworkProtocol : NetworkProtocol
     {
-        public override bool PooledExecution => false;
-        public override int NetworkBufferLength => 8192;
+        public override int NetworkBufferLength => 4096;
+        public override int AuthorizedDataCountPerSecond => 125;
 
         internal DefaultNetworkProtocol()
         {
@@ -60,21 +60,34 @@ namespace Inertia.Network
                     var message = CreateMessage(msgId);
                     if (message == null)
                     {
+                        reader.Skip((int)msgSize);
                         throw new UnknownMessageException(msgId);
                     }
 
                     message.Deserialize(reader);
-                    output.AddOutput(message);
+                    output.AddMessage(message);
                 }
                 catch (Exception ex)
                 {
-                    throw new DefaultProtocolFailedParsingMessageException(ex.Message);
+                    OnParsingError(receiver, ex);
                 }
 
                 reader.RemoveReadedBytes();
             }
 
             return true;
+        }
+        public override void OnParsingError(object receiver, Exception ex)
+        {
+            if (ex is UnknownMessageException)
+            {
+                if (receiver is TcpConnectionEntity connection)
+                {
+                    connection.Disconnect(NetworkDisconnectReason.SendingBadInformation);
+                }
+            }
+
+            Log.Error($"NetworkProtocol Parsing Error: {ex}");
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 
 namespace Inertia.Network
 {
@@ -9,15 +10,19 @@ namespace Inertia.Network
 
         public bool IsConnected => _socket != null && _socket.Connected;
 
+        private TcpServerEntity _server;
+        private Socket _socket;
         private readonly BasicReader _reader;
         private byte[] _buffer;
-        private Socket _socket;
         private bool _disconnectionNotified;
-        
-        internal TcpConnectionEntity(Socket socket, uint id) : base(id)
+        private DateTime _spamTimer;
+        private int _dataCountReceivedInLastSecond;
+
+        internal TcpConnectionEntity(TcpServerEntity server, Socket socket, uint id) : base(id)
         {
+            _server = server;
             _socket = socket;
-            _buffer = new byte[NetworkProtocol.GetCurrentProtocol().NetworkBufferLength];
+            _buffer = new byte[NetworkProtocol.UsedProtocol.NetworkBufferLength];
             _reader = new BasicReader();
         }
 
@@ -35,13 +40,14 @@ namespace Inertia.Network
             {
                 throw new ObjectDisposedException(nameof(TcpConnectionEntity));
             }
+            
+            if (!IsConnected) return;
 
             try { _socket.Send(data); } catch { }
         }
         public override void Send(NetworkMessage message)
         {
-            if (!IsConnected) return;
-            Send(NetworkProtocol.GetCurrentProtocol().OnSerializeMessage(message));
+            Send(NetworkProtocol.UsedProtocol.OnSerializeMessage(message));
         }
 
         public void Disconnect()
@@ -50,34 +56,35 @@ namespace Inertia.Network
         }
         public void Disconnect(NetworkDisconnectReason reason)
         {
-            System.Threading.Tasks.Task.Run(() => {
-                if (IsDisposed)
+            if (IsDisposed)
+            {
+                throw new ObjectDisposedException(nameof(TcpConnectionEntity));
+            }
+
+            if (IsConnected)
+            {
+                try
                 {
-                    throw new ObjectDisposedException(nameof(TcpConnectionEntity));
+                    _socket.Shutdown(SocketShutdown.Both);
                 }
+                catch { }
 
-                if (IsConnected)
-                {
-                    try
-                    {
-                        _socket.Shutdown(SocketShutdown.Both);
-                    }
-                    catch { }
+                _reader?.Dispose();
+                _socket?.Disconnect(false);
+            }
 
-                    _reader?.Dispose();
-                    _socket?.Disconnect(false);
-                }
+            if (!_disconnectionNotified)
+            {
+                _disconnectionNotified = true;
 
-                if (!_disconnectionNotified)
-                {
-                    _disconnectionNotified = true;
-                    Disconnected?.Invoke(reason);
+                Disconnected?.Invoke(reason);
+                _server.ConnectionDisconnected(this, reason);
 
-                    _buffer = null;
-                    _socket = null;
-                    Disconnected = null;
-                }
-            });
+                _server = null;
+                _buffer = null;
+                _socket = null;
+                Disconnected = null;
+            }
         }
 
         public void Dispose()
@@ -94,7 +101,29 @@ namespace Inertia.Network
             try
             {
                 var received = ((Socket)iar.AsyncState).EndReceive(iar);
-                if (received == 0) throw new SocketException();
+                if (received == 0)
+                {
+                    throw new SocketException();
+                }
+
+                _dataCountReceivedInLastSecond++;
+                if (_spamTimer != null)
+                {
+                    var ts = DateTime.Now - _spamTimer;
+                    if (ts.TotalSeconds > 1)
+                    {
+                        if (_dataCountReceivedInLastSecond >= NetworkProtocol.UsedProtocol.AuthorizedDataCountPerSecond)
+                        {
+                            Disconnect(NetworkDisconnectReason.SpammingMessages);
+                            return;
+                        }
+                        else
+                        {
+                            _dataCountReceivedInLastSecond = 0;
+                            _spamTimer = DateTime.Now;
+                        }
+                    }
+                }
 
                 NetworkProtocol.ProcessParsing(this, _reader.Fill(new ReadOnlySpan<byte>(_buffer, 0, received)));
             }

@@ -25,6 +25,7 @@ namespace Inertia
             { typeof(uint), (reader) => reader.GetUInt() },
             { typeof(long), (reader) => reader.GetLong() },
             { typeof(ulong), (reader) => reader.GetULong() },
+            { typeof(DateTime), (reader) => reader.GetDateTime() },
             { typeof(byte[]), (reader) => reader.GetBytes() },
         };
 
@@ -45,25 +46,22 @@ namespace Inertia
         {
             get
             {
-                if (_reader != null) return _reader.BaseStream.Length;
+                if (_reader != null) return _reader.Length;
 
                 return 0;
             }
         }
-        /// <summary>
-        /// Returns the total unreaded length of the stream.
-        /// </summary>
         public long UnreadedLength
         {
             get
             {
-                if (_reader != null) return _reader.BaseStream.Length - _reader.BaseStream.Position;
+                if (_reader != null) return _reader.Length - _reader.Position;
 
                 return 0;
             }
         }
 
-        private BinaryReader _reader;
+        private MemoryStream _reader;
         private readonly Encoding _encoding;
 
         public BasicReader() : this(Encoding.UTF8)
@@ -72,7 +70,7 @@ namespace Inertia
         public BasicReader(Encoding encoding)
         {
             _encoding = encoding;
-            _reader = new BinaryReader(new MemoryStream(), encoding, false);
+            _reader = new MemoryStream();
         }
         public BasicReader(byte[] data) : this(data, Encoding.UTF8)
         {
@@ -84,16 +82,24 @@ namespace Inertia
 
         public BasicReader SetPosition(long position)
         {
-            if (position < 0 || position >= TotalLength) return this;
+            if (IsDisposed)
+            {
+                throw new ObjectDisposedException(nameof(BasicReader));
+            }
 
-            _reader.BaseStream.Position = position;
+            if (position < 0 || position > TotalLength) return this;
+
+            _reader.Position = position;
             return this;
         }
         public long GetPosition()
         {
-            if (_reader != null) return _reader.BaseStream.Position;
+            if (IsDisposed)
+            {
+                throw new ObjectDisposedException(nameof(BasicReader));
+            }
 
-            return 0;
+            return _reader.Position;
         }
 
         public void Clear()
@@ -101,83 +107,74 @@ namespace Inertia
             if (!IsDisposed && _reader != null)
             {
                 _reader.Dispose();
-                _reader = new BinaryReader(new MemoryStream(), _encoding);
+                _reader = new MemoryStream();
             }
         }
 
         public BasicReader Fill(byte[] buffer)
         {
-            return Fill(buffer, TotalLength, buffer.Length);
+            return Fill(buffer, TotalLength);
         }
-        public BasicReader Fill(byte[] buffer, int length)
-        {
-            return Fill(buffer, TotalLength, length);
-        }
-        public BasicReader Fill(byte[] buffer, long offset, int length)
+        public BasicReader Fill(byte[] buffer, long offset)
         {
             if (IsDisposed)
             {
                 throw new ObjectDisposedException(nameof(BasicReader));
             }
 
-            var newLength = offset + length;
-            if (newLength > _reader.BaseStream.Length)
+            var newLength = offset + buffer.Length;
+            if (newLength > _reader.Length)
             {
-                _reader.BaseStream.SetLength(newLength);
-            }
+                _reader.SetLength(newLength);
+                _reader.Capacity = (int)newLength;
+            }            
 
             var oldPosition = GetPosition();
+
             SetPosition(offset);
-            _reader.BaseStream.Write(buffer, 0, length);
+            _reader.Write(buffer, 0, buffer.Length);
             SetPosition(oldPosition);
 
             return this;
         }
 
+        public BasicReader Skip(int length)
+        {
+            return SetPosition(GetPosition() + length);
+        }
         public BasicReader RemoveReadedBytes()
         {
             if (IsDisposed)
             {
-                throw new ObjectDisposedException("BasicReader");
+                throw new ObjectDisposedException(nameof(BasicReader));
             }
 
-            var available = GetBytes(UnreadedLength);
-            _reader.BaseStream.SetLength(available.Length);
+            var available = GetBytes((int)UnreadedLength);
+
+            _reader.SetLength(available.Length);
+            _reader.Capacity = available.Length;
 
             if (available.Length > 0)
             {
-                Fill(available, 0, available.Length);
+                Fill(available, 0);
                 SetPosition(0);
             }
 
             return this;
         }
 
-        /// <summary>
-        /// Read a <see cref="bool"/> value in the stream and change the position
-        /// </summary>
-        /// <returns>Readed <see cref="bool"/> value or false if nothing can be read</returns>
         public bool GetBool()
         {
-            if (IsUpdatable(sizeof(bool)))
+            if (IsUpdatable(1))
             {
-                return _reader.ReadBoolean();
+                return Convert.ToBoolean(_reader.ReadByte());
             }
             else return default;
         }
-        /// <summary>
-        /// Read a bool flag based on specified length
-        /// </summary>
-        /// <param name="length"></param>
-        /// <returns></returns>
         public bool[] GetBoolFlag(int length)
         {
             return GetByte().GetBits(length);
         }
-        /// <summary>
-        /// Read a <see cref="string"/> value with the current instance <see cref="Encoding"/> algorithm in the stream and change the position
-        /// </summary>
-        /// <returns>Readed <see cref="string"/> value or <see cref="string.Empty"/> if nothing can be read</returns>
         public string GetString()
         {
             var b = GetBytes();
@@ -187,198 +184,127 @@ namespace Inertia
             }
             else return string.Empty;
         }
-        /// <summary>
-        /// Read a <see cref="byte"/> value in the stream and change the position
-        /// </summary>
-        /// <returns>Readed <see cref="byte"/> value or 0 if nothing can be read</returns>
         public byte GetByte()
         {
-            if (IsUpdatable(sizeof(byte)))
+            if (IsUpdatable(1))
             {
-                return _reader.ReadByte();
+                return (byte)_reader.ReadByte();
             }
-            else return default;          
+            else return default;
         }
-        /// <summary>
-        /// Read a <see cref="sbyte"/> value in the stream and change the position
-        /// </summary>
-        /// <returns>Readed <see cref="sbyte"/> value or 0 if nothing can be read</returns>
         public sbyte GetSByte()
         {
-            if (IsUpdatable(sizeof(sbyte)))
+            if (IsUpdatable(1))
             {
-                return _reader.ReadSByte();
+                return unchecked((sbyte)_reader.ReadByte());
             }
             else return default;
         }
-        /// <summary>
-        /// Read a <see cref="char"/> value in the stream and change the position
-        /// </summary>
-        /// <returns>Readed <see cref="char"/> value or default <see cref="char"/> if nothing can be read</returns>
         public char GetChar()
         {
-            if (IsUpdatable(sizeof(char)))
+            if (IsUpdatable(1))
             {
-                return _reader.ReadChar();
+                return BitConverter.ToChar(ReadSize(1), 0);
             }
             else return default;
         }
-        /// <summary>
-        /// Read a <see cref="float"/> value in the stream and change the position
-        /// </summary>
-        /// <returns>Readed <see cref="float"/> value or 0 if nothing can be read</returns>
         public float GetFloat()
         {
-            if (IsUpdatable(sizeof(float)))
+            if (IsUpdatable(4))
             {
-                return _reader.ReadSingle();
+                return BitConverter.ToSingle(ReadSize(4), 0);
             }
             else return default;
         }
-        /// <summary>
-        /// Read a <see cref="double"/> value in the stream and change the position
-        /// </summary>
-        /// <returns>Readed <see cref="double"/> value or 0 if nothing can be read</returns>
         public double GetDouble()
         {
-            if (IsUpdatable(sizeof(double)))
+            if (IsUpdatable(8))
             {
-                return _reader.ReadDouble();
+                return BitConverter.ToDouble(ReadSize(8), 0);
             }
             else return default;
         }
-        /// <summary>
-        /// Read a <see cref="decimal"/> value in the stream and change the position
-        /// </summary>
-        /// <returns>Readed <see cref="decimal"/> value or 0 if nothing can be read</returns>
         public decimal GetDecimal()
         {
-            if (IsUpdatable(sizeof(decimal)))
-            {
-                return _reader.ReadDecimal();
-            }
-            else return default;
+            return (decimal)GetDouble();
         }
-        /// <summary>
-        /// Read a <see cref="short"/> value in the stream and change the position
-        /// </summary>
-        /// <returns>Readed <see cref="short"/> value or 0 if nothing can be read</returns>
         public short GetShort()
         {
-            if (IsUpdatable(sizeof(short)))
+            if (IsUpdatable(2))
             {
-                return _reader.ReadInt16();
+                return BitConverter.ToInt16(ReadSize(2), 0);
             }
             else return default;
         }
-        /// <summary>
-        /// Read a <see cref="ushort"/> value in the stream and change the position
-        /// </summary>
-        /// <returns>Readed <see cref="ushort"/> value or 0 if nothing can be read</returns>
         public ushort GetUShort()
         {
-            if (IsUpdatable(sizeof(ushort)))
+            if (IsUpdatable(2))
             {
-                return _reader.ReadUInt16();
+                return BitConverter.ToUInt16(ReadSize(2), 0);
             }
             else return default;
         }
-        /// <summary>
-        /// Read a <see cref="int"/> value in the stream and change the position
-        /// </summary>
-        /// <returns>Readed <see cref="int"/> value or 0 if nothing can be read</returns>
         public int GetInt()
         {
-            if (IsUpdatable(sizeof(int)))
+            if (IsUpdatable(4))
             {
-                return _reader.ReadInt32();
+                return BitConverter.ToInt32(ReadSize(4), 0);
             }
             else return default;
         }
-        /// <summary>
-        /// Read a <see cref="uint"/> value in the stream and change the position
-        /// </summary>
-        /// <returns>Readed <see cref="uint"/> value or 0 if nothing can be read</returns>
         public uint GetUInt()
         {
-            if (IsUpdatable(sizeof(uint)))
+            if (IsUpdatable(4))
             {
-                return _reader.ReadUInt32();
+                return BitConverter.ToUInt32(ReadSize(4), 0);
             }
             else return default;
         }
-        /// <summary>
-        /// Read a <see cref="long"/> value in the stream and change the position
-        /// </summary>
-        /// <returns>Readed <see cref="long"/> value or 0 if nothing can be read</returns>
         public long GetLong()
         {
-            if (IsUpdatable(sizeof(long)))
+            if (IsUpdatable(8))
             {
-                return _reader.ReadInt64();
+                return BitConverter.ToInt64(ReadSize(8), 0);
             }
             else return default;
         }
-        /// <summary>
-        /// Read a <see cref="ulong"/> value in the stream and change the position
-        /// </summary>
-        /// <returns>Readed <see cref="ulong"/> value or 0 if nothing can be read</returns>
         public ulong GetULong()
         {
-            if (IsUpdatable(sizeof(ulong)))
+            if (IsUpdatable(8))
             {
-                return _reader.ReadUInt64();
+                return BitConverter.ToUInt64(ReadSize(8), 0);
             }
             else return default;
         }
-        /// <summary>
-        /// Read a byte array (with an <see cref="long"/> length header) in the stream and change the position
-        /// </summary>
-        /// <returns>Readed byte array value or empty byte array if nothing can be read</returns>
-        public byte[] GetBytes()
-        {
-            if (IsUpdatable(sizeof(uint)))
-            {
-                var length = GetUInt();
-                return GetBytes(length);
-            }
-            return new byte[0];
-        }
-        /// <summary>
-        /// Read specified number of <see cref="byte"/> in the stream and change the position
-        /// </summary>
-        /// <param name="length">Length ot the data's buffer</param>
-        /// <returns>Readed byte array of specified length or an empty byte array if nothing can be read</returns>
-        public byte[] GetBytes(long length)
-        {
-            if (IsUpdatable(length))
-            {
-                return _reader.ReadBytes((int)length);
-            }
-            else return new byte[0];
-        }
-        /// <summary>
-        /// Read DateTime in the stream and change the position
-        /// </summary>
-        /// <returns>Returns a <see cref="DateTime"/> instance</returns>
         public DateTime GetDateTime()
         {
             return new DateTime(GetLong());
         }
-        /// <summary>
-        /// Create an instance of <typeparamref name="T"/> and return it after deserialization
-        /// </summary>
-        /// <returns>Returns a <see cref="ISerializableObject"/></returns>
+        public byte[] GetBytes()
+        {
+            if (IsUpdatable(4))
+            {
+                var length = GetUInt();
+                return GetBytes((int)length);
+            }
+            else return new byte[0];
+        }
+        public byte[] GetBytes(int length)
+        {
+            if (IsUpdatable(length))
+            {
+                return ReadSize(length);
+            }
+            else return new byte[0];
+        }
         public T GetSerializableObject<T>() where T : ISerializableObject
         {
             return (T)GetSerializableObject(typeof(T));
         }
-        /// <summary>
-        /// Create an instance of specified Type and return it after deserialization
-        /// </summary>
-        /// <returns>Returns a <see cref="ISerializableObject"/></returns>
         public object GetSerializableObject(Type type)
         {
+            if (!typeof(ISerializableObject).IsAssignableFrom(type)) return null;
+
             var parameters = type
                 .GetConstructors()[0].GetParameters()
                 .Select(p => (object)null)
@@ -392,29 +318,14 @@ namespace Inertia
 
             return null;
         }
-        /// <summary>
-        /// Create an instance of <typeparamref name="T"/> deserialize it and then return it
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
         public T GetAutoSerializable<T>() where T : IAutoSerializable
         {
             return (T)GetAutoSerializable(typeof(T));
         }
-        /// <summary>
-        /// Deserialize the specified instance of <typeparamref name="T"/>
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
         public void GetAutoSerializable<T>(T instance) where T : IAutoSerializable
         {
             GetAutoSerializable((IAutoSerializable)instance);
         }
-        /// <summary>
-        /// Create an instance of specified <see cref="IAutoSerializable"/> deserialize it and then return it
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
         public IAutoSerializable GetAutoSerializable(Type type)
         {
             if (!typeof(IAutoSerializable).IsAssignableFrom(type))
@@ -425,67 +336,28 @@ namespace Inertia
             var instance = Activator.CreateInstance(type);
             return GetAutoSerializable((IAutoSerializable)instance);
         }
-        /// <summary>
-        /// Deserialize the specified instance of <see cref="IAutoSerializable"/>
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
         public IAutoSerializable GetAutoSerializable(IAutoSerializable instance)
         {
-            var type = instance.GetType();
-            var fields = instance.GetType().GetFields(BindingFlags.Public | BindingFlags.Instance).OrderBy((x) => x.MetadataToken);
-
-            foreach (var field in fields)
+            if (ReflectionProvider.TryGetFields(instance.GetType(), out ReflectionProvider.SerializableFieldMemory[] fields))
             {
-                if (field.GetCustomAttribute<IgnoreInProcess>() == null)
+                foreach (var field in fields)
                 {
-                    if (!typeof(IAutoSerializable).IsAssignableFrom(field.FieldType))
-                    {
-                        var customization = field.GetCustomAttribute<CustomDeserialization>();
-                        if (customization == null)
-                        {
-                            field.SetValue(instance, GetValue(field.FieldType));
-                        }
-                        else
-                        {
-                            var method = type.GetMethod(customization.MethodName, BindingFlags.NonPublic | BindingFlags.Instance);
-                            var parameters = method?.GetParameters();
-
-                            if (parameters.Length == 1 && parameters[0].ParameterType == typeof(BasicReader))
-                            {
-                                method.Invoke(instance, new object[] { this });
-                            }
-                        }
-                    }
-                    else
-                    {
-                        field.SetValue(instance, GetAutoSerializable(field.FieldType));
-                    }
+                    field.Read(instance, this);
                 }
             }
 
             return instance;
         }
 
-        /// <summary>
-        /// Read the next object in the stream based on the specified <see cref="Type"/>
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
         public T GetValue<T>()
         {
             return (T)GetValue(typeof(T));
         }
-        /// <summary>
-        /// Read the next object in the stream based on the specified <see cref="Type"/>
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
         public object GetValue(Type type)
         {
-            if (_typageDefinitions.ContainsKey(type))
+            if (_typageDefinitions.TryGetValue(type, out BasicReturnAction<BasicReader, object> action))
             {
-                return _typageDefinitions[type](this);
+                return action(this);
             }
             else
             {
@@ -520,6 +392,13 @@ namespace Inertia
             }
 
             return UnreadedLength >= length;
+        }
+        private byte[] ReadSize(int size)
+        {
+            var buffer = new byte[size];
+            _reader.Read(buffer, 0, buffer.Length);
+
+            return buffer;
         }
     }
 }

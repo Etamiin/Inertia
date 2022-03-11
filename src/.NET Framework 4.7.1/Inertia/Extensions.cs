@@ -8,6 +8,11 @@ public static class Extensions
 {
     private readonly static Random Randomizer = new Random();
 
+    internal static void Write(this MemoryStream stream, byte[] buffer)
+    {
+        stream.Write(buffer, 0, buffer.Length);
+    }
+
     public static void Shuffle<T>(this IList<T> collection)
     {
         var iStart = 0;
@@ -38,15 +43,6 @@ public static class Extensions
     public static byte[] GzipDecompress(this byte[] compressedData)
     {
         return IOHelper.GzipDecompress(compressedData);
-    }
-
-    public static byte[] EncryptWithString(this byte[] data, string key)
-    {
-        return IOHelper.EncryptWithString(data, key);
-    }
-    public static byte[] DecryptWithString(this byte[] encryptedData, string key)
-    {
-        return IOHelper.DecryptWithString(encryptedData, key);
     }
 
     /// <summary>

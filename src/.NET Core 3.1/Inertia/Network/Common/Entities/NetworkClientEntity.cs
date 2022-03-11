@@ -33,11 +33,10 @@ namespace Inertia.Network
         }
         public void Send(NetworkMessage message)
         {
-            Send(NetworkProtocol.GetCurrentProtocol().OnSerializeMessage(message));
+            Send(NetworkProtocol.UsedProtocol.OnSerializeMessage(message));
         }
 
         protected virtual void OnConnected() { }
         protected virtual void OnDisconnected(NetworkDisconnectReason reason) { }
-        protected virtual void BeforeDispose() { }
     }
 }

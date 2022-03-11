@@ -31,9 +31,9 @@ namespace Inertia.Runtime
 
                 IsRunning = true;
             }
-            internal ExecuteScriptIn(float time, BasicAction<ExecuteScriptIn> action, float totalTime) : this(time, action, false)
+            internal ExecuteScriptIn(float time, BasicAction<ExecuteScriptIn> action, float runningTime) : this(time, action, false)
             {
-                _totalTime = totalTime;
+                _totalTime = runningTime;
             }
 
             public void Stop()
@@ -56,13 +56,14 @@ namespace Inertia.Runtime
 
                     if (!Permanent)
                     {
-                        if (_totalTime > _time)
+                        if (_totalTime <= _time)
+                        {
+                            Stop();
+                        }
+                        else
                         {
                             _totalTime -= _time;
-                            return;
                         }
-
-                        Stop();
                     }
                 }
             }
@@ -76,7 +77,6 @@ namespace Inertia.Runtime
                 if (action != null)
                 {
                     _action = action;
-
                     RuntimeManager.RtUpdate += Execute;
                 }
             }
@@ -88,21 +88,14 @@ namespace Inertia.Runtime
             }
         }
 
-        public static void EnterManualMode()
-        {
-            RuntimeManager.IsManuallyRunning = true;
-        }
-        public static void LeaveManualMode()
-        {
-            RuntimeManager.IsManuallyRunning = false;
-        }
+        public static int TargetTickPerSecond { get; set; } = 120;
 
         /// <summary>
         /// Execute the Runtime cycle manually.
         /// </summary>
-        public static void ManualCall(float deltaTime)
+        public static void RuntimeCall(float deltaTime)
         {
-            if (!RuntimeManager.IsManuallyRunning) return;
+            if (!ReflectionProvider.IsRuntimeCallOverriden) return;
 
             RuntimeManager.ExecuteCycle(null, deltaTime);
         }
@@ -119,7 +112,7 @@ namespace Inertia.Runtime
         {
             new ExecuteScriptIn(delayInSeconds, callback, true);
         }
-        public static void ToNextFrame(BasicAction callback)
+        public static void InNextFrame(BasicAction callback)
         {
             new NextFrameExecution(callback);
         }

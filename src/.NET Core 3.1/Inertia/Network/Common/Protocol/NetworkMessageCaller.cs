@@ -29,12 +29,15 @@ namespace Inertia.Network
             }
         }
 
-        public void CallReference(NetworkMessage message, object receiver)
+        public bool TryCallReference(NetworkMessage message, object receiver)
         {
             if (_references.TryGetValue(message.GetType(), out MethodInfo method))
             {
                 method.Invoke(null, new object[] { message, receiver });
+                return true;
             }
+
+            return false;
         }
     }
 }

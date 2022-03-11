@@ -8,8 +8,10 @@ namespace Inertia.Network
 {
     public enum NetworkDisconnectReason : byte
     {
-        Manual,
-        ConnectionLost,
-        ConnectionFailed
+        Manual = 1,
+        ConnectionLost = 2,
+        ConnectionFailed = 4,
+        SendingBadInformation = 8,
+        SpammingMessages = 16
     }
 }

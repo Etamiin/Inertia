@@ -46,17 +46,15 @@ namespace Inertia
             Task.Factory.StartNew(async () => {
                 while (IsRunning)
                 {
-                    if (PoolLength == 0)
+                    if (PoolLength == 1 && _currentQueue.Count == 0)
                     {
-                        CheckForClearing(true);
-
                         await Task.Delay(10);
                         continue;
                     }
 
                     Execute();
                 }
-            });
+            }, TaskCreationOptions.LongRunning);
 
             return this;
         }
@@ -73,7 +71,7 @@ namespace Inertia
                 throw new ObjectDisposedException(nameof(ExecutorPool));
             }
 
-            if (_currentQueue.Count >= _executorCapacity)
+            if (_currentQueue == null || _currentQueue.Count >= _executorCapacity)
             {
                 ResetCurrentQueue();
             }
@@ -117,7 +115,7 @@ namespace Inertia
             _executionCount++;
 
             Executing();
-            CheckForClearing(false);
+            CheckForClearing();
         }
         private void ResetCurrentQueue()
         {
@@ -132,9 +130,9 @@ namespace Inertia
                 }
             }
         }
-        private void CheckForClearing(bool force)
+        private void CheckForClearing()
         {
-            if ((force || _executionCount >= _clearTick) && _executors.Count > 1)
+            if (_executionCount >= _clearTick && _executors.Count > 1)
             {
                 lock (_locker)
                 {

@@ -5,14 +5,14 @@ using System.Threading;
 
 namespace Inertia
 {
-    public sealed class IdProvider
+    public sealed class SafeIdProvider
     {
         private int _currentId;
 
-        public IdProvider()
+        public SafeIdProvider()
         {
         }
-        public IdProvider(int startId)
+        public SafeIdProvider(int startId)
         {
             _currentId = startId;
         }

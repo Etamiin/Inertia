@@ -64,18 +64,18 @@ public static class Log
 
     public static void Line(object content)
     {
-        Line(content, _options.Line);
+        GenericLine(content, _options.Line);
     }    
     public static void Warn(object content)
     {
-        Line(content, _options.Warn);
+        GenericLine(content, _options.Warn);
     }    
     public static void Error(object content)
     {
-        Line(content, _options.Error);
+        GenericLine(content, _options.Error);
     }
 
-    private static void Line(object content, LogOptions.LogType logType)
+    private static void GenericLine(object content, LogOptions.LogType logType)
     {
         if (_options.ExecuteAsync)
         {

@@ -5,11 +5,7 @@ namespace Inertia
 {
     public abstract class BasicCommand
     {
-        public abstract string Name { get; }
-
-        public abstract void OnExecute(BasicCommandArguments arguments);
-
-        internal void PreExecute(string[] arguments, object[] dataCollection, bool containsBlock)
+        internal static void PreExecute(BasicCommand cmd, string[] arguments, object[] dataCollection, bool containsBlock)
         {
             if (containsBlock)
             {
@@ -43,7 +39,11 @@ namespace Inertia
                 arguments = newArguments.ToArray();
             }
 
-            OnExecute(new BasicCommandArguments(arguments, dataCollection));
+            cmd.OnExecute(new BasicCommandArguments(arguments, dataCollection));
         }
+
+        public abstract string Name { get; }
+
+        public abstract void OnExecute(BasicCommandArguments arguments);
     }
 }

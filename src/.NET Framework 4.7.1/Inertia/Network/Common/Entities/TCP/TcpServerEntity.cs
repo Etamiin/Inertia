@@ -9,10 +9,11 @@ namespace Inertia.Network
     public abstract class TcpServerEntity : NetworkServerEntity, IDisposable
     {
         public bool IsRunning => _socket != null && _socket.IsBound && !_closeNotified;
+        public int ConnectedCount => _connections.Count;
 
-        private object _locker;
-        private readonly Dictionary<uint, TcpConnectionEntity> _connections;
         private Socket _socket;
+        private readonly Dictionary<uint, TcpConnectionEntity> _connections;
+        private object _locker;
 
         protected TcpServerEntity(int port) : this(string.Empty, port)
         {
@@ -23,6 +24,48 @@ namespace Inertia.Network
             _connections = new Dictionary<uint, TcpConnectionEntity>();
         }
 
+        public NetworkConnectionGroup CreateConnectionGroup()
+        {
+            var group = new NetworkConnectionGroup();
+
+            lock (_locker)
+            {
+                group.AddConnections(_connections.Values);
+            }
+
+            return group;
+        }
+        public NetworkConnectionGroup CreateConnectionGroup(Predicate<TcpConnectionEntity> predicate)
+        {
+            var group = new NetworkConnectionGroup();
+
+            lock (_locker)
+            {
+                var targets = new List<TcpConnectionEntity>();
+                foreach (var c in _connections.Values)
+                {
+                    if (predicate(c))
+                    {
+                        targets.Add(c);
+                    }
+                }
+
+                group.AddConnections(targets);
+            }
+
+            return group;
+        }
+
+        internal void ConnectionDisconnected(TcpConnectionEntity connection, NetworkDisconnectReason reason)
+        {
+            lock (_locker)
+            {
+                _connections.Remove(connection.Id);
+            }
+
+            OnClientDisconnected(connection, reason);
+        }
+        
         public sealed override void Start()
         {
             if (IsDisposed)
@@ -80,12 +123,11 @@ namespace Inertia.Network
 
         protected virtual void OnClientConnected(TcpConnectionEntity connection) { }
         protected virtual void OnClientDisconnected(TcpConnectionEntity connection, NetworkDisconnectReason reason) { }
-            
+
         public void Dispose()
         {
             if (!IsDisposed)
             {
-                BeforeDispose();
                 Close();
 
                 IsDisposed = true;
@@ -97,17 +139,7 @@ namespace Inertia.Network
             try
             {
                 var socket = ((Socket)iar.AsyncState).EndAccept(iar);
-                var connection = new TcpConnectionEntity(socket, (uint)_idProvider.NextId());
-
-                connection.Disconnected += (reason) =>
-                {
-                    lock (_locker)
-                    {
-                        _connections.Remove(connection.Id);
-                    }
-
-                    OnClientDisconnected(connection, reason);
-                };
+                var connection = new TcpConnectionEntity(this, socket, (uint)_idProvider.NextId());
 
                 lock (_locker)
                 {

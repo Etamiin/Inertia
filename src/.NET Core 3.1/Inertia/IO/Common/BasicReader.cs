@@ -84,10 +84,10 @@ namespace Inertia
         {
             if (IsDisposed)
             {
-                throw new ObjectDisposedException("BasicReader");
+                throw new ObjectDisposedException(nameof(BasicReader));
             }
 
-            if (position < 0 || position >= TotalLength) return this;
+            if (position < 0 || position > TotalLength) return this;
 
             _reader.Position = position;
             return this;
@@ -96,7 +96,7 @@ namespace Inertia
         {
             if (IsDisposed)
             {
-                throw new ObjectDisposedException("BasicReader");
+                throw new ObjectDisposedException(nameof(BasicReader));
             }
 
             return _reader.Position;
@@ -146,10 +146,11 @@ namespace Inertia
         {
             if (IsDisposed)
             {
-                throw new ObjectDisposedException("BasicReader");
+                throw new ObjectDisposedException(nameof(BasicReader));
             }
 
             var available = GetBytes((int)UnreadedLength);
+
             _reader.SetLength(available.Length);
             _reader.Capacity = available.Length;
 
@@ -302,6 +303,8 @@ namespace Inertia
         }
         public object GetSerializableObject(Type type)
         {
+            if (!typeof(ISerializableObject).IsAssignableFrom(type)) return null;
+
             var parameters = type
                 .GetConstructors()[0].GetParameters()
                 .Select(p => (object)null)

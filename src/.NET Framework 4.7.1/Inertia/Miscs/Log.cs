@@ -8,13 +8,12 @@ public static class Log
 {
     private static LogOptions _options;
     private static ExecutorPool _pool;
-    private static StringBuilder _log;
-    private static DateTime _lastSaveTime;
+    private static StreamWriter _outputFileStream;
+    private static Stream _outputConsoleStream;
 
     static Log()
     {
         SetOptions(LogOptions.Default);
-        _lastSaveTime = DateTime.Now;
 
         AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
         TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
@@ -26,7 +25,10 @@ public static class Log
 
         if (options.ExecuteAsync)
         {
-            _pool = new ExecutorPool(100, true);
+            if (_pool == null)
+            {
+                _pool = new ExecutorPool(1000, true);
+            }
         }
         else if (_pool != null)
         {
@@ -34,48 +36,46 @@ public static class Log
             _pool = null;
         }
 
-        if (options.SaveLog)
+        if (options.OutputInConsole)
         {
-            _log = new StringBuilder();
-            if (!Directory.Exists("logs"))
+            _outputConsoleStream = Console.OpenStandardOutput();
+        }
+        else if (_outputConsoleStream != null)
+        {
+            _outputConsoleStream.Close();
+        }
+
+        if (!string.IsNullOrEmpty(options.OutputFileName))
+        {
+            if (_outputFileStream != null)
             {
-                Directory.CreateDirectory("logs");
+                _outputFileStream.Close();
             }
 
-            if (options.SaveLogTimerMs < LogOptions.MinimumSaveTimer)
+            var info = new FileInfo(options.OutputFileName);
+            if (!info.Directory.Exists)
             {
-                options.SaveLogTimerMs = LogOptions.MinimumSaveTimer;
+                info.Directory.Create();
             }
+
+            _outputFileStream = File.CreateText(options.OutputFileName);
         }
     }
-    public static void SaveNow()
-    {
-        if (_log != null)
-        {
-            lock (_log)
-            {
-                File.AppendAllText($"logs/log { _lastSaveTime: yyyy MM dd}.txt", _log.ToString());
 
-                _lastSaveTime = DateTime.Now;
-                _log.Clear();
-            }
-        }
+    public static void Line(object content)
+    {
+        GenericLine(content, _options.Line);
+    }    
+    public static void Warn(object content)
+    {
+        GenericLine(content, _options.Warn);
+    }    
+    public static void Error(object content)
+    {
+        GenericLine(content, _options.Error);
     }
 
-    public static void Line(object content, params object[] args)
-    {
-        Line(content, _options.DefaultTitle, _options.DefaultColor);
-    }    
-    public static void Warn(object content, params object[] args)
-    {
-        Line(content, _options.WarnTitle, _options.WarnColor);
-    }    
-    public static void Error(object content, params object[] args)
-    {
-        Line(content, _options.ErrorTitle, _options.ErrorColor);
-    }
-
-    private static void Line(object content, string title, ConsoleColor textColor)
+    private static void GenericLine(object content, LogOptions.LogType logType)
     {
         if (_options.ExecuteAsync)
         {
@@ -89,25 +89,17 @@ public static class Log
         void Finalize()
         {
             var time = _options.IncludeTime ? $"[{DateTime.Now.ToLongTimeString()}]" : string.Empty;
-            var log = $"{time}{ title }{ content }";
+            var logBytes = Encoding.UTF8.GetBytes($"{time}{ logType.Title } { content }{Environment.NewLine}");
 
-            Console.ForegroundColor = textColor;
-            Console.WriteLine(log);
-
-            if (textColor != _options.DefaultColor)
+            if (_options.OutputInConsole)
             {
-                Console.ForegroundColor = _options.DefaultColor;
+                Console.ForegroundColor = logType.Color;
+                _outputConsoleStream.Write(logBytes, 0, logBytes.Length);
             }
-
-            if (_options.SaveLog)
+            if (_outputFileStream != null)
             {
-                _log.AppendLine(log);
-
-                var ts = DateTime.Now - _lastSaveTime;
-                if (ts.TotalMilliseconds >= _options.SaveLogTimerMs)
-                {
-                    SaveNow();
-                }
+                _outputFileStream.BaseStream.Write(logBytes, 0, logBytes.Length);
+                _outputFileStream.BaseStream.Flush();
             }
         }
     }
@@ -123,8 +115,7 @@ public static class Log
 
         if (e.IsTerminating)
         {
-            _pool?.ForceExecution();
-            SaveNow();
+            _pool?.ExecuteAllAndDispose();
         }
     }
 }

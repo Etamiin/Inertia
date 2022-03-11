@@ -118,39 +118,56 @@ namespace Inertia
 
         public static byte[] EncryptWithString(byte[] data, string key)
         {
-            var pdb = new PasswordDeriveBytes(key, Encoding.ASCII.GetBytes(key));
-            var ms = new MemoryStream();
+            using (var ms = new MemoryStream())
+            {
+                using (var pdb = new PasswordDeriveBytes(key, Encoding.ASCII.GetBytes(key)))
+                {
+                    using (var aes = new AesManaged())
+                    {
+                        aes.Key = pdb.GetBytes(aes.KeySize / 8);
+                        aes.IV = pdb.GetBytes(aes.BlockSize / 8);
 
-            var aes = new AesManaged();
-            aes.Key = pdb.GetBytes(aes.KeySize / 8);
-            aes.IV = pdb.GetBytes(aes.BlockSize / 8);
+                        using (var cs = new CryptoStream(ms, aes.CreateEncryptor(), CryptoStreamMode.Write))
+                        {
+                            cs.Write(data, 0, data.Length);
+                            cs.Close();
+                        }
 
-            var cs = new CryptoStream(ms, aes.CreateEncryptor(), CryptoStreamMode.Write);
-            cs.Write(data, 0, data.Length);
-            cs.Close();
-
-            aes.Dispose();
-            pdb.Dispose();
-
-            return ms.ToArray();
+                        return ms.ToArray();
+                    }
+                }
+            }
         }        
-        public static byte[] DecryptWithString(byte[] encryptedData, string key)
+        public static bool TryDecryptWithString(byte[] encryptedData, string key, out byte[] decryptedData)
         {
-            var pdb = new PasswordDeriveBytes(key, Encoding.ASCII.GetBytes(key));
-            var ms = new MemoryStream();
+            try
+            {
+                using (var ms = new MemoryStream())
+                {
+                    using (var pdb = new PasswordDeriveBytes(key, Encoding.ASCII.GetBytes(key)))
+                    {
+                        using (var aes = new AesManaged())
+                        {
+                            aes.Key = pdb.GetBytes(aes.KeySize / 8);
+                            aes.IV = pdb.GetBytes(aes.BlockSize / 8);
 
-            var aes = new AesManaged();
-            aes.Key = pdb.GetBytes(aes.KeySize / 8);
-            aes.IV = pdb.GetBytes(aes.BlockSize / 8);
+                            using (var cs = new CryptoStream(ms, aes.CreateDecryptor(), CryptoStreamMode.Write))
+                            {
+                                cs.Write(encryptedData, 0, encryptedData.Length);
+                                cs.Close();
+                            }
+                        }
+                    }
 
-            var cs = new CryptoStream(ms, aes.CreateDecryptor(), CryptoStreamMode.Write);
-            cs.Write(encryptedData, 0, encryptedData.Length);
-            cs.Close();
-
-            aes.Dispose();
-            pdb.Dispose();
-
-            return ms.ToArray();
+                    decryptedData = ms.ToArray();
+                    return true;
+                }
+            }
+            catch
+            {
+                decryptedData = null;
+                return false;
+            }
         }
     }
 }

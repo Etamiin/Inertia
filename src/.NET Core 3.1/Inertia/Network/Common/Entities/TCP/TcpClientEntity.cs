@@ -14,7 +14,7 @@ namespace Inertia.Network
 
         protected TcpClientEntity(string ip, int port) : base(ip, port)
         {
-            _buffer = new byte[NetworkProtocol.GetCurrentProtocol().NetworkBufferLength];
+            _buffer = new byte[NetworkProtocol.UsedProtocol.NetworkBufferLength];
         }
         
         public sealed override void Connect()
@@ -81,8 +81,8 @@ namespace Inertia.Network
         {
             if (!IsDisposed)
             {
-                BeforeDispose();
                 Disconnect(NetworkDisconnectReason.Manual);
+
                 _reader.Dispose();
                 _socket?.Dispose();
 
@@ -95,7 +95,10 @@ namespace Inertia.Network
             try
             {
                 int received = ((Socket)iar.AsyncState).EndReceive(iar);
-                if (received == 0) throw new SocketException();
+                if (received == 0)
+                {
+                    throw new SocketException();
+                }
 
                 NetworkProtocol.ProcessParsing(this, _reader.Fill(new ReadOnlySpan<byte>(_buffer, 0, received)));
             }

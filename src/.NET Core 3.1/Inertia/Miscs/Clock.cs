@@ -20,6 +20,8 @@ namespace Inertia
             return clock.GetElapsedSeconds();
         }
 
+        public long ElapsedTicks => _cw.ElapsedTicks;
+
         private readonly Stopwatch _cw;
 
         public Clock()

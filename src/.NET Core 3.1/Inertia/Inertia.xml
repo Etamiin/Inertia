@@ -59,7 +59,7 @@
             <param name="reader"></param>
             <param name="output"></param>
             <returns></returns>
-            <exception cref="T:Inertia.Network.DefaultProtocolFailedParsingMessageException"></exception>
+            <exception cref="!:DefaultProtocolFailedParsingMessageException"></exception>
         </member>
         <member name="M:Inertia.Network.NetworkProtocol.GetCaller(System.Object)">
             <summary>
@@ -132,7 +132,7 @@
             Returns true if the current script run permanently.
             </summary>
         </member>
-        <member name="M:Inertia.Runtime.Run.ManualCall(System.Single)">
+        <member name="M:Inertia.Runtime.Run.RuntimeCall(System.Single)">
             <summary>
             Execute the Runtime cycle manually.
             </summary>

@@ -40,15 +40,6 @@ public static class Extensions
         return IOHelper.GzipDecompress(compressedData);
     }
 
-    public static byte[] EncryptWithString(this byte[] data, string key)
-    {
-        return IOHelper.EncryptWithString(data, key);
-    }
-    public static byte[] DecryptWithString(this byte[] encryptedData, string key)
-    {
-        return IOHelper.DecryptWithString(encryptedData, key);
-    }
-
     /// <summary>
     /// Create a byte flag containing specified boolean values
     /// </summary>

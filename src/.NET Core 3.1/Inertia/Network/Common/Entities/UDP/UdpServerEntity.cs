@@ -93,7 +93,7 @@ namespace Inertia.Network
                 throw new ObjectDisposedException(nameof(UdpConnectionEntity));
             }
 
-            SendTo(connection.EndPoint, NetworkProtocol.GetCurrentProtocol().OnSerializeMessage(message));
+            SendTo(connection.EndPoint, NetworkProtocol.UsedProtocol.OnSerializeMessage(message));
         }
 
         public virtual void OnConnectionAdded(UdpConnectionEntity connection) { }

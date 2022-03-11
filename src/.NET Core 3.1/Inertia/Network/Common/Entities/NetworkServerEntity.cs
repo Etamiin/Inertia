@@ -33,6 +33,5 @@ namespace Inertia.Network
 
         protected virtual void OnStarted() { }
         protected virtual void OnClosed(NetworkDisconnectReason reason) { }
-        protected virtual void BeforeDispose() { }
     }
 }
