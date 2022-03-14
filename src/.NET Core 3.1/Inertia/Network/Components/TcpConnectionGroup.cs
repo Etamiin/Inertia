@@ -69,7 +69,7 @@ namespace Inertia.Network
     
         public void SendAsync(NetworkMessage message)
         {
-            Task.Run(() => Sender(message));
+            Task.Factory.StartNew(() => Sender(message));
         }
     }
 }

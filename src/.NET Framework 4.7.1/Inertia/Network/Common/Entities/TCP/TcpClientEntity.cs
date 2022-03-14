@@ -71,7 +71,7 @@ namespace Inertia.Network
         {
             if (IsDisposed)
             {
-                throw new NotImplementedException(nameof(TcpClientEntity));
+                throw new ObjectDisposedException(nameof(TcpClientEntity));
             }
 
             try { _socket.Send(data); } catch { }
@@ -100,7 +100,7 @@ namespace Inertia.Network
                     throw new SocketException();
                 }
 
-                NetworkProtocol.ProcessParsing(this, _reader.Fill(_buffer));
+                NetworkProtocol.ProcessParsing(this, _reader.Fill(_buffer, received));
             }
             catch (Exception e)
             {

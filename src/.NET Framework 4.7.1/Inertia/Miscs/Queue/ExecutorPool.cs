@@ -16,8 +16,8 @@ namespace Inertia
 
         private event BasicAction Executing = () => { };
 
-        private List<ManualQueueExecutor> _executors;
-        private ManualQueueExecutor _currentQueue;
+        private List<Queue<BasicAction>> _executors;
+        private Queue<BasicAction> _currentQueue;
         private object _locker;
         private int _executorCapacity, _executionCount, _clearTick;
 
@@ -26,7 +26,7 @@ namespace Inertia
         }
         public ExecutorPool(int executorCapacity, int clearTick, bool autoStart)
         {
-            _executors = new List<ManualQueueExecutor>();
+            _executors = new List<Queue<BasicAction>>();
             _locker = new object();
             _executorCapacity = executorCapacity;
             _clearTick = clearTick;
@@ -48,7 +48,7 @@ namespace Inertia
                 {
                     if (PoolLength == 1 && _currentQueue.Count == 0)
                     {
-                        await Task.Delay(10);
+                        await Task.Delay(10).ConfigureAwait(false);
                         continue;
                     }
 
@@ -71,12 +71,16 @@ namespace Inertia
                 throw new ObjectDisposedException(nameof(ExecutorPool));
             }
 
-            if (_currentQueue == null || _currentQueue.Count >= _executorCapacity)
+            lock (_locker)
             {
-                ResetCurrentQueue();
+                if (_currentQueue == null || _currentQueue.Count >= _executorCapacity)
+                {
+                    ResetCurrentQueue();
+                }
+
+                _currentQueue.Enqueue(action);
             }
 
-            _currentQueue.Enqueue(action);
             return this;
         }
         public void ExecuteAllAndDispose()
@@ -98,59 +102,47 @@ namespace Inertia
                 IsDisposed = true;
             }
         }
-
-        private void Register(ManualQueueExecutor queue)
-        {
-            Executing += queue.Execute;
-            _executors.Add(queue);
-        }
-        private void Unregister(ManualQueueExecutor queue)
-        {
-            Executing -= queue.Execute;
-            _executors.Remove(queue);
-        }
         
         private void Execute()
         {
             _executionCount++;
 
-            Executing();
-            CheckForClearing();
-        }
-        private void ResetCurrentQueue()
-        {
             lock (_locker)
             {
-                _currentQueue = _executors.FirstOrDefault((e) => !e.IsDisposed && e.Count < _executorCapacity);
-
-                if (_currentQueue == null)
+                foreach (var queue in _executors)
                 {
-                    _currentQueue = new ManualQueueExecutor(_executorCapacity);
-                    Register(_currentQueue);
-                }
-            }
-        }
-        private void CheckForClearing()
-        {
-            if (_executionCount >= _clearTick && _executors.Count > 1)
-            {
-                lock (_locker)
-                {
-                    var toRemove = _executors.FindAll((x) => x.Count == 0 || x.IsDisposed).ToArray();
-                    foreach (var trash in toRemove)
+                    while (queue.Count > 0)
                     {
-                        Unregister(trash);
-                        trash.Dispose();
+                        var action = queue.Dequeue();
+                        action?.Invoke();
                     }
                 }
 
-                if (_currentQueue.IsDisposed)
+                if (_executionCount >= _clearTick && _executors.Count > 1)
                 {
-                    ResetCurrentQueue();
+                    Clear();
                 }
-
-                _executionCount = 0;
             }
+        }
+        private void ResetCurrentQueue()
+        {
+            _currentQueue = _executors.FirstOrDefault((e) => e.Count < _executorCapacity);
+
+            if (_currentQueue == null)
+            {
+                _currentQueue = new Queue<BasicAction>(_executorCapacity);
+                _executors.Add(_currentQueue);
+            }
+        }
+        private void Clear()
+        {
+            var toRemove = _executors.FindAll((x) => x.Count == 0 && x != _currentQueue).ToArray();
+            foreach (var trash in toRemove)
+            {
+                _executors.Remove(trash);
+            }
+
+            _executionCount = 0;
         }
     }
 }

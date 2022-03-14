@@ -24,16 +24,6 @@
             Core component for command line management and execution.
             </summary>
         </member>
-        <member name="P:Inertia.ManualQueueExecutor.Count">
-            <summary>
-            Returns the number of actions currently queued.
-            </summary>
-        </member>
-        <member name="M:Inertia.ManualQueueExecutor.Execute">
-            <summary>
-            Execute all the actions queued and remove them from the queue.
-            </summary>
-        </member>
         <member name="P:Inertia.Network.UdpServerEntity.IsInitialized">
             <summary>
             Returns true if <see cref="M:Inertia.Network.UdpServerEntity.Start"/> was called successfully.

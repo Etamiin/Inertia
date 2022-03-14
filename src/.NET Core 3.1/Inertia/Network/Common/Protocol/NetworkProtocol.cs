@@ -8,28 +8,47 @@ namespace Inertia.Network
 {
     public abstract class NetworkProtocol
     {
+        internal static ServerMessagePoolExecutor ServerAsyncPool;
         public static NetworkProtocol UsedProtocol { get; private set; }
 
         internal static void ProcessParsing(object receiver, BasicReader reader)
         {
             var output = new MessageParsingOutput();
             var caller = GetCaller(receiver);
-            var successParsing = UsedProtocol.OnParseMessage(receiver, reader, output);
+            
+            UsedProtocol.OnParseMessage(receiver, reader, output);
 
-            if (successParsing && caller != null)
+            if (output.Messages.Count > 0 && caller != null)
+            {
+                if (receiver is NetworkConnectionEntity connection)
+                {
+                    connection.AssignedMessageQueue.Enqueue(ExecuteOutput);
+                }
+                else
+                {
+                    NetworkClientEntity.ClientAsyncPool.Enqueue(ExecuteOutput);
+                }
+            }
+            else
+            {
+                output.Clean();
+            }
+
+            void ExecuteOutput()
             {
                 foreach (var message in output.Messages)
                 {
                     caller.TryCallReference(message, receiver);
                 }
-            }
 
-            output.Clean();
+                output.Clean();
+            }
         }
 
         public static void SetProtocol(NetworkProtocol protocol)
         {
             UsedProtocol = protocol;
+            ServerAsyncPool.ConnectionPerQueue = UsedProtocol.ConnectionPerQueueInPool;
         }
         public static T CreateMessage<T>() where T : NetworkMessage
         {
@@ -71,11 +90,15 @@ namespace Inertia.Network
         /// The size of the buffer to be used for network communication.
         /// </summary>
         public abstract int NetworkBufferLength { get; }
+        public abstract int ConnectionPerQueueInPool { get; }
+        public abstract int ClientMessagePerQueueCapacity { get; }
         public abstract int AuthorizedDataCountPerSecond { get; }
 
         static NetworkProtocol()
         {
             UsedProtocol = new DefaultNetworkProtocol();
+            ServerAsyncPool = new ServerMessagePoolExecutor(UsedProtocol.ConnectionPerQueueInPool);
+
             ReflectionProvider.Invalidate();
         }
         protected NetworkProtocol()
@@ -88,7 +111,7 @@ namespace Inertia.Network
         /// <param name="message"></param>
         /// <returns></returns>
         public abstract byte[] OnSerializeMessage(NetworkMessage message);
-        public abstract bool OnParseMessage(object receiver, BasicReader reader, MessageParsingOutput output);
+        public abstract void OnParseMessage(object receiver, BasicReader reader, MessageParsingOutput output);
         public abstract void OnParsingError(object receiver, Exception ex);
     }
 }

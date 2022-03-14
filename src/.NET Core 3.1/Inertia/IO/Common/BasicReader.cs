@@ -111,18 +111,18 @@ namespace Inertia
             }
         }
 
-        public BasicReader Fill(ReadOnlySpan<byte> buffer)
+        public BasicReader Fill(ReadOnlySpan<byte> data)
         {
-            return Fill(buffer, TotalLength);
+            return Fill(data, TotalLength);
         }
-        public BasicReader Fill(ReadOnlySpan<byte> buffer, long offset)
+        public BasicReader Fill(ReadOnlySpan<byte> data, long offset)
         {
             if (IsDisposed)
             {
                 throw new ObjectDisposedException(nameof(BasicReader));
             }
 
-            var newLength = offset + buffer.Length;
+            var newLength = offset + data.Length;
             if (newLength > _reader.Length)
             {
                 _reader.SetLength(newLength);
@@ -132,7 +132,7 @@ namespace Inertia
             var oldPosition = GetPosition();
 
             SetPosition(offset);
-            _reader.Write(buffer);
+            _reader.Write(data);
             SetPosition(oldPosition);
 
             return this;
@@ -284,8 +284,8 @@ namespace Inertia
         {
             if (IsUpdatable(4))
             {
-                var length = GetUInt();
-                return GetBytes((int)length);
+                var length = BitConverter.ToInt32(ReadSize(4));
+                return GetBytes(length);
             }
             else return new byte[0];
         }

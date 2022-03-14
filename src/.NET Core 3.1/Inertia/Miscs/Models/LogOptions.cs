@@ -25,7 +25,6 @@ namespace Inertia
                 return new LogOptions
                 {
                     ExecuteAsync = true,
-                    IncludeTime = false,
                     OutputFileName = string.Empty,
                     OutputInConsole = true
                 };
@@ -36,9 +35,15 @@ namespace Inertia
         public string OutputFileName { get; set; }
         public bool IncludeTime { get; set; }
         public bool OutputInConsole { get; set; }
+        public Encoding TextEncoding { get; set; }
 
         public LogType Line { get; set; } = new LogType("[INFO]:", ConsoleColor.White);
         public LogType Warn { get; set; } = new LogType("[WARN]:", ConsoleColor.Yellow);
         public LogType Error { get; set; } = new LogType("[ERROR]:", ConsoleColor.Red);
+    
+        public LogOptions()
+        {
+            TextEncoding = Encoding.UTF8;
+        }
     }
 }

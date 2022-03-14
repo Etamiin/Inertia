@@ -38,6 +38,7 @@ public static class Log
 
         if (options.OutputInConsole)
         {
+            Console.OutputEncoding = options.TextEncoding;
             _outputConsoleStream = Console.OpenStandardOutput();
         }
         else if (_outputConsoleStream != null)
@@ -57,8 +58,12 @@ public static class Log
             {
                 info.Directory.Create();
             }
+            if (!info.Exists)
+            {
+                info.Create();
+            }
 
-            _outputFileStream = File.CreateText(options.OutputFileName);
+            _outputFileStream = new StreamWriter(info.FullName, true, options.TextEncoding);
         }
     }
 

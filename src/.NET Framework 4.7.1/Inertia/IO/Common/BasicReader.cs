@@ -77,7 +77,7 @@ namespace Inertia
         }
         public BasicReader(byte[] data, Encoding encoding) : this(encoding)
         {
-            Fill(data);
+            Fill(data, data.Length);
         }
 
         public BasicReader SetPosition(long position)
@@ -111,18 +111,18 @@ namespace Inertia
             }
         }
 
-        public BasicReader Fill(byte[] buffer)
+        public BasicReader Fill(byte[] buffer, int length)
         {
-            return Fill(buffer, TotalLength);
+            return Fill(buffer, length, TotalLength);
         }
-        public BasicReader Fill(byte[] buffer, long offset)
+        public BasicReader Fill(byte[] buffer, int length, long positionOffset)
         {
             if (IsDisposed)
             {
                 throw new ObjectDisposedException(nameof(BasicReader));
             }
 
-            var newLength = offset + buffer.Length;
+            var newLength = positionOffset + length;
             if (newLength > _reader.Length)
             {
                 _reader.SetLength(newLength);
@@ -131,8 +131,8 @@ namespace Inertia
 
             var oldPosition = GetPosition();
 
-            SetPosition(offset);
-            _reader.Write(buffer, 0, buffer.Length);
+            SetPosition(positionOffset);
+            _reader.Write(buffer, 0, length);
             SetPosition(oldPosition);
 
             return this;
@@ -156,7 +156,7 @@ namespace Inertia
 
             if (available.Length > 0)
             {
-                Fill(available, 0);
+                Fill(available, available.Length, 0);
                 SetPosition(0);
             }
 
@@ -284,8 +284,8 @@ namespace Inertia
         {
             if (IsUpdatable(4))
             {
-                var length = GetUInt();
-                return GetBytes((int)length);
+                var length = BitConverter.ToInt32(ReadSize(4), 0);
+                return GetBytes(length);
             }
             else return new byte[0];
         }

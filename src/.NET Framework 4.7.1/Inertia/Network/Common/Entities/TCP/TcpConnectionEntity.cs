@@ -125,7 +125,7 @@ namespace Inertia.Network
                     }
                 }
 
-                NetworkProtocol.ProcessParsing(this, _reader.Fill(_buffer));
+                NetworkProtocol.ProcessParsing(this, _reader.Fill(_buffer, received));
             }
             catch (Exception ex)
             {

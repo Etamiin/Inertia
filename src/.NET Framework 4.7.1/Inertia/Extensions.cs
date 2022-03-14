@@ -8,9 +8,9 @@ public static class Extensions
 {
     private readonly static Random Randomizer = new Random();
 
-    internal static void Write(this MemoryStream stream, byte[] buffer)
+    internal static void Write(this MemoryStream stream, byte[] data)
     {
-        stream.Write(buffer, 0, buffer.Length);
+        stream.Write(data, 0, data.Length);
     }
 
     public static void Shuffle<T>(this IList<T> collection)

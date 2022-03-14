@@ -181,7 +181,9 @@ namespace Inertia
             }
 
             _writer.Write(BitConverter.GetBytes(value.Length));
-            return SetBytesWithoutHeader(value);
+            _writer.Write(value);
+
+            return this;
         }
         public BasicWriter SetBytesWithoutHeader(byte[] value)
         {

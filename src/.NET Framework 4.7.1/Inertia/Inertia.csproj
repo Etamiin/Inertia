@@ -64,7 +64,6 @@
     <Compile Include="Miscs\Log.cs" />
     <Compile Include="Miscs\Models\LogOptions.cs" />
     <Compile Include="Miscs\Queue\ExecutorPool.cs" />
-    <Compile Include="Miscs\Queue\ManualQueueExecutor.cs" />
     <Compile Include="Miscs\SafeIdProvider.cs" />
     <Compile Include="Network\Common\Entities\NetworkClientEntity.cs" />
     <Compile Include="Network\Common\Entities\NetworkConnectionEntity.cs" />
@@ -80,6 +79,8 @@
     <Compile Include="Network\Common\Protocol\NetworkMessage.cs" />
     <Compile Include="Network\Common\Protocol\NetworkMessageCaller.cs" />
     <Compile Include="Network\Common\Protocol\NetworkProtocol.cs" />
+    <Compile Include="Network\Components\Data\ServerMessageQueue.cs" />
+    <Compile Include="Network\Components\ServerMessagePoolExecutor.cs" />
     <Compile Include="Network\Components\TcpConnectionGroup.cs" />
     <Compile Include="Network\Enums\NetworkDisconnectReason.cs" />
     <Compile Include="Network\Exceptions\UnknownMessageException.cs" />

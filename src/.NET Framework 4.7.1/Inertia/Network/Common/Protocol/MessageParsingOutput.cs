@@ -6,6 +6,8 @@ namespace Inertia.Network
 {
     public sealed class MessageParsingOutput
     {
+        public bool IsDisposed { get; private set; }
+
         internal List<NetworkMessage> Messages { get; private set; }
 
         internal MessageParsingOutput()
@@ -15,13 +17,23 @@ namespace Inertia.Network
 
         public void AddMessage(NetworkMessage message)
         {
+            if (IsDisposed)
+            {
+                throw new ObjectDisposedException(nameof(MessageParsingOutput));
+            }
+
             Messages.Add(message);
         }
 
         internal void Clean()
         {
-            Messages.Clear();
-            Messages = null;
+            if (!IsDisposed)
+            {
+                Messages.Clear();
+                Messages = null;
+
+                IsDisposed = true;
+            }
         }
     }
 }

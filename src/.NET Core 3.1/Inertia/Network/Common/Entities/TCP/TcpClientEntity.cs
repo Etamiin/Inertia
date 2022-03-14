@@ -71,7 +71,7 @@ namespace Inertia.Network
         {
             if (IsDisposed)
             {
-                throw new NotImplementedException(nameof(TcpClientEntity));
+                throw new ObjectDisposedException(nameof(TcpClientEntity));
             }
 
             try { _socket.Send(data); } catch { }
