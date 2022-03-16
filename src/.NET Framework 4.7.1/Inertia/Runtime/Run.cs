@@ -27,6 +27,7 @@ namespace Inertia.Runtime
                 _time = time;
                 Permanent = permanent;
 
+                RuntimeManager.IncrementScriptRunning();
                 RuntimeManager.RtUpdate += Update;
 
                 IsRunning = true;
@@ -41,6 +42,8 @@ namespace Inertia.Runtime
                 if (IsRunning)
                 {
                     RuntimeManager.RtUpdate -= Update;
+                    RuntimeManager.DecrementScriptRunning();
+
                     IsRunning = false;
                 }
             }
@@ -77,6 +80,8 @@ namespace Inertia.Runtime
                 if (action != null)
                 {
                     _action = action;
+
+                    RuntimeManager.IncrementScriptRunning();
                     RuntimeManager.RtUpdate += Execute;
                 }
             }
@@ -85,9 +90,11 @@ namespace Inertia.Runtime
             {
                 _action?.Invoke();
                 RuntimeManager.RtUpdate -= Execute;
+                RuntimeManager.DecrementScriptRunning();
             }
         }
 
+        public static bool LimitProcessorUsage { get; set; } = false;
         public static int TargetTickPerSecond { get; set; } = 120;
 
         /// <summary>

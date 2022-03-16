@@ -13,14 +13,26 @@ namespace Inertia.Runtime
         private static event BasicAction Updating = () => { };
         private static event BasicAction Destroying = () => { };
 
+        private static int _scriptRunningCount;
+
         static RuntimeManager()
         {
             RunCycleLoop();
         }
 
+        internal static void IncrementScriptRunning()
+        {
+            Interlocked.Increment(ref _scriptRunningCount);
+        }
+        internal static void DecrementScriptRunning()
+        {
+            Interlocked.Decrement(ref _scriptRunningCount);
+        }
+
         internal static void RegisterScript(Script script)
         {
             Updating += script.OnUpdate;
+            IncrementScriptRunning();
         }
         internal static void BeginUnregisterScript(Script script)
         {
@@ -30,6 +42,7 @@ namespace Inertia.Runtime
         internal static void EndUnregisterScript(Script script)
         {
             Destroying -= script.PreDestroy;
+            DecrementScriptRunning();            
         }
 
         internal static void RunCycleLoop()
@@ -53,6 +66,8 @@ namespace Inertia.Runtime
                 {
                     var sToSleep = (targetMsUpdate - currentMsUpdate) / 1000.0d;
                     var durationTicks = Math.Round(sToSleep * Stopwatch.Frequency);
+
+                    if (_scriptRunningCount == 0 || Run.LimitProcessorUsage) Thread.Sleep(1);
 
                     while (clock.ElapsedTicks < durationTicks) { }
                     currentMsUpdate = clock.GetElapsedSeconds();

@@ -9,7 +9,7 @@ namespace Inertia.Network
     {
         public int ConnectionCount => _connections.Count;
 
-        private event BasicAction<NetworkMessage> Sender = (msg) => { };
+        private event BasicAction<byte[]> Sender = (msg) => { };
 
         private List<NetworkConnectionEntity> _connections;
         private object _locker;
@@ -69,7 +69,11 @@ namespace Inertia.Network
     
         public void SendAsync(NetworkMessage message)
         {
-            Task.Factory.StartNew(() => Sender(message));
+            Task.Factory.StartNew(() =>
+            {
+                var data = NetworkProtocol.UsedProtocol.OnSerializeMessage(message);
+                Sender(data);
+            });
         }
     }
 }
