@@ -376,7 +376,7 @@
             <param name="parameters"></param>
             <returns></returns>
         </member>
-        <member name="M:Extensions.CreateFlag(System.Boolean[])">
+        <member name="M:Extensions.ToByte(System.Boolean[])">
             <summary>
             Create a byte flag containing specified boolean values
             </summary>
@@ -384,11 +384,11 @@
             <returns></returns>
             <exception cref="T:Inertia.BoolFlagTooLargeException"></exception>
         </member>
-        <member name="M:Extensions.GetBits(System.Byte,System.Int32)">
+        <member name="M:Extensions.ToBits(System.Byte,System.Int32)">
             <summary>
             Read boolean values from a byte flag
             </summary>
-            <param name="flag"></param>
+            <param name="value"></param>
             <param name="length"></param>
             <returns></returns>
         </member>

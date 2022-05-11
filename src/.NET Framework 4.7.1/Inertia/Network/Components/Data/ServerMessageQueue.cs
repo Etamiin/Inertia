@@ -18,19 +18,7 @@ namespace Inertia.Network
         internal ServerMessageQueue()
         {
             _queue = new ConcurrentQueue<BasicAction>();
-
-            Task.Factory.StartNew(async () => {
-                while (!IsDisposed)
-                {
-                    if (_queue.Count == 0)
-                    {
-                        await Task.Delay(10).ConfigureAwait(false);
-                        continue;
-                    }
-
-                    Execute();
-                }
-            }, TaskCreationOptions.LongRunning);
+            StartAutoExecuteAsync();
         }
 
         internal void RegisterConnection(NetworkConnectionEntity connection)
@@ -65,6 +53,22 @@ namespace Inertia.Network
                 _queue = null;
                 IsDisposed = true;
             }
+        }
+
+        private void StartAutoExecuteAsync()
+        {
+            Task.Factory.StartNew(async () => {
+                while (!IsDisposed)
+                {
+                    if (_queue.Count == 0)
+                    {
+                        await Task.Delay(10).ConfigureAwait(false);
+                        continue;
+                    }
+
+                    Execute();
+                }
+            }, TaskCreationOptions.LongRunning);
         }
     }
 }

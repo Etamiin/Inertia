@@ -173,7 +173,7 @@ namespace Inertia
         }
         public bool[] GetBoolFlag(int length)
         {
-            return GetByte().GetBits(length);
+            return GetByte().ToBits(length);
         }
         public string GetString()
         {

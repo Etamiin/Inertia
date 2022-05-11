@@ -46,7 +46,6 @@ namespace Inertia.Network
         /// <param name="reader"></param>
         /// <param name="output"></param>
         /// <returns></returns>
-        /// <exception cref="DefaultProtocolFailedParsingMessageException"></exception>
         public override void OnParseMessage(object receiver, BasicReader reader, MessageParsingOutput output)
         {
             reader.SetPosition(0);

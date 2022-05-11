@@ -46,36 +46,37 @@ public static class Extensions
     /// <param name="values"></param>
     /// <returns></returns>
     /// <exception cref="BoolFlagTooLargeException"></exception>
-    public static byte CreateFlag(this bool[] values)
+    public static byte ToByte(this bool[] values)
     {
         if (values.Length > 8)
         {
             throw new BoolFlagTooLargeException();
         }
 
-        var flag = (byte)0;
+        byte result = 0;
         for (var i = 0; i < values.Length; i++)
         {
-            flag = values[i] ? (byte)(flag | (1 << i)) : (byte)(flag & 255 - (1 << i));
+            if (values[i]) result |= (byte)(1 << (7 - i));
         }
 
-        return flag;
+        return result;
     }
     /// <summary>
     /// Read boolean values from a byte flag
     /// </summary>
-    /// <param name="flag"></param>
+    /// <param name="value"></param>
     /// <param name="length"></param>
     /// <returns></returns>
-    public static bool[] GetBits(this byte flag, int length)
+    public static bool[] ToBits(this byte value, int length)
     {
-        var flags = new bool[length];
-        for (var i = 0; i < length; i++)
+        var result = new bool[length];
+        for (int i = 0; i < length; i++)
         {
-            flags[i] = (flag & (byte)(1 << i)) != 0;
+            result[i] = (value & (1 << i)) != 0;
         }
 
-        return flags;
+        Array.Reverse(result);
+        return result;
     }
 
     /* INTERNAL EXTENSIONS */

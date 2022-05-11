@@ -99,7 +99,7 @@ namespace Inertia
         }
         public BasicWriter SetBoolFlag(params bool[] values)
         {
-            return SetByte(values.CreateFlag());
+            return SetByte(values.ToByte());
         }
         public BasicWriter SetString(string value)
         {
