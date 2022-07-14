@@ -1,0 +1,49 @@
+﻿using System.Collections.Generic;
+using System.Text;
+
+namespace Inertia
+{
+    public abstract class BasicCommand
+    {
+        internal static void PreExecute(BasicCommand cmd, string[] arguments, object[] dataCollection, bool containsBlock)
+        {
+            if (containsBlock)
+            {
+                var newArguments = new List<string>();
+                var sentence = new StringBuilder();
+
+                for (var i = 0; i < arguments.Length; i++)
+                {
+                    var arg = arguments[i];
+
+                    if (arg.StartsWith('"') || sentence.Length > 0)
+                    {
+                        sentence.Append(arg);
+
+                        if (arg.EndsWith('"'))
+                        {
+                            newArguments.Add(sentence.ToString().Replace("\"", string.Empty));
+                            sentence = new StringBuilder();
+                        }
+                        else
+                        {
+                            sentence.Append(" ");
+                        }
+                    }
+                    else
+                    {
+                        newArguments.Add(arg);
+                    }
+                }
+
+                arguments = newArguments.ToArray();
+            }
+
+            cmd.OnExecute(new BasicCommandArguments(arguments, dataCollection));
+        }
+
+        public abstract string Name { get; }
+
+        public abstract void OnExecute(BasicCommandArguments arguments);
+    }
+}

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace Inertia.Network
 {
@@ -56,6 +58,46 @@ namespace Inertia.Network
             return group;
         }
 
+        internal ConnectionType VerifyConnectionType(TcpConnectionEntity connection, byte[] buffer, int receivedCount)
+        {
+            var handshake = Encoding.UTF8.GetString(buffer, 0, receivedCount).Split("\r\n");
+            var finalKey = string.Empty;
+
+            foreach (var line in handshake)
+            {
+                if (line.StartsWith("Sec-WebSocket-Key"))
+                {
+                    var key = line.Split(": ")[1];
+                    key += "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
+
+                    using (SHA1Managed sha1 = new SHA1Managed())
+                    {
+                        var hash = sha1.ComputeHash(Encoding.UTF8.GetBytes(key));
+                        finalKey = Convert.ToBase64String(hash);
+                    }
+                }
+            }
+
+            if (!string.IsNullOrEmpty(finalKey))
+            {
+                connection.Send(BuildWsHandshakeResponse(finalKey));
+                return ConnectionType.WebSocket;
+            }
+
+            return ConnectionType.Classic;
+
+            byte[] BuildWsHandshakeResponse(string finalKey)
+            {
+                var str = 
+                    "HTTP/1.1 101 Switching Protocols\r\n" +
+                    "Upgrade: websocket\r\n" +
+                    "Connection: Upgrade\r\n" +
+                    $"Sec-WebSocket-Accept: {finalKey}\r\n" +
+                    "\r\n";
+
+                return Encoding.UTF8.GetBytes(str);
+            }
+        }
         internal void ConnectionDisconnected(TcpConnectionEntity connection, NetworkDisconnectReason reason)
         {
             lock (_locker)
