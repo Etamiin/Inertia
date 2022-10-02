@@ -11,11 +11,16 @@ namespace Inertia.Runtime
         {
             get
             {
+                if (_arguments == null)
+                {
+                    throw new ObjectDisposedException(nameof(ScriptArguments));
+                }
+
                 return _arguments.Length;
             }
         }
 
-        private object[] _arguments;
+        private object[]? _arguments;
 
         internal ScriptArguments(object[] args)
         {
@@ -31,12 +36,22 @@ namespace Inertia.Runtime
         {
             get
             {
+                if (_arguments == null)
+                {
+                    throw new ObjectDisposedException(nameof(ScriptArguments));
+                }
+
                 return _arguments[index];
             }
         }
 
         public T GetAt<T>(int index)
         {
+            if (_arguments == null)
+            {
+                throw new ObjectDisposedException(nameof(ScriptArguments));
+            }
+
             if (index < 0 || index >= Count)
             {
                 throw new IndexOutOfRangeException();

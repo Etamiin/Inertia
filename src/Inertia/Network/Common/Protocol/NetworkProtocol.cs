@@ -54,7 +54,7 @@ namespace Inertia.Network
         {
             return (T)CreateMessage(typeof(T));
         }
-        public static NetworkMessage CreateMessage(ushort messageId)
+        public static NetworkMessage? CreateMessage(ushort messageId)
         {
             if (ReflectionProvider.TryGetMessageType(messageId, out var messageType))
             {

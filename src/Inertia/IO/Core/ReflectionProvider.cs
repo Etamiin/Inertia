@@ -1,7 +1,9 @@
-﻿using Inertia.Network;
+﻿using Inertia.IO;
+using Inertia.Network;
 using Inertia.Runtime;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -13,18 +15,18 @@ namespace Inertia
         internal class SerializableFieldMemory
         {
             internal readonly FieldInfo Info;
-            internal readonly MethodInfo SerializationMethodInfo;
-            internal readonly MethodInfo DeserializationMethodInfo;
+            internal readonly MethodInfo? SerializationMethodInfo;
+            internal readonly MethodInfo? DeserializationMethodInfo;
 
             internal SerializableFieldMemory(FieldInfo info)
             {
                 Info = info;
-                var scustom = info.GetCustomAttribute<CustomSerialization>();
-                var dcustom = info.GetCustomAttribute<CustomDeserialization>();
+                var serAttr = info.GetCustomAttribute<SerializeWith>();
+                var deserAttr = info.GetCustomAttribute<DeserializeWith>();
 
-                if (scustom != null)
+                if (serAttr != null)
                 {
-                    var method = info.DeclaringType.GetMethod(scustom.MethodName, BindingFlags.NonPublic | BindingFlags.Instance);
+                    var method = info.DeclaringType.GetMethod(serAttr.MethodName, BindingFlags.NonPublic | BindingFlags.Instance);
                     if (method != null)
                     {
                         var parameters = method.GetParameters();
@@ -34,9 +36,9 @@ namespace Inertia
                         }
                     }
                 }
-                if (dcustom != null)
+                if (deserAttr != null)
                 {
-                    var method = info.DeclaringType.GetMethod(dcustom.MethodName, BindingFlags.NonPublic | BindingFlags.Instance);
+                    var method = info.DeclaringType.GetMethod(deserAttr.MethodName, BindingFlags.NonPublic | BindingFlags.Instance);
                     if (method != null)
                     {
                         var parameters = method.GetParameters();
@@ -79,6 +81,9 @@ namespace Inertia
         private static Dictionary<string, BasicCommand> _commands;
         private static Dictionary<ushort, Type> _messageTypes;
         private static Dictionary<Type, NetworkMessageCaller> _messageHookers;
+        private static Dictionary<string, IPlugin> _plugins;
+
+        private static DirectoryInfo _pluginDirInfo;
 
         static ReflectionProvider()
         {
@@ -86,8 +91,11 @@ namespace Inertia
             _commands = new Dictionary<string, BasicCommand>();
             _messageTypes = new Dictionary<ushort, Type>();
             _messageHookers = new Dictionary<Type, NetworkMessageCaller>();
+            _pluginDirInfo = new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Plugins"));
+            _plugins = new Dictionary<string, IPlugin>();
 
             RegisterAll();
+            InitializePlugins();
         }
 
         internal static bool Invalidate() => true;
@@ -98,6 +106,11 @@ namespace Inertia
             {
                 return _commands.Values.ToArray();
             }
+        }
+        internal static IPlugin GetPluginByIdentifier(string identifier)
+        {
+            _plugins.TryGetValue(identifier, out var plugin);
+            return plugin;
         }
 
         internal static bool TryGetFields(Type type, out SerializableFieldMemory[] fields)
@@ -129,7 +142,7 @@ namespace Inertia
 
                     foreach (var type in types)
                     {
-                        if (!IsRuntimeCallOverriden && type.GetCustomAttribute<OverrideRuntimeCallAttribute>() != null)
+                        if (!IsRuntimeCallOverriden && type.GetCustomAttribute<OverrideRuntimeCall>() != null)
                         {
                             IsRuntimeCallOverriden = true;
                         }
@@ -197,5 +210,50 @@ namespace Inertia
                 throw new CriticalException("An error occured during reflection registration", ex);
             }
         }
+        private static void InitializePlugins()
+        {
+            if (!_pluginDirInfo.Exists)
+            {
+                _pluginDirInfo.Create();
+            }
+
+            var dllInfos = _pluginDirInfo.GetFiles()
+                .Where((fileInfo) => fileInfo.Extension.Equals(".dll"));
+
+            foreach (var dllInfo in dllInfos)
+            {
+                var assembly = Assembly.LoadFrom(dllInfo.FullName);
+                var plugins = assembly.GetTypes()
+                    .Where((type) => typeof(IPlugin).IsAssignableFrom(type));
+
+                foreach (var plugin in plugins)
+                {
+                    IPlugin? instance = null;
+
+                    try
+                    {
+                        instance = (IPlugin)Activator.CreateInstance(plugin);
+                        instance.OnInitialize();
+
+                        if (_plugins.ContainsKey(instance.Identifier))
+                        {
+                            throw new FriendlyException($"A plugin with the same identifier ({instance.Identifier}) is already registered");
+                        }
+
+                        _plugins.Add(instance.Identifier, instance);
+
+                        if (instance.AutoExecute)
+                        {
+                            Run.Plugin(instance.Identifier);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Run.OnPluginLoadFailed(instance?.Identifier, ex);
+                    }
+                }
+            }
+        }
+
     }
 }

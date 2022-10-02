@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Inertia.Runtime
 {
@@ -73,9 +74,9 @@ namespace Inertia.Runtime
         }
         internal sealed class NextFrameExecution
         {
-            private readonly BasicAction _action;
+            private readonly BasicAction? _action;
 
-            internal NextFrameExecution(BasicAction action)
+            internal NextFrameExecution(BasicAction? action)
             {
                 if (action != null)
                 {
@@ -95,8 +96,15 @@ namespace Inertia.Runtime
             }
         }
 
+        public static event BasicAction<string?, Exception> PluginLoadFailed = (identifier, ex) => { };
+     
         public static bool LimitProcessorUsage { get; set; } = false;
         public static int TargetTickPerSecond { get; set; } = 120;
+
+        internal static void OnPluginLoadFailed(string? identifier, Exception ex)
+        {
+            PluginLoadFailed(identifier, ex);
+        }
 
         /// <summary>
         /// Execute the Runtime cycle manually.
@@ -120,12 +128,33 @@ namespace Inertia.Runtime
         {
             new ExecuteScriptIn(delayInSeconds, callback, true);
         }
+        public static void Delayed(float delayInSeconds, BasicAction callback)
+        {
+            new ExecuteScriptIn(delayInSeconds, (s) => callback());
+        }
+        public static void Delayed(float delayInSeconds, BasicAction callback, float runningTime)
+        {
+            new ExecuteScriptIn(delayInSeconds, (s) => callback(), runningTime);
+        }
+        public static void DelayedLoop(float delayInSeconds, BasicAction callback)
+        {
+            new ExecuteScriptIn(delayInSeconds, (s) => callback(), true);
+        }
         public static void InNextFrame(BasicAction callback)
         {
             new NextFrameExecution(callback);
         }
-        
-        public static T CreateScript<T>(params object[] parameters) where T : Script
+    
+        public static void Plugin(string identifier, params object[] parameters)
+        {
+            var plugin = ReflectionProvider.GetPluginByIdentifier(identifier);
+            if (plugin != null)
+            {
+                InNextFrame(() => plugin.OnExecute(parameters));
+            }
+        }
+
+        public static T? CreateScript<T>(params object[] parameters) where T : Script
         {
             var scriptType = typeof(T);
             var cstr = scriptType.GetConstructor(Type.EmptyTypes);

@@ -6,7 +6,7 @@ namespace Inertia.Network
 {
     public abstract class TcpClientEntity : NetworkClientEntity, IDisposable
     {
-        public override bool IsConnected => _socket != null && _socket.Connected;
+        public sealed override bool IsConnected => _socket != null && _socket.Connected;
 
         private readonly byte[] _buffer;
         private BasicReader _reader;
@@ -73,6 +73,8 @@ namespace Inertia.Network
             {
                 throw new ObjectDisposedException(nameof(TcpClientEntity));
             }
+
+            if (!IsConnected) return;
 
             try { _socket.Send(data); } catch { }
         }

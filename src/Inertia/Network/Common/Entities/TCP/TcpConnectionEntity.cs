@@ -122,11 +122,11 @@ namespace Inertia.Network
                 if (_spamTimer != null)
                 {
                     var ts = DateTime.Now - _spamTimer;
-                    if (ts.TotalSeconds > 1)
+                    if (ts.TotalSeconds >= 1)
                     {
                         if (_dataCountReceivedInLastSecond >= NetworkProtocol.UsedProtocol.AuthorizedDataCountPerSecond)
                         {
-                            Disconnect(NetworkDisconnectReason.SpammingMessages);
+                            Disconnect(NetworkDisconnectReason.Spamming);
                             return;
                         }
                         else
@@ -139,7 +139,7 @@ namespace Inertia.Network
 
                 if (ConnectionType == ConnectionType.NotDefined)
                 {
-                    ConnectionType = _server.VerifyConnectionType(this, _buffer, received);
+                    ConnectionType = _server.ReadConnectionType(this, _buffer, received);
                     if (ConnectionType == ConnectionType.Classic) CallParsing();
                 }
                 else CallParsing();
@@ -178,6 +178,8 @@ namespace Inertia.Network
             }
         }
 
+        //Mask and Unmask methods for WebSocket packets
+        //These methods are reconstructions to fit the system
         private static byte[] Unmask(byte[] data)
         {
             using (var r = new BasicReader(data))
@@ -259,8 +261,9 @@ namespace Inertia.Network
                     writer.SetLong(longLength);
                 }
 
-                writer.SetBytesWithoutHeader(data);
-                return writer.ToArray();
+                return writer
+                    .SetBytesWithoutHeader(data)
+                    .ToArray();
             }
         }
     }

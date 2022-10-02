@@ -58,7 +58,7 @@ namespace Inertia.Network
             return group;
         }
 
-        internal ConnectionType VerifyConnectionType(TcpConnectionEntity connection, byte[] buffer, int receivedCount)
+        internal ConnectionType ReadConnectionType(TcpConnectionEntity connection, byte[] buffer, int receivedCount)
         {
             var handshake = Encoding.UTF8.GetString(buffer, 0, receivedCount).Split("\r\n");
             var finalKey = string.Empty;

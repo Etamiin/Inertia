@@ -5,6 +5,7 @@ using System.Net.Sockets;
 
 namespace Inertia.Network
 {
+    [Obsolete]
     public abstract class UdpServerEntity : NetworkServerEntity, IDisposable
     {
         /// <summary>

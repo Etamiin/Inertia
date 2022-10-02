@@ -401,7 +401,7 @@ namespace Inertia
 
             return UnreadedLength >= length;
         }
-        private bool TryReadSize(int length, out byte[] data)
+        private bool TryReadSize(int length, out byte[]? data)
         {
             if (IsDisposed)
             {

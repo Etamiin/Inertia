@@ -9,7 +9,7 @@ namespace Inertia.Network
 {
     public abstract class WsClientEntity : NetworkClientEntity
     {
-        public override bool IsConnected
+        public sealed override bool IsConnected
         {
             get
             {
@@ -44,6 +44,7 @@ namespace Inertia.Network
                 throw new ObjectDisposedException(nameof(TcpClientEntity));
             }
 
+            _disconnectNotified = false;
             _ws.ConnectAsync(new Uri($"ws://{_targetIp}:{_targetPort}"), new CancellationToken());
 
             var c = new Clock();
@@ -68,10 +69,16 @@ namespace Inertia.Network
                 throw new ObjectDisposedException(nameof(TcpClientEntity));
             }
 
-            if (!IsConnected) return;
+            if (IsConnected)
+            {
+                _ws.Abort();
+            }
 
-            _ws.Abort();
-            OnDisconnected(reason);
+            if (!_disconnectNotified)
+            {
+                _disconnectNotified = true;
+                OnDisconnected(reason);
+            }
         }
         public sealed override void Send(byte[] data)
         {

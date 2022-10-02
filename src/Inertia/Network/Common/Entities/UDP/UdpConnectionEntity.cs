@@ -3,6 +3,7 @@ using System.Net;
 
 namespace Inertia.Network
 {
+    [Obsolete]
     public sealed class UdpConnectionEntity : NetworkConnectionEntity, IDisposable
     {
         internal IPEndPoint EndPoint { get; set; }

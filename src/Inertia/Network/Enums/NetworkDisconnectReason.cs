@@ -12,6 +12,6 @@ namespace Inertia.Network
         ConnectionLost = 2,
         ConnectionFailed = 4,
         SendingBadInformation = 8,
-        SpammingMessages = 16
+        Spamming = 16
     }
 }

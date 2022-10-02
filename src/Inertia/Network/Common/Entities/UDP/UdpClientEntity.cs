@@ -6,6 +6,7 @@ using System.Net.Sockets;
 
 namespace Inertia.Network
 {
+    [Obsolete]
     public abstract class UdpClientEntity : NetworkClientEntity, IDisposable
     {
         public override bool IsConnected => (_client?.Client) != null && _client.Client.Connected;

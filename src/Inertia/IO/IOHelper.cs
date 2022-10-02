@@ -9,45 +9,6 @@ namespace Inertia
 {
     public static class IOHelper
     {
-        public static string[] GetFilesFromDirectory(string path, bool includeSubFolders)
-        {
-            return GetFilesFromDirectory(path, includeSubFolders, null);
-        }
-        public static string[] GetFilesFromDirectory(string path, bool includeSubFolders, Predicate<DirectoryInfo> ignoreDirectory)
-        {
-            if (!Directory.Exists(path))
-            {
-                throw new DirectoryNotFoundException();
-            }
-
-            path = path.ConventionFolderPath();
-
-            var result = new List<string>();
-            FindPaths(path);
-
-            return result.ToArray();
-
-            void FindPaths(string folderPath)
-            {
-                var info = new DirectoryInfo(folderPath);
-                if (ignoreDirectory != null && ignoreDirectory(info)) return;
-
-                var files = Directory.GetFiles(folderPath);
-                foreach (var file in files)
-                {
-                    result.Add(file);
-                }
-
-                if (includeSubFolders)
-                {
-                    var directories = Directory.GetDirectories(folderPath);
-                    foreach (var dir in directories)
-                    {
-                        FindPaths(dir);
-                    }
-                }
-            }
-        }
         public static void AppendAllBytes(string filePath, byte[] data)
         {
             using (var stream = new FileStream(filePath, FileMode.Append))
