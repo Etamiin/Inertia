@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -75,7 +78,7 @@ namespace Inertia
                 throw new ObjectDisposedException(nameof(BasicWriter));
             }
 
-            _writer.Position = position;
+            _writer.Position = Math.Min(position, TotalLength);
             return this;
         }
         public long GetPosition()
@@ -90,6 +93,7 @@ namespace Inertia
 
         public BasicWriter SetEmpty(int size)
         {
+            if (size <= 0) throw new ArgumentNullException(nameof(size));
             return SetBytesWithoutHeader(new byte[size]);
         }
         public BasicWriter SetBool(bool value)
@@ -181,10 +185,7 @@ namespace Inertia
         }
         public BasicWriter SetBytes(byte[] value)
         {
-            if (value == null)
-            {
-                value = new byte[0];
-            }
+            if (value == null) throw new ArgumentNullException(nameof(value));
 
             _writer.Write(BitConverter.GetBytes(value.Length));
             _writer.Write(value);
@@ -193,6 +194,8 @@ namespace Inertia
         }
         public BasicWriter SetBytesWithoutHeader(byte[] value)
         {
+            if (value == null) throw new ArgumentNullException(nameof(value));
+
             _writer.Write(value);
             return this;
         }
@@ -203,12 +206,34 @@ namespace Inertia
         }
         public BasicWriter SetAutoSerializable(IAutoSerializable value)
         {
-            if (ReflectionProvider.TryGetFields(value.GetType(), out ReflectionProvider.SerializableFieldMemory[] fields))
+            if (ReflectionProvider.TryGetProperties(value.GetType(), out ReflectionProvider.SerializablePropertyMemory[] properties))
             {
-                foreach (var field in fields)
+                foreach (var property in properties)
                 {
-                    field.Write(value, this);
+                    property.Write(value, this);
                 }
+            }
+
+            return this;
+        }
+        public BasicWriter SetArray(Array array)
+        {
+            SetInt(array.Length);
+            for (var i = 0; i < array.Length; i++)
+            {
+                SetValue(array.GetValue(i));
+            }
+
+            return this;
+        }
+        public BasicWriter SetIDictionary(IDictionary dictionary)
+        {
+            SetInt(dictionary.Count);
+
+            foreach (DictionaryEntry entry in dictionary)
+            {
+                SetValue(entry.Key);
+                SetValue(entry.Value);
             }
 
             return this;
@@ -216,7 +241,8 @@ namespace Inertia
 
         public BasicWriter SetValue(object value, Type precisedType = null)
         {
-            if (precisedType == null && value != null)
+            if (value == null) return this;
+            if (precisedType == null)
             {
                 precisedType = value.GetType();
             }
@@ -234,6 +260,14 @@ namespace Inertia
                 else if (precisedType.GetInterface(nameof(ISerializableObject)) != null)
                 {
                     SetSerializableObject((ISerializableObject)value);
+                }
+                else if (precisedType.IsArray)
+                {
+                    SetArray((Array)value);
+                }
+                else if (precisedType.GetInterface(nameof(IDictionary)) != null)
+                {
+                    SetIDictionary((IDictionary)value);
                 }
             }
 

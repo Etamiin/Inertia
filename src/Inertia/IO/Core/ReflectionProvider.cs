@@ -1,6 +1,7 @@
 ﻿using Inertia.IO;
 using Inertia.Network;
 using Inertia.Runtime;
+using Inertia.Runtime.Core;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,13 +13,13 @@ namespace Inertia
 {
     internal static class ReflectionProvider
     {
-        internal class SerializableFieldMemory
+        internal class SerializablePropertyMemory
         {
-            internal readonly FieldInfo Info;
+            internal readonly PropertyInfo Info;
             internal readonly MethodInfo? SerializationMethodInfo;
             internal readonly MethodInfo? DeserializationMethodInfo;
 
-            internal SerializableFieldMemory(FieldInfo info)
+            internal SerializablePropertyMemory(PropertyInfo info)
             {
                 Info = info;
                 var serAttr = info.GetCustomAttribute<SerializeWith>();
@@ -54,8 +55,8 @@ namespace Inertia
             {
                 if (SerializationMethodInfo == null)
                 {
-                    var fieldValue = Info.GetValue(serializableObject);
-                    writer.SetValue(fieldValue, Info.FieldType);
+                    var propertyValue = Info.GetValue(serializableObject);
+                    writer.SetValue(propertyValue, Info.PropertyType);
                 }
                 else
                 {
@@ -66,7 +67,7 @@ namespace Inertia
             {
                 if (DeserializationMethodInfo == null)
                 {
-                    Info.SetValue(serializableObject, reader.GetValue(Info.FieldType));
+                    Info.SetValue(serializableObject, reader.GetValue(Info.PropertyType));
                 }
                 else
                 {
@@ -77,22 +78,24 @@ namespace Inertia
 
         internal static bool IsRuntimeCallOverriden { get; private set; }
 
-        private static Dictionary<Type, SerializableFieldMemory[]> _fields;
+        private static Dictionary<Type, SerializablePropertyMemory[]> _properties;
         private static Dictionary<string, BasicCommand> _commands;
         private static Dictionary<ushort, Type> _messageTypes;
         private static Dictionary<Type, NetworkMessageCaller> _messageHookers;
         private static Dictionary<string, IPlugin> _plugins;
+        private static Dictionary<Type, Type> _scriptComponentTypes;
 
         private static DirectoryInfo _pluginDirInfo;
 
         static ReflectionProvider()
         {
-            _fields = new Dictionary<Type, SerializableFieldMemory[]>();
+            _properties = new Dictionary<Type, SerializablePropertyMemory[]>();
             _commands = new Dictionary<string, BasicCommand>();
             _messageTypes = new Dictionary<ushort, Type>();
             _messageHookers = new Dictionary<Type, NetworkMessageCaller>();
-            _pluginDirInfo = new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Plugins"));
             _plugins = new Dictionary<string, IPlugin>();
+            _scriptComponentTypes = new Dictionary<Type, Type>();
+            _pluginDirInfo = new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Plugins"));
 
             RegisterAll();
             InitializePlugins();
@@ -113,9 +116,9 @@ namespace Inertia
             return plugin;
         }
 
-        internal static bool TryGetFields(Type type, out SerializableFieldMemory[] fields)
+        internal static bool TryGetProperties(Type type, out SerializablePropertyMemory[] properties)
         {
-            return _fields.TryGetValue(type, out fields);
+            return _properties.TryGetValue(type, out properties);
         }
         internal static bool TryGetCommand(string commandName, out BasicCommand command)
         {
@@ -128,6 +131,10 @@ namespace Inertia
         internal static bool TryGetMessageHooker(Type receiverType, out NetworkMessageCaller caller)
         {
             return _messageHookers.TryGetValue(receiverType, out caller);
+        }
+        internal static bool TryGetScriptComponent(Type dataType, out Type componentData)
+        {
+            return _scriptComponentTypes.TryGetValue(dataType, out componentData);
         }
 
         private static void RegisterAll()
@@ -156,10 +163,25 @@ namespace Inertia
                             }
                         }
 
+                        if (typeof(IScriptComponent).IsAssignableFrom(type) && type.BaseType != null)
+                        {
+                            var argTypes = type.BaseType.GetGenericArguments();
+                            foreach (var argType in argTypes)
+                            {
+                                if (argType.IsSubclassOf(typeof(ScriptComponentData)))
+                                {
+                                    if (_scriptComponentTypes.ContainsKey(argType))
+                                    {
+                                        _scriptComponentTypes[argType] = type;
+                                    }
+                                    else _scriptComponentTypes.Add(argType, type);
+                                }
+                            }
+                        }
+
                         if (type.IsSubclassOf(typeof(NetworkMessage)))
                         {
                             var message = NetworkProtocol.CreateMessage(type);
-
                             if (!_messageTypes.ContainsKey(message.MessageId))
                             {
                                 _messageTypes.Add(message.MessageId, type);
@@ -191,16 +213,16 @@ namespace Inertia
 
                         if (typeof(IAutoSerializable).IsAssignableFrom(type))
                         {
-                            var memoryList = new List<SerializableFieldMemory>();
-                            var fields = type.GetFields(BindingFlags.Public | BindingFlags.Instance).OrderBy((field) => field.Name);
-                            foreach (var field in fields)
+                            var memoryList = new List<SerializablePropertyMemory>();
+                            var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance).OrderBy((property) => property.Name);
+                            foreach (var property in properties)
                             {
-                                if (field.GetCustomAttribute<IgnoreInProcess>() != null) continue;
+                                if (property.GetCustomAttribute<IgnoreInProcess>() != null) continue;
 
-                                memoryList.Add(new SerializableFieldMemory(field));
+                                memoryList.Add(new SerializablePropertyMemory(property));
                             }
 
-                            _fields.Add(type, memoryList.ToArray());
+                            _properties.Add(type, memoryList.ToArray());
                         }
                     }
                 }
@@ -233,27 +255,25 @@ namespace Inertia
                     try
                     {
                         instance = (IPlugin)Activator.CreateInstance(plugin);
-                        instance.OnInitialize();
-
                         if (_plugins.ContainsKey(instance.Identifier))
                         {
                             throw new FriendlyException($"A plugin with the same identifier ({instance.Identifier}) is already registered");
                         }
 
+                        instance.OnInitialize();
                         _plugins.Add(instance.Identifier, instance);
 
                         if (instance.AutoExecute)
                         {
-                            Run.Plugin(instance.Identifier);
+                            //Run.Plugin(instance.Identifier);
                         }
                     }
                     catch (Exception ex)
                     {
-                        Run.OnPluginLoadFailed(instance?.Identifier, ex);
+                        //Run.OnPluginLoadFailed(instance?.Identifier, ex);
                     }
                 }
             }
         }
-
     }
 }

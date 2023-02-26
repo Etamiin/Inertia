@@ -8,8 +8,6 @@ namespace Inertia.Network
     {
         internal event BasicAction<NetworkDisconnectReason> Disconnected;
 
-        public ConnectionType ConnectionType { get; private set; }
-
         public bool IsConnected => _socket != null && _socket.Connected;
         
         private TcpServerEntity _server;
@@ -45,17 +43,11 @@ namespace Inertia.Network
             
             if (!IsConnected) return;
 
-            try {
-                if (ConnectionType != ConnectionType.WebSocket)
-                {
-                    _socket.Send(data);
-                }
-                else
-                {
-                    _socket.Send(Mask(data));
-                }
-
-            } catch { }
+            try
+            {
+                _socket.Send(data);
+            }
+            catch { }
         }
         public override void Send(NetworkMessage message)
         {
@@ -137,28 +129,7 @@ namespace Inertia.Network
                     }
                 }
 
-                if (ConnectionType == ConnectionType.NotDefined)
-                {
-                    ConnectionType = _server.ReadConnectionType(this, _buffer, received);
-                    if (ConnectionType == ConnectionType.Classic) CallParsing();
-                }
-                else CallParsing();
-
-                void CallParsing()
-                {
-                    if (ConnectionType == ConnectionType.WebSocket)
-                    {
-                        var data = new byte[received];
-                        Array.Copy(_buffer, 0, data, 0, received);
-
-                        var decryptedData = Unmask(data);
-                        NetworkProtocol.ProcessParsing(this, _reader.Fill(decryptedData));
-                    }
-                    else
-                    {
-                        NetworkProtocol.ProcessParsing(this, _reader.Fill(new ReadOnlySpan<byte>(_buffer, 0, received)));
-                    }                    
-                }                
+                NetworkProtocol.ProcessParsing(this, _reader.Fill(new ReadOnlySpan<byte>(_buffer, 0, received)));
             }
             catch (Exception ex)
             {
@@ -175,95 +146,6 @@ namespace Inertia.Network
             if (IsConnected)
             {
                 _socket.BeginReceive(_buffer, 0, _buffer.Length, SocketFlags.None, new AsyncCallback(OnReceiveData), _socket);
-            }
-        }
-
-        //Mask and Unmask methods for WebSocket packets
-        //These methods are reconstructions to fit the system
-        private static byte[] Unmask(byte[] data)
-        {
-            using (var r = new BasicReader(data))
-            {
-                while (r.UnreadedLength > 0)
-                {
-                    var opCodeMask = r.GetByte().ToBits(8);
-                    var end = opCodeMask[0];
-
-                    for (var i = 0; i < 4; i++)
-                    {
-                        opCodeMask[i] = false;
-                    }
-
-                    var opCode = opCodeMask.ToByte();
-                    var mask = r.GetByte().ToBits(8);
-                    var isMasked = mask[0];
-                    mask[0] = false;
-                    var payloadLength = (int)mask.ToByte();
-
-                    if (payloadLength == 126)
-                    {
-                        payloadLength = System.Buffers.Binary.BinaryPrimitives.ReverseEndianness(r.GetShort());
-                    }
-                    else if (payloadLength == 127)
-                    {
-                        payloadLength = (int)System.Buffers.Binary.BinaryPrimitives.ReverseEndianness(r.GetLong());
-                    }
-
-                    byte[]? encryptedData;
-                    if (isMasked)
-                    {
-                        if (r.UnreadedLength < payloadLength + 4) break;
-
-                        var maskingKey = r.GetBytes(4);
-                        encryptedData = r.GetBytes(payloadLength);
-                        for (var i = 0; i < encryptedData.Length; i++)
-                        {
-                            encryptedData[i] = (byte)(encryptedData[i] ^ maskingKey[i % 4]);
-                        }
-                    }
-                    else
-                    {
-                        if (r.UnreadedLength < payloadLength) break;
-
-                        encryptedData = r.GetBytes(payloadLength);
-                    }
-
-                    return encryptedData;
-                }
-
-                return null;
-            }
-        }
-        private static byte[] Mask(byte[] data)
-        {
-            using (var writer = new BasicWriter())
-            {
-                writer.SetBoolFlag(true, false, false, false, false, false, true, false);
-
-                var cPos = writer.GetPosition();
-                var payloadLength = (byte)
-                    (data.Length > 125 && data.Length <= 65536 ? 126 :
-                    data.Length > 65536 ? 127 : data.Length);
-
-                var maskBits = payloadLength.ToBits(8);
-                maskBits[0] = false;
-
-                writer.SetBoolFlag(maskBits);
-
-                if (payloadLength == 126)
-                {
-                    var shortLength = System.Buffers.Binary.BinaryPrimitives.ReverseEndianness((short)data.Length);
-                    writer.SetShort(shortLength);
-                }
-                else if (payloadLength == 127)
-                {
-                    var longLength = System.Buffers.Binary.BinaryPrimitives.ReverseEndianness((long)data.Length);
-                    writer.SetLong(longLength);
-                }
-
-                return writer
-                    .SetBytesWithoutHeader(data)
-                    .ToArray();
             }
         }
     }

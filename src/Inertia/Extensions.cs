@@ -78,26 +78,4 @@ public static class Extensions
         Array.Reverse(result);
         return result;
     }
-
-    /* INTERNAL EXTENSIONS */
-    [Obsolete]
-    internal static string ConventionFolderPath(this string folderPath)
-    {
-        if (string.IsNullOrEmpty(folderPath))
-        {
-            folderPath = Directory.GetCurrentDirectory();
-        }
-        else if (!File.GetAttributes(folderPath).HasFlag(FileAttributes.Directory))
-        {
-            var info = new DirectoryInfo(folderPath);
-            folderPath = info.FullName;
-        }
-
-        if (!folderPath.EndsWith(@"\"))
-        {
-            folderPath += @"\";
-        }
-
-        return folderPath;
-    }
 }

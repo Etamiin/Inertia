@@ -5,7 +5,7 @@ using System.Text;
 namespace Inertia
 {
     /// <summary>
-    /// Allows the system to automatically serialize or deserialize the fields of an instance.
+    /// Allows the system to automatically serialize or deserialize the properties of an instance.
     /// Attributes <see cref="SerializeWith"/> and <see cref="DeserializeWith"/> can also be used
     /// </summary>
     public interface IAutoSerializable

@@ -86,7 +86,7 @@ namespace Inertia.Network
                 }
             }
 
-            Log.Error($"NetworkProtocol Parsing Error: {ex}");
+            Logger.Error($"NetworkProtocol Parsing Error: {ex}");
         }
     }
 }

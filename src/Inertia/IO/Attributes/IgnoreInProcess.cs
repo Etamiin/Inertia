@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Inertia
 {
-    public class IgnoreInProcess : Attribute
+    public sealed class IgnoreInProcess : Attribute
     {
     }
 }

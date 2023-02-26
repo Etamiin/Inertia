@@ -40,16 +40,8 @@ namespace Inertia
                 return true;
             }
 
-            data = default(T);
+            data = default;
             return false;
-        }
-
-        public void ForEach(BasicAction<int, string> onArgument)
-        {
-            for (var i = 0; i < _arguments.Length; i++)
-            {
-                onArgument(i, _arguments[i]);
-            }
         }
     }
 }

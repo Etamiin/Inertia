@@ -77,7 +77,7 @@ namespace Inertia
             }
         }
 
-        public static byte[] EncryptWithString(byte[] data, string key)
+        public static byte[] AesEncrypt(byte[] data, string key)
         {
             using (var ms = new MemoryStream())
             {
@@ -99,7 +99,7 @@ namespace Inertia
                 }
             }
         }        
-        public static bool TryDecryptWithString(byte[] encryptedData, string key, out byte[] decryptedData)
+        public static bool TryAesDecrypt(byte[] encryptedData, string key, out byte[] decryptedData)
         {
             try
             {

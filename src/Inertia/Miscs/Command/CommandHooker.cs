@@ -16,11 +16,11 @@ namespace Inertia
 
         public static bool TryExecute(string commandLine, params object[] dataCollection)
         {
-            var args = commandLine.Split(' ');
-            var others = new string[args.Length - 1];
-            Array.Copy(args, 1, others, 0, others.Length);
+            var values = commandLine.Split(' ');
+            var args = new string[values.Length - 1];
+            Array.Copy(values, 1, args, 0, args.Length);
 
-            return TryExecuteByName(args[0], dataCollection, commandLine.Contains('"'), others);
+            return TryExecuteByName(values[0], dataCollection, commandLine.Contains('"'), args);
         }
         
         private static bool TryExecuteByName(string commandName, object[] dataCollection, bool containsBlock, params string[] arguments)

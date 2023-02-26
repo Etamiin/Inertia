@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -82,10 +83,10 @@ namespace Inertia
             {
                 throw new ObjectDisposedException(nameof(BasicReader));
             }
+            
+            if (position < 0) return this;
 
-            if (position < 0 || position > TotalLength) return this;
-
-            _reader.Position = position;
+            _reader.Position = Math.Min(position, TotalLength);
             return this;
         }
         public long GetPosition()
@@ -95,9 +96,10 @@ namespace Inertia
                 throw new ObjectDisposedException(nameof(BasicReader));
             }
 
+            if (_reader == null) return 0;
+
             return _reader.Position;
         }
-
         public void Clear()
         {
             if (!IsDisposed && _reader != null)
@@ -167,7 +169,7 @@ namespace Inertia
             }
             else return default;
         }
-        public bool[] GetBoolFlag(int length)
+        public bool[] GetBoolBits(int length)
         {
             return GetByte().ToBits(length);
         }
@@ -317,6 +319,7 @@ namespace Inertia
                 .GetConstructors()[0].GetParameters()
                 .Select(p => null as object)
                 .ToArray();
+
             var instance = Activator.CreateInstance(type, parameters);
             if (instance != null)
             {
@@ -346,38 +349,90 @@ namespace Inertia
         }
         public IAutoSerializable GetAutoSerializable(IAutoSerializable instance)
         {
-            if (ReflectionProvider.TryGetFields(instance.GetType(), out ReflectionProvider.SerializableFieldMemory[] fields))
+            if (ReflectionProvider.TryGetProperties(instance.GetType(), out ReflectionProvider.SerializablePropertyMemory[] properties))
             {
-                foreach (var field in fields)
+                foreach (var property in properties)
                 {
-                    field.Read(instance, this);
+                    property.Read(instance, this);
                 }
             }
 
             return instance;
+        }
+        public Array GetArray(Type arrayType)
+        {
+            if (!arrayType.IsArray) throw new ArgumentNullException(nameof(arrayType));
+
+            var elementType = arrayType.GetElementType();
+            var length = GetInt();
+            var array = Array.CreateInstance(elementType, length);
+            for (var i = 0; i < array.Length; i++)
+            {
+                array.SetValue(GetValue(elementType), i);
+            }
+
+            return array;
+        }
+        public T GetArray<T>()
+        {
+            return (T)(object)GetArray(typeof(T));
+        }
+        public IDictionary GetDictionary(Type dictionaryType)
+        {
+            if (!dictionaryType.IsGenericType) throw new ArgumentNullException(nameof(dictionaryType));
+
+            var count = GetInt();
+            var arguments = dictionaryType.GetGenericArguments();
+            var dict = (IDictionary)Activator.CreateInstance(dictionaryType);
+
+            for (var i = 0; i < count; i++)
+            {
+                var key = GetValue(arguments[0]);
+                var value = GetValue(arguments[1]);
+
+                dict.Add(key, value);
+            }
+
+            return dict;
+        }
+        public Dictionary<TKey, TValue> GetDictionary<TKey, TValue>()
+        {
+            var dict = GetDictionary(typeof(Dictionary<TKey, TValue>));
+            return (Dictionary<TKey, TValue>)dict;
         }
 
         public T GetValue<T>()
         {
             return (T)GetValue(typeof(T));
         }
-        public object GetValue(Type type)
+        public object GetValue(Type valueType)
         {
-            if (_typageDefinitions.TryGetValue(type, out BasicReturnAction<BasicReader, object> action))
+            if (valueType == null) throw new ArgumentNullException(nameof(valueType));
+
+            if (_typageDefinitions.TryGetValue(valueType, out BasicReturnAction<BasicReader, object> action))
             {
                 return action(this);
             }
             else
             {
-                if (type.GetInterface(nameof(IAutoSerializable)) != null)
+                if (typeof(IAutoSerializable).IsAssignableFrom(valueType))
                 {
-                    return GetAutoSerializable(type);
+                    return GetAutoSerializable(valueType);
                 }
-                else if (type.GetInterface(nameof(ISerializableObject)) != null)
+                else if (typeof(ISerializableObject).IsAssignableFrom(valueType))
                 {
-                    return GetSerializableObject(type);
+                    return GetSerializableObject(valueType);
                 }
-                else return null;
+                else if (valueType.IsArray)
+                {
+                    return GetArray(valueType);
+                }
+                else if (typeof(IDictionary).IsAssignableFrom(valueType))
+                {
+                    return GetDictionary(valueType);
+                }
+
+                return null;
             }
         }
 
@@ -399,6 +454,8 @@ namespace Inertia
                 throw new ObjectDisposedException(nameof(BasicReader));
             }
 
+            if (length <= 0) throw new ArgumentNullException(nameof(length));
+
             return UnreadedLength >= length;
         }
         private bool TryReadSize(int length, out byte[]? data)
@@ -407,6 +464,8 @@ namespace Inertia
             {
                 throw new ObjectDisposedException(nameof(BasicReader));
             }
+
+            if (length <= 0) throw new ArgumentNullException(nameof(length));
 
             if (UnreadedLength >= length)
             {

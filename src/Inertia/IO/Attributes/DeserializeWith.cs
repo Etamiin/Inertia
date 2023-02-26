@@ -4,8 +4,8 @@ using System.Text;
 
 namespace Inertia
 {
-    [AttributeUsage(AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
-    public class DeserializeWith : Attribute
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
+    public sealed class DeserializeWith : Attribute
     {
         internal readonly string MethodName;
 

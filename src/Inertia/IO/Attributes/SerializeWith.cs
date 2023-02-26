@@ -6,8 +6,8 @@ using System.Text;
 
 namespace Inertia
 {
-    [AttributeUsage(AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
-    public class SerializeWith : Attribute
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
+    public sealed class SerializeWith : Attribute
     {
         internal readonly string MethodName;
 

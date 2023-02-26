@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Inertia.Runtime.Core;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
@@ -8,82 +9,37 @@ namespace Inertia.Runtime
 {
     internal static class RuntimeManager
     {
-        internal static event BasicAction RtUpdate = () => { };
-
-        private static event BasicAction Updating = () => { };
-        private static event BasicAction Destroying = () => { };
-
-        private static int _scriptRunningCount;
+        private static Dictionary<int, ScriptExecutionLayer> _executionLayers;
+        private static Dictionary<Type, IScriptComponent> _componentInstances;
 
         static RuntimeManager()
         {
-            RunCycleLoop();
+            _componentInstances = new Dictionary<Type, IScriptComponent>();
+            _executionLayers = new Dictionary<int, ScriptExecutionLayer>();
         }
 
-        internal static void IncrementScriptRunning()
+        internal static void RegisterComponentData(ScriptComponentData componentData)
         {
-            Interlocked.Increment(ref _scriptRunningCount);
-        }
-        internal static void DecrementScriptRunning()
-        {
-            Interlocked.Decrement(ref _scriptRunningCount);
-        }
-
-        internal static void RegisterScript(Script script)
-        {
-            Updating += script.OnUpdate;
-            IncrementScriptRunning();
-        }
-        internal static void BeginUnregisterScript(Script script)
-        {
-            Updating -= script.OnUpdate;
-            Destroying += script.PreDestroy;
-        }
-        internal static void EndUnregisterScript(Script script)
-        {
-            Destroying -= script.PreDestroy;
-            DecrementScriptRunning();            
-        }
-
-        internal static void RunCycleLoop()
-        {
-            var clock = new Clock();
-            Task.Factory.StartNew(() => {
-                while (!ReflectionProvider.IsRuntimeCallOverriden)
-                {
-                    ExecuteCycle(clock);
-                }
-            }, TaskCreationOptions.LongRunning);
-        }
-        internal static void ExecuteCycle(Clock clock, float deltaTime = 0f)
-        {
-            if (clock != null)
+            if (ReflectionProvider.TryGetScriptComponent(componentData.GetType(), out var componentType))
             {
-                var currentMsUpdate = clock.GetElapsedSeconds();
-                var targetMsUpdate = 1000.0d / Run.TargetTickPerSecond;
-
-                if (currentMsUpdate < targetMsUpdate)
+                if (!_componentInstances.TryGetValue(componentType, out var componentInstance))
                 {
-                    var sToSleep = (targetMsUpdate - currentMsUpdate) / 1000.0d;
-                    var durationTicks = Math.Round(sToSleep * Stopwatch.Frequency);
+                    componentInstance = (IScriptComponent)Activator.CreateInstance(componentType);
+                    if (!_executionLayers.TryGetValue(componentInstance.ExecutionLayer, out var executionLayer))
+                    {
+                        executionLayer = new ScriptExecutionLayer();
+                        _executionLayers.Add(componentInstance.ExecutionLayer, executionLayer);
+                    }
 
-                    if (_scriptRunningCount == 0 || Run.LimitProcessorUsage) Thread.Sleep(1);
-
-                    while (clock.ElapsedTicks < durationTicks) { }
-                    currentMsUpdate = clock.GetElapsedSeconds();
+                    executionLayer.RegisterScriptComponent(componentInstance);
                 }
 
-                Script.DeltaTime = (float)currentMsUpdate;
-                clock.Reset();
+                componentInstance.RegisterComponentData(componentData);
+                componentData.Destroyed += () =>
+                {
+                    componentInstance.UnregisterComponentData(componentData);
+                };
             }
-            else
-            {
-                Script.DeltaTime = deltaTime;
-            }
-
-            RtUpdate?.Invoke();
-            Updating?.Invoke();
-            Destroying?.Invoke();
         }
     }
 }

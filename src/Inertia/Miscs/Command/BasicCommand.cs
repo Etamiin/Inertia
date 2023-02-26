@@ -5,41 +5,30 @@ namespace Inertia
 {
     public abstract class BasicCommand
     {
-        internal static void PreExecute(BasicCommand cmd, string[] arguments, object[] dataCollection, bool containsBlock)
+        internal static void PreExecute(BasicCommand command, string[] arguments, object[] dataCollection, bool containsQuotes)
         {
-            if (containsBlock)
+            if (containsQuotes)
             {
-                var newArguments = new List<string>();
-                var sentence = new StringBuilder();
+                var parsedArguments = new List<string>();
+                var argBuilder = new StringBuilder();
 
-                for (var i = 0; i < arguments.Length; i++)
+                foreach (var arg in arguments)
                 {
-                    var arg = arguments[i];
-
-                    if (arg.StartsWith('"') || sentence.Length > 0)
+                    if (arg.EndsWith('"'))
                     {
-                        sentence.Append(arg);
-
-                        if (arg.EndsWith('"'))
-                        {
-                            newArguments.Add(sentence.ToString().Replace("\"", string.Empty));
-                            sentence = new StringBuilder();
-                        }
-                        else
-                        {
-                            sentence.Append(" ");
-                        }
+                        argBuilder.Append($" {arg}");
+                        parsedArguments.Add(argBuilder.Replace("\"", string.Empty).ToString().Trim());
+                        argBuilder.Clear();
                     }
-                    else
-                    {
-                        newArguments.Add(arg);
-                    }
+                    else if (arg.StartsWith('"')) argBuilder.Append(arg);
+                    else if (argBuilder.Length > 0) argBuilder.Append($" {arg}");
+                    else parsedArguments.Add(arg);
                 }
 
-                arguments = newArguments.ToArray();
+                arguments = parsedArguments.ToArray();
             }
 
-            cmd.OnExecute(new BasicCommandArguments(arguments, dataCollection));
+            command.OnExecute(new BasicCommandArguments(arguments, dataCollection));
         }
 
         public abstract string Name { get; }

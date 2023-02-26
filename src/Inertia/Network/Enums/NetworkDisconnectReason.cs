@@ -11,7 +11,8 @@ namespace Inertia.Network
         Manual = 1,
         ConnectionLost = 2,
         ConnectionFailed = 4,
-        SendingBadInformation = 8,
-        Spamming = 16
+        ConnectionTimeout = 8,
+        SendingBadInformation = 16,
+        Spamming = 32
     }
 }
