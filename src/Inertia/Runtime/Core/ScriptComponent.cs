@@ -8,29 +8,39 @@ namespace Inertia.Runtime.Core
 {
     public abstract class ScriptComponent<T> : IScriptComponent where T : ScriptComponentData
     {
-        public event BasicAction? Destroyed;
+        public float DeltaTime { get; private set; }
+        public virtual int ExecutionLayer { get; }
+        public bool IsActive { get; private set; }
+
+        internal bool IsRegistered { get; set; }
 
         private object _locker;
         private List<T> _componentDatas;
-
-        public float DeltaTime { get; private set; }
-        public virtual int ExecutionLayer { get; }
-
+        
         public ScriptComponent()
         {
             _locker = new object();
             _componentDatas = new List<T>();
+
+            RuntimeManager.RegisterScriptComponent(this);
         }
 
         public abstract void OnUpdate(T componentData);
 
-        internal void ProcessComponents()
+        internal void ProcessComponents(float deltaTime)
         {
-            lock (_locker)
+            if (!IsRegistered) return;
+
+            DeltaTime = deltaTime;
+
+            if (IsActive)
             {
-                foreach (var componentData in _componentDatas)
+                lock (_locker)
                 {
-                    OnUpdate(componentData);
+                    foreach (var componentData in _componentDatas)
+                    {
+                        OnUpdate(componentData);
+                    }
                 }
             }
         }
@@ -42,6 +52,11 @@ namespace Inertia.Runtime.Core
                 lock (_locker)
                 {
                     _componentDatas.Add(tData);
+                    IsActive = _componentDatas.Count > 0;
+
+                    componentData.Destroying += () => { 
+                        UnregisterComponentData(componentData);
+                    };
                 }
             }
         }
@@ -52,18 +67,7 @@ namespace Inertia.Runtime.Core
                 lock (_locker)
                 {
                     _componentDatas.Remove(tData);
-                }
-            }
-        }
-
-        void IScriptComponent.ProcessComponents(float deltaTime)
-        {
-            DeltaTime = deltaTime;
-            lock (_locker)
-            {
-                foreach (var componentData in _componentDatas)
-                {
-                    OnUpdate(componentData);
+                    IsActive = _componentDatas.Count > 0;
                 }
             }
         }

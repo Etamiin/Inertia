@@ -83,7 +83,6 @@ namespace Inertia
         private static Dictionary<ushort, Type> _messageTypes;
         private static Dictionary<Type, NetworkMessageCaller> _messageHookers;
         private static Dictionary<string, IPlugin> _plugins;
-        private static Dictionary<Type, Type> _scriptComponentTypes;
 
         private static DirectoryInfo _pluginDirInfo;
 
@@ -94,7 +93,6 @@ namespace Inertia
             _messageTypes = new Dictionary<ushort, Type>();
             _messageHookers = new Dictionary<Type, NetworkMessageCaller>();
             _plugins = new Dictionary<string, IPlugin>();
-            _scriptComponentTypes = new Dictionary<Type, Type>();
             _pluginDirInfo = new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Plugins"));
 
             RegisterAll();
@@ -132,10 +130,6 @@ namespace Inertia
         {
             return _messageHookers.TryGetValue(receiverType, out caller);
         }
-        internal static bool TryGetScriptComponent(Type dataType, out Type componentData)
-        {
-            return _scriptComponentTypes.TryGetValue(dataType, out componentData);
-        }
 
         private static void RegisterAll()
         {
@@ -160,22 +154,6 @@ namespace Inertia
                             if (!_commands.ContainsKey(instance.Name))
                             {
                                 _commands.Add(instance.Name, instance);
-                            }
-                        }
-
-                        if (typeof(IScriptComponent).IsAssignableFrom(type) && type.BaseType != null)
-                        {
-                            var argTypes = type.BaseType.GetGenericArguments();
-                            foreach (var argType in argTypes)
-                            {
-                                if (argType.IsSubclassOf(typeof(ScriptComponentData)))
-                                {
-                                    if (_scriptComponentTypes.ContainsKey(argType))
-                                    {
-                                        _scriptComponentTypes[argType] = type;
-                                    }
-                                    else _scriptComponentTypes.Add(argType, type);
-                                }
                             }
                         }
 
@@ -223,6 +201,11 @@ namespace Inertia
                             }
 
                             _properties.Add(type, memoryList.ToArray());
+                        }
+
+                        if (typeof(IScriptComponent).IsAssignableFrom(type))
+                        {
+                            Activator.CreateInstance(type);
                         }
                     }
                 }

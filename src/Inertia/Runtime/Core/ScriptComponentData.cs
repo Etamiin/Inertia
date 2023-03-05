@@ -4,18 +4,29 @@ using System.Text;
 
 namespace Inertia.Runtime.Core
 {
-    public abstract class ScriptComponentData
+    public abstract class ScriptComponentData : IDisposable
     {
-        public event BasicAction? Destroyed;
+        public event BasicAction? Destroying;
+
+        public bool IsDisposed { get; private set; }
 
         public ScriptComponentData()
         {
-            RuntimeManager.RegisterComponentData(this);
+            var component = RuntimeManager.GetScriptComponent(GetType());
+            if (component != null) component.RegisterComponentData(this);
         }
 
-        public void OnDestroy()
+        public void Dispose()
         {
-            Destroyed?.Invoke();
+            Dispose(true);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (!IsDisposed && disposing)
+            {
+                Destroying?.Invoke();
+            }
         }
     }
 }

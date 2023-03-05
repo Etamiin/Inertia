@@ -14,7 +14,10 @@ namespace Inertia.Runtime.Core
 
         internal ScriptExecutionLayer()
         {
-            Task.Factory.StartNew(() => ExecuteCycle(new Clock()), TaskCreationOptions.LongRunning);
+            if (!ReflectionProvider.IsRuntimeCallOverriden)
+            {
+                Task.Factory.StartNew(() => ExecuteCycle(new Clock()), TaskCreationOptions.LongRunning);
+            }
         }
 
         internal void ExecuteCycle(Clock clock)
@@ -42,16 +45,6 @@ namespace Inertia.Runtime.Core
         internal void ExecuteCycle(float deltaTime)
         {
             ComponentsUpdate?.Invoke(deltaTime);
-        }
-
-        internal void RegisterScriptComponent(IScriptComponent component)
-        {
-            ComponentsUpdate += component.ProcessComponents;
-
-            component.Destroyed += () =>
-            {
-                ComponentsUpdate -= component.ProcessComponents;
-            };
         }
     }
 }
