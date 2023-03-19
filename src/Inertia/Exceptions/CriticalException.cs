@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Inertia
 {
-    public class CriticalException : Exception
+    public sealed class CriticalException : Exception
     {
         public override string Message => $"{_message}: {_ex}";
         public Exception Exception => _ex;

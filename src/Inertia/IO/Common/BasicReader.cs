@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 
 namespace Inertia
@@ -341,7 +340,7 @@ namespace Inertia
         {
             if (!typeof(IAutoSerializable).IsAssignableFrom(type))
             {
-                throw new FriendlyException($"Type '{ type.Name }' is not '{ nameof(IAutoSerializable) }'");
+                throw new ArgumentNullException($"Type '{ type.Name }' is not '{ nameof(IAutoSerializable) }'");
             }
 
             var instance = Activator.CreateInstance(type);

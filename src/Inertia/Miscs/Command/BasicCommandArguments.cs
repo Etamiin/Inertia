@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Inertia
+﻿namespace Inertia
 {
     public sealed class BasicCommandArguments
     {
@@ -34,9 +29,9 @@ namespace Inertia
         public bool TryGetDataObject<T>(int index, out T data)
         {
             var obj = GetDataObject(index);
-            if (obj is T)
+            if (obj is T result)
             {
-                data = (T)obj;
+                data = result;
                 return true;
             }
 

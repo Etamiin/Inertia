@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel.Design;
-using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Reflection;
 using System.Text;
 
 namespace Inertia
 {
-    public class BasicWriter : IDisposable
+    public sealed class BasicWriter : IDisposable
     {
         private static Dictionary<Type, BasicAction<BasicWriter, object>> _typageDefinitions = new Dictionary<Type, BasicAction<BasicWriter, object>>
         {
@@ -55,7 +51,7 @@ namespace Inertia
         
         private MemoryStream _writer;
         private readonly Encoding _encoding;
-
+        
         public BasicWriter() : this(Encoding.UTF8)
         {
         }

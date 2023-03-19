@@ -30,9 +30,9 @@ namespace Inertia
 
             command.OnExecute(new BasicCommandArguments(arguments, dataCollection));
         }
-
+        
         public abstract string Name { get; }
-
+        
         public abstract void OnExecute(BasicCommandArguments arguments);
     }
 }

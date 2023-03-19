@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Inertia.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -16,14 +17,23 @@ namespace Inertia.Network
         private Socket _socket;
         private readonly Dictionary<uint, TcpConnectionEntity> _connections;
         private object _locker;
+        private ILogger _logger;
 
-        protected TcpServerEntity(int port) : this(string.Empty, port)
+        protected TcpServerEntity(int port) : this(port, Logger.Instance)
         {
         }
-        protected TcpServerEntity(string ip, int port) : base(ip, port)
+        protected TcpServerEntity(string ip, int port) : this(ip, port, Logger.Instance)
+        {
+
+        }
+        protected TcpServerEntity(int port, ILogger logger) : this(string.Empty, port, logger)
+        {
+        }
+        protected TcpServerEntity(string ip, int port, ILogger logger) : base(ip, port)
         {
             _locker = new object();
             _connections = new Dictionary<uint, TcpConnectionEntity>();
+            _logger = logger;
         }
 
         public NetworkConnectionGroup CreateConnectionGroup()
@@ -90,7 +100,7 @@ namespace Inertia.Network
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error(ex);
+                    _logger.Error(ex);
                     Close(NetworkDisconnectReason.ConnectionFailed);
                 }
             }
@@ -142,7 +152,7 @@ namespace Inertia.Network
             try
             {
                 var socket = ((Socket)iar.AsyncState).EndAccept(iar);
-                var connection = new TcpConnectionEntity(this, socket, (uint)_idProvider.NextId());
+                var connection = new TcpConnectionEntity(this, socket, (uint)_idProvider.NextInt());
 
                 lock (_locker)
                 {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Inertia.Logging;
+using System;
 
 namespace Inertia.Network
 {
@@ -12,8 +13,14 @@ namespace Inertia.Network
         public override int ClientMessagePerQueueCapacity => 1000;
         public override int AuthorizedDataCountPerSecond => 55;
 
-        internal DefaultNetworkProtocol()
+        private ILogger _logger;
+
+        internal DefaultNetworkProtocol() : this(Logger.Instance)
         {
+        }
+        internal DefaultNetworkProtocol(ILogger logger)
+        {
+            _logger = logger;
         }
 
         /// <summary>
@@ -86,7 +93,7 @@ namespace Inertia.Network
                 }
             }
 
-            Logger.Error($"NetworkProtocol Parsing Error: {ex}");
+            _logger.Error($"NetworkProtocol Parsing Error: {ex}");
         }
     }
 }

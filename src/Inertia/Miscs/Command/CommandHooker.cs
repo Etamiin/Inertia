@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Inertia
 {
@@ -9,7 +8,7 @@ namespace Inertia
     /// </summary>
     public static class CommandHooker
     {
-        public static BasicCommand[] GetCommandList()
+        public static IEnumerable<BasicCommand> GetCommandList()
         {
             return ReflectionProvider.GetAllCommands();
         }
@@ -23,11 +22,11 @@ namespace Inertia
             return TryExecuteByName(values[0], dataCollection, commandLine.Contains('"'), args);
         }
         
-        private static bool TryExecuteByName(string commandName, object[] dataCollection, bool containsBlock, params string[] arguments)
+        private static bool TryExecuteByName(string commandName, object[] dataCollection, bool containsQuotes, params string[] arguments)
         {
             if (ReflectionProvider.TryGetCommand(commandName, out BasicCommand cmd))
             {
-                BasicCommand.PreExecute(cmd, arguments, dataCollection, containsBlock);
+                BasicCommand.PreExecute(cmd, arguments, dataCollection, containsQuotes);
                 return true;
             }
 

@@ -8,7 +8,8 @@ namespace Inertia.Network
 {
     public abstract class NetworkProtocol
     {
-        internal static ServerMessagePoolExecutor ServerAsyncPool;
+        internal static AsyncExecutionQueuePool ClientExecutionPool { get; private set; }
+        internal static ServerMessagePoolExecutor ServerAsyncPool { get; private set; }
         public static NetworkProtocol UsedProtocol { get; private set; }
 
         internal static void ProcessParsing(object receiver, BasicReader reader)
@@ -26,7 +27,7 @@ namespace Inertia.Network
                 }
                 else
                 {
-                    NetworkClientEntity.ClientAsyncPool.Enqueue(ExecuteOutput);
+                    ClientExecutionPool.Enqueue(ExecuteOutput);
                 }
             }
             else
@@ -97,6 +98,7 @@ namespace Inertia.Network
         static NetworkProtocol()
         {
             UsedProtocol = new DefaultNetworkProtocol();
+            ClientExecutionPool = new AsyncExecutionQueuePool(100);
             ServerAsyncPool = new ServerMessagePoolExecutor(UsedProtocol.ConnectionPerQueueInPool);
 
             ReflectionProvider.Invalidate();

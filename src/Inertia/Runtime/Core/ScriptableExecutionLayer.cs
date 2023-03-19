@@ -1,18 +1,20 @@
 ﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Inertia.Runtime.Core
+namespace Inertia.Scriptable
 {
-    internal sealed class ScriptExecutionLayer
+    internal sealed class ScriptableExecutionLayer
     {
         internal event BasicAction<float>? ComponentsUpdate;
+        
+        internal void OnComponentsUpdate(float deltaTime)
+        {
+            ComponentsUpdate?.Invoke(deltaTime);
+        }
 
-        internal ScriptExecutionLayer()
+        internal ScriptableExecutionLayer()
         {
             if (!ReflectionProvider.IsRuntimeCallOverriden)
             {
@@ -20,7 +22,7 @@ namespace Inertia.Runtime.Core
             }
         }
 
-        internal void ExecuteCycle(Clock clock)
+        private void ExecuteCycle(Clock clock)
         {
             while (true)
             {
@@ -29,22 +31,21 @@ namespace Inertia.Runtime.Core
 
                 if (currentMsUpdate < targetMsUpdate)
                 {
-                    var sToSleep = (targetMsUpdate - currentMsUpdate) / 1000.0d;
-                    var durationTicks = Math.Round(sToSleep * Stopwatch.Frequency);
-
                     if (ComponentsUpdate == null || Run.LimitProcessorUsage) Thread.Sleep(1);
+                    else
+                    {
+                        var msToSleep = (targetMsUpdate - currentMsUpdate) / 1000.0d;
+                        var durationTicks = Math.Round(msToSleep * Stopwatch.Frequency);
 
-                    while (clock.ElapsedTicks < durationTicks) { }
+                        while (clock.ElapsedTicks < durationTicks) { }
+                    }
+
                     currentMsUpdate = clock.GetElapsedSeconds();
                 }
 
                 clock.Reset();
                 ComponentsUpdate?.Invoke((float)currentMsUpdate);
             }
-        }
-        internal void ExecuteCycle(float deltaTime)
-        {
-            ComponentsUpdate?.Invoke(deltaTime);
         }
     }
 }

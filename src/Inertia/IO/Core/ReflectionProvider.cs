@@ -1,13 +1,13 @@
-﻿using Inertia.IO;
-using Inertia.Network;
-using Inertia.Runtime;
-using Inertia.Runtime.Core;
+﻿using Inertia.Network;
+using Inertia.Plugins;
+using Inertia.Scriptable;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Inertia
 {
@@ -22,32 +22,12 @@ namespace Inertia
             internal SerializablePropertyMemory(PropertyInfo info)
             {
                 Info = info;
-                var serAttr = info.GetCustomAttribute<SerializeWith>();
-                var deserAttr = info.GetCustomAttribute<DeserializeWith>();
 
+                var serAttr = info.GetCustomAttribute<PropertySerialization>();
                 if (serAttr != null)
                 {
-                    var method = info.DeclaringType.GetMethod(serAttr.MethodName, BindingFlags.NonPublic | BindingFlags.Instance);
-                    if (method != null)
-                    {
-                        var parameters = method.GetParameters();
-                        if (parameters.Length == 1 && parameters[0].ParameterType == typeof(BasicWriter))
-                        {
-                            SerializationMethodInfo = method;
-                        }
-                    }
-                }
-                if (deserAttr != null)
-                {
-                    var method = info.DeclaringType.GetMethod(deserAttr.MethodName, BindingFlags.NonPublic | BindingFlags.Instance);
-                    if (method != null)
-                    {
-                        var parameters = method.GetParameters();
-                        if (parameters.Length == 1 && parameters[0].ParameterType == typeof(BasicReader))
-                        {
-                            DeserializationMethodInfo = method;
-                        }
-                    }
+                    SerializationMethodInfo = SearchForMethod(serAttr.SerializationMethodName, typeof(BasicWriter));
+                    DeserializationMethodInfo = SearchForMethod(serAttr.DeserializationMethodName, typeof(BasicReader));
                 }
             }
 
@@ -74,6 +54,18 @@ namespace Inertia
                     DeserializationMethodInfo.Invoke(serializableObject, new object[] { reader });
                 }
             }
+        
+            private MethodInfo? SearchForMethod(string methodName, Type parameterType)
+            {
+                var method = Info.DeclaringType.GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance);
+                if (method != null)
+                {
+                    var parameters = method.GetParameters();
+                    if (parameters.Length == 1 && parameters[0].ParameterType == parameterType) return method;
+                }
+
+                return null;
+            }
         }
 
         internal static bool IsRuntimeCallOverriden { get; private set; }
@@ -82,9 +74,7 @@ namespace Inertia
         private static Dictionary<string, BasicCommand> _commands;
         private static Dictionary<ushort, Type> _messageTypes;
         private static Dictionary<Type, NetworkMessageCaller> _messageHookers;
-        private static Dictionary<string, IPlugin> _plugins;
-
-        private static DirectoryInfo _pluginDirInfo;
+        private static Dictionary<string, PluginTrace> _pluginTraces;
 
         static ReflectionProvider()
         {
@@ -92,31 +82,23 @@ namespace Inertia
             _commands = new Dictionary<string, BasicCommand>();
             _messageTypes = new Dictionary<ushort, Type>();
             _messageHookers = new Dictionary<Type, NetworkMessageCaller>();
-            _plugins = new Dictionary<string, IPlugin>();
-            _pluginDirInfo = new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Plugins"));
+            _pluginTraces = new Dictionary<string, PluginTrace>();
 
             RegisterAll();
-            InitializePlugins();
         }
 
         internal static bool Invalidate() => true;
 
-        internal static BasicCommand[] GetAllCommands()
-        {
-            lock (_commands)
-            {
-                return _commands.Values.ToArray();
-            }
-        }
-        internal static IPlugin GetPluginByIdentifier(string identifier)
-        {
-            _plugins.TryGetValue(identifier, out var plugin);
-            return plugin;
-        }
-
         internal static bool TryGetProperties(Type type, out SerializablePropertyMemory[] properties)
         {
             return _properties.TryGetValue(type, out properties);
+        }
+        internal static IEnumerable<BasicCommand> GetAllCommands()
+        {
+            lock (_commands)
+            {
+                return _commands.Values.AsEnumerable();
+            }
         }
         internal static bool TryGetCommand(string commandName, out BasicCommand command)
         {
@@ -131,6 +113,54 @@ namespace Inertia
             return _messageHookers.TryGetValue(receiverType, out caller);
         }
 
+        internal static PluginExecutionResult TryStartPlugin(string pluginFilePath, object[] executionParameters)
+        {
+            if (!File.Exists(pluginFilePath)) return PluginExecutionResult.FileNotFound;
+
+            var assembly = Assembly.LoadFrom(pluginFilePath);
+            var pluginType = assembly.GetTypes()
+                .FirstOrDefault((type) => typeof(IPlugin).IsAssignableFrom(type));
+
+            var instance = TryCreateInstance<IPlugin>(pluginType, Type.EmptyTypes);
+            if (_pluginTraces.ContainsKey(instance.Identifier)) return PluginExecutionResult.AlreadyLoaded;
+
+            PluginTrace trace = null;
+            CancellationTokenSource executionCancelSource = null;
+            if (!instance.ScriptableRun)
+            {
+                var options = instance.LongRun ? TaskCreationOptions.LongRunning : TaskCreationOptions.None;
+                executionCancelSource = new CancellationTokenSource();
+                trace = new PluginTrace(instance, executionCancelSource);
+
+                Task.Factory.StartNew(
+                    () => RunPluginExecution(instance, executionParameters),
+                    executionCancelSource.Token,
+                    options,
+                    TaskScheduler.Default);
+            }
+            else
+            {
+                trace = new PluginTrace(instance);
+                Run.OnNextTick(() => RunPluginExecution(instance, executionParameters));
+            }
+
+            _pluginTraces.Add(instance.Identifier, new PluginTrace(instance, executionCancelSource));
+
+            return PluginExecutionResult.Success;
+        }
+        internal static bool TryStopPlugin(string pluginIdentifier)
+        {
+            if (_pluginTraces.TryGetValue(pluginIdentifier, out var trace))
+            {
+                trace.Dispose();
+                _pluginTraces.Remove(pluginIdentifier);
+
+                return true;
+            }
+
+            return false;
+        }
+
         private static void RegisterAll()
         {
             var assemblies = AppDomain.CurrentDomain.GetAssemblies();
@@ -143,14 +173,14 @@ namespace Inertia
 
                     foreach (var type in types)
                     {
-                        if (!IsRuntimeCallOverriden && type.GetCustomAttribute<OverrideRuntimeCall>() != null)
+                        if (!IsRuntimeCallOverriden && type.GetCustomAttribute<OverrideScriptableCall>() != null)
                         {
                             IsRuntimeCallOverriden = true;
                         }
 
                         if (type.IsSubclassOf(typeof(BasicCommand)))
                         {
-                            var instance = (BasicCommand)Activator.CreateInstance(type);
+                            var instance = TryCreateInstance<BasicCommand>(type, Type.EmptyTypes);
                             if (!_commands.ContainsKey(instance.Name))
                             {
                                 _commands.Add(instance.Name, instance);
@@ -173,8 +203,11 @@ namespace Inertia
                                 foreach (var smethod in sMethods)
                                 {
                                     var ps = smethod.GetParameters();
-                                    if (ps.Length >= 2 && ps[0].ParameterType.IsSubclassOf(typeof(NetworkMessage)) && (ps[1].ParameterType.IsSubclassOf(typeof(NetworkClientEntity)) || ps[1].ParameterType.IsSubclassOf(typeof(NetworkConnectionEntity))))
+                                    if (ps.Length == 2 && ps[0].ParameterType.IsSubclassOf(typeof(NetworkMessage)))
                                     {
+                                        var isValidEntity = ps[1].ParameterType.IsSubclassOf(typeof(NetworkClientEntity)) || ps[1].ParameterType.IsSubclassOf(typeof(NetworkConnectionEntity));
+                                        if (!isValidEntity) continue;
+
                                         var msgType = ps[0].ParameterType;
                                         var entityType = ps[1].ParameterType;
 
@@ -203,59 +236,36 @@ namespace Inertia
                             _properties.Add(type, memoryList.ToArray());
                         }
 
-                        if (typeof(IScriptComponent).IsAssignableFrom(type))
+                        if (typeof(IScriptable).IsAssignableFrom(type))
                         {
-                            Activator.CreateInstance(type);
+                            TryCreateInstance<IScriptable>(type, Type.EmptyTypes);
                         }
                     }
                 }
             }
             catch (Exception ex)
             {
-                throw new CriticalException("An error occured during reflection registration", ex);
+                throw new CriticalException($"{nameof(ReflectionProvider)} failed to load.", ex);
             }
         }
-        private static void InitializePlugins()
+        private static T TryCreateInstance<T>(Type owner, Type[] parametersType, params object[] parameters)
         {
-            if (!_pluginDirInfo.Exists)
+            var constructor = owner.GetConstructor(parametersType);
+            if (constructor == null) throw new NotFoundConstructorException(owner, parametersType);
+
+            return (T)constructor.Invoke(parameters);
+        }
+        private static void RunPluginExecution(IPlugin instance, object[] executionParameters)
+        {
+            try
             {
-                _pluginDirInfo.Create();
+                instance.Execute(executionParameters);
             }
-
-            var dllInfos = _pluginDirInfo.GetFiles()
-                .Where((fileInfo) => fileInfo.Extension.Equals(".dll"));
-
-            foreach (var dllInfo in dllInfos)
+            catch (Exception ex)
             {
-                var assembly = Assembly.LoadFrom(dllInfo.FullName);
-                var plugins = assembly.GetTypes()
-                    .Where((type) => typeof(IPlugin).IsAssignableFrom(type));
+                instance.Error(ex);
 
-                foreach (var plugin in plugins)
-                {
-                    IPlugin? instance = null;
-
-                    try
-                    {
-                        instance = (IPlugin)Activator.CreateInstance(plugin);
-                        if (_plugins.ContainsKey(instance.Identifier))
-                        {
-                            throw new FriendlyException($"A plugin with the same identifier ({instance.Identifier}) is already registered");
-                        }
-
-                        instance.OnInitialize();
-                        _plugins.Add(instance.Identifier, instance);
-
-                        if (instance.AutoExecute)
-                        {
-                            //Run.Plugin(instance.Identifier);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        //Run.OnPluginLoadFailed(instance?.Identifier, ex);
-                    }
-                }
+                if (instance.StopOnCatchedError) TryStopPlugin(instance.Identifier);
             }
         }
     }

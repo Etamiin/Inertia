@@ -5,8 +5,6 @@ namespace Inertia.Network
 {
     public abstract class NetworkClientEntity
     {
-        internal static ExecutorPool ClientAsyncPool { get; private set; }
-
         public bool IsDisposed { get; protected private set; }
 
         public abstract bool IsConnected { get; }
@@ -15,10 +13,6 @@ namespace Inertia.Network
         protected private readonly int _targetPort;
         protected private bool _disconnectNotified;
 
-        static NetworkClientEntity()
-        {
-            ClientAsyncPool = new ExecutorPool(NetworkProtocol.UsedProtocol.ClientMessagePerQueueCapacity, true);
-        }
         protected internal NetworkClientEntity(string ip, int port)
         {
             _targetIp = ip.Replace("localhost", "127.0.0.1");
