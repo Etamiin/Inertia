@@ -27,13 +27,13 @@ namespace Inertia.Network
 
         public void Dispose()
         {
-            if (!IsDisposed)
-            {
-                EndPoint = null;
-                _server = null;
+            //if (!IsDisposed)
+            //{
+            //    EndPoint = null;
+            //    _server = null;
 
-                IsDisposed = true;
-            }
+            //    IsDisposed = true;
+            //}
         }
     }
 }

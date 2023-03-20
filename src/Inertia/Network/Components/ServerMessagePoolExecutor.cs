@@ -1,27 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Inertia.Network
 {
     internal class ServerMessagePoolExecutor
     {
         internal int ConnectionPerQueue { get; set; }
-
-        private List<ServerMessageQueue> _pool;
-        private object _locker;
+        
+        private readonly List<ServerMessageQueue> _pool;
+        private readonly object _locker;
 
         internal ServerMessagePoolExecutor(int connectionPerQueue)
         {
             _pool = new List<ServerMessageQueue>();
-            ConnectionPerQueue = connectionPerQueue;
             _locker = new object();
+            ConnectionPerQueue = connectionPerQueue;
         }
 
-        internal void RegisterConnection(NetworkConnectionEntity connection)
+        internal ServerMessageQueue RegisterConnection(NetworkConnectionEntity connection)
         {
-            GetAvailableQueue().RegisterConnection(connection);
+            var queue = GetAvailableQueue();
+            queue.RegisterConnection(connection);
+
+            return queue;
         }
 
         private ServerMessageQueue GetAvailableQueue()

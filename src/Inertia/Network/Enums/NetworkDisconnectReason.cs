@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Inertia.Network
+﻿namespace Inertia.Network
 {
     public enum NetworkDisconnectReason : byte
     {
@@ -12,7 +6,8 @@ namespace Inertia.Network
         ConnectionLost = 2,
         ConnectionFailed = 4,
         ConnectionTimeout = 8,
-        SendingBadInformation = 16,
-        Spamming = 32
+        InvalidMessage = 16,
+        SendingBadInformation = 32,
+        Spam = 64
     }
 }

@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -23,38 +21,34 @@ namespace Inertia.Network
 
         internal void RegisterConnection(NetworkConnectionEntity connection)
         {
-            connection.AssignedMessageQueue = this;
             Interlocked.Increment(ref _registeredConnection);
 
             if (connection is TcpConnectionEntity tcpConnection)
             {
-                tcpConnection.Disconnected += (reason) =>
-                {
-                    Interlocked.Decrement(ref _registeredConnection);
-                };
+                tcpConnection.Disconnected += TcpConnection_Disconnected;
             }
         }
         internal void Enqueue(BasicAction action)
         {
             _queue.Enqueue(action);
         }
-        internal void Execute()
-        {
-            while (_queue.TryDequeue(out BasicAction action))
-            {
-                action?.Invoke();
-            }
-        }
 
         public void Dispose()
         {
-            if (!IsDisposed)
+            Dispose(true);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (IsDisposed) return;
+
+            if (disposing)
             {
                 _queue.Clear();
                 _queue = null;
-
-                IsDisposed = true;
             }
+
+            IsDisposed = true;
         }
     
         private void StartAutoExecuteAsync()
@@ -68,9 +62,21 @@ namespace Inertia.Network
                         continue;
                     }
 
-                    Execute();
+                    while (_queue.TryDequeue(out BasicAction action))
+                    {
+                        action?.Invoke();
+                    }
                 }
             }, TaskCreationOptions.LongRunning);
+        }
+        private void TcpConnection_Disconnected(NetworkConnectionEntity entity, NetworkDisconnectReason value)
+        {
+            Interlocked.Decrement(ref _registeredConnection);
+
+            if (entity is TcpConnectionEntity tcpConnection)
+            {
+                tcpConnection.Disconnected += TcpConnection_Disconnected;
+            }
         }
     }
 }

@@ -92,7 +92,7 @@ namespace Inertia.Network
                     _connections.Clear();
                     _closeNotified = false;
                     _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                    _socket.Bind(new IPEndPoint(string.IsNullOrEmpty(_targetIp) ? IPAddress.Any : IPAddress.Parse(_targetIp), _targetPort));
+                    _socket.Bind(new IPEndPoint(string.IsNullOrEmpty(_ip) ? IPAddress.Any : IPAddress.Parse(_ip), _port));
                     _socket.Listen(1000);
 
                     OnStarted();

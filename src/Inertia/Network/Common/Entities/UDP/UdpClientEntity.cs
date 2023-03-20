@@ -20,21 +20,20 @@ namespace Inertia.Network
         
         public sealed override void Connect()
         {
-            if (IsDisposed)
-            {
-                throw new ObjectDisposedException(nameof(UdpClientEntity));
-            }
+            //if (IsDisposed)
+            //{
+            //    throw new ObjectDisposedException(nameof(UdpClientEntity));
+            //}
 
             if (!IsConnected)
             {
                 try
                 {
-                    _disconnectNotified = false;
                     _reader = new BasicReader();
                     _client = new UdpClient();
-                    _client.Connect(new IPEndPoint(IPAddress.Parse(_targetIp), _targetPort));
+                    _client.Connect(new IPEndPoint(IPAddress.Parse(_ip), _port));
 
-                    OnConnected();
+                    Connected();
                     _client.BeginReceive(new AsyncCallback(OnReceiveData), _client);
                 }
                 catch
@@ -45,10 +44,10 @@ namespace Inertia.Network
         }        
         public sealed override void Disconnect(NetworkDisconnectReason reason)
         {
-            if (IsDisposed)
-            {
-                throw new ObjectDisposedException(nameof(UdpClientEntity));
-            }
+            //if (IsDisposed)
+            //{
+            //    throw new ObjectDisposedException(nameof(UdpClientEntity));
+            //}
 
             if (IsConnected)
             {
@@ -56,18 +55,14 @@ namespace Inertia.Network
                 _client?.Close();
             }
 
-            if (!_disconnectNotified)
-            {
-                _disconnectNotified = true;
-                OnDisconnected(reason);
-            }
+            Disconnected(reason);
         }
         public sealed override void Send(byte[] data)
         {
-            if (IsDisposed)
-            {
-                throw new ObjectDisposedException(nameof(UdpClientEntity));
-            }
+            //if (IsDisposed)
+            //{
+            //    throw new ObjectDisposedException(nameof(UdpClientEntity));
+            //}
             if (data.Length > ushort.MaxValue)
             {
                 throw new UserDatagramDataLengthLimitException();
@@ -82,13 +77,13 @@ namespace Inertia.Network
 
         public void Dispose()
         {
-            if (!IsDisposed)
-            {
-                Disconnect(NetworkDisconnectReason.Manual);
-                _client?.Dispose();
+            //if (!IsDisposed)
+            //{
+            //    Disconnect(NetworkDisconnectReason.Manual);
+            //    _client?.Dispose();
 
-                IsDisposed = true;
-            }
+            //    IsDisposed = true;
+            //}
         }
 
         private void OnReceiveData(IAsyncResult iar)

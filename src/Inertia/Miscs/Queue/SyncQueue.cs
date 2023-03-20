@@ -75,22 +75,22 @@ namespace Inertia
 
                         await Task.Delay(10).ConfigureAwait(false);
                     }
+
+                    continue;
                 }
-                else
+
+                EmptySince = null;
+
+                if (Run.LimitProcessorUsage)
                 {
-                    EmptySince = null;
-
-                    if (Run.LimitProcessorUsage)
+                    while (_queue.TryDequeue(out var action))
                     {
-                        while (_queue.TryDequeue(out var action))
-                        {
-                            action?.Invoke();
-                        }
-
-                        await Task.Delay(10).ConfigureAwait(false);
+                        action?.Invoke();
                     }
-                    else if (_queue.TryDequeue(out var action)) action?.Invoke();
+
+                    await Task.Delay(10).ConfigureAwait(false);
                 }
+                else if (_queue.TryDequeue(out var action)) action?.Invoke();
             }
         }
     }

@@ -1,22 +1,18 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace Inertia.Network
 {
     public abstract class NetworkClientEntity
     {
-        public bool IsDisposed { get; protected private set; }
-
         public abstract bool IsConnected { get; }
 
-        protected private readonly string _targetIp;
-        protected private readonly int _targetPort;
-        protected private bool _disconnectNotified;
+        protected private readonly string _ip;
+        protected private readonly int _port;
 
-        protected internal NetworkClientEntity(string ip, int port)
+        private protected NetworkClientEntity(string ip, int port)
         {
-            _targetIp = ip.Replace("localhost", "127.0.0.1");
-            _targetPort = port;
+            _ip = ip.Replace("localhost", "127.0.0.1");
+            _port = port;
         }
 
         public abstract void Connect();
@@ -25,7 +21,7 @@ namespace Inertia.Network
 
         public void ConnectAsync()
         {
-            Task.Factory.StartNew(Connect);
+            Task.Run(Connect);
         }
         public void Disconnect()
         {
@@ -36,7 +32,7 @@ namespace Inertia.Network
             Send(NetworkProtocol.UsedProtocol.OnSerializeMessage(message));
         }
 
-        protected virtual void OnConnected() { }
-        protected virtual void OnDisconnected(NetworkDisconnectReason reason) { }
+        protected virtual void Connected() { }
+        protected virtual void Disconnected(NetworkDisconnectReason reason) { }
     }
 }

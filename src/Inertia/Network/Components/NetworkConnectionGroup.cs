@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Inertia.Network
@@ -9,10 +8,10 @@ namespace Inertia.Network
     {
         public int ConnectionCount => _connections.Count;
 
-        private event BasicAction<byte[]> Sender = (msg) => { };
+        private event BasicAction<byte[]> Sending;
 
-        private List<NetworkConnectionEntity> _connections;
-        private object _locker;
+        private readonly List<NetworkConnectionEntity> _connections;
+        private readonly object _locker;
 
         internal NetworkConnectionGroup()
         {
@@ -24,7 +23,7 @@ namespace Inertia.Network
         {
             lock (_locker)
             {
-                Sender += connection.Send;
+                Sending += connection.Send;
                 _connections.Add(connection);
             }
         }
@@ -32,10 +31,10 @@ namespace Inertia.Network
         {
             lock (_locker)
             {
-                foreach (var c in connections)
+                foreach (var connection in connections)
                 {
-                    Sender += c.Send;
-                    _connections.Add(c);
+                    Sending += connection.Send;
+                    _connections.Add(connection);
                 }
             }
         }
@@ -43,7 +42,7 @@ namespace Inertia.Network
         {
             lock (_locker)
             {
-                Sender -= connection.Send;
+                Sending -= connection.Send;
                 _connections.Remove(connection);
             }
         }
@@ -54,10 +53,10 @@ namespace Inertia.Network
                 var i = 0;
                 while (i < _connections.Count)
                 {
-                    var c = _connections[i];
-                    if (predicate(c))
+                    var connection = _connections[i];
+                    if (predicate(connection))
                     {
-                        Sender -= c.Send;
+                        Sending -= connection.Send;
                         _connections.RemoveAt(i);
                         continue;
                     }
@@ -71,7 +70,7 @@ namespace Inertia.Network
         {
             Task.Factory.StartNew(() => {
                 var data = NetworkProtocol.UsedProtocol.OnSerializeMessage(message);
-                Sender(data);
+                Sending?.Invoke(data);
             });
         }
     }

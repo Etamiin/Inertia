@@ -45,7 +45,7 @@ namespace Inertia.Network
                     _closeNotified = false;
                     _reader = new BasicReader();
                     _connections.Clear();
-                    _client = new UdpClient(new IPEndPoint(string.IsNullOrEmpty(_targetIp) ? IPAddress.Any : IPAddress.Parse(_targetIp), _targetPort));
+                    _client = new UdpClient(new IPEndPoint(string.IsNullOrEmpty(_ip) ? IPAddress.Any : IPAddress.Parse(_ip), _port));
 
                     OnStarted();
                     _client.BeginReceive(new AsyncCallback(OnReceiveData), _client);
@@ -80,19 +80,19 @@ namespace Inertia.Network
 
         public void SendTo(UdpConnectionEntity connection, byte[] data)
         {
-            if (connection.IsDisposed)
-            {
-                throw new ObjectDisposedException(nameof(UdpConnectionEntity));
-            }
+            //if (connection.IsDisposed)
+            //{
+            //    throw new ObjectDisposedException(nameof(UdpConnectionEntity));
+            //}
 
             SendTo(connection.EndPoint, data);
         }        
         public void SendTo(UdpConnectionEntity connection, NetworkMessage message)
         {
-            if (connection.IsDisposed)
-            {
-                throw new ObjectDisposedException(nameof(UdpConnectionEntity));
-            }
+            //if (connection.IsDisposed)
+            //{
+            //    throw new ObjectDisposedException(nameof(UdpConnectionEntity));
+            //}
 
             SendTo(connection.EndPoint, NetworkProtocol.UsedProtocol.OnSerializeMessage(message));
         }

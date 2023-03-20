@@ -8,9 +8,11 @@ namespace Inertia.Network
     {
         public sealed override bool IsConnected => _socket != null && _socket.Connected;
 
+        public bool IsDisposed { get; private set; }
+
         private readonly byte[] _buffer;
-        private BasicReader _reader;
-        private Socket _socket;
+        private BasicReader? _reader;
+        private Socket? _socket;
 
         protected TcpClientEntity(string ip, int port) : base(ip, port)
         {
@@ -28,12 +30,12 @@ namespace Inertia.Network
             {
                 try
                 {
-                    _disconnectNotified = false;
-                    _reader = new BasicReader();
                     _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                    _socket.Connect(new IPEndPoint(IPAddress.Parse(_targetIp), _targetPort));
+                    _socket.Connect(new IPEndPoint(IPAddress.Parse(_ip), _port));
+                    
+                    _reader = new BasicReader();
 
-                    OnConnected();
+                    Connected();
                     _socket.BeginReceive(_buffer, 0, _buffer.Length, SocketFlags.None, OnReceiveData, _socket);
                 }
                 catch
@@ -55,16 +57,13 @@ namespace Inertia.Network
                 {
                     _socket?.Shutdown(SocketShutdown.Both);
                 }
-                catch { }
+                finally
+                {
+                    _reader?.Dispose();
+                    _socket?.Disconnect(false);
 
-                _reader?.Dispose();
-                _socket?.Disconnect(false);
-            }
-
-            if (!_disconnectNotified)
-            {
-                _disconnectNotified = true;
-                OnDisconnected(reason);
+                    Disconnected(reason);
+                }
             }
         }
         public sealed override void Send(byte[] data)
@@ -74,22 +73,26 @@ namespace Inertia.Network
                 throw new ObjectDisposedException(nameof(TcpClientEntity));
             }
 
-            if (!IsConnected) return;
+            if (data == null || data.Length == 0)
+            {
+                throw new ArgumentNullException(nameof(data));
+            }
 
-            try { _socket.Send(data); } catch { }
+            if (IsConnected)
+            {
+                try { 
+                    _socket?.Send(data);
+                }
+                catch 
+                {
+                    Disconnect(NetworkDisconnectReason.InvalidMessage);
+                }
+            }
         }
 
         public void Dispose()
         {
-            if (!IsDisposed)
-            {
-                Disconnect(NetworkDisconnectReason.Manual);
-
-                _reader.Dispose();
-                _socket?.Dispose();
-
-                IsDisposed = true;
-            }
+            Dispose(true);
         }
 
         private void OnReceiveData(IAsyncResult iar)
@@ -97,9 +100,12 @@ namespace Inertia.Network
             try
             {
                 int received = ((Socket)iar.AsyncState).EndReceive(iar);
+                
+                if (!IsConnected) return;
+
                 if (received == 0)
                 {
-                    throw new SocketException();
+                    throw new SocketException((int)SocketError.SocketError);
                 }
 
                 NetworkProtocol.ProcessParsing(this, _reader.Fill(new ReadOnlySpan<byte>(_buffer, 0, received)));
@@ -115,8 +121,19 @@ namespace Inertia.Network
 
             if (IsConnected)
             {
-                _socket.BeginReceive(_buffer, 0, _buffer.Length, SocketFlags.None, OnReceiveData, _socket);
+                _socket?.BeginReceive(_buffer, 0, _buffer.Length, SocketFlags.None, OnReceiveData, _socket);
             }
+        }
+        private void Dispose(bool disposing)
+        {
+            if (IsDisposed) return;
+
+            if (disposing)
+            {
+                Disconnect();
+            }
+
+            IsDisposed = true;
         }
     }
 }
