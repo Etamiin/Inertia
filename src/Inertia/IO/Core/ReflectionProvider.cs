@@ -69,12 +69,15 @@ namespace Inertia
         }
 
         internal static bool IsRuntimeCallOverriden { get; private set; }
+        internal static bool NetworkClientUsedInAssemblies { get; private set; }
+        internal static bool NetworkServerUsedInAssemblies { get; private set; }
 
         private static Dictionary<Type, SerializablePropertyMemory[]> _properties;
         private static Dictionary<string, BasicCommand> _commands;
         private static Dictionary<ushort, Type> _messageTypes;
         private static Dictionary<Type, NetworkMessageCaller> _messageHookers;
         private static Dictionary<string, PluginTrace> _pluginTraces;
+        private static bool _isInitialized;
 
         static ReflectionProvider()
         {
@@ -173,73 +176,9 @@ namespace Inertia
 
                     foreach (var type in types)
                     {
-                        if (!IsRuntimeCallOverriden && type.GetCustomAttribute<OverrideScriptableCall>() != null)
-                        {
-                            IsRuntimeCallOverriden = true;
-                        }
-
-                        if (type.IsSubclassOf(typeof(BasicCommand)))
-                        {
-                            var instance = TryCreateInstance<BasicCommand>(type, Type.EmptyTypes);
-                            if (!_commands.ContainsKey(instance.Name))
-                            {
-                                _commands.Add(instance.Name, instance);
-                            }
-                        }
-
-                        if (type.IsSubclassOf(typeof(NetworkMessage)))
-                        {
-                            var message = NetworkProtocol.CreateMessage(type);
-                            if (!_messageTypes.ContainsKey(message.MessageId))
-                            {
-                                _messageTypes.Add(message.MessageId, type);
-                            }
-                        }
-                        else if (typeof(IMessageHooker).IsAssignableFrom(type))
-                        {
-                            var sMethods = type.GetMethods(BindingFlags.Static | BindingFlags.NonPublic);
-                            if (sMethods.Length > 0)
-                            {
-                                foreach (var smethod in sMethods)
-                                {
-                                    var ps = smethod.GetParameters();
-                                    if (ps.Length == 2 && ps[0].ParameterType.IsSubclassOf(typeof(NetworkMessage)))
-                                    {
-                                        var isValidEntity = ps[1].ParameterType.IsSubclassOf(typeof(NetworkClientEntity)) || ps[1].ParameterType.IsSubclassOf(typeof(NetworkConnectionEntity));
-                                        if (!isValidEntity) continue;
-
-                                        var msgType = ps[0].ParameterType;
-                                        var entityType = ps[1].ParameterType;
-
-                                        if (!_messageHookers.ContainsKey(entityType))
-                                        {
-                                            _messageHookers.Add(entityType, new NetworkMessageCaller());
-                                        }
-
-                                        _messageHookers[entityType].RegisterReference(msgType, smethod);
-                                    }
-                                }
-                            }
-                        }
-
-                        if (typeof(IAutoSerializable).IsAssignableFrom(type))
-                        {
-                            var memoryList = new List<SerializablePropertyMemory>();
-                            var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance).OrderBy((property) => property.Name);
-                            foreach (var property in properties)
-                            {
-                                if (property.GetCustomAttribute<IgnoreInProcess>() != null) continue;
-
-                                memoryList.Add(new SerializablePropertyMemory(property));
-                            }
-
-                            _properties.Add(type, memoryList.ToArray());
-                        }
-
-                        if (typeof(IScriptable).IsAssignableFrom(type))
-                        {
-                            TryCreateInstance<IScriptable>(type, Type.EmptyTypes);
-                        }
+                        ReadTypeIOInformations(type);
+                        ReadTypeInformations(type);
+                        ReadTypeNetworkInformations(type);
                     }
                 }
             }
@@ -266,6 +205,91 @@ namespace Inertia
                 instance.Error(ex);
 
                 if (instance.StopOnCatchedError) TryStopPlugin(instance.Identifier);
+            }
+        }
+        private static void ReadTypeIOInformations(Type type)
+        {
+            if (typeof(IAutoSerializable).IsAssignableFrom(type))
+            {
+                if (type.GetCustomAttribute<IgnoreInReflection>() != null) return;
+
+                var memoryList = new List<SerializablePropertyMemory>();
+                var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance).OrderBy((property) => property.Name);
+                foreach (var property in properties)
+                {
+                    if (!property.CanWrite || property.GetCustomAttribute<IgnoreInReflection>() != null) continue;
+
+                    memoryList.Add(new SerializablePropertyMemory(property));
+                }
+
+                _properties.Add(type, memoryList.ToArray());
+            }
+        }
+        private static void ReadTypeInformations(Type type)
+        {
+            if (type.IsSubclassOf(typeof(BasicCommand)))
+            {
+                var instance = TryCreateInstance<BasicCommand>(type, Type.EmptyTypes);
+                if (!_commands.ContainsKey(instance.Name))
+                {
+                    _commands.Add(instance.Name, instance);
+                }
+            }
+
+            if (!IsRuntimeCallOverriden && type.GetCustomAttribute<OverrideScriptableCall>() != null)
+            {
+                IsRuntimeCallOverriden = true;
+            }
+
+            if (typeof(IScriptable).IsAssignableFrom(type))
+            {
+                TryCreateInstance<IScriptable>(type, Type.EmptyTypes);
+            }
+        }
+        private static void ReadTypeNetworkInformations(Type type)
+        {
+            if (!NetworkClientUsedInAssemblies && type.IsSubclassOf(typeof(TcpClientEntity)))
+            {
+                NetworkClientUsedInAssemblies = true;
+            }
+
+            if (!NetworkServerUsedInAssemblies && type.IsSubclassOf(typeof(TcpServerEntity)))
+            {
+                NetworkServerUsedInAssemblies = true;
+            }            
+
+            if (type.IsSubclassOf(typeof(NetworkMessage)))
+            {
+                var message = NetworkProtocol.CreateMessage(type);
+                if (!_messageTypes.ContainsKey(message.MessageId))
+                {
+                    _messageTypes.Add(message.MessageId, type);
+                }
+            }
+            else if (typeof(IMessageHooker).IsAssignableFrom(type))
+            {
+                var sMethods = type.GetMethods(BindingFlags.Static | BindingFlags.NonPublic);
+                if (sMethods.Length == 0) return;
+
+                foreach (var smethod in sMethods)
+                {
+                    var ps = smethod.GetParameters();
+                    if (ps.Length == 2 && ps[0].ParameterType.IsSubclassOf(typeof(NetworkMessage)))
+                    {
+                        var isValidEntity = ps[1].ParameterType.IsSubclassOf(typeof(NetworkClientEntity)) || ps[1].ParameterType.IsSubclassOf(typeof(NetworkConnectionEntity));
+                        if (!isValidEntity) continue;
+
+                        var msgType = ps[0].ParameterType;
+                        var entityType = ps[1].ParameterType;
+
+                        if (!_messageHookers.ContainsKey(entityType))
+                        {
+                            _messageHookers.Add(entityType, new NetworkMessageCaller());
+                        }
+
+                        _messageHookers[entityType].RegisterReference(msgType, smethod);
+                    }
+                }
             }
         }
     }

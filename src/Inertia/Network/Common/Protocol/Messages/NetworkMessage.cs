@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Inertia.Network
+﻿namespace Inertia.Network
 {
     public abstract class NetworkMessage : IAutoSerializable, ISerializableObject
     {

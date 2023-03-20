@@ -16,23 +16,23 @@ namespace Inertia.Network
         }
 
         public abstract void Connect();
-        public abstract void Disconnect(NetworkDisconnectReason reason);
+        public abstract bool Disconnect(NetworkDisconnectReason reason);
         public abstract void Send(byte[] data);
 
         public void ConnectAsync()
         {
             Task.Run(Connect);
         }
-        public void Disconnect()
+        public bool Disconnect()
         {
-            Disconnect(NetworkDisconnectReason.Manual);
+            return Disconnect(NetworkDisconnectReason.Manual);
         }
         public void Send(NetworkMessage message)
         {
-            Send(NetworkProtocol.UsedProtocol.OnSerializeMessage(message));
+            Send(NetworkProtocol.Current.SerializeMessage(message));
         }
 
         protected virtual void Connected() { }
-        protected virtual void Disconnected(NetworkDisconnectReason reason) { }
+        protected virtual void Disconnecting(NetworkDisconnectReason reason) { }
     }
 }

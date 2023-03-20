@@ -42,7 +42,7 @@ namespace Inertia.Network
                 }
             }
         }        
-        public sealed override void Disconnect(NetworkDisconnectReason reason)
+        public sealed override bool Disconnect(NetworkDisconnectReason reason)
         {
             //if (IsDisposed)
             //{
@@ -53,9 +53,13 @@ namespace Inertia.Network
             {
                 _reader?.Dispose();
                 _client?.Close();
+
+                return true;
             }
 
-            Disconnected(reason);
+            Disconnecting(reason);
+
+            return false;
         }
         public sealed override void Send(byte[] data)
         {

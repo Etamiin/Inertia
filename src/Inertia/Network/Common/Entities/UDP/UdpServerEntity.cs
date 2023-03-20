@@ -33,21 +33,20 @@ namespace Inertia.Network
 
         public sealed override void Start()
         {
-            if (IsDisposed)
-            {
-                throw new ObjectDisposedException(nameof(UdpServerEntity));
-            }
+            //if (IsDisposed)
+            //{
+            //    throw new ObjectDisposedException(nameof(UdpServerEntity));
+            //}
 
             if (!IsInitialized)
             {
                 try
                 {
-                    _closeNotified = false;
                     _reader = new BasicReader();
                     _connections.Clear();
                     _client = new UdpClient(new IPEndPoint(string.IsNullOrEmpty(_ip) ? IPAddress.Any : IPAddress.Parse(_ip), _port));
 
-                    OnStarted();
+                    Started();
                     _client.BeginReceive(new AsyncCallback(OnReceiveData), _client);
                 }
                 catch
@@ -58,10 +57,10 @@ namespace Inertia.Network
         }        
         public sealed override void Close(NetworkDisconnectReason reason)
         {
-            if (IsDisposed)
-            {
-                throw new ObjectDisposedException(nameof(UdpServerEntity));
-            }
+            //if (IsDisposed)
+            //{
+            //    throw new ObjectDisposedException(nameof(UdpServerEntity));
+            //}
 
             if (IsInitialized)
             {
@@ -69,13 +68,13 @@ namespace Inertia.Network
                 _client?.Close();
                 _client = null;
             }
-            if (!_closeNotified)
-            {
-                _connections.Clear();
-                _closeNotified = true;
+            //if (!_closeNotified)
+            //{
+            //    _connections.Clear();
+            //    _closeNotified = true;
 
-                OnClosed(reason);
-            }
+            //    Closed(reason);
+            //}
         }
 
         public void SendTo(UdpConnectionEntity connection, byte[] data)
@@ -94,28 +93,28 @@ namespace Inertia.Network
             //    throw new ObjectDisposedException(nameof(UdpConnectionEntity));
             //}
 
-            SendTo(connection.EndPoint, NetworkProtocol.UsedProtocol.OnSerializeMessage(message));
+            SendTo(connection.EndPoint, NetworkProtocol.Current.SerializeMessage(message));
         }
 
         public virtual void OnConnectionAdded(UdpConnectionEntity connection) { }
 
         public void Dispose()
         {
-            if (!IsDisposed)
-            {
-                Close();
-                _client?.Dispose();
+            //if (!IsDisposed)
+            //{
+            //    Close();
+            //    _client?.Dispose();
 
-                IsDisposed = true;
-            }
+            //    IsDisposed = true;
+            //}
         }
 
         private void SendTo(IPEndPoint endPoint, byte[] data)
         {
-            if (IsDisposed)
-            {
-                throw new ObjectDisposedException(nameof(UdpServerEntity));
-            }
+            //if (IsDisposed)
+            //{
+            //    throw new ObjectDisposedException(nameof(UdpServerEntity));
+            //}
 
             if (data.Length > ushort.MaxValue)
             {

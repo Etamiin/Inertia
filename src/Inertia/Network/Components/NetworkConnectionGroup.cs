@@ -69,7 +69,7 @@ namespace Inertia.Network
         public void SendAsync(NetworkMessage message)
         {
             Task.Factory.StartNew(() => {
-                var data = NetworkProtocol.UsedProtocol.OnSerializeMessage(message);
+                var data = NetworkProtocol.Current.SerializeMessage(message);
                 Sending?.Invoke(data);
             });
         }

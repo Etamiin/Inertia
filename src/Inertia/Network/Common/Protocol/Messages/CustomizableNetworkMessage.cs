@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Inertia.Network
+﻿namespace Inertia.Network
 {
+    [IgnoreInReflection]
     public abstract class CustomizableNetworkMessage : NetworkMessage
     {
         public sealed override bool UseAutoSerialization => false;

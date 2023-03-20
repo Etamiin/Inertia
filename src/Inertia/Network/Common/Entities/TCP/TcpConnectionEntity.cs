@@ -5,28 +5,26 @@ namespace Inertia.Network
 {
     public sealed class TcpConnectionEntity : NetworkConnectionEntity, IDisposable
     {
-        internal event BasicAction<TcpConnectionEntity, NetworkDisconnectReason> Disconnected;
+        internal event BasicAction<TcpConnectionEntity, NetworkDisconnectReason> Disconnecting;
 
         public ConnectionStatistics Statistics { get; private set; }
         public bool IsDisposed { get; private set; }
         public bool IsConnected => _socket != null && _socket.Connected;
         
-        private TcpServerEntity _server;
         private Socket _socket;
         private BasicReader _reader;
         private byte[] _buffer;
         private DateTime? _spamTimer;
 
-        internal TcpConnectionEntity(TcpServerEntity server, Socket socket, uint id) : base(id)
+        internal TcpConnectionEntity(Socket socket, uint id) : base(id)
         {
-            _server = server;
             _socket = socket;
-            _buffer = new byte[NetworkProtocol.UsedProtocol.NetworkBufferLength];
+            _buffer = new byte[NetworkProtocol.Current.NetworkBufferLength];
             _reader = new BasicReader();
             Statistics = new ConnectionStatistics();
         }
 
-        internal void StartReception()
+        internal void BeginReceiveMessages()
         {
             if (!IsDisposed)
             {
@@ -34,7 +32,7 @@ namespace Inertia.Network
             }
         }
 
-        public override void Send(byte[] data)
+        public sealed override void Send(byte[] data)
         {
             if (IsDisposed)
             {
@@ -54,19 +52,19 @@ namespace Inertia.Network
             }
             catch 
             {
-                Disconnect(NetworkDisconnectReason.InvalidMessage);
+                Disconnect(NetworkDisconnectReason.InvalidMessageSended);
             }
         }
-        public override void Send(NetworkMessage message)
+        public sealed override void Send(NetworkMessage message)
         {
-            Send(NetworkProtocol.UsedProtocol.OnSerializeMessage(message));
+            Send(NetworkProtocol.Current.SerializeMessage(message));
         }
 
-        public void Disconnect()
+        public bool Disconnect()
         {
-            Disconnect(NetworkDisconnectReason.Manual);
+            return Disconnect(NetworkDisconnectReason.Manual);
         }
-        public void Disconnect(NetworkDisconnectReason reason)
+        public bool Disconnect(NetworkDisconnectReason reason)
         {
             if (IsDisposed)
             {
@@ -75,23 +73,18 @@ namespace Inertia.Network
 
             if (IsConnected)
             {
-                try
-                {
-                    _socket.Shutdown(SocketShutdown.Both);
-                }
-                finally
-                {
-                    Disconnected?.Invoke(this, reason);
-                    _server.ConnectionDisconnected(this, reason);
+                Disconnecting?.Invoke(this, reason);
 
-                    _reader?.Dispose();
-                    _socket?.Disconnect(false);
-                    _server = null;
-                    _buffer = null;
-                    _socket = null;
-                    Disconnected = null;
-                }
+                _socket?.Disconnect(false);
+                _reader?.Dispose();
+                _buffer = null;
+                _socket = null;
+                Disconnecting = null;
+
+                return true;
             }
+
+            return false;
         }
 
         public void Dispose()
@@ -113,7 +106,7 @@ namespace Inertia.Network
                 }
 
                 var messageReceivedInLastSecond = Statistics.NotifyMessageReceived();
-                if (messageReceivedInLastSecond >= NetworkProtocol.UsedProtocol.AuthorizedDataCountPerSecond)
+                if (messageReceivedInLastSecond >= NetworkProtocol.Current.MaximumMessageCountPerSecond)
                 {
                     Disconnect(NetworkDisconnectReason.Spam);
                     return;

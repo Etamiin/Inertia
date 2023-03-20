@@ -1,38 +1,48 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using Inertia.Logging;
+using System;
 using System.Linq;
-using System.Reflection;
 
 namespace Inertia.Network
 {
     public abstract class NetworkProtocol
     {
-        internal static AsyncExecutionQueuePool ClientExecutionPool { get; private set; }
-        internal static ServerMessagePoolExecutor ServerAsyncPool { get; private set; }
-        public static NetworkProtocol UsedProtocol { get; private set; }
+        public static NetworkProtocol Current { get; private set; }
+
+        public static void SetProtocol(NetworkProtocol protocol)
+        {
+            if (Current == protocol) return;
+
+            Current = protocol;
+            if (ServerAsyncPool != null)
+            {
+                ServerAsyncPool.ConnectionPerQueue = Current.ConnectionPerQueueInPool;
+            }
+        }
+
+        internal static AsyncExecutionQueuePool? ClientExecutionPool { get; private set; }
+        internal static ServerMessagePoolExecutor? ServerAsyncPool { get; private set; }
 
         internal static void ProcessParsing(object receiver, BasicReader reader)
         {
             var output = new MessageParsingOutput();
-            var caller = GetCaller(receiver);
-            
-            UsedProtocol.OnParseMessage(receiver, reader, output);
 
-            if (output.Messages.Count > 0 && caller != null)
+            if (!Current.ParseMessage(receiver, reader, output)) return;
+            if (output.Messages.Count == 0)
             {
-                if (receiver is NetworkConnectionEntity connection)
-                {
-                    connection.AssignedMessageQueue.Enqueue(ExecuteOutput);
-                }
-                else
-                {
-                    ClientExecutionPool.Enqueue(ExecuteOutput);
-                }
+                output.Dispose();
+                return;
             }
-            else
+
+            var caller = GetCaller(receiver);
+            if (caller == null) return;
+
+            if (receiver is NetworkConnectionEntity connection)
             {
-                output.Clean();
+                connection.AssignedMessageQueue.Enqueue(ExecuteOutput);
+            }
+            else //client entity
+            {
+                ClientExecutionPool?.Enqueue(ExecuteOutput);
             }
 
             void ExecuteOutput()
@@ -42,20 +52,31 @@ namespace Inertia.Network
                     caller.TryCallReference(message, receiver);
                 }
 
-                output.Clean();
+                output.Dispose();
+            }
+        }
+        internal static NetworkMessage CreateMessage(Type messageType)
+        {
+            if (messageType.IsAbstract || !messageType.IsSubclassOf(typeof(NetworkMessage))) return null;
+
+            var cnstr = messageType.GetConstructor(Type.EmptyTypes);
+            if (cnstr == null)
+            {
+                cnstr = messageType.GetConstructors()[0];
+                var parameters = cnstr
+                    .GetParameters()
+                    .Select((p) => (object)null)
+                    .ToArray();
+
+                return (NetworkMessage)cnstr.Invoke(parameters);
+            }
+            else
+            {
+                return (NetworkMessage)Activator.CreateInstance(messageType);
             }
         }
 
-        public static void SetProtocol(NetworkProtocol protocol)
-        {
-            UsedProtocol = protocol;
-            ServerAsyncPool.ConnectionPerQueue = UsedProtocol.ConnectionPerQueueInPool;
-        }
-        public static T CreateMessage<T>() where T : NetworkMessage
-        {
-            return (T)CreateMessage(typeof(T));
-        }
-        public static NetworkMessage? CreateMessage(ushort messageId)
+        protected static NetworkMessage? CreateMessage(ushort messageId)
         {
             if (ReflectionProvider.TryGetMessageType(messageId, out var messageType))
             {
@@ -64,19 +85,6 @@ namespace Inertia.Network
 
             return null;
         }
-        public static NetworkMessage CreateMessage(Type messageType)
-        {
-            if (messageType.IsAbstract || !messageType.IsSubclassOf(typeof(NetworkMessage))) return null;
-
-            var constr = messageType.GetConstructors()[0];
-            var parameters = constr
-                .GetParameters()
-                .Select(p => (object)null)
-                .ToArray();
-
-            return (NetworkMessage)constr.Invoke(parameters);
-        }
-
         /// <summary>
         /// Returns the instance of <see cref="NetworkMessageCaller"/> associated with the indicated <see cref="NetworkMessage"/> or null.
         /// </summary>
@@ -93,15 +101,21 @@ namespace Inertia.Network
         public abstract int NetworkBufferLength { get; }
         public abstract int ConnectionPerQueueInPool { get; }
         public abstract int ClientMessagePerQueueCapacity { get; }
-        public abstract int AuthorizedDataCountPerSecond { get; }
+        public abstract int MaximumMessageCountPerSecond { get; }
 
         static NetworkProtocol()
         {
-            UsedProtocol = new DefaultNetworkProtocol();
-            ClientExecutionPool = new AsyncExecutionQueuePool(100);
-            ServerAsyncPool = new ServerMessagePoolExecutor(UsedProtocol.ConnectionPerQueueInPool);
+            Current = new DefaultNetworkProtocol();
 
-            ReflectionProvider.Invalidate();
+            if (ReflectionProvider.NetworkClientUsedInAssemblies)
+            {
+                ClientExecutionPool = new AsyncExecutionQueuePool(Current.ClientMessagePerQueueCapacity);
+            }
+
+            if (ReflectionProvider.NetworkServerUsedInAssemblies)
+            {
+                ServerAsyncPool = new ServerMessagePoolExecutor(Current.ConnectionPerQueueInPool);
+            }
         }
         protected NetworkProtocol()
         {
@@ -112,8 +126,7 @@ namespace Inertia.Network
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        public abstract byte[] OnSerializeMessage(NetworkMessage message);
-        public abstract void OnParseMessage(object receiver, BasicReader reader, MessageParsingOutput output);
-        public abstract void OnParsingError(object receiver, Exception ex);
+        public abstract byte[] SerializeMessage(NetworkMessage message);
+        public abstract bool ParseMessage(object receiver, BasicReader reader, MessageParsingOutput output);
     }
 }

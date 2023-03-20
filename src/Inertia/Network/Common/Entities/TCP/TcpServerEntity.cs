@@ -1,22 +1,20 @@
 ﻿using Inertia.Logging;
 using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace Inertia.Network
 {
     public abstract class TcpServerEntity : NetworkServerEntity, IDisposable
     {
-        public bool IsRunning => _socket != null && _socket.IsBound && !_closeNotified;
+        public bool IsDisposed { get; private set; }
+        public bool IsRunning => _socket != null && _socket.IsBound;
         public int ConnectedCount => _connections.Count;
 
         private Socket _socket;
-        private readonly Dictionary<uint, TcpConnectionEntity> _connections;
-        private object _locker;
+        private readonly ConcurrentDictionary<uint, TcpConnectionEntity> _connections;
         private ILogger _logger;
 
         protected TcpServerEntity(int port) : this(port, Logger.Instance)
@@ -31,8 +29,7 @@ namespace Inertia.Network
         }
         protected TcpServerEntity(string ip, int port, ILogger logger) : base(ip, port)
         {
-            _locker = new object();
-            _connections = new Dictionary<uint, TcpConnectionEntity>();
+            _connections = new ConcurrentDictionary<uint, TcpConnectionEntity>();
             _logger = logger;
         }
 
@@ -40,44 +37,26 @@ namespace Inertia.Network
         {
             var group = new NetworkConnectionGroup();
 
-            lock (_locker)
-            {
-                group.AddConnections(_connections.Values);
-            }
+            group.AddConnections(_connections.Values);
 
             return group;
         }
         public NetworkConnectionGroup CreateConnectionGroup(Predicate<TcpConnectionEntity> predicate)
         {
             var group = new NetworkConnectionGroup();
+            var connections = _connections.Values
+                .Where((connection) => predicate(connection));
 
-            lock (_locker)
-            {
-                var targets = new List<TcpConnectionEntity>();
-                foreach (var c in _connections.Values)
-                {
-                    if (predicate(c))
-                    {
-                        targets.Add(c);
-                    }
-                }
-
-                group.AddConnections(targets);
-            }
+            group.AddConnections(connections);
 
             return group;
         }
-
-        internal void ConnectionDisconnected(TcpConnectionEntity connection, NetworkDisconnectReason reason)
-        {
-            lock (_locker)
-            {
-                _connections.Remove(connection.Id);
-            }
-
-            OnClientDisconnected(connection, reason);
-        }
         
+        public bool TryGetConnection(uint id, out TcpConnectionEntity connection)
+        {
+            return _connections.TryGetValue(id, out connection);
+        }
+
         public sealed override void Start()
         {
             if (IsDisposed)
@@ -90,12 +69,12 @@ namespace Inertia.Network
                 try
                 {
                     _connections.Clear();
-                    _closeNotified = false;
+
                     _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                     _socket.Bind(new IPEndPoint(string.IsNullOrEmpty(_ip) ? IPAddress.Any : IPAddress.Parse(_ip), _port));
                     _socket.Listen(1000);
 
-                    OnStarted();
+                    Started();
                     _socket.BeginAccept(new AsyncCallback(OnAcceptConnection), _socket);
                 }
                 catch (Exception ex)
@@ -112,55 +91,43 @@ namespace Inertia.Network
                 throw new ObjectDisposedException(nameof(TcpServerEntity));
             }
 
-            if (IsRunning)
+            if (_connections != null && _connections.Count > 0)
             {
-                _socket?.Close();
-            }
-            if (!_closeNotified)
-            {
-                TcpConnectionEntity[] entities;
-                lock (_locker)
-                {
-                    entities = _connections.Values.ToArray();
-                }
-
+                var entities = _connections.Values.ToArray();
                 foreach (var connection in entities)
                 {
                     connection.Dispose();
                 }
+            }
 
-                _closeNotified = true;
-                OnClosed(reason);
+            if (IsRunning)
+            {
+                _socket?.Close();
+                _socket = null;
             }
         }
-
-        protected virtual void OnClientConnected(TcpConnectionEntity connection) { }
-        protected virtual void OnClientDisconnected(TcpConnectionEntity connection, NetworkDisconnectReason reason) { }
 
         public void Dispose()
         {
-            if (!IsDisposed)
-            {
-                Close();
-
-                IsDisposed = true;
-            }
+            Dispose(true);
         }
+
+        protected virtual void OnConnectionConnected(TcpConnectionEntity connection) { }
+        protected virtual void OnConnectionDisconnecting(TcpConnectionEntity connection, NetworkDisconnectReason reason) { }
 
         private void OnAcceptConnection(IAsyncResult iar)
         {
             try
             {
                 var socket = ((Socket)iar.AsyncState).EndAccept(iar);
-                var connection = new TcpConnectionEntity(this, socket, (uint)_idProvider.NextInt());
+                var connection = new TcpConnectionEntity(socket, (uint)_idProvider.NextInt());
 
-                lock (_locker)
-                {
-                    _connections.Add(connection.Id, connection);
-                }
+                _connections.TryAdd(connection.Id, connection);
 
-                connection.StartReception();
-                OnClientConnected(connection);
+                connection.Disconnecting += ConnectionDisconnected;
+                connection.BeginReceiveMessages();
+
+                OnConnectionConnected(connection);
             }
             catch (Exception e)
             {
@@ -172,8 +139,27 @@ namespace Inertia.Network
 
             if (IsRunning)
             {
-                _socket.BeginAccept(new AsyncCallback(OnAcceptConnection), _socket);
+                _socket.BeginAccept(OnAcceptConnection, _socket);
             }
+        }
+
+        private void ConnectionDisconnected(TcpConnectionEntity connection, NetworkDisconnectReason reason)
+        {
+            _connections.TryRemove(connection.Id, out _);
+            connection.Disconnecting -= ConnectionDisconnected;
+
+            OnConnectionDisconnecting(connection, reason);
+        }
+        private void Dispose(bool disposing)
+        {
+            if (IsDisposed) return;
+
+            if (disposing)
+            {
+                Close();
+            }
+
+            IsDisposed = true;
         }
     }
 }

@@ -4,13 +4,10 @@ namespace Inertia.Network
 {
     public abstract class NetworkServerEntity
     {
-        public bool IsDisposed { get; protected private set; }
-
         protected private readonly SafeOrderedIntProvider _idProvider;
         protected private readonly string _ip;
         protected private readonly int _port;
-        protected private bool _closeNotified;
-        
+
         private protected NetworkServerEntity(string ip, int port)
         {
             _idProvider = new SafeOrderedIntProvider();
@@ -30,7 +27,7 @@ namespace Inertia.Network
         public abstract void Start();
         public abstract void Close(NetworkDisconnectReason reason);
 
-        protected virtual void OnStarted() { }
-        protected virtual void OnClosed(NetworkDisconnectReason reason) { }
+        protected virtual void Started() { }
+        protected virtual void Closed(NetworkDisconnectReason reason) { }
     }
 }

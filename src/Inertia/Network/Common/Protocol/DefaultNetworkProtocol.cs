@@ -1,7 +1,4 @@
-﻿using Inertia.Logging;
-using System;
-
-namespace Inertia.Network
+﻿namespace Inertia.Network
 {
     /// <summary>
     /// Represents the default network protocol used by network entities.
@@ -9,18 +6,12 @@ namespace Inertia.Network
     public sealed class DefaultNetworkProtocol : NetworkProtocol
     {
         public override int NetworkBufferLength => 4096;
-        public override int ConnectionPerQueueInPool => 750;
+        public override int ConnectionPerQueueInPool => 500;
         public override int ClientMessagePerQueueCapacity => 1000;
-        public override int AuthorizedDataCountPerSecond => 55;
+        public override int MaximumMessageCountPerSecond => 55;
 
-        private ILogger _logger;
-
-        internal DefaultNetworkProtocol() : this(Logger.Instance)
+        internal DefaultNetworkProtocol()
         {
-        }
-        internal DefaultNetworkProtocol(ILogger logger)
-        {
-            _logger = logger;
         }
 
         /// <summary>
@@ -28,7 +19,7 @@ namespace Inertia.Network
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        public override byte[] OnSerializeMessage(NetworkMessage message)
+        public override byte[] SerializeMessage(NetworkMessage message)
         {
             using (var writer = new BasicWriter())
             {
@@ -53,47 +44,50 @@ namespace Inertia.Network
         /// <param name="reader"></param>
         /// <param name="output"></param>
         /// <returns></returns>
-        public override void OnParseMessage(object receiver, BasicReader reader, MessageParsingOutput output)
+        public override bool ParseMessage(object receiver, BasicReader reader, MessageParsingOutput output)
         {
             reader.SetPosition(0);
-            while (reader.UnreadedLength > 0)
+
+            try 
             {
-                var msgId = reader.GetUShort();
-                var msgSize = reader.GetUInt();
-
-                if (reader.UnreadedLength < msgSize) break;
-
-                try
+                while (reader.UnreadedLength > 0)
                 {
+                    var msgId = reader.GetUShort();
+                    var msgSize = reader.GetUInt();
+
+                    if (reader.UnreadedLength < msgSize) break;
+
                     var message = CreateMessage(msgId);
                     if (message == null)
                     {
-                        reader.Skip((int)msgSize);
+                        reader
+                            .Skip((int)msgSize)
+                            .RemoveReadedBytes();
+
                         throw new UnknownMessageException(msgId);
                     }
 
                     message.Deserialize(reader);
                     output.AddMessage(message);
-                }
-                catch (Exception ex)
-                {
-                    OnParsingError(receiver, ex);
+                    reader.RemoveReadedBytes();
                 }
 
-                reader.RemoveReadedBytes();
+                return true;
             }
-        }
-        public override void OnParsingError(object receiver, Exception ex)
-        {
-            if (ex is UnknownMessageException)
+            catch
             {
+                //Transform type to NetworkConnectionEntity for UDP support
                 if (receiver is TcpConnectionEntity connection)
                 {
-                    connection.Disconnect(NetworkDisconnectReason.SendingBadInformation);
+                    connection.Disconnect(NetworkDisconnectReason.InvalidDataReceived);
                 }
-            }
+                else if (receiver is NetworkClientEntity client)
+                {
+                    client.Disconnect(NetworkDisconnectReason.InvalidDataReceived);
+                }
 
-            _logger.Error($"NetworkProtocol Parsing Error: {ex}");
+                return false;
+            }            
         }
     }
 }

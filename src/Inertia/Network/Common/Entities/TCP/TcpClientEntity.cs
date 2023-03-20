@@ -16,7 +16,7 @@ namespace Inertia.Network
 
         protected TcpClientEntity(string ip, int port) : base(ip, port)
         {
-            _buffer = new byte[NetworkProtocol.UsedProtocol.NetworkBufferLength];
+            _buffer = new byte[NetworkProtocol.Current.NetworkBufferLength];
         }
         
         public sealed override void Connect()
@@ -44,7 +44,7 @@ namespace Inertia.Network
                 }
             }
         }
-        public sealed override void Disconnect(NetworkDisconnectReason reason)
+        public sealed override bool Disconnect(NetworkDisconnectReason reason)
         {
             if (IsDisposed)
             {
@@ -53,18 +53,15 @@ namespace Inertia.Network
 
             if (IsConnected)
             {
-                try
-                {
-                    _socket?.Shutdown(SocketShutdown.Both);
-                }
-                finally
-                {
-                    _reader?.Dispose();
-                    _socket?.Disconnect(false);
+                Disconnecting(reason);
 
-                    Disconnected(reason);
-                }
+                _socket?.Disconnect(false);
+                _reader?.Dispose();
+
+                return true;
             }
+
+            return false;
         }
         public sealed override void Send(byte[] data)
         {
@@ -85,7 +82,7 @@ namespace Inertia.Network
                 }
                 catch 
                 {
-                    Disconnect(NetworkDisconnectReason.InvalidMessage);
+                    Disconnect(NetworkDisconnectReason.InvalidMessageSended);
                 }
             }
         }

@@ -25,8 +25,9 @@ namespace Inertia.Network
 
             if (connection is TcpConnectionEntity tcpConnection)
             {
-                tcpConnection.Disconnected += TcpConnection_Disconnected;
+                tcpConnection.Disconnecting += TcpConnection_Disconnected;
             }
+            //check for udp connection
         }
         internal void Enqueue(BasicAction action)
         {
@@ -75,7 +76,7 @@ namespace Inertia.Network
 
             if (entity is TcpConnectionEntity tcpConnection)
             {
-                tcpConnection.Disconnected += TcpConnection_Disconnected;
+                tcpConnection.Disconnecting += TcpConnection_Disconnected;
             }
         }
     }

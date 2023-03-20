@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Inertia.Network
 {
-    public sealed class MessageParsingOutput
+    public class MessageParsingOutput : IDisposable
     {
         public bool IsDisposed { get; private set; }
 
@@ -24,16 +23,22 @@ namespace Inertia.Network
 
             Messages.Add(message);
         }
-
-        internal void Clean()
+        public void Dispose()
         {
-            if (!IsDisposed)
+            Dispose(true);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (IsDisposed) return;
+
+            if (disposing)
             {
                 Messages.Clear();
                 Messages = null;
-
-                IsDisposed = true;
             }
+
+            IsDisposed = true;
         }
     }
 }

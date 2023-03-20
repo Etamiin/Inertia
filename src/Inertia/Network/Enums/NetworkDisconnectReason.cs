@@ -6,8 +6,8 @@
         ConnectionLost = 2,
         ConnectionFailed = 4,
         ConnectionTimeout = 8,
-        InvalidMessage = 16,
-        SendingBadInformation = 32,
+        InvalidMessageSended = 16,
+        InvalidDataReceived = 32,
         Spam = 64
     }
 }
