@@ -33,8 +33,7 @@ namespace Inertia.Network
                 return;
             }
 
-            var caller = GetCaller(receiver);
-            if (caller == null) return;
+            if (!TryGetHandler(receiver, out var handler)) return;
 
             if (receiver is NetworkConnectionEntity connection)
             {
@@ -49,7 +48,7 @@ namespace Inertia.Network
             {
                 foreach (var message in output.Messages)
                 {
-                    caller.TryCallReference(message, receiver);
+                    handler.TryHandle(message, receiver);
                 }
 
                 output.Dispose();
@@ -75,6 +74,10 @@ namespace Inertia.Network
                 return (NetworkMessage)Activator.CreateInstance(messageType);
             }
         }
+        internal static bool TryGetHandler(object receiver, out NetworkMessageHandler handler)
+        {
+            return ReflectionProvider.TryGetMessageHandler(receiver.GetType(), out handler);
+        }
 
         protected static NetworkMessage? CreateMessage(ushort messageId)
         {
@@ -84,15 +87,6 @@ namespace Inertia.Network
             }
 
             return null;
-        }
-        /// <summary>
-        /// Returns the instance of <see cref="NetworkMessageCaller"/> associated with the indicated <see cref="NetworkMessage"/> or null.
-        /// </summary>
-        /// <param name="receiver"></param>
-        protected static NetworkMessageCaller GetCaller(object receiver)
-        {
-            ReflectionProvider.TryGetMessageHooker(receiver.GetType(), out NetworkMessageCaller caller);
-            return caller;
         }
 
         /// <summary>

@@ -72,19 +72,18 @@ namespace Inertia
         internal static bool NetworkClientUsedInAssemblies { get; private set; }
         internal static bool NetworkServerUsedInAssemblies { get; private set; }
 
-        private static Dictionary<Type, SerializablePropertyMemory[]> _properties;
-        private static Dictionary<string, BasicCommand> _commands;
-        private static Dictionary<ushort, Type> _messageTypes;
-        private static Dictionary<Type, NetworkMessageCaller> _messageHookers;
-        private static Dictionary<string, PluginTrace> _pluginTraces;
-        private static bool _isInitialized;
-
+        private readonly static Dictionary<Type, SerializablePropertyMemory[]> _properties;
+        private readonly static Dictionary<string, BasicCommand> _commands;
+        private readonly static Dictionary<ushort, Type> _messageTypes;
+        private readonly static Dictionary<Type, NetworkMessageHandler> _messagesHandlers;
+        private readonly static Dictionary<string, PluginTrace> _pluginTraces;
+        
         static ReflectionProvider()
         {
             _properties = new Dictionary<Type, SerializablePropertyMemory[]>();
             _commands = new Dictionary<string, BasicCommand>();
             _messageTypes = new Dictionary<ushort, Type>();
-            _messageHookers = new Dictionary<Type, NetworkMessageCaller>();
+            _messagesHandlers = new Dictionary<Type, NetworkMessageHandler>();
             _pluginTraces = new Dictionary<string, PluginTrace>();
 
             RegisterAll();
@@ -111,9 +110,9 @@ namespace Inertia
         {
             return _messageTypes.TryGetValue(messageId, out messageType);
         }
-        internal static bool TryGetMessageHooker(Type receiverType, out NetworkMessageCaller caller)
+        internal static bool TryGetMessageHandler(Type receiverType, out NetworkMessageHandler handler)
         {
-            return _messageHookers.TryGetValue(receiverType, out caller);
+            return _messagesHandlers.TryGetValue(receiverType, out handler);
         }
 
         internal static PluginExecutionResult TryStartPlugin(string pluginFilePath, object[] executionParameters)
@@ -266,7 +265,7 @@ namespace Inertia
                     _messageTypes.Add(message.MessageId, type);
                 }
             }
-            else if (typeof(IMessageHooker).IsAssignableFrom(type))
+            else if (typeof(IMessageHandler).IsAssignableFrom(type))
             {
                 var sMethods = type.GetMethods(BindingFlags.Static | BindingFlags.NonPublic);
                 if (sMethods.Length == 0) return;
@@ -282,12 +281,12 @@ namespace Inertia
                         var msgType = ps[0].ParameterType;
                         var entityType = ps[1].ParameterType;
 
-                        if (!_messageHookers.ContainsKey(entityType))
+                        if (!_messagesHandlers.ContainsKey(entityType))
                         {
-                            _messageHookers.Add(entityType, new NetworkMessageCaller());
+                            _messagesHandlers.Add(entityType, new NetworkMessageHandler());
                         }
 
-                        _messageHookers[entityType].RegisterReference(msgType, smethod);
+                        _messagesHandlers[entityType].RegisterReference(msgType, smethod);
                     }
                 }
             }

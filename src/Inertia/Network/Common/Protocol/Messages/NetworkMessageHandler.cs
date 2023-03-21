@@ -1,18 +1,14 @@
 ﻿using System;
-using System.CodeDom;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Inertia.Network
 {
-    public sealed class NetworkMessageCaller
+    public sealed class NetworkMessageHandler
     {
         private readonly Dictionary<Type, MethodInfo> _references;
 
-        internal NetworkMessageCaller()
+        internal NetworkMessageHandler()
         {
             _references = new Dictionary<Type, MethodInfo>();
         }
@@ -29,7 +25,7 @@ namespace Inertia.Network
             }
         }
 
-        public bool TryCallReference(NetworkMessage message, object receiver)
+        public bool TryHandle(NetworkMessage message, object receiver)
         {
             if (_references.TryGetValue(message.GetType(), out MethodInfo method))
             {

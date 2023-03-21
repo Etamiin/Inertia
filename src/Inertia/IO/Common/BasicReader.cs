@@ -464,7 +464,13 @@ namespace Inertia
                 throw new ObjectDisposedException(nameof(BasicReader));
             }
 
-            if (length <= 0) throw new ArgumentNullException(nameof(length));
+            if (length < 0) throw new ArgumentNullException(nameof(length));
+
+            if (length == 0)
+            {
+                data = new byte[0];
+                return true;
+            }
 
             if (UnreadedLength >= length)
             {
