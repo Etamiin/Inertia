@@ -8,7 +8,7 @@
         public override int NetworkBufferLength => 4096;
         public override int ConnectionPerQueueInPool => 500;
         public override int ClientMessagePerQueueCapacity => 1000;
-        public override int MaximumMessageCountPerSecond => 55;
+        public override int MaximumMessageCountPerSecond => 5500;
 
         internal DefaultNetworkProtocol()
         {

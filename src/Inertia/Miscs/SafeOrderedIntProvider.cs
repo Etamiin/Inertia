@@ -14,9 +14,13 @@ namespace Inertia
             _currentId = startId;
         }
 
-        public int NextInt()
+        public int NextValue()
         {
             return Interlocked.Increment(ref _currentId);
+        }
+        public int GetCurrentValue()
+        {
+            return _currentId;
         }
     }
 }

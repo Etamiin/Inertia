@@ -5,7 +5,6 @@ namespace Inertia.Scriptable
 {
     internal static class RuntimeManager
     {
-        internal static TimeSpan ScriptableDataSleepTime = TimeSpan.FromMilliseconds(50);
         internal static AsyncExecutionQueuePool QueuePool { get; private set; }
 
         private static Dictionary<int, ScriptableExecutionLayer> _executionLayers;
@@ -26,10 +25,8 @@ namespace Inertia.Scriptable
             
             return default;
         }
-        internal static void RegisterScriptComponent<T>(ScriptableSystem<T> component) where T : ScriptableData
+        internal static ScriptableExecutionLayer RegisterScriptComponent<T>(ScriptableSystem<T> component) where T : ScriptableData
         {
-            if (component.IsRegistered) return;
-
             var dataType = typeof(T);
             if (_componentInstances.ContainsKey(dataType))
             {
@@ -43,8 +40,7 @@ namespace Inertia.Scriptable
                 _executionLayers.Add(component.ExecutionLayer, executionLayer);
             }
 
-            executionLayer.ComponentsUpdate += component.ProcessComponents;
-            component.IsRegistered = true;
+            return executionLayer;
         }
         internal static void RuntimeCall(float deltaTime)
         {

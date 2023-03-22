@@ -16,43 +16,20 @@ namespace Inertia.Scriptable
             }
         }
 
-        internal bool IsRegistered { get; set; }
+        private readonly ScriptableExecutionLayer _executionLayer;
+        private readonly List<T> _componentDatas;
+        private readonly object _locker;
+        private bool _processingRegistered;
 
-        private object _locker;
-        private List<T> _componentDatas;
-        
         public ScriptableSystem()
         {
             _locker = new object();
             _componentDatas = new List<T>();
-
-            RuntimeManager.RegisterScriptComponent(this);
+            _executionLayer = RuntimeManager.RegisterScriptComponent(this);
         }
 
         public abstract void OnProcess(IEnumerable<T> componentDatas);
         
-        internal void ProcessComponents(float deltaTime)
-        {
-            if (!IsRegistered) return;
-
-            DeltaTime = deltaTime;
-
-            if (IsActive)
-            {
-                lock (_locker)
-                {
-                    var executableDatas = _componentDatas.Where((data) => data.CanBeProcessed).ToArray();
-                    OnProcess(executableDatas);
-
-                    var destroyableDatas = _componentDatas.Where((data) => data.DisposeRequested).ToArray();
-                    foreach (var data in destroyableDatas)
-                    {
-                        data.Destroy();
-                    }
-                }
-            }
-        }
-
         void IScriptable.RegisterComponentData(ScriptableData componentData)
         {
             if (componentData is T tData)
@@ -60,6 +37,12 @@ namespace Inertia.Scriptable
                 lock (_locker)
                 {
                     _componentDatas.Add(tData);
+
+                    if (!_processingRegistered)
+                    {
+                        _executionLayer.ComponentsUpdate += ProcessComponents;
+                        _processingRegistered = true;
+                    }
                 }
 
                 componentData.Destroying += ComponentData_Destroying;
@@ -72,12 +55,44 @@ namespace Inertia.Scriptable
                 lock (_locker)
                 {
                     _componentDatas.Remove(tData);
+
+                    if (_processingRegistered && !IsActive)
+                    {
+                        _executionLayer.ComponentsUpdate -= ProcessComponents;
+                        _processingRegistered = false;
+                    }
                 }
                 
                 componentData.Destroying -= ComponentData_Destroying;
             }
         }
 
+        private void ProcessComponents(float deltaTime)
+        {
+            DeltaTime = deltaTime;
+
+            if (IsActive)
+            {
+                lock (_locker)
+                {
+                    var executableDatas = _componentDatas.Where((data) => data.State == ScriptableData.ScriptableDataState.Initialized);
+                    OnProcess(executableDatas);
+
+                    var notInitializedDatas = _componentDatas.Where((data) => data.State != ScriptableData.ScriptableDataState.Initialized).ToArray();
+                    foreach (var data in notInitializedDatas)
+                    {
+                        if (data.State == ScriptableData.ScriptableDataState.Disposing)
+                        {
+                            data.Destroy();
+                        }
+                        else if (data.State == ScriptableData.ScriptableDataState.Initializing)
+                        {
+                            data.State = ScriptableData.ScriptableDataState.Initialized;
+                        }
+                    }
+                }
+            }
+        }
         private void ComponentData_Destroying(ScriptableData componentData)
         {
             ((IScriptable)this).UnregisterComponentData(componentData);

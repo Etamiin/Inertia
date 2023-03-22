@@ -120,7 +120,7 @@ namespace Inertia.Network
             try
             {
                 var socket = ((Socket)iar.AsyncState).EndAccept(iar);
-                var connection = new TcpConnectionEntity(socket, (uint)_idProvider.NextInt());
+                var connection = new TcpConnectionEntity(socket, (uint)_idProvider.NextValue());
 
                 _connections.TryAdd(connection.Id, connection);
 
@@ -142,7 +142,6 @@ namespace Inertia.Network
                 _socket.BeginAccept(OnAcceptConnection, _socket);
             }
         }
-
         private void ConnectionDisconnected(TcpConnectionEntity connection, NetworkDisconnectReason reason)
         {
             _connections.TryRemove(connection.Id, out _);

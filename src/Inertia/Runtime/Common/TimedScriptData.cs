@@ -17,7 +17,7 @@ namespace Inertia.Scriptable
             }
         }
         internal bool DisposeWhenExecuted { get; private set; }
-
+        
         private TimeSpan _delayTime;
         private DateTime _startAt;
 
@@ -31,7 +31,7 @@ namespace Inertia.Scriptable
         {
             Action = action;
             _delayTime = delayTime;
-            _startAt = CreatedAt;
+            _startAt = DateTime.Now;
             DisposeWhenExecuted = !loopExecution;
 
             if (Action == null) Dispose();

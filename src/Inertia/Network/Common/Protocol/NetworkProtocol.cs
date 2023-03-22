@@ -17,6 +17,10 @@ namespace Inertia.Network
             {
                 ServerAsyncPool.ConnectionPerQueue = Current.ConnectionPerQueueInPool;
             }
+            if (ClientExecutionPool != null)
+            {
+                ClientExecutionPool.QueueCapacity = Current.ClientMessagePerQueueCapacity;
+            }
         }
 
         internal static AsyncExecutionQueuePool? ClientExecutionPool { get; private set; }

@@ -8,11 +8,12 @@ namespace Inertia
     {
         public bool IsDisposed { get; private set; }
 
+        internal int QueueCapacity { get; set; }
+
         private SafeOrderedIntProvider _idProvider;
         private ConcurrentDictionary<int, SyncQueue> _queues;
         private SyncQueue _currentQueue;
         private object _locker;
-        private int _queueCapacity;
         private TimeSpan _maxTimeQueueAlive;
 
         public AsyncExecutionQueuePool(int queueCapacity) : this(queueCapacity, TimeSpan.FromMinutes(5))
@@ -27,9 +28,9 @@ namespace Inertia
 
             _idProvider = new SafeOrderedIntProvider();
             _queues = new ConcurrentDictionary<int, SyncQueue>();
-            _queueCapacity = queueCapacity;
             _locker = new object();
             _maxTimeQueueAlive = maxTimeQueueAlive;
+            QueueCapacity = queueCapacity;
         }
 
         public void Enqueue(BasicAction action)
@@ -39,14 +40,14 @@ namespace Inertia
                 throw new ObjectDisposedException(nameof(AsyncExecutionQueuePool));
             }
 
-            if (_currentQueue == null || _currentQueue.Count >= _queueCapacity)
+            if (_currentQueue == null || _currentQueue.Count >= QueueCapacity)
             {
                 lock (_locker)
                 {
-                    var queue = _queues.FirstOrDefault((pair) => !pair.Value.DisposeRequested && pair.Value.Count < _queueCapacity).Value;
+                    var queue = _queues.FirstOrDefault((pair) => !pair.Value.DisposeRequested && pair.Value.Count < QueueCapacity).Value;
                     if (queue == null)
                     {
-                        queue = new SyncQueue(_idProvider.NextInt(), _maxTimeQueueAlive);
+                        queue = new SyncQueue(_idProvider.NextValue(), _maxTimeQueueAlive);
                         queue.Disposing += Queue_Disposing;
 
                         _queues.TryAdd(queue.Id, queue);

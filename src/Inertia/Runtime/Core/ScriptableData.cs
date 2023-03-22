@@ -4,27 +4,30 @@ namespace Inertia.Scriptable
 {
     public abstract class ScriptableData : IDisposable
     {
+        internal enum ScriptableDataState : byte
+        {
+            NoState = 0,
+            Initializing = 1,
+            Initialized = 2,
+            Disposing = 3,
+            Disposed = 4
+        }
+
         internal event BasicAction<ScriptableData>? Destroying;
 
         public bool IsDisposed { get; private set; }
         
-        internal bool CanBeProcessed
-        {
-            get
-            {
-                var elapsed = DateTime.Now - CreatedAt;
-                return elapsed >= RuntimeManager.ScriptableDataSleepTime;
-            }
-        }
-        internal bool DisposeRequested { get; private set; }
-        internal DateTime CreatedAt { get; private set; }
+        internal ScriptableDataState State { get; set; }
 
         public ScriptableData()
         {
             var component = RuntimeManager.GetScriptableSystem(GetType());
-            if (component != null) component.RegisterComponentData(this);
+            if (component != null)
+            {
+                component.RegisterComponentData(this);
 
-            CreatedAt = DateTime.Now;
+                State = ScriptableDataState.Initializing;
+            }
         }
 
         public void Dispose()
@@ -34,10 +37,10 @@ namespace Inertia.Scriptable
         
         internal void Destroy()
         {
-            if (!DisposeRequested) return;
+            if (State != ScriptableDataState.Disposing) return;
 
             Destroying?.Invoke(this);
-            DisposeRequested = false;
+            State = ScriptableDataState.Disposed;
         }
 
         private void OnDispose(bool disposing)
@@ -45,7 +48,7 @@ namespace Inertia.Scriptable
             if (!IsDisposed && disposing)
             {
                 IsDisposed = true;
-                DisposeRequested = true;
+                State = ScriptableDataState.Disposing;
             }
         }
     }
