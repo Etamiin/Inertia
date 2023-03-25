@@ -8,7 +8,7 @@
         public override int NetworkBufferLength => 4096;
         public override int ConnectionPerQueueInPool => 500;
         public override int ClientMessagePerQueueCapacity => 1000;
-        public override int MaximumMessageCountPerSecond => 5500;
+        public override int MaximumMessageCountPerSecond => 55;
 
         internal DefaultNetworkProtocol()
         {
@@ -34,7 +34,7 @@
                     .SetPosition(cPos - sizeof(uint))
                     .SetUInt((uint)(writer.TotalLength - cPos));
 
-                return writer.ToArrayAndDispose();
+                return writer.ToArray();
             }
         }
         /// <summary>

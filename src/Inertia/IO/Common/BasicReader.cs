@@ -168,10 +168,6 @@ namespace Inertia
             }
             else return default;
         }
-        public bool[] GetBoolBits(int length)
-        {
-            return GetByte().ToBits(length);
-        }
         public string GetString()
         {
             var data = GetBytes();

@@ -6,7 +6,7 @@
 
         internal readonly ServerMessageQueue AssignedMessageQueue;
 
-        private protected NetworkConnectionEntity(uint id)
+        protected NetworkConnectionEntity(uint id)
         {
             Id = id;
             AssignedMessageQueue = NetworkProtocol.ServerAsyncPool.RegisterConnection(this);

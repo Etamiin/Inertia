@@ -21,12 +21,14 @@ namespace Inertia.Network
             {
                 ClientExecutionPool.QueueCapacity = Current.ClientMessagePerQueueCapacity;
             }
+
+            IsCurrentWebSocketProtocol = Current is WebSocketNetworkProtocol;
         }
-
-        internal static AsyncExecutionQueuePool? ClientExecutionPool { get; private set; }
-        internal static ServerMessagePoolExecutor? ServerAsyncPool { get; private set; }
-
-        internal static void ProcessParsing(object receiver, BasicReader reader)
+        public static void UseWebSocketProtocol()
+        {
+            SetProtocol(new WebSocketNetworkProtocol());
+        }
+        public static void ProcessParsing(object receiver, BasicReader reader)
         {
             var output = new MessageParsingOutput();
 
@@ -58,6 +60,11 @@ namespace Inertia.Network
                 output.Dispose();
             }
         }
+
+        internal static AsyncExecutionQueuePool? ClientExecutionPool { get; private set; }
+        internal static ServerMessagePoolExecutor? ServerAsyncPool { get; private set; }
+        internal static bool IsCurrentWebSocketProtocol { get; private set; }
+
         internal static NetworkMessage CreateMessage(Type messageType)
         {
             if (messageType.IsAbstract || !messageType.IsSubclassOf(typeof(NetworkMessage))) return null;
@@ -107,7 +114,7 @@ namespace Inertia.Network
 
             if (ReflectionProvider.NetworkClientUsedInAssemblies)
             {
-                ClientExecutionPool = new AsyncExecutionQueuePool(Current.ClientMessagePerQueueCapacity);
+                ClientExecutionPool = new AsyncExecutionQueuePool(Current.ClientMessagePerQueueCapacity, false);
             }
 
             if (ReflectionProvider.NetworkServerUsedInAssemblies)

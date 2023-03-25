@@ -4,15 +4,15 @@ namespace Inertia.Network
 {
     public abstract class NetworkServerEntity
     {
-        protected private readonly SafeOrderedIntProvider _idProvider;
-        protected private readonly string _ip;
-        protected private readonly int _port;
+        protected readonly SafeOrderedIntProvider IdProvider;
+        protected readonly string Ip;
+        protected readonly int Port;
 
-        private protected NetworkServerEntity(string ip, int port)
+        protected NetworkServerEntity(string ip, int port)
         {
-            _idProvider = new SafeOrderedIntProvider();
-            _ip = ip.Replace("localhost", "127.0.0.1");
-            _port = port;
+            IdProvider = new SafeOrderedIntProvider();
+            Ip = ip.Replace("localhost", "127.0.0.1");
+            Port = port;
         }
 
         public void StartAsync()

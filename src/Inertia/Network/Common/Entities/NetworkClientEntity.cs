@@ -6,13 +6,13 @@ namespace Inertia.Network
     {
         public abstract bool IsConnected { get; }
 
-        protected private readonly string _ip;
-        protected private readonly int _port;
+        protected readonly string Ip;
+        protected readonly int Port;
 
-        private protected NetworkClientEntity(string ip, int port)
+        protected NetworkClientEntity(string ip, int port)
         {
-            _ip = ip.Replace("localhost", "127.0.0.1");
-            _port = port;
+            Ip = ip.Replace("localhost", "127.0.0.1");
+            Port = port;
         }
 
         public abstract void Connect();

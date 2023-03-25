@@ -1,16 +1,20 @@
-﻿using System;
+﻿using Inertia.Logging;
+using System;
 using System.Net.Sockets;
+using System.Text;
 
 namespace Inertia.Network
 {
     public sealed class TcpConnectionEntity : NetworkConnectionEntity, IDisposable
     {
         internal event BasicAction<TcpConnectionEntity, NetworkDisconnectReason> Disconnecting;
+        internal event BasicAction<TcpConnectionEntity> WebSocketDetermined;
 
         public ConnectionStatistics Statistics { get; private set; }
         public bool IsDisposed { get; private set; }
         public bool IsConnected => _socket != null && _socket.Connected;
-        
+        public bool? IsWebSocketConnection { get; internal set; }
+
         private Socket _socket;
         private BasicReader _reader;
         private byte[] _buffer;
@@ -24,6 +28,11 @@ namespace Inertia.Network
             Statistics = new ConnectionStatistics();
         }
 
+        internal void SetAsWebSocketConnection()
+        {
+            IsWebSocketConnection = true;
+            WebSocketDetermined?.Invoke(this);
+        }
         internal void BeginReceiveMessages()
         {
             if (!IsDisposed)
@@ -48,7 +57,14 @@ namespace Inertia.Network
 
             try
             {
-                _socket.Send(data);
+                if (IsWebSocketConnection == true &&  NetworkProtocol.Current is WebSocketNetworkProtocol wsProtocol)
+                {
+                    _socket.Send(wsProtocol.WriteWsMessage(data, WebSocketOpCode.BinaryFrame));
+                }
+                else
+                {
+                    _socket.Send(data);
+                }
             }
             catch 
             {
@@ -58,6 +74,26 @@ namespace Inertia.Network
         public sealed override void Send(NetworkMessage message)
         {
             Send(NetworkProtocol.Current.SerializeMessage(message));
+        }
+
+        internal void Send(byte[] data, WebSocketOpCode opCode)
+        {
+            if (IsDisposed)
+            {
+                throw new ObjectDisposedException(nameof(TcpConnectionEntity));
+            }
+
+            if (!IsConnected) return;
+
+            try
+            {
+                _socket.Send(((WebSocketNetworkProtocol)NetworkProtocol.Current).WriteWsMessage(data, opCode));
+            }
+            catch
+            {
+                Disconnect(NetworkDisconnectReason.InvalidMessageSended);
+            }
+
         }
 
         public bool Disconnect()
@@ -99,7 +135,6 @@ namespace Inertia.Network
                 var received = ((Socket)iar.AsyncState).EndReceive(iar);
 
                 if (!IsConnected) return;
-
                 if (received == 0)
                 {
                     throw new SocketException((int)SocketError.SocketError);
@@ -142,6 +177,5 @@ namespace Inertia.Network
 
             IsDisposed = true;
         }
-    
     }
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Inertia.Network
 {
-    public class MessageParsingOutput : IDisposable
+    public sealed class MessageParsingOutput : IDisposable
     {
         public bool IsDisposed { get; private set; }
 

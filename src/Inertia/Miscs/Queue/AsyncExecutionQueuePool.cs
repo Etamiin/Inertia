@@ -6,6 +6,8 @@ namespace Inertia
 {
     public class AsyncExecutionQueuePool : IDisposable
     {
+        private readonly static TimeSpan MinTimeQueueAlive= TimeSpan.FromMinutes(1);
+
         public bool IsDisposed { get; private set; }
 
         internal int QueueCapacity { get; set; }
@@ -15,22 +17,24 @@ namespace Inertia
         private SyncQueue _currentQueue;
         private object _locker;
         private TimeSpan _maxTimeQueueAlive;
+        private bool _limitProcessorUsage;
 
-        public AsyncExecutionQueuePool(int queueCapacity) : this(queueCapacity, TimeSpan.FromMinutes(5))
+        public AsyncExecutionQueuePool(int queueCapacity, bool limitProcessorUsage) : this(queueCapacity, limitProcessorUsage, TimeSpan.FromMinutes(5))
         {
         }
-        public AsyncExecutionQueuePool(int queueCapacity, TimeSpan maxTimeQueueAlive)
+        public AsyncExecutionQueuePool(int queueCapacity, bool limitProcessorUsage, TimeSpan maxTimeQueueAlive)
         {
-            if (maxTimeQueueAlive < TimeSpan.FromMinutes(1))
+            if (maxTimeQueueAlive < MinTimeQueueAlive)
             {
                 maxTimeQueueAlive = TimeSpan.FromMinutes(5);
             }
 
+            QueueCapacity = queueCapacity;
             _idProvider = new SafeOrderedIntProvider();
             _queues = new ConcurrentDictionary<int, SyncQueue>();
             _locker = new object();
             _maxTimeQueueAlive = maxTimeQueueAlive;
-            QueueCapacity = queueCapacity;
+            _limitProcessorUsage = limitProcessorUsage;
         }
 
         public void Enqueue(BasicAction action)
@@ -47,7 +51,7 @@ namespace Inertia
                     var queue = _queues.FirstOrDefault((pair) => !pair.Value.DisposeRequested && pair.Value.Count < QueueCapacity).Value;
                     if (queue == null)
                     {
-                        queue = new SyncQueue(_idProvider.NextValue(), _maxTimeQueueAlive);
+                        queue = new SyncQueue(_idProvider.NextValue(), _maxTimeQueueAlive, _limitProcessorUsage);
                         queue.Disposing += Queue_Disposing;
 
                         _queues.TryAdd(queue.Id, queue);

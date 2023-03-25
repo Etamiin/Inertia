@@ -60,21 +60,41 @@ public static class Extensions
 
         return result;
     }
-    /// <summary>
-    /// Read boolean values from a byte flag
-    /// </summary>
-    /// <param name="value"></param>
-    /// <param name="length"></param>
-    /// <returns></returns>
-    public static bool[] ToBits(this byte value, int length)
+    public static bool GetBit(this ref byte value, int index, EndiannessType endianness = EndiannessType.Auto)
     {
-        var result = new bool[length];
-        for (int i = 0; i < length; i++)
+        if (endianness == EndiannessType.Auto && !BitConverter.IsLittleEndian)
         {
-            result[i] = (value & (1 << i)) != 0;
+            endianness = EndiannessType.BigEndian;
         }
 
-        Array.Reverse(result);
-        return result;
+        if (endianness == EndiannessType.BigEndian)
+        {
+            index = 7 - index;
+        }
+
+        return (value & (1 << index)) != 0;
+    }
+    public static byte SetBit(this ref byte value, int index, bool bitValue, EndiannessType endianness = EndiannessType.Auto)
+    {
+        if (endianness == EndiannessType.Auto && !BitConverter.IsLittleEndian)
+        {
+            endianness = EndiannessType.BigEndian;
+        }
+
+        if (endianness == EndiannessType.BigEndian)
+        {
+            index = 7 - index;
+        }
+
+        if (bitValue)
+        {
+            value = (byte)(value | (1 << index));
+        }
+        else
+        {
+            value = (byte)(value & ~(1 << index));
+        }
+
+        return value;
     }
 }

@@ -12,7 +12,7 @@ namespace Inertia.Scriptable
 
         static RuntimeManager()
         {
-            QueuePool = new AsyncExecutionQueuePool(500);
+            QueuePool = new AsyncExecutionQueuePool(500, true);
             _componentInstances = new Dictionary<Type, IScriptable>();
             _executionLayers = new Dictionary<int, ScriptableExecutionLayer>();
 

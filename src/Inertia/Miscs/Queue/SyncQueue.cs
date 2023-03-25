@@ -7,6 +7,8 @@ namespace Inertia
 {
     internal class SyncQueue
     {
+        private const int LimitProcessorUsageMaxDequeuePerTick = 20;
+
         internal event BasicAction<SyncQueue> Disposing;
 
         internal int Id { get; private set; }
@@ -25,14 +27,16 @@ namespace Inertia
         private ConcurrentQueue<BasicAction> _queue;
         private bool _isRunning;
         private TimeSpan _maxTimeQueueAlive;
+        private bool _limitProcessorUsage;
 
-        internal SyncQueue(int id, TimeSpan maxTimeQueueAlive)
+        internal SyncQueue(int id, TimeSpan maxTimeQueueAlive, bool limitProcessorUsage)
         {
             Id = id;
-            _maxTimeQueueAlive = maxTimeQueueAlive;
             _queue = new ConcurrentQueue<BasicAction>();
+            _maxTimeQueueAlive = maxTimeQueueAlive;
+            _limitProcessorUsage = limitProcessorUsage;
 
-            Task.Factory.StartNew(Running, TaskCreationOptions.LongRunning);
+            Task.Factory.StartNew(ProcessQueue, TaskCreationOptions.LongRunning);
         }
 
         internal void Enqueue(BasicAction action)
@@ -44,7 +48,7 @@ namespace Inertia
             DisposeRequested = true;
         }
 
-        private async void Running()
+        private async void ProcessQueue()
         {
             _isRunning = true;
 
@@ -81,11 +85,13 @@ namespace Inertia
 
                 EmptySince = null;
 
-                if (Run.LimitProcessorUsage)
+                if (_limitProcessorUsage)
                 {
-                    while (_queue.TryDequeue(out var action))
+                    var i = 0;
+                    while (i < LimitProcessorUsageMaxDequeuePerTick && _queue.TryDequeue(out var action))
                     {
                         action?.Invoke();
+                        i++;
                     }
 
                     await Task.Delay(10).ConfigureAwait(false);

@@ -71,7 +71,7 @@ namespace Inertia.Network
                     _connections.Clear();
 
                     _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                    _socket.Bind(new IPEndPoint(string.IsNullOrEmpty(_ip) ? IPAddress.Any : IPAddress.Parse(_ip), _port));
+                    _socket.Bind(new IPEndPoint(string.IsNullOrEmpty(Ip) ? IPAddress.Any : IPAddress.Parse(Ip), Port));
                     _socket.Listen(1000);
 
                     Started();
@@ -120,14 +120,22 @@ namespace Inertia.Network
             try
             {
                 var socket = ((Socket)iar.AsyncState).EndAccept(iar);
-                var connection = new TcpConnectionEntity(socket, (uint)_idProvider.NextValue());
+                var connection = new TcpConnectionEntity(socket, (uint)IdProvider.NextValue());
 
                 _connections.TryAdd(connection.Id, connection);
 
                 connection.Disconnecting += ConnectionDisconnected;
-                connection.BeginReceiveMessages();
 
-                OnConnectionConnected(connection);
+                if (!NetworkProtocol.IsCurrentWebSocketProtocol)
+                {
+                    connection.BeginReceiveMessages();
+                    OnConnectionConnected(connection);
+                }
+                else
+                {
+                    connection.WebSocketDetermined += ConnectionWebSocketDetermined;
+                    connection.BeginReceiveMessages();
+                }
             }
             catch (Exception e)
             {
@@ -141,6 +149,12 @@ namespace Inertia.Network
             {
                 _socket.BeginAccept(OnAcceptConnection, _socket);
             }
+        }
+
+        private void ConnectionWebSocketDetermined(TcpConnectionEntity connection)
+        {
+            OnConnectionConnected(connection);
+            connection.WebSocketDetermined -= ConnectionWebSocketDetermined;
         }
         private void ConnectionDisconnected(TcpConnectionEntity connection, NetworkDisconnectReason reason)
         {

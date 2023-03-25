@@ -31,7 +31,7 @@ namespace Inertia.Network
                 try
                 {
                     _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                    _socket.Connect(new IPEndPoint(IPAddress.Parse(_ip), _port));
+                    _socket.Connect(new IPEndPoint(IPAddress.Parse(Ip), Port));
                     
                     _reader = new BasicReader();
 
