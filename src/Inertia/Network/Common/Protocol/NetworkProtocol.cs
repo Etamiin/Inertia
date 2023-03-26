@@ -1,6 +1,6 @@
-﻿using Inertia.Logging;
-using System;
+﻿using System;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Inertia.Network
 {
@@ -24,8 +24,9 @@ namespace Inertia.Network
 
             IsCurrentWebSocketProtocol = Current is WebSocketNetworkProtocol;
         }
-        public static void UseWebSocketProtocol()
+        public static void UseWebSocketProtocol(X509Certificate? serverCertificate = null)
         {
+            _sslCertificate = serverCertificate;
             SetProtocol(new WebSocketNetworkProtocol());
         }
         public static void ProcessParsing(object receiver, BasicReader reader)
@@ -64,6 +65,7 @@ namespace Inertia.Network
         internal static AsyncExecutionQueuePool? ClientExecutionPool { get; private set; }
         internal static ServerMessagePoolExecutor? ServerAsyncPool { get; private set; }
         internal static bool IsCurrentWebSocketProtocol { get; private set; }
+        internal static X509Certificate? _sslCertificate { get; set; }
 
         internal static NetworkMessage CreateMessage(Type messageType)
         {

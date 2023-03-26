@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Inertia.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -29,7 +30,8 @@ namespace Inertia.Scriptable
         }
 
         public abstract void OnProcess(IEnumerable<T> componentDatas);
-        
+        public abstract void OnExceptionThrown(Exception exception);
+
         void IScriptable.RegisterComponentData(ScriptableData componentData)
         {
             if (componentData is T tData)
@@ -45,7 +47,7 @@ namespace Inertia.Scriptable
                     }
                 }
 
-                componentData.Destroying += ComponentData_Destroying;
+                componentData.Disposing += ComponentData_Disposing;
             }
         }
         void IScriptable.UnregisterComponentData(ScriptableData componentData)
@@ -63,7 +65,7 @@ namespace Inertia.Scriptable
                     }
                 }
                 
-                componentData.Destroying -= ComponentData_Destroying;
+                componentData.Disposing -= ComponentData_Disposing;
             }
         }
 
@@ -75,15 +77,23 @@ namespace Inertia.Scriptable
             {
                 lock (_locker)
                 {
-                    var executableDatas = _componentDatas.Where((data) => data.State == ScriptableData.ScriptableDataState.Initialized);
-                    OnProcess(executableDatas);
+                    var executableDatas = _componentDatas.Where((data) => data.State == ScriptableData.ScriptableDataState.Initialized).ToArray();
+                    
+                    try
+                    {
+                        OnProcess(executableDatas);
+                    }
+                    catch (Exception ex)
+                    {
+                        OnExceptionThrown(ex);
+                    }
 
                     var notInitializedDatas = _componentDatas.Where((data) => data.State != ScriptableData.ScriptableDataState.Initialized).ToArray();
                     foreach (var data in notInitializedDatas)
                     {
-                        if (data.State == ScriptableData.ScriptableDataState.Disposing)
+                        if (data.State == ScriptableData.ScriptableDataState.Destroying)
                         {
-                            data.Destroy();
+                            data.Dispose();
                         }
                         else if (data.State == ScriptableData.ScriptableDataState.Initializing)
                         {
@@ -93,7 +103,7 @@ namespace Inertia.Scriptable
                 }
             }
         }
-        private void ComponentData_Destroying(ScriptableData componentData)
+        private void ComponentData_Disposing(ScriptableData componentData)
         {
             ((IScriptable)this).UnregisterComponentData(componentData);
         }

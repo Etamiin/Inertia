@@ -34,17 +34,23 @@ namespace Inertia.Scriptable
             _startAt = DateTime.Now;
             DisposeWhenExecuted = !loopExecution;
 
-            if (Action == null) Dispose();
+            if (Action == null) BeginDestroy();
         }
 
         internal void Execute()
         {
-            Action.Invoke();
-            if (!DisposeWhenExecuted)
+            try
             {
-                _startAt = DateTime.Now;
+                Action.Invoke();
             }
-            else Dispose();
+            finally
+            {
+                if (!DisposeWhenExecuted)
+                {
+                    _startAt = DateTime.Now;
+                }
+                else BeginDestroy();
+            }
         }
     }
 }

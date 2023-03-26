@@ -1,5 +1,8 @@
-﻿namespace Inertia.Network
+﻿using System;
+
+namespace Inertia.Network
 {
+    [Flags]
     public enum NetworkDisconnectReason : byte
     {
         Manual = 1,
@@ -8,6 +11,7 @@
         ConnectionTimeout = 8,
         InvalidMessageSended = 16,
         InvalidDataReceived = 32,
-        Spam = 64
+        SslAuthentificationFailed = 64,
+        Spam = 128
     }
 }

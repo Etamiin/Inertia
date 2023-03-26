@@ -17,10 +17,10 @@ namespace Inertia.Network
         private readonly ConcurrentDictionary<uint, TcpConnectionEntity> _connections;
         private ILogger _logger;
 
-        protected TcpServerEntity(int port) : this(port, Logger.Instance)
+        protected TcpServerEntity(int port) : this(port, Logger.Default)
         {
         }
-        protected TcpServerEntity(string ip, int port) : this(ip, port, Logger.Instance)
+        protected TcpServerEntity(string ip, int port) : this(ip, port, Logger.Default)
         {
 
         }

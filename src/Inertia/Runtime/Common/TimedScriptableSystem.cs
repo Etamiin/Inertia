@@ -1,4 +1,5 @@
 ﻿using Inertia.Logging;
+using System;
 using System.Collections.Generic;
 
 namespace Inertia.Scriptable
@@ -12,5 +13,7 @@ namespace Inertia.Scriptable
                 if (script.CanBeExecuted) script.Execute();
             }
         }
+
+        public override void OnExceptionThrown(Exception exception) { }
     }
 }

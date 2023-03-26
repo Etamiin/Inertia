@@ -8,9 +8,12 @@ namespace Inertia.Logging
 {
     public class Logger : ILogger
     {
-        public static ILogger Instance => _defaultInstance;
+        public static ILogger Default { get; private set; }
 
-        private static readonly Logger _defaultInstance;
+        public static void SetDefault(ILogger logger)
+        {
+            Default = logger;
+        }
 
         private LoggerParameters _parameters;
         private StreamWriter? _outputFileStream;
@@ -19,7 +22,7 @@ namespace Inertia.Logging
                 
         static Logger()
         {
-            _defaultInstance = new Logger(new LoggerParameters());
+            Default = new Logger(new LoggerParameters());
         }
         public Logger(LoggerParameters parameters)
         {

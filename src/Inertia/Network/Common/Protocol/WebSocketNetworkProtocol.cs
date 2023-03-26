@@ -1,8 +1,11 @@
 ﻿using Inertia.Logging;
 using System;
+using System.IO;
 using System.Linq;
+using System.Net.Security;
 using System.Net.Sockets;
 using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
 namespace Inertia.Network
@@ -58,6 +61,7 @@ namespace Inertia.Network
                     var data = reader.GetBytes((int)reader.UnreadedLength);
                     var dataAsString = Encoding.UTF8.GetString(data);
                     var handshakeResult = GetHanshakeKeyResult(dataAsString);
+
                     if (string.IsNullOrWhiteSpace(handshakeResult))
                     {
                         throw new SocketException();
@@ -65,8 +69,6 @@ namespace Inertia.Network
                     else
                     {
                         SendHandshakeResponse(connection, handshakeResult);
-
-                        connection.IsWebSocketConnection = true;
                         connection.SetAsWebSocketConnection();
                     }
 
@@ -83,6 +85,7 @@ namespace Inertia.Network
                         if (opCode == WebSocketOpCode.ConnectionClose)
                         {
                             connection.Send(new byte[0], WebSocketOpCode.ConnectionClose);
+                            connection.Disconnect(NetworkDisconnectReason.ConnectionLost);
                             break;
                         }
                         else if (opCode == WebSocketOpCode.Ping)

@@ -9,11 +9,11 @@ namespace Inertia.Scriptable
             NoState = 0,
             Initializing = 1,
             Initialized = 2,
-            Disposing = 3,
+            Destroying = 3,
             Disposed = 4
         }
 
-        internal event BasicAction<ScriptableData>? Destroying;
+        internal event BasicAction<ScriptableData>? Disposing;
 
         public bool IsDisposed { get; private set; }
         
@@ -21,34 +21,39 @@ namespace Inertia.Scriptable
 
         public ScriptableData()
         {
+            State = ScriptableDataState.Initializing;
+
             var component = RuntimeManager.GetScriptableSystem(GetType());
             if (component != null)
             {
                 component.RegisterComponentData(this);
-
-                State = ScriptableDataState.Initializing;
+            }
+            else
+            {
+                BeginDestroy();
+                Dispose();
             }
         }
 
+        public void BeginDestroy()
+        {
+            State = ScriptableDataState.Destroying;
+        }
         public void Dispose()
         {
-            OnDispose(true);
-        }
-        
-        internal void Destroy()
-        {
-            if (State != ScriptableDataState.Disposing) return;
+            if (State != ScriptableDataState.Destroying) return;
 
-            Destroying?.Invoke(this);
-            State = ScriptableDataState.Disposed;
-        }
+            OnDispose(true);
+        }       
 
         private void OnDispose(bool disposing)
         {
             if (!IsDisposed && disposing)
             {
+                Disposing?.Invoke(this);
+
                 IsDisposed = true;
-                State = ScriptableDataState.Disposing;
+                State = ScriptableDataState.Disposed;
             }
         }
     }
