@@ -10,41 +10,29 @@ namespace Inertia.Network
     public abstract class TcpServerEntity : NetworkServerEntity, IDisposable
     {
         public bool IsDisposed { get; private set; }
-        public bool IsRunning => _socket != null && _socket.IsBound;
-        public int ConnectedCount => _connections.Count;
+        public bool IsRunning => Socket != null && Socket.IsBound;
+        public int ConnectedCount => Connections.Count;
 
-        private Socket _socket;
-        private readonly ConcurrentDictionary<uint, TcpConnectionEntity> _connections;
-        private ILogger _logger;
-
-        protected TcpServerEntity(int port) : this(port, Logger.Default)
+        internal protected Socket Socket { get; private set; }
+        internal protected readonly ConcurrentDictionary<uint, TcpConnectionEntity> Connections;
+        
+        protected TcpServerEntity(ServerParameters parameters) : base(parameters)
         {
-        }
-        protected TcpServerEntity(string ip, int port) : this(ip, port, Logger.Default)
-        {
-
-        }
-        protected TcpServerEntity(int port, ILogger logger) : this(string.Empty, port, logger)
-        {
-        }
-        protected TcpServerEntity(string ip, int port, ILogger logger) : base(ip, port)
-        {
-            _connections = new ConcurrentDictionary<uint, TcpConnectionEntity>();
-            _logger = logger;
+            Connections = new ConcurrentDictionary<uint, TcpConnectionEntity>();
         }
 
         public NetworkConnectionGroup CreateConnectionGroup()
         {
             var group = new NetworkConnectionGroup();
 
-            group.AddConnections(_connections.Values);
+            group.AddConnections(Connections.Values);
 
             return group;
         }
         public NetworkConnectionGroup CreateConnectionGroup(Predicate<TcpConnectionEntity> predicate)
         {
             var group = new NetworkConnectionGroup();
-            var connections = _connections.Values
+            var connections = Connections.Values
                 .Where((connection) => predicate(connection));
 
             group.AddConnections(connections);
@@ -54,7 +42,7 @@ namespace Inertia.Network
         
         public bool TryGetConnection(uint id, out TcpConnectionEntity connection)
         {
-            return _connections.TryGetValue(id, out connection);
+            return Connections.TryGetValue(id, out connection);
         }
 
         public sealed override void Start()
@@ -68,18 +56,18 @@ namespace Inertia.Network
             {
                 try
                 {
-                    _connections.Clear();
+                    Connections.Clear();
 
-                    _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                    _socket.Bind(new IPEndPoint(string.IsNullOrEmpty(Ip) ? IPAddress.Any : IPAddress.Parse(Ip), Port));
-                    _socket.Listen(1000);
+                    Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                    Socket.Bind(new IPEndPoint(string.IsNullOrEmpty(Parameters.Ip) ? IPAddress.Any : IPAddress.Parse(Parameters.Ip), Parameters.Port));
+                    Socket.Listen(1000);
 
                     Started();
-                    _socket.BeginAccept(new AsyncCallback(OnAcceptConnection), _socket);
+                    Socket.BeginAccept(new AsyncCallback(OnAcceptConnection), Socket);
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error(ex);
+                    Logger?.Error(ex);
                     Close(NetworkDisconnectReason.ConnectionFailed);
                 }
             }
@@ -91,9 +79,9 @@ namespace Inertia.Network
                 throw new ObjectDisposedException(nameof(TcpServerEntity));
             }
 
-            if (_connections != null && _connections.Count > 0)
+            if (Connections != null && Connections.Count > 0)
             {
-                var entities = _connections.Values.ToArray();
+                var entities = Connections.Values.ToArray();
                 foreach (var connection in entities)
                 {
                     connection.Dispose();
@@ -102,8 +90,8 @@ namespace Inertia.Network
 
             if (IsRunning)
             {
-                _socket?.Close();
-                _socket = null;
+                Socket?.Close();
+                Socket = null;
             }
         }
 
@@ -115,27 +103,25 @@ namespace Inertia.Network
         protected virtual void OnConnectionConnected(TcpConnectionEntity connection) { }
         protected virtual void OnConnectionDisconnecting(TcpConnectionEntity connection, NetworkDisconnectReason reason) { }
 
+        internal protected virtual TcpConnectionEntity CreateConnection(Socket socket, uint id)
+        {
+            return new TcpConnectionEntity(socket, id);
+
+            connection.BeginReceiveMessages();
+            OnConnectionConnected(connection);
+        }
+
         private void OnAcceptConnection(IAsyncResult iar)
         {
             try
             {
                 var socket = ((Socket)iar.AsyncState).EndAccept(iar);
-                var connection = new TcpConnectionEntity(socket, (uint)IdProvider.NextValue());
+                var connection = CreateConnection(socket, (uint)IdProvider.NextValue());
 
-                _connections.TryAdd(connection.Id, connection);
+                connection.Disconnecting += ConnectionDisconnecting;
 
-                connection.Disconnecting += ConnectionDisconnected;
-
-                if (!NetworkProtocol.IsCurrentWebSocketProtocol)
-                {
-                    connection.BeginReceiveMessages();
-                    OnConnectionConnected(connection);
-                }
-                else
-                {
-                    connection.WebSocketDetermined += ConnectionWebSocketDetermined;
-                    connection.BeginReceiveMessages();
-                }
+                Connections.TryAdd(connection.Id, connection);
+                OnConnectionCreated(connection);
             }
             catch (Exception e)
             {
@@ -147,19 +133,14 @@ namespace Inertia.Network
 
             if (IsRunning)
             {
-                _socket.BeginAccept(OnAcceptConnection, _socket);
+                Socket.BeginAccept(OnAcceptConnection, Socket);
             }
         }
 
-        private void ConnectionWebSocketDetermined(TcpConnectionEntity connection)
+        private void ConnectionDisconnecting(TcpConnectionEntity connection, NetworkDisconnectReason reason)
         {
-            OnConnectionConnected(connection);
-            connection.WebSocketDetermined -= ConnectionWebSocketDetermined;
-        }
-        private void ConnectionDisconnected(TcpConnectionEntity connection, NetworkDisconnectReason reason)
-        {
-            _connections.TryRemove(connection.Id, out _);
-            connection.Disconnecting -= ConnectionDisconnected;
+            Connections.TryRemove(connection.Id, out _);
+            connection.Disconnecting -= ConnectionDisconnecting;
 
             OnConnectionDisconnecting(connection, reason);
         }

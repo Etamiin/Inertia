@@ -49,14 +49,14 @@ namespace Inertia.Network
 
             try
             {
-                var isTcpConnection = receiver is TcpConnectionEntity;
+                var isTcpConnection = receiver is WebSocketConnectionEntity;
                 if (!isTcpConnection)
                 {
                     throw new SocketException();
                 }
 
-                var connection = (TcpConnectionEntity)receiver;
-                if (!connection.IsWebSocketConnection.HasValue)
+                var connection = (WebSocketConnectionEntity)receiver;
+                if (connection.State == WebSocketConnectionState.Connecting)
                 {
                     var data = reader.GetBytes((int)reader.UnreadedLength);
                     var dataAsString = Encoding.UTF8.GetString(data);
@@ -66,12 +66,8 @@ namespace Inertia.Network
                     {
                         throw new SocketException();
                     }
-                    else
-                    {
-                        SendHandshakeResponse(connection, handshakeResult);
-                        connection.SetAsWebSocketConnection();
-                    }
 
+                    connection.SendHandshakeResponse(handshakeResult);
                     reader.RemoveReadedBytes();
                     return true;
                 }
@@ -185,15 +181,6 @@ namespace Inertia.Network
             }
 
             return null;
-        }
-        private void SendHandshakeResponse(TcpConnectionEntity connection, string handshakeKey)
-        {
-            var response = $"HTTP/1.1 101 Switching Protocols\r\n" +
-                $"Upgrade: websocket\r\n" +
-                $"Connection: Upgrade\r\n" +
-                $"Sec-WebSocket-Accept: {handshakeKey}\r\n\r\n";
-
-            connection.Send(Encoding.UTF8.GetBytes(response));
         }
         private bool TryParseWsMessage(BasicReader reader, out byte[] applicationData, out WebSocketOpCode opCode)
         {

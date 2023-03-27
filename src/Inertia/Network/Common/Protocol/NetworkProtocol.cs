@@ -24,9 +24,8 @@ namespace Inertia.Network
 
             IsCurrentWebSocketProtocol = Current is WebSocketNetworkProtocol;
         }
-        public static void UseWebSocketProtocol(X509Certificate? serverCertificate = null)
+        public static void UseWebSocketProtocol()
         {
-            _sslCertificate = serverCertificate;
             SetProtocol(new WebSocketNetworkProtocol());
         }
         public static void ProcessParsing(object receiver, BasicReader reader)
@@ -65,7 +64,6 @@ namespace Inertia.Network
         internal static AsyncExecutionQueuePool? ClientExecutionPool { get; private set; }
         internal static ServerMessagePoolExecutor? ServerAsyncPool { get; private set; }
         internal static bool IsCurrentWebSocketProtocol { get; private set; }
-        internal static X509Certificate? _sslCertificate { get; set; }
 
         internal static NetworkMessage CreateMessage(Type messageType)
         {

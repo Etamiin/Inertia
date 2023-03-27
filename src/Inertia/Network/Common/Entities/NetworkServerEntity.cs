@@ -1,18 +1,19 @@
-﻿using System.Threading.Tasks;
+﻿using Inertia.Logging;
+using System.Threading.Tasks;
 
 namespace Inertia.Network
 {
     public abstract class NetworkServerEntity
     {
-        protected readonly SafeOrderedIntProvider IdProvider;
-        protected readonly string Ip;
-        protected readonly int Port;
+        protected ILogger? Logger => Parameters.Logger;
 
-        protected NetworkServerEntity(string ip, int port)
+        protected readonly SafeOrderedIntProvider IdProvider;
+        protected readonly ServerParameters Parameters;
+
+        protected NetworkServerEntity(ServerParameters parameters)
         {
             IdProvider = new SafeOrderedIntProvider();
-            Ip = ip.Replace("localhost", "127.0.0.1");
-            Port = port;
+            Parameters = parameters;
         }
 
         public void StartAsync()
