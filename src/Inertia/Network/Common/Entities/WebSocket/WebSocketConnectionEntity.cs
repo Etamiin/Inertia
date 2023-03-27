@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net.Security;
 using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
@@ -9,6 +8,8 @@ namespace Inertia.Network
 {
     public class WebSocketConnectionEntity : TcpConnectionEntity
     {
+        internal event BasicAction<WebSocketConnectionEntity>? ConnectionEstablished;
+
         public WebSocketConnectionState State { get; private set; }
 
         private SslStream _sslStream;
@@ -16,72 +17,16 @@ namespace Inertia.Network
 
         internal WebSocketConnectionEntity(Socket socket, uint id, X509Certificate? serverCertificate) : base(socket, id)
         {
-            _sslStream = new SslStream(new NetworkStream(socket), false);
-            _serverCertificate = serverCertificate;
             State = WebSocketConnectionState.Connecting;
-        }
 
-        public sealed override void Send(byte[] data)
-        {
-            if (IsDisposed)
+            _serverCertificate = serverCertificate;
+            if (_serverCertificate != null)
             {
-                throw new ObjectDisposedException(nameof(TcpConnectionEntity));
-            }
-
-            if (!IsConnected) return;
-
-            if (data == null || data.Length == 0)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
-
-            try
-            {
-                if (_sslStream == null)
-                {
-                    var wsProtocol = (WebSocketNetworkProtocol)NetworkProtocol.Current;
-                    _socket.Send(wsProtocol.WriteWsMessage(data, WebSocketOpCode.BinaryFrame));
-                }
-                else
-                {
-                    if (_sslStream.IsAuthenticated)
-                    {
-                        var wsProtocol = (WebSocketNetworkProtocol)NetworkProtocol.Current;
-                        _sslStream.Write(wsProtocol.WriteWsMessage(data, WebSocketOpCode.BinaryFrame));
-                    }
-                    else
-                    {
-                        _sslStream.Write(data);
-                    }
-                }
-            }
-            catch
-            {
-                Disconnect(NetworkDisconnectReason.InvalidMessageSended);
+                _sslStream = new SslStream(new NetworkStream(socket), false);
             }
         }
-        public bool Disconnect(NetworkDisconnectReason reason)
-        {
-            if (IsDisposed)
-            {
-                throw new ObjectDisposedException(nameof(TcpConnectionEntity));
-            }
 
-            if (IsConnected)
-            {
-                _sslStream?.Dispose();
-                _sslStream = null;
-                _serverCertificate = null;
-
-                State = WebSocketConnectionState.Closed;
-
-                return true;
-            }
-
-            return false;
-        }
-
-        internal void Send(byte[] data, WebSocketOpCode opCode)
+        internal void SendSpecificOpCode(byte[] data, WebSocketOpCode opCode)
         {
             if (IsDisposed)
             {
@@ -101,7 +46,6 @@ namespace Inertia.Network
             }
 
         }
-
         internal void SendHandshakeResponse(string handshakeKey)
         {
             var response = $"HTTP/1.1 101 Switching Protocols\r\n" +
@@ -112,6 +56,7 @@ namespace Inertia.Network
             Send(Encoding.UTF8.GetBytes(response));
 
             State = WebSocketConnectionState.Connected;
+            ConnectionEstablished?.Invoke(this);
         }
 
         internal protected override void BeginReceiveMessages()
@@ -126,6 +71,32 @@ namespace Inertia.Network
             }
         }
 
+        private protected override void InternalSend(byte[] data)
+        {
+            if (_sslStream == null)
+            {
+                var wsProtocol = (WebSocketNetworkProtocol)NetworkProtocol.Current;
+                Socket.Send(wsProtocol.WriteWsMessage(data, WebSocketOpCode.BinaryFrame));
+            }
+            else if (_sslStream.IsAuthenticated)
+            {
+                var wsProtocol = (WebSocketNetworkProtocol)NetworkProtocol.Current;
+                _sslStream.Write(wsProtocol.WriteWsMessage(data, WebSocketOpCode.BinaryFrame));
+            }
+            else
+            {
+                _sslStream.Write(data);
+            }
+        }
+        private protected override void InternalDispose()
+        {
+            _sslStream?.Dispose();
+            _sslStream = null;
+            _serverCertificate = null;
+
+            State = WebSocketConnectionState.Closed;
+        }
+
         private void OnAuthentificated(IAsyncResult iar)
         {
             var sslStream = (SslStream)iar.AsyncState;
@@ -133,33 +104,20 @@ namespace Inertia.Network
             sslStream.EndAuthenticateAsServer(iar);
             if (sslStream.IsAuthenticated)
             {
-                sslStream.BeginRead(Buffer, 0, Buffer.Length, OnReceiveData, sslStream);
+                sslStream.BeginRead(Buffer, 0, Buffer.Length, OnReceiveSslData, sslStream);
             }
             else
             {
                 Disconnect(NetworkDisconnectReason.SslAuthentificationFailed);
             }
         }
-        private void OnReceiveData(IAsyncResult iar)
+        private void OnReceiveSslData(IAsyncResult iar)
         {
             try
             {
                 var received = ((SslStream)iar.AsyncState).EndRead(iar);
 
-                if (!IsConnected) return;
-                if (received == 0)
-                {
-                    throw new SocketException((int)SocketError.SocketError);
-                }
-
-                var messageReceivedInLastSecond = Statistics.NotifyMessageReceived();
-                if (messageReceivedInLastSecond >= NetworkProtocol.Current.MaximumMessageCountPerSecond)
-                {
-                    Disconnect(NetworkDisconnectReason.Spam);
-                    return;
-                }
-
-                NetworkProtocol.ProcessParsing(this, _reader.Fill(new ReadOnlySpan<byte>(Buffer, 0, received)));
+                ProcessReceivedData(received);
             }
             catch (Exception ex)
             {
@@ -175,7 +133,7 @@ namespace Inertia.Network
 
             if (IsConnected)
             {
-                _sslStream.BeginRead(Buffer, 0, Buffer.Length, OnReceiveData, _sslStream);
+                _sslStream.BeginRead(Buffer, 0, Buffer.Length, OnReceiveSslData, _sslStream);
             }
         }
     }

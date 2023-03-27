@@ -11,23 +11,22 @@ namespace Inertia.Network
 {
     public class TcpConnectionEntity : NetworkConnectionEntity, IDisposable
     {
-        internal event BasicAction<TcpConnectionEntity, NetworkDisconnectReason> Disconnecting;
+        internal event BasicAction<TcpConnectionEntity, NetworkDisconnectReason>? Disconnecting;
 
         public ConnectionStatistics Statistics { get; private set; }
         public bool IsDisposed { get; private set; }
-        public bool IsConnected => _socket != null && _socket.Connected;
+        public bool IsConnected => Socket != null && Socket.Connected;
 
-        internal protected byte[] Buffer { get; private set; }
-
-        private Socket _socket;
-        private BasicReader _reader;
+        private protected Socket Socket { get; private set; }
+        private protected BasicReader NetworkDataReader { get; private set; }
+        private protected byte[] Buffer { get; private set; }
 
         internal TcpConnectionEntity(Socket socket, uint id) : base(id)
         {
             Statistics = new ConnectionStatistics();
 
-            _socket = socket;
-            _reader = new BasicReader();
+            Socket = socket;
+            NetworkDataReader = new BasicReader();
             Buffer = new byte[NetworkProtocol.Current.NetworkBufferLength];
         }
 
@@ -47,9 +46,9 @@ namespace Inertia.Network
 
             try
             {
-                _socket.Send(data);
+                InternalSend(data);
             }
-            catch 
+            catch
             {
                 Disconnect(NetworkDisconnectReason.InvalidMessageSended);
             }
@@ -75,12 +74,12 @@ namespace Inertia.Network
                 Disconnecting?.Invoke(this, reason);
                 Disconnecting = null;
 
-                _socket?.Disconnect(false);
-                _reader?.Dispose();
-                _socket = null;
-
+                Socket?.Disconnect(false);
+                NetworkDataReader?.Dispose();
+                Socket = null;
                 Buffer = null;
 
+                InternalDispose();
                 return true;
             }
 
@@ -93,29 +92,38 @@ namespace Inertia.Network
 
         internal protected virtual void BeginReceiveMessages()
         {
-            _socket.BeginReceive(Buffer, 0, Buffer.Length, SocketFlags.None, OnReceiveData, _socket);
+            Socket.BeginReceive(Buffer, 0, Buffer.Length, SocketFlags.None, OnReceiveData, Socket);
+        }
+        
+        private protected virtual void InternalSend(byte[] data)
+        {
+            Socket.Send(data);
+        }
+        private protected virtual void InternalDispose() { }
+        private protected void ProcessReceivedData(int receivedLength)
+        {
+            if (!IsConnected) return;
+            if (receivedLength == 0)
+            {
+                throw new SocketException((int)SocketError.SocketError);
+            }
+
+            var messageReceivedInLastSecond = Statistics.NotifyMessageReceived();
+            if (messageReceivedInLastSecond >= NetworkProtocol.Current.MaximumMessageCountPerSecond)
+            {
+                Disconnect(NetworkDisconnectReason.Spam);
+                return;
+            }
+
+            NetworkProtocol.ProcessParsing(this, NetworkDataReader.Fill(new ReadOnlySpan<byte>(Buffer, 0, receivedLength)));
         }
 
         private void OnReceiveData(IAsyncResult iar)
         {
             try
             {
-                var received = ((SslStream)iar.AsyncState).EndRead(iar);
-
-                if (!IsConnected) return;
-                if (received == 0)
-                {
-                    throw new SocketException((int)SocketError.SocketError);
-                }
-
-                var messageReceivedInLastSecond = Statistics.NotifyMessageReceived();
-                if (messageReceivedInLastSecond >= NetworkProtocol.Current.MaximumMessageCountPerSecond)
-                {
-                    Disconnect(NetworkDisconnectReason.Spam);
-                    return;
-                }
-
-                NetworkProtocol.ProcessParsing(this, _reader.Fill(new ReadOnlySpan<byte>(Buffer, 0, received)));
+                var received = ((Socket)iar.AsyncState).EndReceive(iar);
+                ProcessReceivedData(received);
             }
             catch (Exception ex)
             {
@@ -131,7 +139,7 @@ namespace Inertia.Network
 
             if (IsConnected)
             {
-                _socket.BeginReceive(Buffer, 0, Buffer.Length, SocketFlags.None, OnReceiveData, _socket);
+                Socket.BeginReceive(Buffer, 0, Buffer.Length, SocketFlags.None, OnReceiveData, Socket);
             }
         }
         private void Dispose(bool disposing)

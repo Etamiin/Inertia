@@ -80,13 +80,13 @@ namespace Inertia.Network
 
                         if (opCode == WebSocketOpCode.ConnectionClose)
                         {
-                            connection.Send(new byte[0], WebSocketOpCode.ConnectionClose);
+                            connection.SendSpecificOpCode(new byte[0], WebSocketOpCode.ConnectionClose);
                             connection.Disconnect(NetworkDisconnectReason.ConnectionLost);
                             break;
                         }
                         else if (opCode == WebSocketOpCode.Ping)
                         {
-                            connection.Send(applicationData, WebSocketOpCode.Pong);
+                            connection.SendSpecificOpCode(applicationData, WebSocketOpCode.Pong);
                             break;
                         }
 

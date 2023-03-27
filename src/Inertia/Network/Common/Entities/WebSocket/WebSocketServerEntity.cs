@@ -3,30 +3,48 @@ using System.Net.Sockets;
 
 namespace Inertia.Network
 {
-    public abstract class WebSocketServerEntity : TcpServerEntity, IDisposable
+    public abstract class WebSocketServerEntity : BaseTcpServer<WebSocketConnectionEntity, WebSocketServerParameters>
     {
-        public readonly new WebSocketServerParameters Parameters;
-
         protected WebSocketServerEntity(WebSocketServerParameters parameters) : base(parameters)
         {
-            Parameters = parameters;
         }
 
-        protected internal override TcpConnectionEntity CreateConnection(Socket socket, uint id)
+        internal override void OnAcceptConnection(IAsyncResult iar)
         {
-            return new WebSocketConnectionEntity(socket, id, Parameters.SslCertificate);
-        }
+            try
+            {
+                var socket = ((Socket)iar.AsyncState).EndAccept(iar);
+                var connection = new WebSocketConnectionEntity(Socket, (uint)IdProvider.NextValue(), Parameters.SslCertificate);
+                connection.ConnectionEstablished += ConnectionEstablished;
+                connection.Disconnecting += ConnectionDisconnecting;
 
-        protected internal override void OnConnectionCreated(TcpConnectionEntity connection)
-        {
-            connection.DeterminedAsWebSocket += ConnectionWebSocketDetermined;
-            connection.BeginReceiveMessages();
-        }
+                Connections.TryAdd(connection.Id, connection);
+                connection.BeginReceiveMessages();
+            }
+            catch (Exception e)
+            {
+                if (e is SocketException || e is ObjectDisposedException)
+                {
+                    return;
+                }
+            }
 
-        private void ConnectionWebSocketDetermined(TcpConnectionEntity connection)
+            if (IsRunning)
+            {
+                Socket.BeginAccept(OnAcceptConnection, Socket);
+            }
+        }
+        private void ConnectionEstablished(WebSocketConnectionEntity connection)
         {
-            connection.DeterminedAsWebSocket -= ConnectionWebSocketDetermined;
+            connection.ConnectionEstablished -= ConnectionEstablished;
             OnConnectionConnected(connection);
+        }
+        private void ConnectionDisconnecting(TcpConnectionEntity connection, NetworkDisconnectReason reason)
+        {
+            Connections.TryRemove(connection.Id, out _);
+            connection.Disconnecting -= ConnectionDisconnecting;
+
+            OnConnectionDisconnecting((WebSocketConnectionEntity)connection, reason);
         }
     }
 }

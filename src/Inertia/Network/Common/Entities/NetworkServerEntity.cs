@@ -3,22 +3,23 @@ using System.Threading.Tasks;
 
 namespace Inertia.Network
 {
-    public abstract class NetworkServerEntity
+    public abstract class NetworkServerEntity<TParameters> where TParameters : ServerParameters
     {
+        public readonly TParameters Parameters;
+
         protected ILogger? Logger => Parameters.Logger;
 
-        protected readonly SafeOrderedIntProvider IdProvider;
-        protected readonly ServerParameters Parameters;
-
-        protected NetworkServerEntity(ServerParameters parameters)
+        private protected readonly SafeOrderedIntProvider IdProvider;
+        
+        protected NetworkServerEntity(TParameters parameters)
         {
             IdProvider = new SafeOrderedIntProvider();
             Parameters = parameters;
         }
 
-        public void StartAsync()
+        public Task StartAsync()
         {
-            Task.Run(Start);
+            return Task.Run(Start);
         }        
         public void Close()
         {
@@ -28,7 +29,7 @@ namespace Inertia.Network
         public abstract void Start();
         public abstract void Close(NetworkDisconnectReason reason);
 
-        protected virtual void Started() { }
-        protected virtual void Closed(NetworkDisconnectReason reason) { }
+        protected virtual void OnStarted() { }
+        protected virtual void OnClosed(NetworkDisconnectReason reason) { }
     }
 }
