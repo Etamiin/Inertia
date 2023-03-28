@@ -56,6 +56,9 @@ namespace Inertia.Network
                 }
 
                 var connection = (WebSocketConnectionEntity)receiver;
+
+                Logger.Default.Warn("PROCESS PARSING: " + connection.State);
+
                 if (connection.State == WebSocketConnectionState.Connecting)
                 {
                     var data = reader.GetBytes((int)reader.UnreadedLength);
@@ -76,6 +79,8 @@ namespace Inertia.Network
                 {
                     if (TryParseWsMessage(reader, out var applicationData, out var opCode))
                     {
+                        Logger.Default.Warn("WS MSG PARSED: " + applicationData.Length + " <> " + opCode);
+
                         reader.RemoveReadedBytes();
 
                         if (opCode == WebSocketOpCode.ConnectionClose)

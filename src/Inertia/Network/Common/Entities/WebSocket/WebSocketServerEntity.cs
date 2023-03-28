@@ -9,20 +9,21 @@ namespace Inertia.Network
         {
         }
 
-        internal override void OnAcceptConnection(IAsyncResult iar)
+        internal protected override void OnAcceptConnection(IAsyncResult iar)
         {
             try
             {
                 var socket = ((Socket)iar.AsyncState).EndAccept(iar);
-                var connection = new WebSocketConnectionEntity(Socket, (uint)IdProvider.NextValue(), Parameters.SslCertificate);
+                var connection = new WebSocketConnectionEntity(socket, (uint)IdProvider.NextValue(), Parameters.SslCertificate);
                 connection.ConnectionEstablished += ConnectionEstablished;
                 connection.Disconnecting += ConnectionDisconnecting;
 
-                Connections.TryAdd(connection.Id, connection);
+                _connections.TryAdd(connection.Id, connection);
                 connection.BeginReceiveMessages();
             }
             catch (Exception e)
             {
+                Logger.Error(e);
                 if (e is SocketException || e is ObjectDisposedException)
                 {
                     return;
@@ -31,9 +32,10 @@ namespace Inertia.Network
 
             if (IsRunning)
             {
-                Socket.BeginAccept(OnAcceptConnection, Socket);
+                _socket.BeginAccept(OnAcceptConnection, _socket);
             }
         }
+        
         private void ConnectionEstablished(WebSocketConnectionEntity connection)
         {
             connection.ConnectionEstablished -= ConnectionEstablished;
@@ -41,7 +43,7 @@ namespace Inertia.Network
         }
         private void ConnectionDisconnecting(TcpConnectionEntity connection, NetworkDisconnectReason reason)
         {
-            Connections.TryRemove(connection.Id, out _);
+            _connections.TryRemove(connection.Id, out _);
             connection.Disconnecting -= ConnectionDisconnecting;
 
             OnConnectionDisconnecting((WebSocketConnectionEntity)connection, reason);

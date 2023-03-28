@@ -9,14 +9,14 @@ namespace Inertia.Network
         {
         }
 
-        internal override void OnAcceptConnection(IAsyncResult iar)
+        internal protected override void OnAcceptConnection(IAsyncResult iar)
         {
             try
             {
                 var socket = ((Socket)iar.AsyncState).EndAccept(iar);
                 var connection = new TcpConnectionEntity(socket, (uint)IdProvider.NextValue());
 
-                Connections.TryAdd(connection.Id, connection);
+                _connections.TryAdd(connection.Id, connection);
 
                 connection.BeginReceiveMessages();
                 OnConnectionConnected(connection);
@@ -31,12 +31,12 @@ namespace Inertia.Network
 
             if (IsRunning)
             {
-                Socket.BeginAccept(OnAcceptConnection, Socket);
+                _socket.BeginAccept(OnAcceptConnection, _socket);
             }
         }
         private void ConnectionDisconnecting(TcpConnectionEntity connection, NetworkDisconnectReason reason)
         {
-            Connections.TryRemove(connection.Id, out _);
+            _connections.TryRemove(connection.Id, out _);
             connection.Disconnecting -= ConnectionDisconnecting;
 
             OnConnectionDisconnecting(connection, reason);

@@ -9,29 +9,29 @@ namespace Inertia.Network
     public abstract class BaseTcpServer<T, TParameters> : NetworkServerEntity<TParameters>, IDisposable where T : TcpConnectionEntity where TParameters : ServerParameters
     {
         public bool IsDisposed { get; private set; }
-        public bool IsRunning => Socket != null && Socket.IsBound;
-        public int ConnectedCount => Connections.Count;
+        public bool IsRunning => _socket != null && _socket.IsBound;
+        public int ConnectedCount => _connections.Count;
 
-        private protected Socket Socket { get; private set; }
-        private protected readonly ConcurrentDictionary<uint, T> Connections;
+        private protected Socket? _socket { get; private set; }
+        private protected readonly ConcurrentDictionary<uint, T> _connections;
 
         protected BaseTcpServer(TParameters parameters) : base(parameters)
         {
-            Connections = new ConcurrentDictionary<uint, T>();
+            _connections = new ConcurrentDictionary<uint, T>();
         }
 
         public NetworkConnectionGroup CreateConnectionGroup()
         {
             var group = new NetworkConnectionGroup();
 
-            group.AddConnections(Connections.Values);
+            group.AddConnections(_connections.Values);
 
             return group;
         }
         public NetworkConnectionGroup CreateConnectionGroup(Predicate<T> predicate)
         {
             var group = new NetworkConnectionGroup();
-            var connections = Connections.Values
+            var connections = _connections.Values
                 .Where((connection) => predicate(connection));
 
             group.AddConnections(connections);
@@ -41,7 +41,7 @@ namespace Inertia.Network
 
         public bool TryGetConnection(uint id, out T connection)
         {
-            return Connections.TryGetValue(id, out connection);
+            return _connections.TryGetValue(id, out connection);
         }
 
         public sealed override void Start()
@@ -55,14 +55,14 @@ namespace Inertia.Network
             {
                 try
                 {
-                    Connections.Clear();
+                    _connections.Clear();
 
-                    Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                    Socket.Bind(new IPEndPoint(string.IsNullOrEmpty(Parameters.Ip) ? IPAddress.Any : IPAddress.Parse(Parameters.Ip), Parameters.Port));
-                    Socket.Listen(1000);
+                    _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                    _socket.Bind(new IPEndPoint(string.IsNullOrEmpty(Parameters.Ip) ? IPAddress.Any : IPAddress.Parse(Parameters.Ip), Parameters.Port));
+                    _socket.Listen(1000);
 
                     OnStarted();
-                    Socket.BeginAccept(new AsyncCallback(OnAcceptConnection), Socket);
+                    _socket.BeginAccept(OnAcceptConnection, _socket);
                 }
                 catch (Exception ex)
                 {
@@ -78,9 +78,9 @@ namespace Inertia.Network
                 throw new ObjectDisposedException(nameof(TcpServerEntity));
             }
 
-            if (Connections != null && Connections.Count > 0)
+            if (_connections != null && _connections.Count > 0)
             {
-                var entities = Connections.Values.ToArray();
+                var entities = _connections.Values.ToArray();
                 foreach (var connection in entities)
                 {
                     connection.Dispose();
@@ -89,8 +89,8 @@ namespace Inertia.Network
 
             if (IsRunning)
             {
-                Socket?.Close();
-                Socket = null;
+                _socket?.Close();
+                _socket = null;
             }
         }
 
@@ -99,10 +99,10 @@ namespace Inertia.Network
             Dispose(true);
         }
 
+        internal protected abstract void OnAcceptConnection(IAsyncResult iar);
+
         protected virtual void OnConnectionConnected(T connection) { }
         protected virtual void OnConnectionDisconnecting(T connection, NetworkDisconnectReason reason) { }
-
-        internal abstract void OnAcceptConnection(IAsyncResult iar);
 
         private void Dispose(bool disposing)
         {

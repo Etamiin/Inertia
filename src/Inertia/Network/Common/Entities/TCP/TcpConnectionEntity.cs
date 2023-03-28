@@ -1,5 +1,6 @@
 ﻿using Inertia.Logging;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Net.Security;
 using System.Net.Sockets;
@@ -15,19 +16,18 @@ namespace Inertia.Network
 
         public ConnectionStatistics Statistics { get; private set; }
         public bool IsDisposed { get; private set; }
-        public bool IsConnected => Socket != null && Socket.Connected;
+        public bool IsConnected => _socket != null && _socket.Connected;
 
-        private protected Socket Socket { get; private set; }
-        private protected BasicReader NetworkDataReader { get; private set; }
-        private protected byte[] Buffer { get; private set; }
+        private protected Socket _socket { get; private set; }
+        private protected BasicReader _networkDataReader { get; private set; }
+        private protected byte[] _buffer { get; private set; }
 
         internal TcpConnectionEntity(Socket socket, uint id) : base(id)
         {
             Statistics = new ConnectionStatistics();
-
-            Socket = socket;
-            NetworkDataReader = new BasicReader();
-            Buffer = new byte[NetworkProtocol.Current.NetworkBufferLength];
+            _socket = socket;
+            _networkDataReader = new BasicReader();
+            _buffer = new byte[NetworkProtocol.Current.NetworkBufferLength];
         }
 
         public sealed override void Send(byte[] data)
@@ -69,21 +69,18 @@ namespace Inertia.Network
                 throw new ObjectDisposedException(nameof(TcpConnectionEntity));
             }
 
-            if (IsConnected)
-            {
-                Disconnecting?.Invoke(this, reason);
-                Disconnecting = null;
+            if (_socket == null) return false;
 
-                Socket?.Disconnect(false);
-                NetworkDataReader?.Dispose();
-                Socket = null;
-                Buffer = null;
+            Disconnecting?.Invoke(this, reason);
+            Disconnecting = null;
 
-                InternalDispose();
-                return true;
-            }
+            _socket?.Disconnect(false);
+            _networkDataReader?.Dispose();
+            _socket = null;
+            _buffer = null;
 
-            return false;
+            InternalDisconnect();
+            return true;
         }
         public void Dispose()
         {
@@ -92,14 +89,14 @@ namespace Inertia.Network
 
         internal protected virtual void BeginReceiveMessages()
         {
-            Socket.BeginReceive(Buffer, 0, Buffer.Length, SocketFlags.None, OnReceiveData, Socket);
+            _socket.BeginReceive(_buffer, 0, _buffer.Length, SocketFlags.None, OnReceiveData, _socket);
         }
         
         private protected virtual void InternalSend(byte[] data)
         {
-            Socket.Send(data);
+            _socket.Send(data);
         }
-        private protected virtual void InternalDispose() { }
+        private protected virtual void InternalDisconnect() { }
         private protected void ProcessReceivedData(int receivedLength)
         {
             if (!IsConnected) return;
@@ -115,7 +112,7 @@ namespace Inertia.Network
                 return;
             }
 
-            NetworkProtocol.ProcessParsing(this, NetworkDataReader.Fill(new ReadOnlySpan<byte>(Buffer, 0, receivedLength)));
+            NetworkProtocol.ProcessParsing(this, _networkDataReader.Fill(new ReadOnlySpan<byte>(_buffer, 0, receivedLength)));
         }
 
         private void OnReceiveData(IAsyncResult iar)
@@ -139,7 +136,7 @@ namespace Inertia.Network
 
             if (IsConnected)
             {
-                Socket.BeginReceive(Buffer, 0, Buffer.Length, SocketFlags.None, OnReceiveData, Socket);
+                _socket.BeginReceive(_buffer, 0, _buffer.Length, SocketFlags.None, OnReceiveData, _socket);
             }
         }
         private void Dispose(bool disposing)

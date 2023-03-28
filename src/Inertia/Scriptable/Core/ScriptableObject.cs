@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
 
 namespace Inertia.Scriptable
 {
@@ -13,11 +14,11 @@ namespace Inertia.Scriptable
             Disposed = 3
         }
 
-        public static T CreateActive<T>(params object[] args) where T : ScriptableObject
+        public static T CreateAndActive<T>(params object[] args) where T : ScriptableObject
         {
             var type = typeof(T);
             var types = args.Select((obj) => obj.GetType()).ToArray();
-            var cnstr = type.GetConstructor(types);
+            var cnstr = type.GetConstructor(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, types, null);
 
             if (cnstr == null)
             {
