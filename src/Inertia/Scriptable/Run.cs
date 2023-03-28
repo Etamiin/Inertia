@@ -39,13 +39,13 @@ namespace Inertia.Scriptable
         {
             new TimedScriptData(action, delayTimeSeconds);
         }
-        public static TimedScriptData DelayedLoop(float delayTimeSeconds, BasicAction action)
-        {
-            return new TimedScriptData(action, delayTimeSeconds, true);
-        }
         public static void Delayed(TimeSpan delayTime, BasicAction action)
         {
             new TimedScriptData(action, delayTime);
+        }
+        public static TimedScriptData DelayedLoop(float delayTimeSeconds, BasicAction action)
+        {
+            return new TimedScriptData(action, delayTimeSeconds, true);
         }
         public static TimedScriptData DelayedLoop(TimeSpan delayTime, BasicAction action)
         {

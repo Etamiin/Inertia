@@ -2,9 +2,8 @@
 
 namespace Inertia.Scriptable
 {
-    public class TimedScriptData : ScriptableData
+    public class TimedScriptData : ScriptableObject
     {
-        internal BasicAction Action;
         internal bool CanBeExecuted
         {
             get
@@ -16,9 +15,10 @@ namespace Inertia.Scriptable
                 return elapsed >= _delayTime;
             }
         }
-        internal bool DisposeWhenExecuted { get; private set; }
-        
-        private TimeSpan _delayTime;
+
+        private readonly BasicAction? _action;
+        private readonly bool _disposeWhenExecuted;
+        private readonly TimeSpan _delayTime;
         private DateTime _startAt;
 
         internal TimedScriptData(BasicAction action) : this(action, TimeSpan.Zero)
@@ -29,27 +29,30 @@ namespace Inertia.Scriptable
         }
         internal TimedScriptData(BasicAction action, TimeSpan delayTime, bool loopExecution = false)
         {
-            Action = action;
+            _disposeWhenExecuted = !loopExecution;
+            _action = action;
             _delayTime = delayTime;
             _startAt = DateTime.Now;
-            DisposeWhenExecuted = !loopExecution;
 
-            if (Action == null) BeginDestroy();
+            if (_action == null)
+            {
+                _disposeWhenExecuted = true;
+            }
         }
 
         internal void Execute()
         {
             try
             {
-                Action.Invoke();
+                _action?.Invoke();
             }
             finally
             {
-                if (!DisposeWhenExecuted)
+                if (!_disposeWhenExecuted)
                 {
                     _startAt = DateTime.Now;
                 }
-                else BeginDestroy();
+                else Dispose();
             }
         }
     }

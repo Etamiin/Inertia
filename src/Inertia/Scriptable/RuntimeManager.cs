@@ -8,24 +8,24 @@ namespace Inertia.Scriptable
         internal static AsyncExecutionQueuePool QueuePool { get; private set; }
 
         private static Dictionary<int, ScriptableExecutionLayer> _executionLayers;
-        private static Dictionary<Type, IScriptable> _componentInstances;
+        private static Dictionary<Type, IScriptableSystem> _componentInstances;
 
         static RuntimeManager()
         {
             QueuePool = new AsyncExecutionQueuePool(500, true);
-            _componentInstances = new Dictionary<Type, IScriptable>();
+            _componentInstances = new Dictionary<Type, IScriptableSystem>();
             _executionLayers = new Dictionary<int, ScriptableExecutionLayer>();
 
             ReflectionProvider.Invalidate();
         }
 
-        internal static IScriptable GetScriptableSystem(Type dataType)
+        internal static IScriptableSystem GetScriptableSystem(Type dataType)
         {
             if (_componentInstances.TryGetValue(dataType, out var component)) return component;
             
             return default;
         }
-        internal static ScriptableExecutionLayer RegisterScriptComponent<T>(ScriptableSystem<T> component) where T : ScriptableData
+        internal static ScriptableExecutionLayer RegisterScriptComponent<T>(ScriptableSystem<T> component) where T : ScriptableObject
         {
             var dataType = typeof(T);
             if (_componentInstances.ContainsKey(dataType))

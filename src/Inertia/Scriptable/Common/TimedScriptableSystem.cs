@@ -6,12 +6,11 @@ namespace Inertia.Scriptable
 {
     internal class TimedScriptableSystem : ScriptableSystem<TimedScriptData>
     {
-        public override void OnProcess(IEnumerable<TimedScriptData> componentDatas)
+        public override bool ProcessIndividualTryCatch => false;
+
+        public override void OnProcess(TimedScriptData script)
         {
-            foreach (var script in componentDatas)
-            {
-                if (script.CanBeExecuted) script.Execute();
-            }
+            if (script.CanBeExecuted) script.Execute();
         }
 
         public override void OnExceptionThrown(Exception exception) { }

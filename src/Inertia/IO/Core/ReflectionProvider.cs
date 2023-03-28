@@ -240,9 +240,9 @@ namespace Inertia
                 IsRuntimeCallOverriden = true;
             }
 
-            if (typeof(IScriptable).IsAssignableFrom(type))
+            if (typeof(IScriptableSystem).IsAssignableFrom(type))
             {
-                TryCreateInstance<IScriptable>(type, Type.EmptyTypes);
+                TryCreateInstance<IScriptableSystem>(type, Type.EmptyTypes);
             }
         }
         private static void ReadTypeNetworkInformations(Type type)

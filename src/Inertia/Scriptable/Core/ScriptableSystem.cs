@@ -1,12 +1,13 @@
-﻿using Inertia.Logging;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Inertia.Scriptable
 {
-    public abstract class ScriptableSystem<T> : IScriptable where T : ScriptableData
+    public abstract class ScriptableSystem<T> : IScriptableSystem where T : ScriptableObject
     {
+        public abstract bool ProcessIndividualTryCatch { get; }
+
         public virtual int ExecutionLayer { get; }
         public float DeltaTime { get; private set; }
         public bool IsActive
@@ -22,19 +23,19 @@ namespace Inertia.Scriptable
         private readonly object _locker;
         private bool _processingRegistered;
 
-        public ScriptableSystem()
+        protected ScriptableSystem()
         {
             _locker = new object();
             _componentDatas = new List<T>();
             _executionLayer = RuntimeManager.RegisterScriptComponent(this);
         }
 
-        public abstract void OnProcess(IEnumerable<T> componentDatas);
+        public abstract void OnProcess(T obj);
         public abstract void OnExceptionThrown(Exception exception);
 
-        void IScriptable.RegisterComponentData(ScriptableData componentData)
+        void IScriptableSystem.RegisterComponentData(ScriptableObject obj)
         {
-            if (componentData is T tData)
+            if (obj is T tData)
             {
                 lock (_locker)
                 {
@@ -46,13 +47,11 @@ namespace Inertia.Scriptable
                         _processingRegistered = true;
                     }
                 }
-
-                componentData.Disposing += ComponentData_Disposing;
             }
         }
-        void IScriptable.UnregisterComponentData(ScriptableData componentData)
+        void IScriptableSystem.UnregisterComponentData(ScriptableObject obj)
         {
-            if (componentData is T tData)
+            if (obj is T tData)
             {
                 lock (_locker)
                 {
@@ -64,8 +63,6 @@ namespace Inertia.Scriptable
                         _processingRegistered = false;
                     }
                 }
-                
-                componentData.Disposing -= ComponentData_Disposing;
             }
         }
 
@@ -73,39 +70,52 @@ namespace Inertia.Scriptable
         {
             DeltaTime = deltaTime;
 
-            if (IsActive)
+            if (!IsActive) return;
+            lock (_locker)
             {
-                lock (_locker)
+                var executableDatas = _componentDatas.Where((obj) => obj.State == ScriptableObject.ScriptableDataState.Initialized).ToArray();
+
+                if (ProcessIndividualTryCatch)
                 {
-                    var executableDatas = _componentDatas.Where((data) => data.State == ScriptableData.ScriptableDataState.Initialized).ToArray();
-                    
+                    foreach (var obj in executableDatas)
+                    {
+                        if (obj.State == ScriptableObject.ScriptableDataState.Disposed) continue;
+
+                        try
+                        {
+                            OnProcess(obj);
+                        }
+                        catch (Exception ex)
+                        {
+                            OnExceptionThrown(ex);
+                        }
+                    }
+                }
+                else
+                {
                     try
                     {
-                        OnProcess(executableDatas);
+                        foreach (var obj in executableDatas)
+                        {
+                            OnProcess(obj);
+                        }
                     }
                     catch (Exception ex)
                     {
                         OnExceptionThrown(ex);
                     }
+                }
 
-                    var notInitializedDatas = _componentDatas.Where((data) => data.State != ScriptableData.ScriptableDataState.Initialized).ToArray();
-                    foreach (var data in notInitializedDatas)
+                var notInitializedDatas = _componentDatas.Where((obj) => obj.State != ScriptableObject.ScriptableDataState.Initialized).ToArray();
+                foreach (var obj in notInitializedDatas)
+                {
+                    if (obj.State == ScriptableObject.ScriptableDataState.Disposing)
                     {
-                        if (data.State == ScriptableData.ScriptableDataState.Destroying)
-                        {
-                            data.Dispose();
-                        }
-                        else if (data.State == ScriptableData.ScriptableDataState.Initializing)
-                        {
-                            data.State = ScriptableData.ScriptableDataState.Initialized;
-                        }
+                        obj.State = ScriptableObject.ScriptableDataState.Disposed;
+                        ((IScriptableSystem)this).UnregisterComponentData(obj);
                     }
                 }
             }
-        }
-        private void ComponentData_Disposing(ScriptableData componentData)
-        {
-            ((IScriptable)this).UnregisterComponentData(componentData);
         }
     }
 }
