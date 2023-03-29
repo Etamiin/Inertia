@@ -58,7 +58,7 @@ namespace Inertia.Network
                     _connections.Clear();
 
                     _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                    _socket.Bind(new IPEndPoint(string.IsNullOrEmpty(Parameters.Ip) ? IPAddress.Any : IPAddress.Parse(Parameters.Ip), Parameters.Port));
+                    _socket.Bind(new IPEndPoint(string.IsNullOrWhiteSpace(Parameters.Ip) ? IPAddress.Any : IPAddress.Parse(Parameters.Ip), Parameters.Port));
                     _socket.Listen(1000);
 
                     OnStarted();

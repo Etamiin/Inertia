@@ -97,13 +97,9 @@ namespace Inertia
             _writer.WriteByte(Convert.ToByte(value));
             return this;
         }
-        public BasicWriter SetBoolFlag(params bool[] values)
-        {
-            return SetByte(values.ToByte());
-        }
         public BasicWriter SetString(string value)
         {
-            return SetBytes(!string.IsNullOrEmpty(value) ? _encoding.GetBytes(value) : new byte[0]);
+            return SetBytes(!string.IsNullOrWhiteSpace(value) ? _encoding.GetBytes(value) : new byte[0]);
         }
         public BasicWriter SetFloat(float value)
         {

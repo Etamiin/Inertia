@@ -6,18 +6,18 @@ namespace Inertia
 {
     public class AsyncExecutionQueuePool : IDisposable
     {
-        private readonly static TimeSpan MinTimeQueueAlive= TimeSpan.FromMinutes(1);
+        private readonly static TimeSpan MinTimeQueueAlive = TimeSpan.FromMinutes(5);
 
         public bool IsDisposed { get; private set; }
 
         internal int QueueCapacity { get; set; }
 
+        private readonly ConcurrentDictionary<int, SyncQueue> _queues;
+        private readonly object _locker;
+        private readonly TimeSpan _maxTimeQueueAlive;
+        private readonly bool _limitProcessorUsage;
         private SafeOrderedIntProvider _idProvider;
-        private ConcurrentDictionary<int, SyncQueue> _queues;
-        private SyncQueue _currentQueue;
-        private object _locker;
-        private TimeSpan _maxTimeQueueAlive;
-        private bool _limitProcessorUsage;
+        private SyncQueue? _currentQueue;
 
         public AsyncExecutionQueuePool(int queueCapacity, bool limitProcessorUsage) : this(queueCapacity, limitProcessorUsage, TimeSpan.FromMinutes(5))
         {
@@ -52,7 +52,7 @@ namespace Inertia
                     if (queue == null)
                     {
                         queue = new SyncQueue(_idProvider.NextValue(), _maxTimeQueueAlive, _limitProcessorUsage);
-                        queue.Disposing += Queue_Disposing;
+                        queue.Disposing += QueueDisposing;
 
                         _queues.TryAdd(queue.Id, queue);
                     }
@@ -65,17 +65,17 @@ namespace Inertia
         }
         public void Dispose()
         {
-            OnDispose(true);
+            Dispose(true);
         }
 
-        private void OnDispose(bool disposing)
+        private void Dispose(bool disposing)
         {
             if (IsDisposed) return;
 
+            IsDisposed = true;
+
             if (disposing)
             {
-                IsDisposed = true;
-
                 SyncQueue[] queues;
                 lock (_locker)
                 {
@@ -84,18 +84,17 @@ namespace Inertia
 
                 foreach (var queue in queues)
                 {
-                    queue.Dispose();
+                    queue.BeginDispose();
                 }
 
                 _currentQueue = null;
-                _idProvider = null;
             }
         }
-        private void Queue_Disposing(SyncQueue queue)
+        private void QueueDisposing(SyncQueue queue)
         {
             _queues.TryRemove(queue.Id, out _);
 
-            queue.Disposing -= Queue_Disposing;
+            queue.Disposing -= QueueDisposing;
         }
     }
 }

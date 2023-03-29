@@ -112,12 +112,12 @@ namespace Inertia.Network
         {
             Current = new DefaultNetworkProtocol();
 
-            if (ReflectionProvider.NetworkClientUsedInAssemblies)
+            if (ReflectionProvider.IsNetworkClientUsedInAssemblies)
             {
                 ClientExecutionPool = new AsyncExecutionQueuePool(Current.ClientMessagePerQueueCapacity, false);
             }
 
-            if (ReflectionProvider.NetworkServerUsedInAssemblies)
+            if (ReflectionProvider.IsNetworkServerUsedInAssemblies)
             {
                 ServerAsyncPool = new ServerMessagePoolExecutor(Current.ConnectionPerQueueInPool);
             }

@@ -1,5 +1,4 @@
-﻿using Inertia.Scriptable;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
 
@@ -18,16 +17,13 @@ namespace Inertia
         {
             get
             {
-                if (_queue == null) return -1;
-
                 return _queue.Count;
             }
         }
 
-        private ConcurrentQueue<BasicAction> _queue;
-        private bool _isRunning;
-        private TimeSpan _maxTimeQueueAlive;
-        private bool _limitProcessorUsage;
+        private readonly ConcurrentQueue<BasicAction> _queue;
+        private readonly TimeSpan _maxTimeQueueAlive;
+        private readonly bool _limitProcessorUsage;
 
         internal SyncQueue(int id, TimeSpan maxTimeQueueAlive, bool limitProcessorUsage)
         {
@@ -43,16 +39,15 @@ namespace Inertia
         {
             _queue.Enqueue(action);
         }
-        internal void Dispose()
+        internal void BeginDispose()
         {
             DisposeRequested = true;
         }
 
         private async void ProcessQueue()
         {
-            _isRunning = true;
-
-            while (_isRunning)
+            var isRunning = true;
+            while (isRunning)
             {
                 if (_queue.Count == 0)
                 {
@@ -62,15 +57,14 @@ namespace Inertia
 
                         EmptySince = null;
                         _queue?.Clear();
-                        _queue = null;
-                        _isRunning = false;
+                        isRunning = false;
                     }
                     else
                     {
                         if (EmptySince.HasValue)
                         {
                             var span = DateTime.Now - EmptySince.Value;
-                            if (span >= _maxTimeQueueAlive) Dispose();
+                            if (span >= _maxTimeQueueAlive) BeginDispose();
                         }
                         else
                         {

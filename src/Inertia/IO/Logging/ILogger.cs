@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Inertia.Logging
+﻿namespace Inertia.Logging
 {
     public interface ILogger 
     {

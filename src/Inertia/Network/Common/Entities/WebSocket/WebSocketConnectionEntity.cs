@@ -25,7 +25,7 @@ namespace Inertia.Network
             if (_serverCertificate != null)
             {
                 _sslStream = new SslStream(new NetworkStream(socket), false);
-                Logger.Default.Warn("ssl stream OK");
+                SimpleLogger.Default.Warn("ssl stream OK");
             }
         }
 
@@ -90,14 +90,14 @@ namespace Inertia.Network
             }
             else if (State == WebSocketConnectionState.Connected)
             {
-                Logger.Default.Warn("sending ssl data as authentified");
+                SimpleLogger.Default.Warn("sending ssl data as authentified");
 
                 var wsProtocol = (WebSocketNetworkProtocol)NetworkProtocol.Current;
                 _sslStream.Write(wsProtocol.WriteWsMessage(data, WebSocketOpCode.BinaryFrame));
             }
             else
             {
-                Logger.Default.Warn("sending normal ssl data");
+                SimpleLogger.Default.Warn("sending normal ssl data");
 
                 _sslStream.Write(data);
             }
@@ -130,7 +130,7 @@ namespace Inertia.Network
             try
             {
                 var received = ((SslStream)iar.AsyncState).EndRead(iar);
-                Logger.Default.Warn("PROCESSING: " + received + " <> " + State);
+                SimpleLogger.Default.Warn("PROCESSING: " + received + " <> " + State);
 
                 ProcessReceivedData(received);
             }

@@ -1,4 +1,6 @@
-﻿namespace Inertia.Network
+﻿using System;
+
+namespace Inertia.Network
 {
     public abstract class NetworkMessageWithBag : NetworkMessage
     {

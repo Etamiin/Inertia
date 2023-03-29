@@ -5,7 +5,7 @@ namespace Inertia
 {
     public abstract class BasicCommand
     {
-        internal static void PreExecute(BasicCommand command, string[] arguments, object[] dataCollection, bool containsQuotes)
+        internal static void PreExecute(BasicCommand command, string[] arguments, object? state, bool containsQuotes)
         {
             if (containsQuotes)
             {
@@ -28,11 +28,11 @@ namespace Inertia
                 arguments = parsedArguments.ToArray();
             }
 
-            command.OnExecute(new BasicCommandArguments(arguments, dataCollection));
+            command.OnExecute(new CommandArguments(arguments, state));
         }
         
         public abstract string Name { get; }
         
-        public abstract void OnExecute(BasicCommandArguments arguments);
+        public abstract void OnExecute(CommandArguments arguments);
     }
 }

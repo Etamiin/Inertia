@@ -21,10 +21,10 @@ namespace Inertia.Plugins
 
         public void Dispose()
         {
-            OnDispose(true);
+            Dispose(true);
         }
 
-        private void OnDispose(bool disposing)
+        private void Dispose(bool disposing)
         {
             if (IsDisposed) return;
 
@@ -36,8 +36,9 @@ namespace Inertia.Plugins
 
                 Plugin = null;
                 Token = null;
-                IsDisposed = true;
             }
+
+            IsDisposed = true;
         }
     }
 }

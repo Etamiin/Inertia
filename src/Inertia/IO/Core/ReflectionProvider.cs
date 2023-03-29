@@ -69,8 +69,8 @@ namespace Inertia
         }
 
         internal static bool IsRuntimeCallOverriden { get; private set; }
-        internal static bool NetworkClientUsedInAssemblies { get; private set; }
-        internal static bool NetworkServerUsedInAssemblies { get; private set; }
+        internal static bool IsNetworkClientUsedInAssemblies { get; private set; }
+        internal static bool IsNetworkServerUsedInAssemblies { get; private set; }
 
         private readonly static Dictionary<Type, SerializablePropertyMemory[]> _properties;
         private readonly static Dictionary<string, BasicCommand> _commands;
@@ -183,7 +183,7 @@ namespace Inertia
             }
             catch (Exception ex)
             {
-                throw new CriticalException($"{nameof(ReflectionProvider)} failed to load.", ex);
+                throw new TypeLoadException($"{nameof(ReflectionProvider)} failed to load.", ex);
             }
         }
         private static T TryCreateInstance<T>(Type owner, Type[] parametersType, params object[] parameters)
@@ -193,17 +193,17 @@ namespace Inertia
 
             return (T)constructor.Invoke(parameters);
         }
-        private static void RunPluginExecution(IPlugin instance, object[] executionParameters)
+        private static void RunPluginExecution(IPlugin pluginInstance, object[] executionParameters)
         {
             try
             {
-                instance.Execute(executionParameters);
+                pluginInstance.Execute(executionParameters);
             }
             catch (Exception ex)
             {
-                instance.Error(ex);
+                pluginInstance.Error(ex);
 
-                if (instance.StopOnCatchedError) TryStopPlugin(instance.Identifier);
+                if (pluginInstance.StopOnCatchedError) TryStopPlugin(pluginInstance.Identifier);
             }
         }
         private static void ReadTypeIOInformations(Type type)
@@ -247,14 +247,14 @@ namespace Inertia
         }
         private static void ReadTypeNetworkInformations(Type type)
         {
-            if (!NetworkClientUsedInAssemblies && type.IsSubclassOf(typeof(TcpClientEntity)))
+            if (!IsNetworkClientUsedInAssemblies && type.IsSubclassOf(typeof(TcpClientEntity)))
             {
-                NetworkClientUsedInAssemblies = true;
+                IsNetworkClientUsedInAssemblies = true;
             }
 
-            if (!NetworkServerUsedInAssemblies && type.IsSubclassOf(typeof(TcpServerEntity)))
+            if (!IsNetworkServerUsedInAssemblies && type.IsSubclassOf(typeof(TcpServerEntity)))
             {
-                NetworkServerUsedInAssemblies = true;
+                IsNetworkServerUsedInAssemblies = true;
             }            
 
             if (type.IsSubclassOf(typeof(NetworkMessage)))
