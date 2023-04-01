@@ -58,17 +58,14 @@ namespace Inertia.Network
                 Disconnecting?.Invoke(this, reason);
                 Disconnecting = null;
 
-                try
+                if (IsConnected)
                 {
                     _socket?.Disconnect(false);
                 }
-                catch { }
-                finally
-                {
-                    _networkDataReader?.Dispose();
-                    _socket = null;
-                    _buffer = null;
-                }
+
+                _networkDataReader?.Dispose();
+                _socket = null;
+                _buffer = null;
             }
 
             ProcessClean();

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text;
 using Inertia;
+using Inertia.IO;
 
 namespace System
 {
@@ -31,16 +32,20 @@ namespace System
             return IOHelper.GetSHA256(encoding.GetBytes(text));
         }
 
-        public static byte[] GzipCompress(this byte[] data, out bool hasBetterSize)
+        public static ZipCompressionResult GzipCompress(this byte[] data)
         {
-            return IOHelper.GzipCompress(data, out hasBetterSize);
+            return IOHelper.GzipCompress(data);
         }
-        public static byte[] GzipDecompress(this byte[] compressedData)
+        public static ZipCompressionResult GzipDecompress(this byte[] compressedData)
         {
             return IOHelper.GzipDecompress(compressedData);
         }
 
-        public static bool GetBit(this ref byte value, int index, EndiannessType endianness = EndiannessType.Auto)
+        public static bool GetBit(this ref byte value, int index)
+        {
+            return GetBit(ref value, index, EndiannessType.Auto);
+        }
+        public static bool GetBit(this ref byte value, int index, EndiannessType endianness)
         {
             if (index < 0 || index >= 8) throw new ArgumentOutOfRangeException(nameof(index));
 
@@ -56,7 +61,11 @@ namespace System
 
             return (value & (1 << index)) != 0;
         }
-        public static byte SetBit(this ref byte value, int index, bool bitValue, EndiannessType endianness = EndiannessType.Auto)
+        public static byte SetBit(this ref byte value, int index, bool bitValue)
+        {
+            return SetBit(ref value, index, bitValue, EndiannessType.Auto);
+        }
+        public static byte SetBit(this ref byte value, int index, bool bitValue, EndiannessType endianness)
         {
             if (index < 0 || index >= 8) throw new ArgumentOutOfRangeException(nameof(index));
 

@@ -16,7 +16,7 @@ namespace Inertia
         private readonly object _locker;
         private readonly TimeSpan _maxTimeQueueAlive;
         private readonly bool _limitProcessorUsage;
-        private SafeOrderedIntProvider _idProvider;
+        private readonly SafeOrderedIntProvider _idProvider;
         private SyncQueue? _currentQueue;
 
         public AsyncExecutionQueuePool(int queueCapacity, bool limitProcessorUsage) : this(queueCapacity, limitProcessorUsage, TimeSpan.FromMinutes(5))

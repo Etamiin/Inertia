@@ -10,7 +10,7 @@ namespace Inertia.Network
         protected ILogger? Logger => _parameters.Logger;
         protected NetworkProtocol Protocol => _parameters.Protocol;
         private protected readonly SafeOrderedIntProvider IdProvider;
-        private TParameters _parameters;
+        private readonly TParameters _parameters;
 
         protected NetworkServerEntity(TParameters parameters)
         {

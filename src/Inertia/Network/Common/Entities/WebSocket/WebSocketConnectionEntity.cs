@@ -98,6 +98,7 @@ namespace Inertia.Network
             _sslStream?.Dispose();
             _sslStream = null;
             _serverCertificate = null;
+            _wsProtocol = null;
 
             State = WebSocketConnectionState.Closed;
         }

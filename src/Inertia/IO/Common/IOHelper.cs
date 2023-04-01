@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using Inertia.IO;
+using System.IO;
 using System.IO.Compression;
 using System.Security.Cryptography;
 using System.Text;
@@ -44,7 +45,7 @@ namespace Inertia
             }
         }
 
-        public static byte[] GzipCompress(byte[] data, out bool hasBetterSize)
+        public static ZipCompressionResult GzipCompress(byte[] data)
         {
             using (var ms = new MemoryStream())
             {
@@ -55,11 +56,10 @@ namespace Inertia
 
                 var compressedData = ms.ToArray();
 
-                hasBetterSize = compressedData.Length < data.Length;
-                return compressedData;
+                return new ZipCompressionResult(compressedData, compressedData.Length < data.Length);
             }
         }
-        public static byte[] GzipDecompress(byte[] compressedData)
+        public static ZipCompressionResult GzipDecompress(byte[] compressedData)
         {
             using (var cms = new MemoryStream(compressedData))
             {
@@ -70,7 +70,7 @@ namespace Inertia
                         gzs.CopyTo(ms);
                     }
 
-                    return ms.ToArray();
+                    return new ZipCompressionResult(ms.ToArray());
                 }
             }
         }

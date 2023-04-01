@@ -209,7 +209,7 @@ namespace Inertia
         {
             if (TryReadSize(16, out var data))
             {
-                var bits = new int[]
+                var bits = new[]
                 {
                     BitConverter.ToInt32(data, 0),
                     BitConverter.ToInt32(data, 4),
@@ -421,13 +421,7 @@ namespace Inertia
 
         public void Dispose()
         {
-            if (!IsDisposed)
-            {
-                _reader.Close();
-                _reader.Dispose();
-
-                IsDisposed = true;
-            }
+            Dispose(true);
         }
 
         private bool IsReadable(int length)
@@ -453,13 +447,26 @@ namespace Inertia
             if (UnreadedLength >= length)
             {
                 data = new byte[length];
-                _reader.Read(data);
+                var readedLength = _reader.Read(data);
 
-                return true;
+                return readedLength == data.Length;
             }
 
             data = null;
             return false;
+        }
+        private void Dispose(bool disposing)
+        {
+            if (IsDisposed) return;
+
+            if (disposing)
+            {
+                _reader.Close();
+                _reader.Dispose();
+                _reader = null;
+            }
+
+            IsDisposed = true;
         }
     }
 }

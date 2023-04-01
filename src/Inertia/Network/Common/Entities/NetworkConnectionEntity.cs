@@ -6,7 +6,7 @@
 
         internal ServerMessageQueue AssignedMessageQueue => _messageQueue;
 
-        private ServerMessageQueue _messageQueue;
+        private readonly ServerMessageQueue _messageQueue;
         private protected NetworkProtocol _protocol { get; private set; }
 
         protected NetworkConnectionEntity(uint id, NetworkProtocol protocol)

@@ -45,7 +45,7 @@ namespace Inertia.Network
                 cnstr = messageType.GetConstructors()[0];
                 var parameters = cnstr
                     .GetParameters()
-                    .Select((p) => (object)null)
+                    .Select((_) => (object)null)
                     .ToArray();
 
                 return (NetworkMessage)cnstr.Invoke(parameters);
@@ -58,15 +58,8 @@ namespace Inertia.Network
 
         public static void SetDefaultProtocol(DefaultNetworkProtocols protocolType)
         {
-            switch (protocolType)
-            {
-                case DefaultNetworkProtocols.Default:
-                    SetDefaultProtocol(DefaultProtocol);
-                    break;
-                case DefaultNetworkProtocols.WebSocket:
-                    SetDefaultProtocol(DefaultWsProtocol);
-                    break;
-            }
+            if (protocolType == DefaultNetworkProtocols.Default) SetDefaultProtocol(DefaultProtocol);
+            else if (protocolType == DefaultNetworkProtocols.WebSocket) SetDefaultProtocol(DefaultWsProtocol);
         }
         public static void SetDefaultProtocol(NetworkProtocol protocol)
         {

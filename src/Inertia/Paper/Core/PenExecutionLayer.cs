@@ -5,15 +5,12 @@ using System.Threading.Tasks;
 
 namespace Inertia.Scriptable
 {
-    internal sealed class PenExecutionLayer
+    internal sealed class PenExecutionLayer : IDisposable
     {
         internal event BasicAction<float>? ComponentsUpdate;
-        
-        internal void OnComponentsUpdate(float deltaTime)
-        {
-            ComponentsUpdate?.Invoke(deltaTime);
-        }
 
+        internal bool IsDisposed { get; private set; }
+        
         internal PenExecutionLayer()
         {
             if (!ReflectionProvider.IsPaperCallOverriden)
@@ -22,9 +19,19 @@ namespace Inertia.Scriptable
             }
         }
 
+        internal void OnComponentsUpdate(float deltaTime)
+        {
+            ComponentsUpdate?.Invoke(deltaTime);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+
         private void ExecuteCycle(Clock clock)
         {
-            while (true)
+            while (!IsDisposed)
             {
                 var currentMsUpdate = clock.GetElapsedSeconds();
                 var targetMsUpdate = 1000.0d / PaperFactory.TargetTickPerSecond;
@@ -35,9 +42,9 @@ namespace Inertia.Scriptable
                     else
                     {
                         var msToSleep = (targetMsUpdate - currentMsUpdate) / 1000.0d;
-                        var durationTicks = Math.Round(msToSleep * Stopwatch.Frequency);
+                        var sleepTicks = Math.Round(msToSleep * Stopwatch.Frequency);
 
-                        while (clock.ElapsedTicks < durationTicks) { }
+                        while (clock.ElapsedTicks < sleepTicks) { }
                     }
 
                     currentMsUpdate = clock.GetElapsedSeconds();
@@ -46,6 +53,17 @@ namespace Inertia.Scriptable
                 clock.Reset();
                 ComponentsUpdate?.Invoke((float)currentMsUpdate);
             }
+        }
+        private void Dispose(bool disposing)
+        {
+            if (IsDisposed) return;
+
+            if (disposing)
+            {
+                //
+            }
+
+            IsDisposed = true;
         }
     }
 }

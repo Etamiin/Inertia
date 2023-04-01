@@ -225,7 +225,11 @@ namespace Inertia
             return this;
         }
 
-        public BasicWriter SetValue(object value, Type precisedType = null)
+        public BasicWriter SetValue(object value)
+        {
+            return SetValue(value, null);
+        }
+        public BasicWriter SetValue(object value, Type precisedType)
         {
             if (value == null) return this;
             if (precisedType == null)
@@ -258,7 +262,7 @@ namespace Inertia
             }
 
             return this;
-        }        
+        }
         public BasicWriter SetValues(params object[] values)
         {
             foreach (var obj in values)
@@ -288,14 +292,22 @@ namespace Inertia
 
         public void Dispose()
         {
-            if (!IsDisposed)
+            Dispose(true);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (IsDisposed) return;
+
+            if (disposing)
             {
                 _writer.Flush();
                 _writer.Close();
                 _writer.Dispose();
-
-                IsDisposed = true;
+                _writer = null;
             }
+
+            IsDisposed = true;
         }
     }
 }
