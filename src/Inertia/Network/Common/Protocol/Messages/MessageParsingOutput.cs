@@ -16,11 +16,7 @@ namespace Inertia.Network
 
         public void AddMessage(NetworkMessage message)
         {
-            if (IsDisposed)
-            {
-                throw new ObjectDisposedException(nameof(MessageParsingOutput));
-            }
-
+            this.ThrowIfDisposable(IsDisposed);
             Messages.Add(message);
         }
         public void Dispose()

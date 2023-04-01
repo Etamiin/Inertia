@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Net.Sockets;
 
 namespace Inertia.Network
@@ -7,24 +8,27 @@ namespace Inertia.Network
     {
         protected WebSocketServerEntity(WebSocketServerParameters parameters) : base(parameters)
         {
+            if (parameters.Protocol == NetworkProtocolFactory.DefaultProtocol)
+            {
+                parameters.Protocol = NetworkProtocolFactory.DefaultWsProtocol;
+            }
         }
 
-        internal protected override void OnAcceptConnection(IAsyncResult iar)
+        internal override void OnAcceptConnection(IAsyncResult iar)
         {
             try
             {
                 var socket = ((Socket)iar.AsyncState).EndAccept(iar);
-                var connection = new WebSocketConnectionEntity(socket, (uint)IdProvider.NextValue(), Parameters.SslCertificate);
+                var connection = new WebSocketConnectionEntity(socket, (uint)IdProvider.NextValue(), Protocol, Parameters.SslCertificate);
                 connection.ConnectionEstablished += ConnectionEstablished;
                 connection.Disconnecting += ConnectionDisconnecting;
 
                 _connections.TryAdd(connection.Id, connection);
                 connection.BeginReceiveMessages();
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Logger.Error(e);
-                if (e is SocketException || e is ObjectDisposedException)
+                if (ex is SocketException || ex is ObjectDisposedException)
                 {
                     return;
                 }
@@ -32,7 +36,7 @@ namespace Inertia.Network
 
             if (IsRunning)
             {
-                _socket.BeginAccept(OnAcceptConnection, _socket);
+                _socket?.BeginAccept(OnAcceptConnection, _socket);
             }
         }
         

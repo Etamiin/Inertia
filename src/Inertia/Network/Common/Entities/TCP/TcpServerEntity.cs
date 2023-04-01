@@ -3,18 +3,20 @@ using System.Net.Sockets;
 
 namespace Inertia.Network
 {
-    public abstract class TcpServerEntity : BaseTcpServer<TcpConnectionEntity, ServerParameters>
+    public abstract class TcpServerEntity : BaseTcpServer<TcpConnectionEntity, TcpServerParameters>
     {        
-        protected TcpServerEntity(ServerParameters parameters) : base(parameters)
+        protected TcpServerEntity(TcpServerParameters parameters) : base(parameters)
         {
         }
 
-        internal protected override void OnAcceptConnection(IAsyncResult iar)
+        internal override void OnAcceptConnection(IAsyncResult iar)
         {
             try
             {
                 var socket = ((Socket)iar.AsyncState).EndAccept(iar);
-                var connection = new TcpConnectionEntity(socket, (uint)IdProvider.NextValue());
+                var connection = new TcpConnectionEntity(socket, (uint)IdProvider.NextValue(), Protocol);
+
+                connection.Disconnecting += ConnectionDisconnecting;
 
                 _connections.TryAdd(connection.Id, connection);
 
@@ -31,9 +33,10 @@ namespace Inertia.Network
 
             if (IsRunning)
             {
-                _socket.BeginAccept(OnAcceptConnection, _socket);
+                _socket?.BeginAccept(OnAcceptConnection, _socket);
             }
         }
+
         private void ConnectionDisconnecting(TcpConnectionEntity connection, NetworkDisconnectReason reason)
         {
             _connections.TryRemove(connection.Id, out _);

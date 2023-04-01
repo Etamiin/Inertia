@@ -10,30 +10,27 @@ namespace Inertia.Network
 
         public bool IsDisposed { get; private set; }
 
-        private readonly byte[] _buffer;
-        private BasicReader? _reader;
+        private BasicReader? _networkDataReader;
         private Socket? _socket;
-
-        protected TcpClientEntity(string ip, int port) : base(ip, port)
-        {
-            _buffer = new byte[NetworkProtocol.Current.NetworkBufferLength];
-        }
+        private byte[] _buffer;
         
+        protected TcpClientEntity(ClientParameters parameters) : base(parameters)
+        {
+        }
+
         public sealed override void Connect()
         {
-            if (IsDisposed)
-            {
-                throw new ObjectDisposedException(nameof(TcpClientEntity));
-            }
+            this.ThrowIfDisposable(IsDisposed);
 
             if (!IsConnected)
             {
                 try
                 {
                     _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                    _socket.Connect(new IPEndPoint(IPAddress.Parse(Ip), Port));
+                    _socket.Connect(new IPEndPoint(IPAddress.Parse(_parameters.Ip), _parameters.Port));
                     
-                    _reader = new BasicReader();
+                    _networkDataReader = new BasicReader();
+                    _buffer = new byte[Protocol.NetworkBufferLength];
 
                     Connected();
                     _socket.BeginReceive(_buffer, 0, _buffer.Length, SocketFlags.None, OnReceiveData, _socket);
@@ -46,39 +43,41 @@ namespace Inertia.Network
         }
         public sealed override bool Disconnect(NetworkDisconnectReason reason)
         {
-            if (IsDisposed)
-            {
-                throw new ObjectDisposedException(nameof(TcpClientEntity));
-            }
+            this.ThrowIfDisposable(IsDisposed);
 
-            if (IsConnected)
+            if (_socket != null)
             {
                 Disconnecting(reason);
 
-                _socket?.Disconnect(false);
-                _reader?.Dispose();
+                try
+                {
+                    _socket?.Disconnect(false);
+                }
+                catch { }
+                finally
+                {
+                    _networkDataReader?.Dispose();
+                    _buffer = null;
+                }
 
                 return true;
             }
 
             return false;
         }
-        public sealed override void Send(byte[] data)
+        public sealed override void Send(byte[] dataToSend)
         {
-            if (IsDisposed)
-            {
-                throw new ObjectDisposedException(nameof(TcpClientEntity));
-            }
+            this.ThrowIfDisposable(IsDisposed);
 
-            if (data == null || data.Length == 0)
+            if (dataToSend == null || dataToSend.Length == 0)
             {
-                throw new ArgumentNullException(nameof(data));
+                throw new ArgumentNullException(nameof(dataToSend));
             }
 
             if (IsConnected)
             {
                 try { 
-                    _socket?.Send(data);
+                    _socket?.Send(dataToSend);
                 }
                 catch 
                 {
@@ -99,13 +98,12 @@ namespace Inertia.Network
                 int received = ((Socket)iar.AsyncState).EndReceive(iar);
                 
                 if (!IsConnected) return;
-
                 if (received == 0)
                 {
                     throw new SocketException((int)SocketError.SocketError);
                 }
 
-                NetworkProtocol.ProcessParsing(this, _reader.Fill(new ReadOnlySpan<byte>(_buffer, 0, received)));
+                NetworkProtocolFactory.ProcessParsing(Protocol, this, _networkDataReader.Fill(new ReadOnlySpan<byte>(_buffer, 0, received)));
             }
             catch (Exception e)
             {

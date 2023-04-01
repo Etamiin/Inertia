@@ -1,9 +1,6 @@
 ﻿namespace Inertia.Network
 {
-    /// <summary>
-    /// Represents the default network protocol used by network entities.
-    /// </summary>
-    public sealed class DefaultNetworkProtocol : NetworkProtocol
+    internal sealed class DefaultNetworkProtocol : NetworkProtocol
     {
         public override int NetworkBufferLength => 4096;
         public override int ConnectionPerQueueInPool => 500;
@@ -14,11 +11,6 @@
         {
         }
 
-        /// <summary>
-        /// Occurs when a <see cref="NetworkMessage"/> is requested to be written before being sent.
-        /// </summary>
-        /// <param name="message"></param>
-        /// <returns></returns>
         public override byte[] SerializeMessage(NetworkMessage message)
         {
             using (var writer = new BasicWriter())
@@ -37,14 +29,7 @@
                 return writer.ToArray();
             }
         }
-        /// <summary>
-        /// Occurs when data are received and have to be parsed
-        /// </summary>
-        /// <param name="receiver"></param>
-        /// <param name="reader"></param>
-        /// <param name="output"></param>
-        /// <returns></returns>
-        public override bool ParseMessage(object receiver, BasicReader reader, MessageParsingOutput output)
+        public override bool ParseMessage(INetworkEntity receiver, BasicReader reader, MessageParsingOutput output)
         {
             reader.SetPosition(0);
 
@@ -57,7 +42,7 @@
 
                     if (reader.UnreadedLength < msgSize) break;
 
-                    var message = CreateMessage(msgId);
+                    var message = CreateMessageById(msgId);
                     if (message == null)
                     {
                         reader
@@ -76,8 +61,7 @@
             }
             catch
             {
-                //Transform type to NetworkConnectionEntity for UDP support
-                if (receiver is TcpConnectionEntity connection)
+                if (receiver is NetworkConnectionEntity connection)
                 {
                     connection.Disconnect(NetworkDisconnectReason.InvalidDataReceived);
                 }

@@ -69,20 +69,14 @@ namespace Inertia
 
         public BasicWriter SetPosition(long position)
         {
-            if (IsDisposed)
-            {
-                throw new ObjectDisposedException(nameof(BasicWriter));
-            }
+            this.ThrowIfDisposable(IsDisposed);
 
             _writer.Position = Math.Min(position, TotalLength);
             return this;
         }
         public long GetPosition()
         {
-            if (IsDisposed)
-            {
-                throw new ObjectDisposedException(nameof(BasicWriter));
-            }
+            this.ThrowIfDisposable(IsDisposed);
 
             return _writer.Position;
         }

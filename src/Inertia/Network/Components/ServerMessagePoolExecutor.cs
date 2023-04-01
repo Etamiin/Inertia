@@ -12,9 +12,10 @@ namespace Inertia.Network
 
         internal ServerMessagePoolExecutor(int connectionPerQueue)
         {
+            ConnectionPerQueue = connectionPerQueue;
+
             _pool = new List<ServerMessageQueue>();
             _locker = new object();
-            ConnectionPerQueue = connectionPerQueue;
         }
 
         internal ServerMessageQueue RegisterConnection(NetworkConnectionEntity connection)

@@ -2,9 +2,11 @@
 
 namespace Inertia.Network
 {
-    public sealed class WebSocketServerParameters : ServerParameters
+    public class WebSocketServerParameters : TcpServerParameters
     {
-        public readonly X509Certificate SslCertificate;
+        public X509Certificate? SslCertificate => _certificate;
+
+        private X509Certificate? _certificate;
 
         public WebSocketServerParameters(int port) : base(port)
         {
@@ -17,7 +19,7 @@ namespace Inertia.Network
         }
         public WebSocketServerParameters(string ip, int port, X509Certificate sslCertificate) : base(ip, port)
         {
-            SslCertificate = sslCertificate;
+            _certificate = sslCertificate;
         }
     }
 }

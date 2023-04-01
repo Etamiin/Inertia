@@ -3,40 +3,23 @@ using System.Collections.Concurrent;
 using System.Net.Sockets;
 using System.Net;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace Inertia.Network
 {
-    public abstract class BaseTcpServer<T, TParameters> : NetworkServerEntity<TParameters>, IDisposable where T : TcpConnectionEntity where TParameters : ServerParameters
+    public abstract class BaseTcpServer<T, TParameters> : NetworkServerEntity<TParameters>, IDisposable where T : TcpConnectionEntity where TParameters : TcpServerParameters
     {
         public bool IsDisposed { get; private set; }
         public bool IsRunning => _socket != null && _socket.IsBound;
         public int ConnectedCount => _connections.Count;
 
         private protected Socket? _socket { get; private set; }
+
         private protected readonly ConcurrentDictionary<uint, T> _connections;
 
-        protected BaseTcpServer(TParameters parameters) : base(parameters)
+        protected BaseTcpServer(TParameters parameters) : base (parameters)
         {
             _connections = new ConcurrentDictionary<uint, T>();
-        }
-
-        public NetworkConnectionGroup CreateConnectionGroup()
-        {
-            var group = new NetworkConnectionGroup();
-
-            group.AddConnections(_connections.Values);
-
-            return group;
-        }
-        public NetworkConnectionGroup CreateConnectionGroup(Predicate<T> predicate)
-        {
-            var group = new NetworkConnectionGroup();
-            var connections = _connections.Values
-                .Where((connection) => predicate(connection));
-
-            group.AddConnections(connections);
-
-            return group;
         }
 
         public bool TryGetConnection(uint id, out T connection)
@@ -44,12 +27,21 @@ namespace Inertia.Network
             return _connections.TryGetValue(id, out connection);
         }
 
+        public NetworkConnectionGroup CreateConnectionGroup()
+        {
+            return CreateConnectionGroup(_connections.Values);
+        }
+        public NetworkConnectionGroup CreateConnectionGroup(Predicate<T> predicate)
+        {
+            var connections = _connections.Values
+                .Where((connection) => predicate(connection));
+
+            return CreateConnectionGroup(connections);
+        }
+
         public sealed override void Start()
         {
-            if (IsDisposed)
-            {
-                throw new ObjectDisposedException(nameof(TcpServerEntity));
-            }
+            this.ThrowIfDisposable(IsDisposed);
 
             if (!IsRunning)
             {
@@ -59,24 +51,21 @@ namespace Inertia.Network
 
                     _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                     _socket.Bind(new IPEndPoint(string.IsNullOrWhiteSpace(Parameters.Ip) ? IPAddress.Any : IPAddress.Parse(Parameters.Ip), Parameters.Port));
-                    _socket.Listen(1000);
+                    _socket.Listen(Parameters.BacklogQueueSize);
 
                     OnStarted();
                     _socket.BeginAccept(OnAcceptConnection, _socket);
                 }
                 catch (Exception ex)
                 {
-                    Logger?.Error(ex);
+                    Logger?.Error($"Starting server failed: {ex}");
                     Close(NetworkDisconnectReason.ConnectionFailed);
                 }
             }
         }
         public sealed override void Close(NetworkDisconnectReason reason)
         {
-            if (IsDisposed)
-            {
-                throw new ObjectDisposedException(nameof(TcpServerEntity));
-            }
+            this.ThrowIfDisposable(IsDisposed);
 
             if (_connections != null && _connections.Count > 0)
             {
@@ -99,8 +88,7 @@ namespace Inertia.Network
             Dispose(true);
         }
 
-        internal protected abstract void OnAcceptConnection(IAsyncResult iar);
-
+        internal abstract void OnAcceptConnection(IAsyncResult iar);
         protected virtual void OnConnectionConnected(T connection) { }
         protected virtual void OnConnectionDisconnecting(T connection, NetworkDisconnectReason reason) { }
 
@@ -114,6 +102,15 @@ namespace Inertia.Network
             }
 
             IsDisposed = true;
+        }
+        private NetworkConnectionGroup CreateConnectionGroup(IEnumerable<T> connections)
+        {
+            this.ThrowIfDisposable(IsDisposed);
+
+            var group = new NetworkConnectionGroup(Protocol);
+            group.AddConnections(connections);
+
+            return group;
         }
     }
 }

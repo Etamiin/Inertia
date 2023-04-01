@@ -1,18 +1,19 @@
-﻿using System.Threading.Tasks;
+﻿using Inertia.Logging;
+using System.Threading.Tasks;
 
 namespace Inertia.Network
 {
-    public abstract class NetworkClientEntity
+    public abstract class NetworkClientEntity : INetworkEntity
     {
         public abstract bool IsConnected { get; }
 
-        protected readonly string Ip;
-        protected readonly int Port;
-
-        protected NetworkClientEntity(string ip, int port)
+        protected ILogger? Logger => _parameters.Logger;
+        protected NetworkProtocol Protocol => _parameters.Protocol;
+        private protected readonly ClientParameters _parameters;
+        
+        protected NetworkClientEntity(ClientParameters parameters)
         {
-            Ip = ip.Replace("localhost", "127.0.0.1");
-            Port = port;
+            _parameters = parameters;
         }
 
         public abstract void Connect();
@@ -29,7 +30,7 @@ namespace Inertia.Network
         }
         public void Send(NetworkMessage message)
         {
-            Send(NetworkProtocol.Current.SerializeMessage(message));
+            Send(Protocol.SerializeMessage(message));
         }
 
         protected virtual void Connected() { }

@@ -31,7 +31,7 @@ namespace Inertia.Logging
 
             if (configuration.ExecuteAsync)
             {
-                _pool = RuntimeManager.QueuePool;
+                _pool = PaperFactory.QueuePool;
             }
 
             if (configuration.OutputInConsole)

@@ -8,15 +8,17 @@ namespace Inertia.Network
     {
         public int ConnectionCount => _connections.Count;
 
-        private event BasicAction<byte[]> Sending;
+        private event BasicAction<byte[]>? Sending;
 
+        private readonly NetworkProtocol _protocol;
         private readonly List<NetworkConnectionEntity> _connections;
         private readonly object _locker;
 
-        internal NetworkConnectionGroup()
+        internal NetworkConnectionGroup(NetworkProtocol protocol)
         {
-            _locker = new object();
+            _protocol = protocol;
             _connections = new List<NetworkConnectionEntity>();
+            _locker = new object();
         }
 
         public void AddConnection(NetworkConnectionEntity connection)
@@ -66,10 +68,10 @@ namespace Inertia.Network
             }
         }
     
-        public void SendAsync(NetworkMessage message)
+        public async Task SendAsync(NetworkMessage message)
         {
-            Task.Factory.StartNew(() => {
-                var data = NetworkProtocol.Current.SerializeMessage(message);
+            await Task.Run(() => {
+                var data = _protocol.SerializeMessage(message);
                 Sending?.Invoke(data);
             });
         }

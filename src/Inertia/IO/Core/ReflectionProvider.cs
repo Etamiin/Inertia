@@ -68,7 +68,8 @@ namespace Inertia
             }
         }
 
-        internal static bool IsRuntimeCallOverriden { get; private set; }
+        internal static bool IsPaperCallOverriden { get; private set; }
+        internal static bool IsAsyncPoolDisabled { get; private set; }
         internal static bool IsNetworkClientUsedInAssemblies { get; private set; }
         internal static bool IsNetworkServerUsedInAssemblies { get; private set; }
 
@@ -128,7 +129,7 @@ namespace Inertia
 
             PluginTrace trace = null;
             CancellationTokenSource executionCancelSource = null;
-            if (!instance.ScriptableRun)
+            if (!instance.UsePaper)
             {
                 var options = instance.LongRun ? TaskCreationOptions.LongRunning : TaskCreationOptions.None;
                 executionCancelSource = new CancellationTokenSource();
@@ -143,7 +144,7 @@ namespace Inertia
             else
             {
                 trace = new PluginTrace(instance);
-                Run.OnNextTick(() => RunPluginExecution(instance, executionParameters));
+                TimedPaper.OnNextTick(() => RunPluginExecution(instance, executionParameters));
             }
 
             _pluginTraces.Add(instance.Identifier, new PluginTrace(instance, executionCancelSource));
@@ -235,14 +236,19 @@ namespace Inertia
                 }
             }
 
-            if (!IsRuntimeCallOverriden && type.GetCustomAttribute<OverrideScriptableCall>() != null)
+            if (!IsPaperCallOverriden && type.GetCustomAttribute<OverridePaperCall>() != null)
             {
-                IsRuntimeCallOverriden = true;
+                IsPaperCallOverriden = true;
+            }
+            
+            if (!IsAsyncPoolDisabled && type.GetCustomAttribute<DisableAsyncPoolExecution>() != null)
+            {
+                IsAsyncPoolDisabled = true;
             }
 
-            if (typeof(IScriptableSystem).IsAssignableFrom(type))
+            if (typeof(IPenSystem).IsAssignableFrom(type))
             {
-                TryCreateInstance<IScriptableSystem>(type, Type.EmptyTypes);
+                TryCreateInstance<IPenSystem>(type, Type.EmptyTypes);
             }
         }
         private static void ReadTypeNetworkInformations(Type type)
@@ -259,7 +265,7 @@ namespace Inertia
 
             if (type.IsSubclassOf(typeof(NetworkMessage)))
             {
-                var message = NetworkProtocol.CreateMessage(type);
+                var message = NetworkProtocolFactory.CreateMessage(type);
                 if (!_messageTypes.ContainsKey(message.MessageId))
                 {
                     _messageTypes.Add(message.MessageId, type);

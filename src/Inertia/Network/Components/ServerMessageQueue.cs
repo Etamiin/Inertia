@@ -25,9 +25,8 @@ namespace Inertia.Network
 
             if (connection is TcpConnectionEntity tcpConnection)
             {
-                tcpConnection.Disconnecting += TcpConnection_Disconnected;
+                tcpConnection.Disconnecting += ConnectionDisconnected;
             }
-            //check for udp connection
         }
         internal void Enqueue(BasicAction action)
         {
@@ -39,19 +38,6 @@ namespace Inertia.Network
             Dispose(true);
         }
 
-        private void Dispose(bool disposing)
-        {
-            if (IsDisposed) return;
-
-            if (disposing)
-            {
-                _queue.Clear();
-                _queue = null;
-            }
-
-            IsDisposed = true;
-        }
-    
         private void StartAutoExecuteAsync()
         {
             Task.Factory.StartNew(async () => {
@@ -70,14 +56,26 @@ namespace Inertia.Network
                 }
             }, TaskCreationOptions.LongRunning);
         }
-        private void TcpConnection_Disconnected(NetworkConnectionEntity entity, NetworkDisconnectReason value)
+        private void ConnectionDisconnected(NetworkConnectionEntity entity, NetworkDisconnectReason reason)
         {
             Interlocked.Decrement(ref _registeredConnection);
 
             if (entity is TcpConnectionEntity tcpConnection)
             {
-                tcpConnection.Disconnecting += TcpConnection_Disconnected;
+                tcpConnection.Disconnecting += ConnectionDisconnected;
             }
+        }
+        private void Dispose(bool disposing)
+        {
+            if (IsDisposed) return;
+
+            if (disposing)
+            {
+                _queue.Clear();
+                _queue = null;
+            }
+
+            IsDisposed = true;
         }
     }
 }

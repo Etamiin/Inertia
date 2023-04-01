@@ -6,12 +6,13 @@ namespace Inertia.Plugins
     internal sealed class PluginTrace : IDisposable
     {
         internal bool IsDisposed { get; private set; }
-        internal IPlugin Plugin { get; private set; }
         internal CancellationTokenSource? Token { get; private set; }
+
+        private IPlugin _instance;
 
         internal PluginTrace(IPlugin instance, CancellationTokenSource? executionTaskToken = null)
         {
-            Plugin = instance;
+            _instance = instance;
 
             if (executionTaskToken != null)
             {
@@ -30,11 +31,11 @@ namespace Inertia.Plugins
 
             if (disposing)
             {
-                Plugin.Stopping();
+                _instance.Stopping();
 
                 if (Token != null) Token.Cancel();
 
-                Plugin = null;
+                _instance = null;
                 Token = null;
             }
 

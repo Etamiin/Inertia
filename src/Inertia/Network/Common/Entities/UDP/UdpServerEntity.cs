@@ -6,7 +6,7 @@ using System.Net.Sockets;
 namespace Inertia.Network
 {
     [Obsolete]
-    public abstract class UdpServerEntity : NetworkServerEntity<ServerParameters>, IDisposable
+    public abstract class UdpServerEntity : NetworkServerEntity<NetworkEntityParameters>, IDisposable
     {
         /// <summary>
         /// Returns true if <see cref="Start"/> was called successfully.
@@ -23,7 +23,7 @@ namespace Inertia.Network
         private UdpClient _client;
         private BasicReader _reader;
 
-        protected UdpServerEntity(ServerParameters parameters) : base(parameters)
+        protected UdpServerEntity(NetworkEntityParameters parameters) : base(parameters)
         {
             _connections = new Dictionary<IPEndPoint, UdpConnectionEntity>();
         }
@@ -90,7 +90,7 @@ namespace Inertia.Network
             //    throw new ObjectDisposedException(nameof(UdpConnectionEntity));
             //}
 
-            SendTo(connection.EndPoint, NetworkProtocol.Current.SerializeMessage(message));
+            SendTo(connection.EndPoint, Protocol.SerializeMessage(message));
         }
 
         public virtual void OnConnectionAdded(UdpConnectionEntity connection) { }
@@ -133,13 +133,13 @@ namespace Inertia.Network
 
                 if (!_connections.ContainsKey(endPoint))
                 {
-                    var connection = new UdpConnectionEntity((uint)IdProvider.NextValue(), this, endPoint);
+                    var connection = new UdpConnectionEntity((uint)IdProvider.NextValue(), this, endPoint, Protocol);
                     _connections.Add(endPoint, connection);
 
                     OnConnectionAdded(connection);
                 }
 
-                NetworkProtocol.ProcessParsing(_connections[endPoint], _reader.Fill(data));
+                NetworkProtocolFactory.ProcessParsing(Protocol, _connections[endPoint], _reader.Fill(data));
             }
             catch (Exception ex)
             {

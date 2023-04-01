@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Inertia.Scriptable
 {
-    internal sealed class ScriptableExecutionLayer
+    internal sealed class PenExecutionLayer
     {
         internal event BasicAction<float>? ComponentsUpdate;
         
@@ -14,9 +14,9 @@ namespace Inertia.Scriptable
             ComponentsUpdate?.Invoke(deltaTime);
         }
 
-        internal ScriptableExecutionLayer()
+        internal PenExecutionLayer()
         {
-            if (!ReflectionProvider.IsRuntimeCallOverriden)
+            if (!ReflectionProvider.IsPaperCallOverriden)
             {
                 Task.Factory.StartNew(() => ExecuteCycle(new Clock()), TaskCreationOptions.LongRunning);
             }
@@ -27,11 +27,11 @@ namespace Inertia.Scriptable
             while (true)
             {
                 var currentMsUpdate = clock.GetElapsedSeconds();
-                var targetMsUpdate = 1000.0d / Run.TargetTickPerSecond;
+                var targetMsUpdate = 1000.0d / PaperFactory.TargetTickPerSecond;
 
                 if (currentMsUpdate < targetMsUpdate)
                 {
-                    if (ComponentsUpdate == null || Run.LimitProcessorUsage) Thread.Sleep(1);
+                    if (ComponentsUpdate == null || PaperFactory.LimitProcessorUsage) Thread.Sleep(1);
                     else
                     {
                         var msToSleep = (targetMsUpdate - currentMsUpdate) / 1000.0d;

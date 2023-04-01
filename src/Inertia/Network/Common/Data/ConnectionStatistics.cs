@@ -1,5 +1,4 @@
-﻿using Inertia.Logging;
-using System;
+﻿using System;
 
 namespace Inertia.Network
 {
@@ -14,11 +13,7 @@ namespace Inertia.Network
         {
         }
 
-        /// <summary>
-        /// Notify that a message has been received.
-        /// </summary>
-        /// <returns>The number of messages received in the last second.</returns>
-        internal int NotifyMessageReceived()
+        internal void NotifyMessageReceived()
         {
             MessageReceivedCount++;
             MessageReceivedInLastSecond++;
@@ -32,16 +27,10 @@ namespace Inertia.Network
                 var span = DateTime.Now - _lastSecondTimer.Value;
                 if (span.TotalSeconds >= 1)
                 {
-                    var receivedInLastSecond = MessageReceivedInLastSecond;
-
                     MessageReceivedInLastSecond = 0;
                     _lastSecondTimer = DateTime.Now;
-
-                    return receivedInLastSecond;
                 }
             }
-
-            return MessageReceivedInLastSecond;
         }
     }
 }

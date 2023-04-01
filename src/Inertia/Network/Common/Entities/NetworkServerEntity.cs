@@ -3,18 +3,19 @@ using System.Threading.Tasks;
 
 namespace Inertia.Network
 {
-    public abstract class NetworkServerEntity<TParameters> where TParameters : ServerParameters
+    public abstract class NetworkServerEntity<TParameters> : INetworkEntity where TParameters : NetworkEntityParameters
     {
-        public readonly TParameters Parameters;
+        public TParameters Parameters => _parameters;
 
-        protected ILogger? Logger => Parameters.Logger;
-
+        protected ILogger? Logger => _parameters.Logger;
+        protected NetworkProtocol Protocol => _parameters.Protocol;
         private protected readonly SafeOrderedIntProvider IdProvider;
-        
+        private TParameters _parameters;
+
         protected NetworkServerEntity(TParameters parameters)
         {
             IdProvider = new SafeOrderedIntProvider();
-            Parameters = parameters;
+            _parameters = parameters;
         }
 
         public Task StartAsync()

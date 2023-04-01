@@ -37,12 +37,30 @@ namespace Inertia
             _limitProcessorUsage = limitProcessorUsage;
         }
 
+        internal void Execute()
+        {
+            this.ThrowIfDisposable(IsDisposed);
+
+            if (_queues.Count == 0) return;
+            if (_queues.Count == 1 && _currentQueue != null)
+            {
+                _currentQueue.SyncProcessQueue();
+            }
+            else
+            {
+                lock (_locker)
+                {
+                    foreach (var pair in _queues)
+                    {
+                        pair.Value.SyncProcessQueue();
+                    }
+                }
+            }
+        }
+
         public void Enqueue(BasicAction action)
         {
-            if (IsDisposed)
-            {
-                throw new ObjectDisposedException(nameof(AsyncExecutionQueuePool));
-            }
+            this.ThrowIfDisposable(IsDisposed);
 
             if (_currentQueue == null || _currentQueue.Count >= QueueCapacity)
             {

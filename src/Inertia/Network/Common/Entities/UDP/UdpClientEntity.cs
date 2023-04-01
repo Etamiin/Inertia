@@ -14,7 +14,7 @@ namespace Inertia.Network
         private UdpClient _client;
         private BasicReader _reader;
 
-        protected UdpClientEntity(string ip, int port) : base(ip, port)
+        protected UdpClientEntity(ClientParameters parameters) : base(parameters)
         {
         }
         
@@ -31,7 +31,7 @@ namespace Inertia.Network
                 {
                     _reader = new BasicReader();
                     _client = new UdpClient();
-                    _client.Connect(new IPEndPoint(IPAddress.Parse(Ip), Port));
+                    _client.Connect(new IPEndPoint(IPAddress.Parse(_parameters.Ip), _parameters.Port));
 
                     Connected();
                     _client.BeginReceive(new AsyncCallback(OnReceiveData), _client);
@@ -97,7 +97,7 @@ namespace Inertia.Network
                 IPEndPoint endPoint = null;
                 var data = ((UdpClient)iar.AsyncState).EndReceive(iar, ref endPoint);
 
-                NetworkProtocol.ProcessParsing(this, _reader.Fill(data));
+                NetworkProtocolFactory.ProcessParsing(Protocol, this, _reader.Fill(data));
             }
             catch (Exception e)
             {

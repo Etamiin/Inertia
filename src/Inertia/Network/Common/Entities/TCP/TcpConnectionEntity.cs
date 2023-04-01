@@ -1,12 +1,5 @@
-﻿using Inertia.Logging;
-using System;
-using System.Diagnostics;
-using System.IO;
-using System.Net.Security;
+﻿using System;
 using System.Net.Sockets;
-using System.Security.Cryptography;
-using System.Text;
-using System.Xml.Linq;
 
 namespace Inertia.Network
 {
@@ -22,64 +15,63 @@ namespace Inertia.Network
         private protected BasicReader _networkDataReader { get; private set; }
         private protected byte[] _buffer { get; private set; }
 
-        internal TcpConnectionEntity(Socket socket, uint id) : base(id)
+        internal TcpConnectionEntity(Socket socket, uint id, NetworkProtocol protocol) : base(id, protocol)
         {
             Statistics = new ConnectionStatistics();
             _socket = socket;
             _networkDataReader = new BasicReader();
-            _buffer = new byte[NetworkProtocol.Current.NetworkBufferLength];
+            _buffer = new byte[_protocol.NetworkBufferLength];
         }
 
-        public sealed override void Send(byte[] data)
+        public sealed override void Send(byte[] dataToSend)
         {
-            if (IsDisposed)
+            this.ThrowIfDisposable(IsDisposed);
+
+            if (dataToSend == null || dataToSend.Length == 0)
             {
-                throw new ObjectDisposedException(nameof(TcpConnectionEntity));
+                throw new ArgumentNullException(nameof(dataToSend));
             }
 
-            if (!IsConnected) return;
-
-            if (data == null || data.Length == 0)
+            if (IsConnected)
             {
-                throw new ArgumentNullException(nameof(data));
+                try
+                {
+                    ProcessSend(dataToSend);
+                }
+                catch
+                {
+                    Disconnect(NetworkDisconnectReason.InvalidMessageSended);
+                }
             }
-
-            try
-            {
-                InternalSend(data);
-            }
-            catch
-            {
-                Disconnect(NetworkDisconnectReason.InvalidMessageSended);
-            }
-        }
-        public sealed override void Send(NetworkMessage message)
-        {
-            Send(NetworkProtocol.Current.SerializeMessage(message));
         }
 
         public bool Disconnect()
         {
             return Disconnect(NetworkDisconnectReason.Manual);
         }
-        public bool Disconnect(NetworkDisconnectReason reason)
+        public override bool Disconnect(NetworkDisconnectReason reason)
         {
-            if (IsDisposed)
+            this.ThrowIfDisposable(IsDisposed);
+
+            if (_socket != null)
             {
-                throw new ObjectDisposedException(nameof(TcpConnectionEntity));
+                Disconnecting?.Invoke(this, reason);
+                Disconnecting = null;
+
+                try
+                {
+                    _socket?.Disconnect(false);
+                }
+                catch { }
+                finally
+                {
+                    _networkDataReader?.Dispose();
+                    _socket = null;
+                    _buffer = null;
+                }
             }
 
-            if (_socket == null) return false;
-
-            Disconnecting?.Invoke(this, reason);
-            Disconnecting = null;
-
-            _socket?.Disconnect(false);
-            _networkDataReader?.Dispose();
-            _socket = null;
-            _buffer = null;
-
-            InternalDisconnect();
+            ProcessClean();
             return true;
         }
         public void Dispose()
@@ -92,11 +84,11 @@ namespace Inertia.Network
             _socket.BeginReceive(_buffer, 0, _buffer.Length, SocketFlags.None, OnReceiveData, _socket);
         }
         
-        private protected virtual void InternalSend(byte[] data)
+        private protected virtual void ProcessSend(byte[] data)
         {
             _socket.Send(data);
         }
-        private protected virtual void InternalDisconnect() { }
+        private protected virtual void ProcessClean() { }
         private protected void ProcessReceivedData(int receivedLength)
         {
             if (!IsConnected) return;
@@ -105,14 +97,14 @@ namespace Inertia.Network
                 throw new SocketException((int)SocketError.SocketError);
             }
 
-            var messageReceivedInLastSecond = Statistics.NotifyMessageReceived();
-            if (messageReceivedInLastSecond >= NetworkProtocol.Current.MaximumMessageCountPerSecond)
+            Statistics.NotifyMessageReceived();
+            if (Statistics.MessageReceivedInLastSecond >= _protocol.MaximumMessageCountPerSecond)
             {
                 Disconnect(NetworkDisconnectReason.Spam);
                 return;
             }
 
-            NetworkProtocol.ProcessParsing(this, _networkDataReader.Fill(new ReadOnlySpan<byte>(_buffer, 0, receivedLength)));
+            NetworkProtocolFactory.ProcessParsing(_protocol, this, _networkDataReader.Fill(new ReadOnlySpan<byte>(_buffer, 0, receivedLength)));
         }
 
         private void OnReceiveData(IAsyncResult iar)

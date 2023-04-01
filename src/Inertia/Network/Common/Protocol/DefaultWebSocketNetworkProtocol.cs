@@ -1,27 +1,26 @@
 ﻿using Inertia.Logging;
 using System;
-using System.IO;
 using System.Linq;
-using System.Net.Security;
-using System.Net.Sockets;
+using System.Net.WebSockets;
 using System.Security.Cryptography;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
 namespace Inertia.Network
 {
-    internal sealed class WebSocketNetworkProtocol : NetworkProtocol
+    internal sealed class DefaultWebSocketNetworkProtocol : NetworkProtocol
     {
         private const string HttpProtocolKey = "HTTP/1.1";
         private const string WsHandshakeKey = "Sec-WebSocket-Key:";
         private const string WsStaticHexHashKey = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
+        private const byte PayloadMidSize = 126;
+        private const byte PayloadFullSize = 127;
 
-        public override int NetworkBufferLength => 8192;
+        public override int NetworkBufferLength => 4096;
         public override int ConnectionPerQueueInPool => 500;
         public override int ClientMessagePerQueueCapacity => 1000;
         public override int MaximumMessageCountPerSecond => 70;
 
-        internal WebSocketNetworkProtocol()
+        internal DefaultWebSocketNetworkProtocol()
         {
         }
 
@@ -29,99 +28,60 @@ namespace Inertia.Network
         {
             using (var writer = new BasicWriter())
             {
-                writer
-                    .SetUShort(message.MessageId)
-                    .SetEmpty(sizeof(uint));
-
-                var cPos = writer.GetPosition();
-
+                writer.SetUShort(message.MessageId);
                 message.Serialize(writer);
-                writer
-                    .SetPosition(cPos - sizeof(uint))
-                    .SetUInt((uint)(writer.TotalLength - cPos));
 
                 return writer.ToArray();
             }
         }
-        public override bool ParseMessage(object receiver, BasicReader reader, MessageParsingOutput output)
+        public override bool ParseMessage(INetworkEntity receiver, BasicReader reader, MessageParsingOutput output)
         {
             reader.SetPosition(0);
 
             try
             {
-                var isTcpConnection = receiver is WebSocketConnectionEntity;
-                if (!isTcpConnection)
+                if (!(receiver is WebSocketConnectionEntity))
                 {
-                    throw new SocketException();
+                    throw new WebSocketException($"The client is not a valid {nameof(WebSocketConnectionEntity)}.");
                 }
 
                 var connection = (WebSocketConnectionEntity)receiver;
-
-                SimpleLogger.Default.Warn("PROCESS PARSING: " + connection.State);
-
                 if (connection.State == WebSocketConnectionState.Connecting)
                 {
-                    var data = reader.GetBytes((int)reader.UnreadedLength);
-                    var dataAsString = Encoding.UTF8.GetString(data);
-                    var handshakeResult = GetHanshakeKeyResult(dataAsString);
-
-                    if (string.IsNullOrWhiteSpace(handshakeResult))
-                    {
-                        throw new SocketException();
-                    }
-
-                    connection.SendHandshakeResponse(handshakeResult);
-                    reader.RemoveReadedBytes();
+                    TryProcessHandshakeMessage(reader, connection);
                     return true;
                 }
 
                 while (reader.UnreadedLength > 0)
                 {
-                    if (TryParseWsMessage(reader, out var applicationData, out var opCode))
+                    if (!TryParseMessage(reader, out var applicationData, out var opCode)) break;
+
+                    reader.RemoveReadedBytes();
+                    if (ProcessOpCodeMessages(connection, opCode, ref applicationData)) break;
+
+                    using (var messageReader = new BasicReader(applicationData))
                     {
-                        SimpleLogger.Default.Warn("WS MSG PARSED: " + applicationData.Length + " <> " + opCode);
-
-                        reader.RemoveReadedBytes();
-
-                        if (opCode == WebSocketOpCode.ConnectionClose)
-                        {
-                            connection.SendSpecificOpCode(new byte[0], WebSocketOpCode.ConnectionClose);
-                            connection.Disconnect(NetworkDisconnectReason.ConnectionLost);
-                            break;
-                        }
-                        else if (opCode == WebSocketOpCode.Ping)
-                        {
-                            connection.SendSpecificOpCode(applicationData, WebSocketOpCode.Pong);
-                            break;
-                        }
-
-                        using (var messageReader = new BasicReader(applicationData))
+                        while (messageReader.UnreadedLength > 0)
                         {
                             var msgId = messageReader.GetUShort();
-                            var msgSize = messageReader.GetUInt();
-                            var message = CreateMessage(msgId);
+                            var message = CreateMessageById(msgId);
                             if (message == null)
                             {
-                                messageReader
-                                    .Skip((int)msgSize)
-                                    .RemoveReadedBytes();
-
                                 throw new UnknownMessageException(msgId);
                             }
 
                             message.Deserialize(messageReader);
                             output.AddMessage(message);
+                            if (messageReader.UnreadedLength > 0) messageReader.RemoveReadedBytes();
                         }
                     }
-                    else break;                
                 }
 
                 return true;
             }
             catch
             {
-                //Transform type to NetworkConnectionEntity for UDP support
-                if (receiver is TcpConnectionEntity connection)
+                if (receiver is NetworkConnectionEntity connection)
                 {
                     connection.Disconnect(NetworkDisconnectReason.InvalidDataReceived);
                 }
@@ -134,26 +94,27 @@ namespace Inertia.Network
             }
         }
 
-        internal byte[] WriteWsMessage(byte[] applicationData, WebSocketOpCode wsOpCode)
+        internal byte[] WriteMessage(byte[] applicationData, WebSocketOpCode wsOpCode)
         {
             using (var writer = new BasicWriter())
             {
-                var payloadSize = applicationData.Length < 126 ? applicationData.Length : (applicationData.Length <= ushort.MaxValue ? 126 : 127);
+                var payloadSize = applicationData.Length < PayloadMidSize ? applicationData.Length : (applicationData.Length <= ushort.MaxValue ? PayloadMidSize : PayloadFullSize);
                 byte opCode = (byte)wsOpCode;
-                opCode |= 1 << 7;
+                opCode.SetBit(0, true, EndiannessType.BigEndian);
+                //opCode |= 1 << 7;
 
                 writer
                     .SetByte(opCode)
                     .SetByte((byte)payloadSize);
 
-                if (payloadSize == 126)
+                if (payloadSize == PayloadMidSize)
                 {
                     var bytes = BitConverter.GetBytes((ushort)applicationData.Length);
                     Array.Reverse(bytes);
 
                     writer.SetBytesWithoutHeader(bytes);
                 }
-                else if (payloadSize == 127)
+                else if (payloadSize == PayloadFullSize)
                 {
                     var bytes = BitConverter.GetBytes((uint)applicationData.Length);
                     Array.Reverse(bytes);
@@ -167,11 +128,25 @@ namespace Inertia.Network
             }
         }
 
-        private string GetHanshakeKeyResult(string data)
+        private void TryProcessHandshakeMessage(BasicReader reader, WebSocketConnectionEntity connection)
         {
-            if (data.Contains(HttpProtocolKey))
+            var data = reader.GetBytes((int)reader.UnreadedLength);
+            var httpRequest = Encoding.UTF8.GetString(data);
+            var handshakeResult = GetHanshakeKeyResult(httpRequest);
+
+            if (string.IsNullOrWhiteSpace(handshakeResult))
             {
-                var handshakeKeyLine = data.Split("\r\n")
+                throw new WebSocketException(WebSocketError.HeaderError);
+            }
+
+            reader.RemoveReadedBytes();
+            connection.SendHandshakeResponse(handshakeResult);
+        }
+        private string GetHanshakeKeyResult(string request)
+        {
+            if (request.Contains(HttpProtocolKey))
+            {
+                var handshakeKeyLine = request.Split("\r\n")
                     .FirstOrDefault((line) => line.Trim().StartsWith(WsHandshakeKey));
 
                 if (!string.IsNullOrWhiteSpace(handshakeKeyLine))
@@ -187,7 +162,23 @@ namespace Inertia.Network
 
             return null;
         }
-        private bool TryParseWsMessage(BasicReader reader, out byte[] applicationData, out WebSocketOpCode opCode)
+        private bool ProcessOpCodeMessages(WebSocketConnectionEntity connection, WebSocketOpCode opCode, ref byte[] applicationData)
+        {
+            if (opCode == WebSocketOpCode.ConnectionClose)
+            {
+                connection.SendSpecificOpCode(applicationData, WebSocketOpCode.ConnectionClose);
+                connection.Disconnect(NetworkDisconnectReason.ConnectionLost);
+                return true;
+            }
+            else if (opCode == WebSocketOpCode.Ping)
+            {
+                connection.SendSpecificOpCode(applicationData, WebSocketOpCode.Pong);
+                return true;
+            }
+
+            return false;
+        }
+        private bool TryParseMessage(BasicReader reader, out byte[] applicationData, out WebSocketOpCode opCode)
         {
             //'Fin' not supported (always considered as true)
             //ExtensionData not supported
@@ -201,14 +192,14 @@ namespace Inertia.Network
             payloadByte.SetBit(0, false, EndiannessType.BigEndian);
 
             int appDataSize = payloadByte;
-            if (payloadByte == 126)
+            if (payloadByte == PayloadMidSize)
             {
                 var bytes = reader.GetBytes(2);
                 Array.Reverse(bytes);
 
                 appDataSize = BitConverter.ToUInt16(bytes);
             }
-            else if (payloadByte == 127)
+            else if (payloadByte == PayloadFullSize)
             {
                 var bytes = reader.GetBytes(4);
                 Array.Reverse(bytes);
@@ -225,14 +216,12 @@ namespace Inertia.Network
             if (masked)
             {
                 var maskingKey = reader.GetBytes(4);
-                var data = reader.GetBytes(appDataSize);
+                applicationData = reader.GetBytes(appDataSize);
 
-                for (var i = 0; i < data.Length; i++)
+                for (var i = 0; i < applicationData.Length; i++)
                 {
-                    data[i] = (byte)(data[i] ^ maskingKey[i % 4]);
+                    applicationData[i] = (byte)(applicationData[i] ^ maskingKey[i % 4]);
                 }
-
-                applicationData = data;
             }
             else
             {

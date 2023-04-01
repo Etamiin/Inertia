@@ -81,5 +81,13 @@ namespace System
 
             return value;
         }
+    
+        public static void ThrowIfDisposable(this IDisposable disposable, bool isDisposed)
+        {
+            if (isDisposed)
+            {
+                throw new ObjectDisposedException(disposable.GetType().Name);
+            }
+        }
     }
 }

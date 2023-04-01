@@ -4,10 +4,8 @@ using System.Linq;
 
 namespace Inertia.Scriptable
 {
-    public abstract class ScriptableSystem<T> : IScriptableSystem where T : ScriptableObject
+    public abstract class PenSystem<T> : IPenSystem where T : PaperObject
     {
-        public abstract bool ProcessIndividualTryCatch { get; }
-
         public virtual int ExecutionLayer { get; }
         public float DeltaTime { get; private set; }
         public bool IsActive
@@ -18,22 +16,22 @@ namespace Inertia.Scriptable
             }
         }
 
-        private readonly ScriptableExecutionLayer _executionLayer;
+        private readonly PenExecutionLayer _executionLayer;
         private readonly List<T> _componentDatas;
         private readonly object _locker;
         private bool _processingRegistered;
 
-        protected ScriptableSystem()
+        protected PenSystem()
         {
             _locker = new object();
             _componentDatas = new List<T>();
-            _executionLayer = RuntimeManager.RegisterScriptComponent(this);
+            _executionLayer = PaperFactory.RegisterScriptableSystem(this);
         }
 
         public abstract void OnProcess(T obj);
         public abstract void OnExceptionThrown(Exception exception);
 
-        void IScriptableSystem.RegisterComponentData(ScriptableObject obj)
+        void IPenSystem.RegisterComponentData(PaperObject obj)
         {
             if (obj is T tData)
             {
@@ -49,7 +47,7 @@ namespace Inertia.Scriptable
                 }
             }
         }
-        void IScriptableSystem.UnregisterComponentData(ScriptableObject obj)
+        void IPenSystem.UnregisterComponentData(PaperObject obj)
         {
             if (obj is T tData)
             {
@@ -73,46 +71,29 @@ namespace Inertia.Scriptable
             if (!IsActive) return;
             lock (_locker)
             {
-                var executableDatas = _componentDatas.Where((obj) => obj.State == ScriptableObject.ScriptableDataState.Initialized).ToArray();
+                var executableDatas = _componentDatas.Where((obj) => obj.State == PaperObject.PaperObjectState.Initialized).ToArray();
 
-                if (ProcessIndividualTryCatch)
+                try
                 {
                     foreach (var obj in executableDatas)
                     {
-                        if (obj.State == ScriptableObject.ScriptableDataState.Disposed) continue;
+                        if (obj.State == PaperObject.PaperObjectState.Disposed) continue;
 
-                        try
-                        {
-                            OnProcess(obj);
-                        }
-                        catch (Exception ex)
-                        {
-                            OnExceptionThrown(ex);
-                        }
+                        OnProcess(obj);
                     }
                 }
-                else
+                catch (Exception ex)
                 {
-                    try
-                    {
-                        foreach (var obj in executableDatas)
-                        {
-                            OnProcess(obj);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        OnExceptionThrown(ex);
-                    }
+                    OnExceptionThrown(ex);
                 }
 
-                var notInitializedDatas = _componentDatas.Where((obj) => obj.State != ScriptableObject.ScriptableDataState.Initialized).ToArray();
+                var notInitializedDatas = _componentDatas.Where((obj) => obj.State != PaperObject.PaperObjectState.Initialized).ToArray();
                 foreach (var obj in notInitializedDatas)
                 {
-                    if (obj.State == ScriptableObject.ScriptableDataState.Disposing)
+                    if (obj.State == PaperObject.PaperObjectState.Disposing)
                     {
-                        obj.State = ScriptableObject.ScriptableDataState.Disposed;
-                        ((IScriptableSystem)this).UnregisterComponentData(obj);
+                        obj.State = PaperObject.PaperObjectState.Disposed;
+                        ((IPenSystem)this).UnregisterComponentData(obj);
                     }
                 }
             }

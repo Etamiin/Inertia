@@ -10,7 +10,7 @@ namespace Inertia.Network
 
         private UdpServerEntity _server;
 
-        internal UdpConnectionEntity(uint id, UdpServerEntity server, IPEndPoint endPoint) : base(id)
+        internal UdpConnectionEntity(uint id, UdpServerEntity server, IPEndPoint endPoint, NetworkProtocol protocol) : base(id, protocol)
         {
             _server = server;
             EndPoint = endPoint;
@@ -19,10 +19,11 @@ namespace Inertia.Network
         public override void Send(byte[] data)
         {
             _server.SendTo(this, data);
-        }        
-        public override void Send(NetworkMessage message)
+        }
+
+        public override bool Disconnect(NetworkDisconnectReason reason)
         {
-            _server.SendTo(this, message);
+            return true;
         }
 
         public void Dispose()

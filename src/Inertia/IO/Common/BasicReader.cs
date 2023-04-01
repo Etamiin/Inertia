@@ -78,10 +78,7 @@ namespace Inertia
 
         public BasicReader SetPosition(long position)
         {
-            if (IsDisposed)
-            {
-                throw new ObjectDisposedException(nameof(BasicReader));
-            }
+            this.ThrowIfDisposable(IsDisposed);
             
             if (position < 0) return this;
 
@@ -90,10 +87,7 @@ namespace Inertia
         }
         public long GetPosition()
         {
-            if (IsDisposed)
-            {
-                throw new ObjectDisposedException(nameof(BasicReader));
-            }
+            this.ThrowIfDisposable(IsDisposed);
 
             if (_reader == null) return 0;
 
@@ -114,10 +108,7 @@ namespace Inertia
         }
         public BasicReader Fill(ReadOnlySpan<byte> data, long offset)
         {
-            if (IsDisposed)
-            {
-                throw new ObjectDisposedException(nameof(BasicReader));
-            }
+            this.ThrowIfDisposable(IsDisposed);
 
             var newLength = offset + data.Length;
             if (newLength > _reader.Length)
@@ -141,10 +132,7 @@ namespace Inertia
         }
         public BasicReader RemoveReadedBytes()
         {
-            if (IsDisposed)
-            {
-                throw new ObjectDisposedException(nameof(BasicReader));
-            }
+            this.ThrowIfDisposable(IsDisposed);
 
             var available = GetBytes((int)UnreadedLength);
 
@@ -444,10 +432,7 @@ namespace Inertia
 
         private bool IsReadable(int length)
         {
-            if (IsDisposed)
-            {
-                throw new ObjectDisposedException(nameof(BasicReader));
-            }
+            this.ThrowIfDisposable(IsDisposed);
 
             if (length <= 0) throw new ArgumentNullException(nameof(length));
 
@@ -455,10 +440,7 @@ namespace Inertia
         }
         private bool TryReadSize(int length, out byte[]? data)
         {
-            if (IsDisposed)
-            {
-                throw new ObjectDisposedException(nameof(BasicReader));
-            }
+            this.ThrowIfDisposable(IsDisposed);
 
             if (length < 0) throw new ArgumentNullException(nameof(length));
 

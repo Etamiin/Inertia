@@ -6,7 +6,7 @@ namespace Inertia.Plugins
     {
         public string Identifier { get; }
         public bool LongRun { get; }
-        public bool ScriptableRun { get; }
+        public bool UsePaper { get; }
         public bool StopOnCatchedError { get; }
         
         public void Execute(object[] parameters);
