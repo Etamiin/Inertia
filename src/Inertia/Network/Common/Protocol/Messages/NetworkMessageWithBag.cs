@@ -7,8 +7,8 @@ namespace Inertia.Network
         private BasicWriter _bagWriter;
         private BasicReader _bagReader;
 
-        public virtual void BaseSerialize(BasicWriter writer) { }
-        public virtual void BaseDeserialize(BasicReader reader) { }
+        protected virtual void BaseSerialize(BasicWriter writer) { }
+        protected virtual void BaseDeserialize(BasicReader reader) { }
 
         public BasicWriter GetBagWriter()
         {

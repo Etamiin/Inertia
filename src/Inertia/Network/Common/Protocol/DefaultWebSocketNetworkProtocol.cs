@@ -100,7 +100,7 @@ namespace Inertia.Network
             {
                 var payloadSize = applicationData.Length < PayloadMidSize ? applicationData.Length : (applicationData.Length <= ushort.MaxValue ? PayloadMidSize : PayloadFullSize);
                 byte opCode = (byte)wsOpCode;
-                opCode.SetBit(0, true, EndiannessType.BigEndian);
+                opCode.SetBitRef(0, true, EndiannessType.BigEndian);
                 //opCode |= 1 << 7;
 
                 writer
@@ -189,7 +189,7 @@ namespace Inertia.Network
             var masked = payloadByte.GetBit(0, EndiannessType.BigEndian);
 
             opCode = (WebSocketOpCode)fByte.SetBit(0, false, EndiannessType.BigEndian);
-            payloadByte.SetBit(0, false, EndiannessType.BigEndian);
+            payloadByte.SetBitRef(0, false, EndiannessType.BigEndian);
 
             int appDataSize = payloadByte;
             if (payloadByte == PayloadMidSize)

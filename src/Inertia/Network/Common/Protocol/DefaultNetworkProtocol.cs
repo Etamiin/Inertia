@@ -1,4 +1,6 @@
-﻿namespace Inertia.Network
+﻿using Inertia.Logging;
+
+namespace Inertia.Network
 {
     internal sealed class DefaultNetworkProtocol : NetworkProtocol
     {
@@ -33,7 +35,7 @@
         {
             reader.SetPosition(0);
 
-            try 
+            try
             {
                 while (reader.UnreadedLength > 0)
                 {

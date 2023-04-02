@@ -64,6 +64,7 @@ namespace Inertia.Network
                 }
 
                 _networkDataReader?.Dispose();
+                _networkDataReader = null;
                 _socket = null;
                 _buffer = null;
             }

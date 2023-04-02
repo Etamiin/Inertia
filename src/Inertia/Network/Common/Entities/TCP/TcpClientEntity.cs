@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Inertia.Logging;
+using System;
 using System.Net;
 using System.Net.Sockets;
 
@@ -49,16 +50,15 @@ namespace Inertia.Network
             {
                 Disconnecting(reason);
 
-                try
+                if (_socket.Connected)
                 {
                     _socket?.Disconnect(false);
                 }
-                catch { }
-                finally
-                {
-                    _networkDataReader?.Dispose();
-                    _buffer = null;
-                }
+
+                _networkDataReader?.Dispose();
+                _networkDataReader = null;
+                _socket = null;
+                _buffer = null;
 
                 return true;
             }
@@ -96,7 +96,7 @@ namespace Inertia.Network
             try
             {
                 int received = ((Socket)iar.AsyncState).EndReceive(iar);
-                
+
                 if (!IsConnected) return;
                 if (received == 0)
                 {

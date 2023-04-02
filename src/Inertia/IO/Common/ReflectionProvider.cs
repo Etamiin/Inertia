@@ -1,8 +1,10 @@
-﻿using Inertia.Network;
+﻿using Inertia.Logging;
+using Inertia.Network;
 using Inertia.Plugins;
 using Inertia.Scriptable;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -253,15 +255,18 @@ namespace Inertia
         }
         private static void ReadTypeNetworkInformations(Type type)
         {
-            if (!IsNetworkClientUsedInAssemblies && type.IsSubclassOf(typeof(TcpClientEntity)))
+            if (!IsNetworkClientUsedInAssemblies && type.IsSubclassOf(typeof(NetworkClientEntity)))
             {
                 IsNetworkClientUsedInAssemblies = true;
             }
 
-            if (!IsNetworkServerUsedInAssemblies && type.IsSubclassOf(typeof(TcpServerEntity)))
+            if (type.IsSubclassOf(typeof(TcpServerEntity)) || type.IsSubclassOf(typeof(WebSocketServerEntity)))
             {
-                IsNetworkServerUsedInAssemblies = true;
-            }            
+                if (!IsNetworkServerUsedInAssemblies)
+                {
+                    IsNetworkServerUsedInAssemblies = true;
+                }
+            }      
 
             if (type.IsSubclassOf(typeof(NetworkMessage)))
             {

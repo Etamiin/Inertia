@@ -41,11 +41,11 @@ namespace System
             return IOHelper.GzipDecompress(compressedData);
         }
 
-        public static bool GetBit(this ref byte value, int index)
+        public static bool GetBit(this byte value, int index)
         {
-            return GetBit(ref value, index, EndiannessType.Auto);
+            return GetBit(value, index, EndiannessType.Auto);
         }
-        public static bool GetBit(this ref byte value, int index, EndiannessType endianness)
+        public static bool GetBit(this byte value, int index, EndiannessType endianness)
         {
             if (index < 0 || index >= 8) throw new ArgumentOutOfRangeException(nameof(index));
 
@@ -61,11 +61,11 @@ namespace System
 
             return (value & (1 << index)) != 0;
         }
-        public static byte SetBit(this ref byte value, int index, bool bitValue)
+        public static byte SetBit(this byte value, int index, bool bitValue)
         {
-            return SetBit(ref value, index, bitValue, EndiannessType.Auto);
+            return SetBit(value, index, bitValue, EndiannessType.Auto);
         }
-        public static byte SetBit(this ref byte value, int index, bool bitValue, EndiannessType endianness)
+        public static byte SetBit(this byte value, int index, bool bitValue, EndiannessType endianness)
         {
             if (index < 0 || index >= 8) throw new ArgumentOutOfRangeException(nameof(index));
 
@@ -90,7 +90,15 @@ namespace System
 
             return value;
         }
-    
+        public static void SetBitRef(this ref byte value, int index, bool bitValue)
+        {
+            value = SetBit(value, index, bitValue, EndiannessType.Auto);
+        }
+        public static void SetBitRef(this ref byte value, int index, bool bitValue, EndiannessType endianness)
+        {
+            value = SetBit(value, index, bitValue, endianness);
+        }
+
         public static void ThrowIfDisposable(this IDisposable disposable, bool isDisposed)
         {
             if (isDisposed)
