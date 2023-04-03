@@ -15,12 +15,12 @@ namespace Inertia.Network
         private protected BasicReader _networkDataReader { get; private set; }
         private protected byte[] _buffer { get; private set; }
 
-        internal TcpConnectionEntity(Socket socket, uint id, NetworkProtocol protocol) : base(id, protocol)
+        internal TcpConnectionEntity(Socket socket, uint id, NetworkEntityParameters parameters) : base(id, parameters)
         {
             Statistics = new ConnectionStatistics();
             _socket = socket;
             _networkDataReader = new BasicReader();
-            _buffer = new byte[_protocol.NetworkBufferLength];
+            _buffer = new byte[_parameters.Protocol.NetworkBufferLength];
         }
 
         public sealed override void Send(byte[] dataToSend)
@@ -96,13 +96,13 @@ namespace Inertia.Network
             }
 
             Statistics.NotifyMessageReceived();
-            if (Statistics.MessageReceivedInLastSecond >= _protocol.MaximumMessageCountPerSecond)
+            if (Statistics.MessageReceivedInLastSecond >= _parameters.MessageCountLimitBeforeSpam)
             {
                 Disconnect(NetworkDisconnectReason.Spam);
                 return;
             }
 
-            NetworkProtocolFactory.ProcessParsing(_protocol, this, _networkDataReader.Fill(new ReadOnlySpan<byte>(_buffer, 0, receivedLength)));
+            NetworkProtocolFactory.ProcessParsing(_parameters.Protocol, this, _networkDataReader.Fill(new ReadOnlySpan<byte>(_buffer, 0, receivedLength)));
         }
 
         private void OnReceiveData(IAsyncResult iar)

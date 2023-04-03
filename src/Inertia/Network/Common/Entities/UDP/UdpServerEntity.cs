@@ -133,7 +133,7 @@ namespace Inertia.Network
 
                 if (!_connections.ContainsKey(endPoint))
                 {
-                    var connection = new UdpConnectionEntity((uint)IdProvider.NextValue(), this, endPoint, Protocol);
+                    var connection = new UdpConnectionEntity((uint)IdProvider.NextValue(), this, endPoint, Parameters);
                     _connections.Add(endPoint, connection);
 
                     OnConnectionAdded(connection);

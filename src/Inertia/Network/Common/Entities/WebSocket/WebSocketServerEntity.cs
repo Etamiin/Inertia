@@ -19,7 +19,7 @@ namespace Inertia.Network
             try
             {
                 var socket = ((Socket)iar.AsyncState).EndAccept(iar);
-                var connection = new WebSocketConnectionEntity(socket, (uint)IdProvider.NextValue(), Protocol, Parameters.SslCertificate);
+                var connection = new WebSocketConnectionEntity(socket, (uint)IdProvider.NextValue(), Parameters, Parameters.SslCertificate);
                 connection.ConnectionEstablished += ConnectionEstablished;
                 connection.Disconnecting += ConnectionDisconnecting;
 

@@ -31,7 +31,7 @@ namespace Inertia.Network
                 {
                     _reader = new BasicReader();
                     _client = new UdpClient();
-                    _client.Connect(new IPEndPoint(IPAddress.Parse(_parameters.Ip), _parameters.Port));
+                    _client.Connect(new IPEndPoint(IPAddress.Parse(Parameters.Ip), Parameters.Port));
 
                     Connected();
                     _client.BeginReceive(new AsyncCallback(OnReceiveData), _client);

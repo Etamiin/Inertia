@@ -14,7 +14,7 @@ namespace Inertia.Network
             try
             {
                 var socket = ((Socket)iar.AsyncState).EndAccept(iar);
-                var connection = new TcpConnectionEntity(socket, (uint)IdProvider.NextValue(), Protocol);
+                var connection = new TcpConnectionEntity(socket, (uint)IdProvider.NextValue(), Parameters);
 
                 connection.Disconnecting += ConnectionDisconnecting;
 

@@ -5,7 +5,6 @@
         public abstract int NetworkBufferLength { get; }
         public abstract int ConnectionPerQueueInPool { get; }
         public abstract int ClientMessagePerQueueCapacity { get; }
-        public abstract int MaximumMessageCountPerSecond { get; }
 
         protected NetworkProtocol()
         {

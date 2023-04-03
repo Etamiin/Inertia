@@ -19,7 +19,7 @@ namespace Inertia.Logging
         private readonly SimpleLoggerConfiguration _configuration;
         private readonly StreamWriter? _outputFileStream;
         private readonly Stream? _outputConsoleStream;
-        private readonly AsyncExecutionQueuePool? _pool;
+        private readonly ActionQueuePool? _pool;
                 
         static SimpleLogger()
         {

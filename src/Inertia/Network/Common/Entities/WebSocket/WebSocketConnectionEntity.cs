@@ -18,10 +18,10 @@ namespace Inertia.Network
         private X509Certificate? _serverCertificate;
         private DefaultWebSocketNetworkProtocol _wsProtocol;
 
-        internal WebSocketConnectionEntity(Socket socket, uint id, NetworkProtocol protocol, X509Certificate? serverCertificate) : base(socket, id, protocol)
+        internal WebSocketConnectionEntity(Socket socket, uint id, NetworkEntityParameters parameters, X509Certificate? serverCertificate) : base(socket, id, parameters)
         {
             State = WebSocketConnectionState.Connecting;
-            _wsProtocol = (DefaultWebSocketNetworkProtocol)protocol;
+            _wsProtocol = (DefaultWebSocketNetworkProtocol)parameters.Protocol;
             _serverCertificate = serverCertificate;
             if (_serverCertificate != null)
             {

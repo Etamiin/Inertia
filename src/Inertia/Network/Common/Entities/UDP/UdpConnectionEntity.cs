@@ -10,7 +10,7 @@ namespace Inertia.Network
 
         private UdpServerEntity _server;
 
-        internal UdpConnectionEntity(uint id, UdpServerEntity server, IPEndPoint endPoint, NetworkProtocol protocol) : base(id, protocol)
+        internal UdpConnectionEntity(uint id, UdpServerEntity server, IPEndPoint endPoint, NetworkEntityParameters parameters) : base(id, parameters)
         {
             _server = server;
             EndPoint = endPoint;

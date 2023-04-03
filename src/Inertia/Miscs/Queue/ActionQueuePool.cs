@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Inertia
 {
-    public class AsyncExecutionQueuePool : IDisposable
+    public class ActionQueuePool : IDisposable
     {
         private readonly static TimeSpan MinTimeQueueAlive = TimeSpan.FromMinutes(5);
 
@@ -12,17 +12,18 @@ namespace Inertia
 
         internal int QueueCapacity { get; set; }
 
-        private readonly ConcurrentDictionary<int, SyncQueue> _queues;
+        private readonly ConcurrentDictionary<int, ActionQueue> _queues;
         private readonly object _locker;
         private readonly TimeSpan _maxTimeQueueAlive;
         private readonly bool _limitProcessorUsage;
         private readonly SafeOrderedIntProvider _idProvider;
-        private SyncQueue? _currentQueue;
+        private ActionQueue? _currentQueue;
+        private bool _asyncEnabled;
 
-        public AsyncExecutionQueuePool(int queueCapacity, bool limitProcessorUsage) : this(queueCapacity, limitProcessorUsage, TimeSpan.FromMinutes(5))
+        public ActionQueuePool(int queueCapacity, bool limitProcessorUsage) : this(queueCapacity, limitProcessorUsage, TimeSpan.FromMinutes(5))
         {
         }
-        public AsyncExecutionQueuePool(int queueCapacity, bool limitProcessorUsage, TimeSpan maxTimeQueueAlive)
+        public ActionQueuePool(int queueCapacity, bool limitProcessorUsage, TimeSpan maxTimeQueueAlive)
         {
             if (maxTimeQueueAlive < MinTimeQueueAlive)
             {
@@ -31,13 +32,14 @@ namespace Inertia
 
             QueueCapacity = queueCapacity;
             _idProvider = new SafeOrderedIntProvider();
-            _queues = new ConcurrentDictionary<int, SyncQueue>();
+            _queues = new ConcurrentDictionary<int, ActionQueue>();
             _locker = new object();
             _maxTimeQueueAlive = maxTimeQueueAlive;
             _limitProcessorUsage = limitProcessorUsage;
+            _asyncEnabled = true;
         }
 
-        internal void Execute()
+        public void SyncProcessPool()
         {
             this.ThrowIfDisposable(IsDisposed);
 
@@ -57,7 +59,24 @@ namespace Inertia
                 }
             }
         }
-
+        public void SetActiveAsyncExecution(bool active)
+        {
+            _asyncEnabled = active;
+            if (_queues.Count == 1 && _currentQueue != null)
+            {
+                _currentQueue.SetAsyncExecutionState(active);
+            }
+            else
+            {
+                lock (_locker)
+                {
+                    foreach (var pair in _queues)
+                    {
+                        pair.Value.SetAsyncExecutionState(active);
+                    }
+                }
+            }
+        }
         public void Enqueue(BasicAction action)
         {
             this.ThrowIfDisposable(IsDisposed);
@@ -69,7 +88,7 @@ namespace Inertia
                     var queue = _queues.FirstOrDefault((pair) => !pair.Value.DisposeRequested && pair.Value.Count < QueueCapacity).Value;
                     if (queue == null)
                     {
-                        queue = new SyncQueue(_idProvider.NextValue(), _maxTimeQueueAlive, _limitProcessorUsage);
+                        queue = new ActionQueue(_idProvider.NextValue(), _maxTimeQueueAlive, _limitProcessorUsage, _asyncEnabled);
                         queue.Disposing += QueueDisposing;
 
                         _queues.TryAdd(queue.Id, queue);
@@ -94,7 +113,7 @@ namespace Inertia
 
             if (disposing)
             {
-                SyncQueue[] queues;
+                ActionQueue[] queues;
                 lock (_locker)
                 {
                     queues = _queues.Values.ToArray();
@@ -108,7 +127,7 @@ namespace Inertia
                 _currentQueue = null;
             }
         }
-        private void QueueDisposing(SyncQueue queue)
+        private void QueueDisposing(ActionQueue queue)
         {
             _queues.TryRemove(queue.Id, out _);
 

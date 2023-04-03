@@ -7,21 +7,13 @@ namespace Inertia.Network
     public static class NetworkProtocolFactory
     {
         internal const int DefaultBacklogSize = 1000;
+        internal const int DefaultMessageCountLimitBeforeSpam = 55;
 
-        internal static AsyncExecutionQueuePool? ClientExecutionPool { get; private set; }
         internal static ServerMessagePoolExecutor? ServerAsyncPool { get; private set; }
         internal static NetworkProtocol DefaultProtocol { get; private set; }
         internal static DefaultWebSocketNetworkProtocol DefaultWsProtocol { get; private set; }
 
         public static NetworkProtocol CurrentProtocol { get; private set; }
-
-        public static void ExecuteClientExecutionPool()
-        {
-            if (ReflectionProvider.IsAsyncPoolDisabled)
-            {
-                ClientExecutionPool?.Execute();
-            }
-        }
 
         static NetworkProtocolFactory()
         {
@@ -77,18 +69,6 @@ namespace Inertia.Network
             {
                 ServerAsyncPool.ConnectionPerQueue = protocol.ConnectionPerQueueInPool;
             }
-
-            if (ClientExecutionPool == null)
-            {
-                if (ReflectionProvider.IsNetworkClientUsedInAssemblies)
-                {
-                    ClientExecutionPool = new AsyncExecutionQueuePool(protocol.ClientMessagePerQueueCapacity, false);
-                }
-            }
-            else
-            {
-                ClientExecutionPool.QueueCapacity = protocol.ClientMessagePerQueueCapacity;
-            }
         }
 
         public static void ProcessParsing(NetworkProtocol protocol, INetworkEntity receiver, BasicReader reader)
@@ -110,7 +90,15 @@ namespace Inertia.Network
             }
             else
             {
-                ClientExecutionPool?.Enqueue(ExecuteOutput);
+                var client = receiver as NetworkClientEntity;
+                if (client.Parameters.ExecutionPool == null)
+                {
+                    SimpleLogger.Default.Error($"Cannot process '{receiver.GetType().Name}' messages: ExecutionPool is null.");
+                    
+                    return;
+                }
+
+                client.Parameters.ExecutionPool.Enqueue(ExecuteOutput);
             }
 
             void ExecuteOutput()

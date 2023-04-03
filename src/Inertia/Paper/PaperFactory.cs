@@ -10,7 +10,7 @@ namespace Inertia.Scriptable
     {
         private const int MaxTickPerSecond = 180;
 
-        internal static AsyncExecutionQueuePool QueuePool { get; private set; }
+        internal static ActionQueuePool QueuePool { get; private set; }
 
         public static bool LimitProcessorUsage { get; set; }
         public static int TargetTickPerSecond
@@ -33,7 +33,7 @@ namespace Inertia.Scriptable
 
         static PaperFactory()
         {
-            QueuePool = new AsyncExecutionQueuePool(500, true);
+            QueuePool = new ActionQueuePool(500, true);
             _componentInstances = new Dictionary<Type, IPenSystem>();
             _executionLayers = new Dictionary<int, PenExecutionLayer>();
 

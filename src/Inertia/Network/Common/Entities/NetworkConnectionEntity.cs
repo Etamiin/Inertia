@@ -7,18 +7,18 @@
         internal ServerMessageQueue AssignedMessageQueue => _messageQueue;
 
         private readonly ServerMessageQueue _messageQueue;
-        private protected NetworkProtocol _protocol { get; private set; }
+        private protected readonly NetworkEntityParameters _parameters;
 
-        protected NetworkConnectionEntity(uint id, NetworkProtocol protocol)
+        protected NetworkConnectionEntity(uint id, NetworkEntityParameters parameters)
         {
             Id = id;
-            _protocol = protocol;
+            _parameters = parameters;
             _messageQueue = NetworkProtocolFactory.ServerAsyncPool.RegisterConnection(this);
         }
 
         public void Send(NetworkMessage message)
         {
-            Send(_protocol.SerializeMessage(message));
+            Send(_parameters.Protocol.SerializeMessage(message));
         }
 
         public abstract void Send(byte[] data);

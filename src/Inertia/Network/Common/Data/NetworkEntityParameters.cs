@@ -8,6 +8,7 @@ namespace Inertia.Network
         public NetworkProtocol Protocol { get; set; } = NetworkProtocolFactory.DefaultProtocol;
         public string Ip { get; set; }
         public int Port { get; set; }
+        public int MessageCountLimitBeforeSpam { get; set; } = NetworkProtocolFactory.DefaultMessageCountLimitBeforeSpam;
 
         protected NetworkEntityParameters(int port) : this(string.Empty, port)
         {

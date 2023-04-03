@@ -5,15 +5,16 @@ namespace Inertia.Network
 {
     public abstract class NetworkClientEntity : INetworkEntity
     {
+        internal protected readonly ClientParameters Parameters;
+
         public abstract bool IsConnected { get; }
 
-        protected ILogger? Logger => _parameters.Logger;
-        protected NetworkProtocol Protocol => _parameters.Protocol;
-        private protected readonly ClientParameters _parameters;
+        protected ILogger? Logger => Parameters.Logger;
+        protected NetworkProtocol Protocol => Parameters.Protocol;
         
         protected NetworkClientEntity(ClientParameters parameters)
         {
-            _parameters = parameters;
+            Parameters = parameters;
         }
 
         public abstract void Connect();

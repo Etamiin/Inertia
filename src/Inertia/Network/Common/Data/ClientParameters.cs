@@ -2,8 +2,11 @@
 {
     public class ClientParameters : NetworkEntityParameters
     {
-        public ClientParameters(string ip, int port) : base(ip, port)
+        public ActionQueuePool ExecutionPool { get; private set; }
+
+        public ClientParameters(string ip, int port, ActionQueuePool executionPool) : base(ip, port)
         {
+            ExecutionPool = executionPool;
         }
     }
 }

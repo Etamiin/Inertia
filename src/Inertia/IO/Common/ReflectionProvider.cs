@@ -71,7 +71,6 @@ namespace Inertia
         }
 
         internal static bool IsPaperCallOverriden { get; private set; }
-        internal static bool IsAsyncPoolDisabled { get; private set; }
         internal static bool IsNetworkClientUsedInAssemblies { get; private set; }
         internal static bool IsNetworkServerUsedInAssemblies { get; private set; }
 
@@ -241,11 +240,6 @@ namespace Inertia
             if (!IsPaperCallOverriden && type.GetCustomAttribute<OverridePaperCall>() != null)
             {
                 IsPaperCallOverriden = true;
-            }
-            
-            if (!IsAsyncPoolDisabled && type.GetCustomAttribute<DisableAsyncPoolExecution>() != null)
-            {
-                IsAsyncPoolDisabled = true;
             }
 
             if (typeof(IPenSystem).IsAssignableFrom(type))
