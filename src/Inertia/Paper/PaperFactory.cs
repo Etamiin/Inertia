@@ -1,68 +1,49 @@
 ﻿using Inertia.Plugins;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace Inertia.Scriptable
+namespace Inertia.Paper
 {
     public static class PaperFactory
     {
-        private const int MaxTickPerSecond = 180;
-
-        internal static ActionQueuePool QueuePool { get; private set; }
-
-        public static bool LimitProcessorUsage { get; set; }
-        public static int TargetTickPerSecond
-        {
-            get => _targetTickPerSecond;
-            set
-            {
-                if (value > MaxTickPerSecond)
-                {
-                    _targetTickPerSecond = MaxTickPerSecond;
-                }
-                else _targetTickPerSecond = value;
-            }
-        }
-
-        private static Dictionary<int, PenExecutionLayer> _executionLayers;
-        private static Dictionary<Type, IPenSystem> _componentInstances;
-
-        private static int _targetTickPerSecond = MaxTickPerSecond;
+        private static ConcurrentDictionary<int, PenExecutionLayer> _executionLayers;
+        private static ConcurrentDictionary<Type, IPenSystem> _componentInstances;
 
         static PaperFactory()
         {
-            QueuePool = new ActionQueuePool(500, true);
-            _componentInstances = new Dictionary<Type, IPenSystem>();
-            _executionLayers = new Dictionary<int, PenExecutionLayer>();
+            _componentInstances = new ConcurrentDictionary<Type, IPenSystem>();
+            _executionLayers = new ConcurrentDictionary<int, PenExecutionLayer>();
 
             ReflectionProvider.Invalidate();
         }
 
-        public static T CreateAndActive<T>(params object[] args) where T : PaperObject
+        public static void ConfigureLayer(int layerIndex, PenExecutionLayerType type)
         {
-            var type = typeof(T);
-            var types = args.Select((obj) => obj.GetType()).ToArray();
-            var cnstr = type.GetConstructor(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, types, null);
-
-            if (cnstr == null)
+            ConfigureLayer(layerIndex, -1, type);
+        }
+        public static void ConfigureLayer(int layerIndex, int tickPerSecond, PenExecutionLayerType type)
+        {
+            if (!_executionLayers.TryGetValue(layerIndex, out var layer))
             {
-                throw new NotFoundConstructorException(type, types);
+                layer = new PenExecutionLayer(tickPerSecond, type);
+                _executionLayers.TryAdd(layerIndex, layer);
             }
-
-            var instance = (T)cnstr.Invoke(args);
-            instance.SetActive();
-
-            return instance;
+            else
+            {
+                layer.Change(tickPerSecond, type);
+            }
         }
         public static void CallCycle(float deltaTime)
         {
-            if (!ReflectionProvider.IsPaperCallOverriden) return;
+            if (!ReflectionProvider.IsPaperOwned) return;
 
-            foreach (var pair in _executionLayers)
+            var layers = _executionLayers.Values;
+            foreach (var layer in layers)
             {
-                pair.Value.OnComponentsUpdate(deltaTime);
+                layer.OnComponentsUpdate(deltaTime);
             }
         }
         public static PluginExecutionResult TryStartPlugin(string pluginFilePath, params object[] executionParameters)
@@ -85,14 +66,14 @@ namespace Inertia.Scriptable
             var dataType = typeof(T);
             if (_componentInstances.ContainsKey(dataType))
             {
-                throw new ScriptComponentSystemDuplicate(component.GetType(), dataType);
+                throw new PenSystemDuplicateException(component.GetType(), dataType);
             }
-            else _componentInstances.Add(dataType, component);
+            else _componentInstances.TryAdd(dataType, component);
 
-            if (!_executionLayers.TryGetValue(component.ExecutionLayer, out var executionLayer))
+            if (!_executionLayers.TryGetValue(component.LayerIndex, out var executionLayer))
             {
-                executionLayer = new PenExecutionLayer();
-                _executionLayers.Add(component.ExecutionLayer, executionLayer);
+                ConfigureLayer(component.LayerIndex, PenExecutionLayerType.FixedSleep);
+                executionLayer = _executionLayers[component.LayerIndex];
             }
 
             return executionLayer;

@@ -1,28 +1,28 @@
 ﻿using System;
 
-namespace Inertia.Scriptable
+namespace Inertia.Paper
 {
     public class TimedPaper : PaperObject
     {
         public static void OnNextTick(BasicAction action)
         {
-            PaperFactory.CreateAndActive<TimedPaper>(action);
+            TimedPenSystem.CreatePaperAndActive(action);
         }
         public static void Delayed(float delayTimeSeconds, BasicAction action)
         {
-            PaperFactory.CreateAndActive<TimedPaper>(action, delayTimeSeconds, false);
+            TimedPenSystem.CreatePaperAndActive(action, delayTimeSeconds, false);
         }
         public static void Delayed(TimeSpan delayTime, BasicAction action)
         {
-            PaperFactory.CreateAndActive<TimedPaper>(action, delayTime, false);
+            TimedPenSystem.CreatePaperAndActive(action, delayTime, false);
         }
         public static TimedPaper DelayedLoop(float delayTimeSeconds, BasicAction action)
         {
-            return PaperFactory.CreateAndActive<TimedPaper>(action, delayTimeSeconds, true);
+            return TimedPenSystem.CreatePaperAndActive(action, delayTimeSeconds, true);
         }
         public static TimedPaper DelayedLoop(TimeSpan delayTime, BasicAction action)
         {
-            return PaperFactory.CreateAndActive<TimedPaper>(action, delayTime, true);
+            return TimedPenSystem.CreatePaperAndActive(action, delayTime, true);
         }
 
         internal bool CanBeExecuted

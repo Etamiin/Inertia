@@ -1,12 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
-namespace Inertia.Scriptable
+namespace Inertia.Paper
 {
     public abstract class PenSystem<T> : IPenSystem where T : PaperObject
     {
-        public virtual int ExecutionLayer { get; }
+        public static T CreatePaperAndActive(params object[] args)
+        {
+            var type = typeof(T);
+            var types = args.Select((obj) => obj.GetType()).ToArray();
+            var cnstr = type.GetConstructor(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, types, null);
+
+            if (cnstr == null)
+            {
+                throw new NotFoundConstructorException(type, types);
+            }
+
+            var instance = (T)cnstr.Invoke(args);
+            instance.SetActive();
+
+            return instance;
+        }
+
+        public virtual int LayerIndex { get; }
         public float DeltaTime { get; private set; }
         public bool IsActive
         {
@@ -71,13 +89,13 @@ namespace Inertia.Scriptable
             if (!IsActive) return;
             lock (_locker)
             {
-                var executableDatas = _componentDatas.Where((obj) => obj.State == PaperObject.PaperObjectState.Initialized).ToArray();
+                var executableDatas = _componentDatas.Where((obj) => obj.State == PaperObjectState.Initialized).ToArray();
 
                 try
                 {
                     foreach (var obj in executableDatas)
                     {
-                        if (obj.State == PaperObject.PaperObjectState.Disposed) continue;
+                        if (obj.State == PaperObjectState.Disposed) continue;
 
                         OnProcess(obj);
                     }
@@ -87,12 +105,12 @@ namespace Inertia.Scriptable
                     OnExceptionThrown(ex);
                 }
 
-                var notInitializedDatas = _componentDatas.Where((obj) => obj.State != PaperObject.PaperObjectState.Initialized).ToArray();
+                var notInitializedDatas = _componentDatas.Where((obj) => obj.State != PaperObjectState.Initialized).ToArray();
                 foreach (var obj in notInitializedDatas)
                 {
-                    if (obj.State == PaperObject.PaperObjectState.Disposing)
+                    if (obj.State == PaperObjectState.Disposing)
                     {
-                        obj.State = PaperObject.PaperObjectState.Disposed;
+                        obj.State = PaperObjectState.Disposed;
                         ((IPenSystem)this).UnregisterComponentData(obj);
                     }
                 }

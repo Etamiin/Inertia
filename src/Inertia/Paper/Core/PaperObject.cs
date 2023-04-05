@@ -1,17 +1,9 @@
 ﻿using System;
 
-namespace Inertia.Scriptable
+namespace Inertia.Paper
 {
     public abstract class PaperObject : IDisposable
     {
-        internal enum PaperObjectState : byte
-        {
-            NoState = 0,
-            Initialized = 1,
-            Disposing = 2,
-            Disposed = 3
-        }
-
         public bool IsDisposed
         {
             get

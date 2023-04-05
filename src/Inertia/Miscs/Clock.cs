@@ -54,7 +54,7 @@ namespace Inertia
         }        
         public double GetElapsedSecondsAndReset()
         {
-            var seconds = GetElapsedMillisecondsAndReset();
+            var seconds = _cw.Elapsed.TotalSeconds;
             Reset();
 
             return seconds;

@@ -1,9 +1,9 @@
 ﻿using System;
 
-namespace Inertia.Scriptable
+namespace Inertia.Paper
 {
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
-    public class OverridePaperCall : Attribute
+    public class OverridePaperOwnerAttribute : Attribute
     {
     }
 }

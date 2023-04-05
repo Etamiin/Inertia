@@ -1,144 +1,66 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Threading.Tasks;
 
 namespace Inertia
 {
-    internal class ActionQueue
+    public abstract class ActionQueue
     {
-        private const int LimitProcessorUsageMaxDequeuePerTick = 20;
+        private protected bool DisposeRequested { get; private set; }
 
-        internal event BasicAction<ActionQueue>? Disposing;
+        public bool IsDisposed { get; private set; }
+        public int Count => _queue.Count;
 
-        internal bool IsDisposed { get; private set; }
+        private protected readonly ActionQueueParameters Parameters;
+        private ConcurrentQueue<BasicAction> _queue;
 
-        internal int Id { get; private set; }
-        internal DateTime? EmptySince { get; private set; }
-        internal bool DisposeRequested { get; private set; }
-        internal int Count
+        protected ActionQueue(ActionQueueParameters parameters)
         {
-            get
-            {
-                return _queue.Count;
-            }
-        }
-        internal bool AsyncExecution { get; set; }
-
-        private readonly ConcurrentQueue<BasicAction> _queue;
-        private readonly TimeSpan _maxTimeQueueAlive;
-        private readonly bool _limitProcessorUsage;
-        private Task? _currentTask;
-
-        internal ActionQueue(int id, TimeSpan maxTimeQueueAlive, bool limitProcessorUsage, bool asyncExecution)
-        {
-            Id = id;
+            Parameters = parameters;
             _queue = new ConcurrentQueue<BasicAction>();
-            _maxTimeQueueAlive = maxTimeQueueAlive;
-            _limitProcessorUsage = limitProcessorUsage;
-
-            SetAsyncExecutionState(asyncExecution);
         }
 
-        internal void SetAsyncExecutionState(bool active)
+        public void Enqueue(BasicAction action)
         {
-            var state = AsyncExecution;
-
-            AsyncExecution = active;
-            if (!state && active)
-            {
-                if (_currentTask == null && !DisposeRequested)
-                {
-                    _currentTask = Task.Factory.StartNew(ProcessQueueAsync, TaskCreationOptions.LongRunning);
-                }
-            }
-        }
-        internal void SyncProcessQueue()
-        {
-            if (IsDisposed) return;
-
-            CheckForDisposal();
-            if (_queue.Count == 0) return;
-
-            var i = 0;
-            while (i < LimitProcessorUsageMaxDequeuePerTick && _queue.TryDequeue(out var action))
-            {
-                action?.Invoke();
-                i++;
-            }
-        }
-        internal void Enqueue(BasicAction action)
-        {
-            if (IsDisposed) return;
+            if (IsDisposed || DisposeRequested) return;
 
             _queue.Enqueue(action);
         }
-        internal void BeginDispose()
+
+        public virtual void RequestDispose()
         {
+            if (IsDisposed || DisposeRequested) return;
+
             DisposeRequested = true;
         }
 
-        private async void ProcessQueueAsync()
+        protected void ProcessQueue()
         {
-            var isRunning = true;
-            while (AsyncExecution && isRunning)
+            if (IsDisposed) return;
+
+            var i = 0;
+            do
             {
-                isRunning = CheckForDisposal();
-                if (_queue.Count == 0)
+                if (_queue.TryDequeue(out var action))
                 {
-                    if (isRunning)
-                    {
-                        await Task.Delay(10).ConfigureAwait(false);
-                    }
-
-                    continue;
+                    action?.Invoke();
+                    i++;
                 }
-
-                EmptySince = null;
-
-                if (_limitProcessorUsage)
-                {
-                    var i = 0;
-                    while (i < LimitProcessorUsageMaxDequeuePerTick && _queue.TryDequeue(out var action))
-                    {
-                        action?.Invoke();
-                        i++;
-                    }
-
-                    await Task.Delay(10).ConfigureAwait(false);
-                }
-                else if (_queue.TryDequeue(out var action)) action?.Invoke();
+                else break;
             }
+            while (i < Parameters.MaximumExecutionPerTick);
         }
-        private bool CheckForDisposal()
+        protected void Clean()
         {
-            if (_queue.Count == 0)
-            {
-                if (DisposeRequested)
-                {
-                    Disposing?.Invoke(this);
-                    _queue?.Clear();
-                    Disposing = null;
-                    EmptySince = null;
-                    _currentTask = null;
-                    IsDisposed = true;
+            if (IsDisposed) return;
 
-                    return false;
-                }
-                else
-                {
-                    if (EmptySince.HasValue)
-                    {
-                        var span = DateTime.Now - EmptySince.Value;
-                        if (span >= _maxTimeQueueAlive) BeginDispose();
-                    }
-                    else
-                    {
-                        EmptySince = DateTime.Now;
-                    }
-                }
+            while (Count > 0)
+            {
+                ProcessQueue();
             }
 
-            return true;
+            _queue = null;
+            IsDisposed = true;
+            DisposeRequested = false;
         }
     }
 }

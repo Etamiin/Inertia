@@ -1,7 +1,7 @@
 ﻿using Inertia.Logging;
 using Inertia.Network;
 using Inertia.Plugins;
-using Inertia.Scriptable;
+using Inertia.Paper;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -25,7 +25,7 @@ namespace Inertia
             {
                 Info = info;
 
-                var serAttr = info.GetCustomAttribute<PropertySerialization>();
+                var serAttr = info.GetCustomAttribute<PropertySerializationAttribute>();
                 if (serAttr != null)
                 {
                     SerializationMethodInfo = SearchForMethod(serAttr.SerializationMethodName, typeof(BasicWriter));
@@ -70,7 +70,7 @@ namespace Inertia
             }
         }
 
-        internal static bool IsPaperCallOverriden { get; private set; }
+        internal static bool IsPaperOwned { get; private set; }
         internal static bool IsNetworkClientUsedInAssemblies { get; private set; }
         internal static bool IsNetworkServerUsedInAssemblies { get; private set; }
 
@@ -212,13 +212,13 @@ namespace Inertia
         {
             if (typeof(IAutoSerializable).IsAssignableFrom(type))
             {
-                if (type.GetCustomAttribute<IgnoreInReflection>() != null) return;
+                if (type.GetCustomAttribute<IgnoreInReflectionAttribute>() != null) return;
 
                 var memoryList = new List<SerializablePropertyMemory>();
                 var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance).OrderBy((property) => property.Name);
                 foreach (var property in properties)
                 {
-                    if (!property.CanWrite || property.GetCustomAttribute<IgnoreInReflection>() != null) continue;
+                    if (!property.CanWrite || property.GetCustomAttribute<IgnoreInReflectionAttribute>() != null) continue;
 
                     memoryList.Add(new SerializablePropertyMemory(property));
                 }
@@ -237,9 +237,9 @@ namespace Inertia
                 }
             }
 
-            if (!IsPaperCallOverriden && type.GetCustomAttribute<OverridePaperCall>() != null)
+            if (!IsPaperOwned && type.GetCustomAttribute<OverridePaperOwnerAttribute>() != null)
             {
-                IsPaperCallOverriden = true;
+                IsPaperOwned = true;
             }
 
             if (typeof(IPenSystem).IsAssignableFrom(type))

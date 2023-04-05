@@ -4,8 +4,8 @@ namespace Inertia.Network
 {
     public abstract class NetworkMessageWithBag : NetworkMessage
     {
-        private BasicWriter _bagWriter;
-        private BasicReader _bagReader;
+        private BasicWriter? _bagWriter;
+        private BasicReader? _bagReader;
 
         protected virtual void BaseSerialize(BasicWriter writer) { }
         protected virtual void BaseDeserialize(BasicReader reader) { }
@@ -41,10 +41,7 @@ namespace Inertia.Network
             {
                 writer.SetAutoSerializable(this);
             }
-            else
-            {
-                BaseSerialize(writer);
-            }
+            else BaseSerialize(writer);
 
             var hasCustomData = _bagWriter != null && _bagWriter.TotalLength > 0;
 
@@ -57,10 +54,7 @@ namespace Inertia.Network
             {
                 reader.GetAutoSerializable(this);
             }
-            else
-            {
-                BaseDeserialize(reader);
-            }
+            else BaseDeserialize(reader);
 
             if (reader.GetBool())
             {

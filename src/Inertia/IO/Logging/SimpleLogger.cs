@@ -1,5 +1,4 @@
-﻿using Inertia.Scriptable;
-using System;
+﻿using System;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -19,7 +18,7 @@ namespace Inertia.Logging
         private readonly SimpleLoggerConfiguration _configuration;
         private readonly StreamWriter? _outputFileStream;
         private readonly Stream? _outputConsoleStream;
-        private readonly ActionQueuePool? _pool;
+        private readonly AsyncActionQueue? _actionQueue;
                 
         static SimpleLogger()
         {
@@ -31,7 +30,11 @@ namespace Inertia.Logging
 
             if (configuration.ExecuteAsync)
             {
-                _pool = PaperFactory.QueuePool;
+                _actionQueue = new AsyncActionQueue(new ActionQueueParameters()
+                {
+                    MaximumExecutionPerTick = 100,
+                    SleepTimeOnEmptyQueue = TimeSpan.FromMilliseconds(200)
+                });
             }
 
             if (configuration.OutputInConsole)
@@ -79,7 +82,7 @@ namespace Inertia.Logging
 
         private void LogLine(object content, SimpleLoggerConfiguration.LogStyle logStyle)
         {
-            if (_configuration.ExecuteAsync) _pool.Enqueue(Finalize);
+            if (_configuration.ExecuteAsync) _actionQueue.Enqueue(Finalize);
             else Finalize();
 
             void Finalize()

@@ -91,14 +91,14 @@ namespace Inertia.Network
             else
             {
                 var client = receiver as NetworkClientEntity;
-                if (client.Parameters.ExecutionPool == null)
+                if (client.Parameters.ExecutionQueue == null)
                 {
                     SimpleLogger.Default.Error($"Cannot process '{receiver.GetType().Name}' messages: ExecutionPool is null.");
                     
                     return;
                 }
 
-                client.Parameters.ExecutionPool.Enqueue(ExecuteOutput);
+                client.Parameters.ExecutionQueue.Enqueue(ExecuteOutput);
             }
 
             void ExecuteOutput()

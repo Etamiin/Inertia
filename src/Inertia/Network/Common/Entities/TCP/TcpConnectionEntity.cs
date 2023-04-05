@@ -23,6 +23,15 @@ namespace Inertia.Network
             _buffer = new byte[_parameters.Protocol.NetworkBufferLength];
         }
 
+        public bool Disconnect()
+        {
+            return Disconnect(NetworkDisconnectReason.Manual);
+        }
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+
         public sealed override void Send(byte[] dataToSend)
         {
             this.ThrowIfDisposable(IsDisposed);
@@ -43,11 +52,6 @@ namespace Inertia.Network
                     Disconnect(NetworkDisconnectReason.InvalidMessageSended);
                 }
             }
-        }
-
-        public bool Disconnect()
-        {
-            return Disconnect(NetworkDisconnectReason.Manual);
         }
         public override bool Disconnect(NetworkDisconnectReason reason)
         {
@@ -71,10 +75,6 @@ namespace Inertia.Network
 
             ProcessClean();
             return true;
-        }
-        public void Dispose()
-        {
-            Dispose(true);
         }
 
         internal protected virtual void BeginReceiveMessages()

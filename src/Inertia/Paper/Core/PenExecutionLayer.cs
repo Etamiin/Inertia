@@ -1,24 +1,56 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Threading;
-using System.Threading.Tasks;
 
-namespace Inertia.Scriptable
+namespace Inertia.Paper
 {
     internal sealed class PenExecutionLayer : IDisposable
     {
+        private const int DefaultTickPerSecond = 60;
+
         internal event BasicAction<float>? ComponentsUpdate;
 
         internal bool IsDisposed { get; private set; }
-        
-        internal PenExecutionLayer()
+
+        private PenExecutionLayerType _type;
+        private double _targetMsPerTick;
+        private Thread? _thread;
+        private Clock? _clock;
+
+        internal PenExecutionLayer(int tickPerSecond, PenExecutionLayerType type)
         {
-            if (!ReflectionProvider.IsPaperCallOverriden)
+            Change(tickPerSecond, type);
+
+            if (!ReflectionProvider.IsPaperOwned)
             {
-                Task.Factory.StartNew(() => ExecuteCycle(new Clock()), TaskCreationOptions.LongRunning);
+                _thread = new Thread(ExecuteCycle);
+                _thread.IsBackground = true;
+
+                _thread.Start();
             }
         }
 
+        internal void Change(int tickPerSecond, PenExecutionLayerType type)
+        {
+            if (IsDisposed) return;
+
+            if (tickPerSecond <= 0)
+            {
+                tickPerSecond = DefaultTickPerSecond;
+            }
+
+            _targetMsPerTick = 1000.0d / tickPerSecond;
+
+            if (!ReflectionProvider.IsPaperOwned)
+            {
+                if (_clock == null)
+                {
+                    _clock = new Clock();
+                }
+                else _clock.Reset();
+
+                _type = type;
+            }
+        }
         internal void OnComponentsUpdate(float deltaTime)
         {
             ComponentsUpdate?.Invoke(deltaTime);
@@ -29,29 +61,32 @@ namespace Inertia.Scriptable
             Dispose(true);
         }
 
-        private void ExecuteCycle(Clock clock)
+        private void ExecuteCycle()
         {
-            while (!IsDisposed)
+            while (!IsDisposed && _type != PenExecutionLayerType.None)
             {
-                var currentMsUpdate = clock.GetElapsedSeconds();
-                var targetMsUpdate = 1000.0d / PaperFactory.TargetTickPerSecond;
+                var currentMsUpdate = _clock.GetElapsedMilliseconds();
 
-                if (currentMsUpdate < targetMsUpdate)
+                if (_type == PenExecutionLayerType.TickBased)
                 {
-                    if (ComponentsUpdate == null || PaperFactory.LimitProcessorUsage) Thread.Sleep(1);
-                    else
+                    if (currentMsUpdate < _targetMsPerTick)
                     {
-                        var msToSleep = (targetMsUpdate - currentMsUpdate) / 1000.0d;
-                        var sleepTicks = Math.Round(msToSleep * Stopwatch.Frequency);
+                        var msToSleep = _targetMsPerTick - currentMsUpdate;
+                        var sleepTicks = TimeSpan.TicksPerMillisecond * msToSleep;
 
-                        while (clock.ElapsedTicks < sleepTicks) { }
+                        while (_clock.ElapsedTicks < sleepTicks) ;
                     }
-
-                    currentMsUpdate = clock.GetElapsedSeconds();
+                }
+                else if (_type == PenExecutionLayerType.FixedSleep)
+                {
+                    Thread.Sleep(1);
                 }
 
-                clock.Reset();
-                ComponentsUpdate?.Invoke((float)currentMsUpdate);
+
+                currentMsUpdate = _clock.GetElapsedMilliseconds();
+
+                _clock.Reset();
+                ComponentsUpdate?.Invoke((float)(currentMsUpdate / 1000.0d));
             }
         }
         private void Dispose(bool disposing)
@@ -60,7 +95,7 @@ namespace Inertia.Scriptable
 
             if (disposing)
             {
-                //
+                _type = PenExecutionLayerType.None;
             }
 
             IsDisposed = true;

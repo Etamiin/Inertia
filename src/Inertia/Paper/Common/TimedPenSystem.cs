@@ -1,7 +1,7 @@
 ﻿using Inertia.Logging;
 using System;
 
-namespace Inertia.Scriptable
+namespace Inertia.Paper
 {
     internal sealed class TimedPenSystem : PenSystem<TimedPaper>
     {
