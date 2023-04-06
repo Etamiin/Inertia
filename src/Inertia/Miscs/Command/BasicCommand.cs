@@ -1,10 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using Inertia.Logging;
+using System.Collections.Generic;
 using System.Text;
 
 namespace Inertia
 {
     public abstract class BasicCommand
     {
+        public ILogger Logger { get; internal set; } = BasicLogger.Default;
+
         internal static void PreExecute(BasicCommand command, string[] arguments, object? state, bool containsQuotes)
         {
             if (containsQuotes)

@@ -128,27 +128,24 @@ namespace Inertia
             var instance = TryCreateInstance<IPlugin>(pluginType, Type.EmptyTypes);
             if (_pluginTraces.ContainsKey(instance.Identifier)) return PluginExecutionResult.AlreadyLoaded;
 
-            PluginTrace trace = null;
-            CancellationTokenSource executionCancelSource = null;
             if (!instance.UsePaper)
             {
                 var options = instance.LongRun ? TaskCreationOptions.LongRunning : TaskCreationOptions.None;
-                executionCancelSource = new CancellationTokenSource();
-                trace = new PluginTrace(instance, executionCancelSource);
+                var executionCancelSource = new CancellationTokenSource();
 
                 Task.Factory.StartNew(
                     () => RunPluginExecution(instance, executionParameters),
                     executionCancelSource.Token,
                     options,
                     TaskScheduler.Default);
+
+                _pluginTraces.Add(instance.Identifier, new PluginTrace(instance, executionCancelSource));
             }
             else
             {
-                trace = new PluginTrace(instance);
+                _pluginTraces.Add(instance.Identifier, new PluginTrace(instance));
                 TimedPaper.OnNextTick(() => RunPluginExecution(instance, executionParameters));
             }
-
-            _pluginTraces.Add(instance.Identifier, new PluginTrace(instance, executionCancelSource));
 
             return PluginExecutionResult.Success;
         }

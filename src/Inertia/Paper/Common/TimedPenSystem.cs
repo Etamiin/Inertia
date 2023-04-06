@@ -10,9 +10,11 @@ namespace Inertia.Paper
             if (script.CanBeExecuted) script.Execute();
         }
 
-        public override void OnExceptionThrown(Exception exception)
+        public override void OnExceptionThrown(PaperInstanceThrowedException<TimedPaper> paperException)
         {
-            SimpleLogger.Default.Error($"{nameof(TimedPaper)} failed to execute: {exception}");
+            paperException.DisposeResponsibleInstance = true;
+
+            BasicLogger.Default.Error($"'{paperException.Instance}' failed to execute: {paperException.InnerException}");
         }
     }
 }

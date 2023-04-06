@@ -63,18 +63,13 @@ namespace Inertia.Paper
 
         internal void Execute()
         {
-            try
+            _action?.Invoke();
+
+            if (!_disposeWhenExecuted)
             {
-                _action?.Invoke();
+                _startAt = DateTime.Now;
             }
-            finally
-            {
-                if (!_disposeWhenExecuted)
-                {
-                    _startAt = DateTime.Now;
-                }
-                else Dispose();
-            }
+            else Dispose();
         }
     }
 }

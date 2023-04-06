@@ -10,9 +10,5 @@ namespace Inertia
         public int MaximumExecutionPerTick { get; set; } = DefaultMaxExecutionPerTick;
         public TimeSpan? TimeBeforeDisposeOnEmptyQueue { get; set; }
         public TimeSpan SleepTimeOnEmptyQueue { get; set; } = DefaultSleepTimeOnEmptyQueue;
-
-        public ActionQueueParameters()
-        {
-        }
     }
 }

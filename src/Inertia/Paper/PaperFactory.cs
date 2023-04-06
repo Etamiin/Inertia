@@ -1,9 +1,6 @@
 ﻿using Inertia.Plugins;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 
 namespace Inertia.Paper
 {
@@ -57,9 +54,8 @@ namespace Inertia.Paper
 
         internal static IPenSystem GetScriptableSystem(Type dataType)
         {
-            if (_componentInstances.TryGetValue(dataType, out var component)) return component;
-
-            return default;
+            _componentInstances.TryGetValue(dataType, out var component);
+            return component;
         }
         internal static PenExecutionLayer RegisterScriptableSystem<T>(PenSystem<T> component) where T : PaperObject
         {

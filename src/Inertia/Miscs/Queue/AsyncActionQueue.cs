@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Inertia
@@ -26,12 +24,12 @@ namespace Inertia
 
                 if (Count == 0)
                 {
-                    if (Parameters.TimeBeforeDisposeOnEmptyQueue.HasValue)
+                    if (_parameters.TimeBeforeDisposeOnEmptyQueue.HasValue)
                     {
                         if (_emptySince.HasValue)
                         {
                             var span = DateTime.Now - _emptySince;
-                            if (span >= Parameters.TimeBeforeDisposeOnEmptyQueue.Value)
+                            if (span >= _parameters.TimeBeforeDisposeOnEmptyQueue.Value)
                             {
                                 RequestDispose();
                                 continue;
@@ -43,7 +41,7 @@ namespace Inertia
                         }
                     }
 
-                    await Task.Delay(Parameters.SleepTimeOnEmptyQueue);
+                    await Task.Delay(_parameters.SleepTimeOnEmptyQueue);
                 }
                 else
                 {

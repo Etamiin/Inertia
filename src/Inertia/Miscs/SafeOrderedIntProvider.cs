@@ -4,23 +4,23 @@ namespace Inertia
 {
     public sealed class SafeOrderedIntProvider
     {
-        private int _currentId;
+        private int _currentValue;
 
         public SafeOrderedIntProvider()
         {
         }
-        public SafeOrderedIntProvider(int startId)
+        public SafeOrderedIntProvider(int startValue)
         {
-            _currentId = startId;
+            _currentValue = startValue;
         }
 
         public int NextValue()
         {
-            return Interlocked.Increment(ref _currentId);
+            return Interlocked.Increment(ref _currentValue);
         }
         public int GetCurrentValue()
         {
-            return _currentId;
+            return _currentValue;
         }
     }
 }

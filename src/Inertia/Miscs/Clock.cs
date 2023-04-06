@@ -10,14 +10,14 @@ namespace Inertia
             var clock = new Clock();
             action();
 
-            return clock.GetElapsedMilliseconds();
+            return clock._cw.Elapsed.TotalMilliseconds;
         }   
         public static double GetElapsedSeconds(BasicAction action)
         {
             var clock = new Clock();
             action();
 
-            return clock.GetElapsedSeconds();
+            return clock._cw.Elapsed.TotalSeconds;
         }
 
         public long ElapsedTicks => _cw.ElapsedTicks;
@@ -47,7 +47,6 @@ namespace Inertia
 
             return ms;
         }
-
         public double GetElapsedSeconds()
         {
             return _cw.Elapsed.TotalSeconds;

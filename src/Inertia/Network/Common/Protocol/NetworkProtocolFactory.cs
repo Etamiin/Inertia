@@ -20,7 +20,7 @@ namespace Inertia.Network
             DefaultProtocol = new DefaultNetworkProtocol();
             DefaultWsProtocol = new DefaultWebSocketNetworkProtocol();
 
-            SetDefaultProtocol(DefaultNetworkProtocols.Default);
+            SetDefaultProtocol(InternalNetworkProtocolType.Default);
         }
 
         internal static NetworkMessage CreateMessage(Type messageType)
@@ -48,10 +48,10 @@ namespace Inertia.Network
             return ReflectionProvider.TryGetMessageHandler(receiver.GetType(), out handler);
         }
 
-        public static void SetDefaultProtocol(DefaultNetworkProtocols protocolType)
+        public static void SetDefaultProtocol(InternalNetworkProtocolType protocolType)
         {
-            if (protocolType == DefaultNetworkProtocols.Default) SetDefaultProtocol(DefaultProtocol);
-            else if (protocolType == DefaultNetworkProtocols.WebSocket) SetDefaultProtocol(DefaultWsProtocol);
+            if (protocolType == InternalNetworkProtocolType.Default) SetDefaultProtocol(DefaultProtocol);
+            else if (protocolType == InternalNetworkProtocolType.WebSocket) SetDefaultProtocol(DefaultWsProtocol);
         }
         public static void SetDefaultProtocol(NetworkProtocol protocol)
         {
@@ -93,7 +93,7 @@ namespace Inertia.Network
                 var client = receiver as NetworkClientEntity;
                 if (client.Parameters.ExecutionQueue == null)
                 {
-                    SimpleLogger.Default.Error($"Cannot process '{receiver.GetType().Name}' messages: ExecutionPool is null.");
+                    BasicLogger.Default.Error($"Cannot process '{receiver.GetType().Name}' messages: ExecutionPool is null.");
                     
                     return;
                 }

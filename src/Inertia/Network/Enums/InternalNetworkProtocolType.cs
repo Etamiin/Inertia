@@ -1,6 +1,6 @@
 ﻿namespace Inertia.Network
 {
-    public enum DefaultNetworkProtocols
+    public enum InternalNetworkProtocolType
     {
         Default = 0,
         WebSocket = 1

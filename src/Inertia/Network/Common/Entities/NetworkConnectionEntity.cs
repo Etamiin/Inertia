@@ -1,20 +1,23 @@
-﻿namespace Inertia.Network
+﻿using Inertia.Logging;
+
+namespace Inertia.Network
 {
     public abstract class NetworkConnectionEntity : INetworkEntity
     {
         public uint Id { get; internal set; }
         public object? State { get; set; }
 
-        internal ServerMessageQueue AssignedMessageQueue => _messageQueue;
+        protected ILogger Logger => _parameters.Logger;
 
-        private readonly ServerMessageQueue _messageQueue;
+        internal ServerMessageQueue AssignedMessageQueue { get; private set; }
+
         private protected readonly NetworkEntityParameters _parameters;
 
         protected NetworkConnectionEntity(uint id, NetworkEntityParameters parameters)
         {
             Id = id;
             _parameters = parameters;
-            _messageQueue = NetworkProtocolFactory.ServerAsyncPool.RegisterConnection(this);
+            AssignedMessageQueue = NetworkProtocolFactory.ServerAsyncPool.RegisterConnection(this);
         }
 
         public T GetStateAs<T>()

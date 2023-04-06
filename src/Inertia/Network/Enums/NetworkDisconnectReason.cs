@@ -3,12 +3,12 @@
     public enum NetworkDisconnectReason : byte
     {
         Manual = 1,
-        ConnectionLost = 100,
-        ConnectionFailed = 101,
-        ConnectionTimeout = 102,
-        InvalidMessageSended = 103,
-        InvalidDataReceived = 104,
-        SslAuthentificationFailed = 105,
-        Spam = 106
+        ConnectionLost = 2,
+        ConnectionFailed = 3,
+        ConnectionTimeout = 4,
+        InvalidMessageSended = 5,
+        InvalidDataReceived = 6,
+        SslAuthentificationFailed = 7,
+        Spam = 8
     }
 }

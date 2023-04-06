@@ -5,7 +5,7 @@
         float DeltaTime { get; }
         int LayerIndex { get; }
 
-        internal void RegisterComponentData(PaperObject obj);
-        internal void UnregisterComponentData(PaperObject obj);
+        internal void RegisterPaper(PaperObject obj);
+        internal void UnregisterPaper(PaperObject obj);
     }
 }

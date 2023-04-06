@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Inertia.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -30,89 +31,110 @@ namespace Inertia.Paper
         {
             get
             {
-                return _componentDatas.Count > 0;
+                return _papers.Count > 0;
             }
         }
 
         private readonly PenExecutionLayer _executionLayer;
-        private readonly List<T> _componentDatas;
+        private readonly List<T> _papers;
         private readonly object _locker;
         private bool _processingRegistered;
 
         protected PenSystem()
         {
             _locker = new object();
-            _componentDatas = new List<T>();
+            _papers = new List<T>();
             _executionLayer = PaperFactory.RegisterScriptableSystem(this);
         }
 
         public abstract void OnProcess(T obj);
-        public abstract void OnExceptionThrown(Exception exception);
+        public abstract void OnExceptionThrown(PaperInstanceThrowedException<T> paperException);
 
-        void IPenSystem.RegisterComponentData(PaperObject obj)
+        void IPenSystem.RegisterPaper(PaperObject obj)
         {
             if (obj is T tData)
             {
                 lock (_locker)
                 {
-                    _componentDatas.Add(tData);
+                    _papers.Add(tData);
 
                     if (!_processingRegistered)
                     {
-                        _executionLayer.ComponentsUpdate += ProcessComponents;
+                        _executionLayer.ComponentsUpdate += ProcessPapers;
                         _processingRegistered = true;
                     }
                 }
             }
         }
-        void IPenSystem.UnregisterComponentData(PaperObject obj)
+        void IPenSystem.UnregisterPaper(PaperObject obj)
         {
             if (obj is T tData)
             {
                 lock (_locker)
                 {
-                    _componentDatas.Remove(tData);
+                    _papers.Remove(tData);
 
                     if (_processingRegistered && !IsActive)
                     {
-                        _executionLayer.ComponentsUpdate -= ProcessComponents;
+                        _executionLayer.ComponentsUpdate -= ProcessPapers;
                         _processingRegistered = false;
                     }
                 }
             }
         }
 
-        private void ProcessComponents(float deltaTime)
+        private void ProcessPapers(float deltaTime)
         {
             DeltaTime = deltaTime;
 
             if (!IsActive) return;
             lock (_locker)
             {
-                var executableDatas = _componentDatas.Where((obj) => obj.State == PaperObjectState.Initialized).ToArray();
+                var executableDatas = _papers
+                    .Where((obj) => obj.State == PaperObjectState.Initialized)
+                    .ToArray();
 
-                try
-                {
-                    foreach (var obj in executableDatas)
-                    {
-                        if (obj.State == PaperObjectState.Disposed) continue;
+                var startIndex = 0;
+                ProcessPapers(executableDatas, ref startIndex);
 
-                        OnProcess(obj);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    OnExceptionThrown(ex);
-                }
+                var notInitializedDatas = _papers
+                    .Where((obj) => obj.State != PaperObjectState.Initialized)
+                    .ToArray();
 
-                var notInitializedDatas = _componentDatas.Where((obj) => obj.State != PaperObjectState.Initialized).ToArray();
                 foreach (var obj in notInitializedDatas)
                 {
                     if (obj.State == PaperObjectState.Disposing)
                     {
                         obj.State = PaperObjectState.Disposed;
-                        ((IPenSystem)this).UnregisterComponentData(obj);
+                        ((IPenSystem)this).UnregisterPaper(obj);
                     }
+                }
+            }
+        }
+        private void ProcessPapers(T[] components, ref int index)
+        {
+            try
+            {
+                for (; index < components.Length; index++)
+                {
+                    var obj = components[index];
+                    if (obj.State != PaperObjectState.Disposed)
+                    {
+                        OnProcess(obj);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                var instance = components[index];
+                var paperEx = new PaperInstanceThrowedException<T>(instance, ex);
+                OnExceptionThrown(paperEx);
+
+                if (paperEx.DisposeResponsibleInstance) instance.Dispose();
+                if (!paperEx.StopTick && index < components.Length - 1)
+                {
+                    index++;
+                    ProcessPapers(components, ref index);
                 }
             }
         }

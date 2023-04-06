@@ -10,12 +10,12 @@ namespace Inertia
         public bool IsDisposed { get; private set; }
         public int Count => _queue.Count;
 
-        private protected readonly ActionQueueParameters Parameters;
+        private protected readonly ActionQueueParameters _parameters;
         private ConcurrentQueue<BasicAction> _queue;
 
         protected ActionQueue(ActionQueueParameters parameters)
         {
-            Parameters = parameters;
+            _parameters = parameters;
             _queue = new ConcurrentQueue<BasicAction>();
         }
 
@@ -47,7 +47,7 @@ namespace Inertia
                 }
                 else break;
             }
-            while (i < Parameters.MaximumExecutionPerTick);
+            while (i < _parameters.MaximumExecutionPerTick);
         }
         protected void Clean()
         {

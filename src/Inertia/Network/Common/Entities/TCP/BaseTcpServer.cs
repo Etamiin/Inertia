@@ -58,7 +58,7 @@ namespace Inertia.Network
                 }
                 catch (Exception ex)
                 {
-                    Logger?.Error($"Starting server failed: {ex}");
+                    Logger.Error($"Starting server failed: {ex}");
                     Close(NetworkDisconnectReason.ConnectionFailed);
                 }
             }

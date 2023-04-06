@@ -39,7 +39,6 @@ namespace Inertia.Paper
             }
 
             _targetMsPerTick = 1000.0d / tickPerSecond;
-
             if (!ReflectionProvider.IsPaperOwned)
             {
                 if (_clock == null)

@@ -3,20 +3,8 @@ using System.Text;
 
 namespace Inertia.Logging
 {
-    public sealed class SimpleLoggerConfiguration
+    public sealed class BasicLoggerConfiguration
     {
-        public struct LogStyle
-        {
-            public readonly string Title;
-            public readonly ConsoleColor Color;
-
-            public LogStyle(string title, ConsoleColor color)
-            {
-                Title = title;
-                Color = color;
-            }
-        }
-
         public bool ExecuteAsync { get; set; }
         public string? OutputFileName { get; set; }
         public bool OutputInConsole { get; set; }
@@ -28,7 +16,7 @@ namespace Inertia.Logging
         public LogStyle Warn { get; set; } = new LogStyle("[Warn]", ConsoleColor.Yellow);
         public LogStyle Error { get; set; } = new LogStyle("[Error]", ConsoleColor.Red);
     
-        public SimpleLoggerConfiguration()
+        public BasicLoggerConfiguration()
         {
             TextEncoding = Encoding.UTF8;
             OutputInConsole = true;

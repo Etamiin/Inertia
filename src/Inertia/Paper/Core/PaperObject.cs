@@ -22,7 +22,7 @@ namespace Inertia.Paper
             if (component != null)
             {
                 State = PaperObjectState.Initialized;
-                component.RegisterComponentData(this);
+                component.RegisterPaper(this);
             }
             else Dispose();
         }

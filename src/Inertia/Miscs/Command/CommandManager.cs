@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Inertia.Logging;
+using System;
 using System.Collections.Generic;
 
 namespace Inertia
@@ -15,9 +16,17 @@ namespace Inertia
 
         public static bool TryExecute(string commandLine)
         {
-            return TryExecute(commandLine, null);
+            return TryExecute(commandLine, null, null);
+        }
+        public static bool TryExecute(string commandLine, ILogger logger)
+        {
+            return TryExecute(commandLine, logger, null);
         }
         public static bool TryExecute(string commandLine, object? state)
+        {
+            return TryExecute(commandLine, null, state);
+        }
+        public static bool TryExecute(string commandLine, ILogger? logger, object? state)
         {
             if (string.IsNullOrWhiteSpace(commandLine)) return false;
 
@@ -25,13 +34,18 @@ namespace Inertia
             var args = new string[values.Length - 1];
             Array.Copy(values, 1, args, 0, args.Length);
 
-            return TryExecuteByName(values[0], state, commandLine.Contains('"'), args);
+            return TryExecuteByName(values[0], logger, state, commandLine.Contains('"'), args);
         }
         
-        private static bool TryExecuteByName(string commandName, object? state, bool containsQuotes, params string[] arguments)
+        private static bool TryExecuteByName(string commandName, ILogger? logger, object? state, bool containsQuotes, params string[] arguments)
         {
             if (ReflectionProvider.TryGetCommand(commandName, out BasicCommand cmd))
             {
+                if (logger != null)
+                {
+                    cmd.Logger = logger;
+                }
+
                 BasicCommand.PreExecute(cmd, arguments, state, containsQuotes);
                 return true;
             }

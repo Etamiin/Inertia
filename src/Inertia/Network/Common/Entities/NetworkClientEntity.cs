@@ -9,7 +9,7 @@ namespace Inertia.Network
 
         public abstract bool IsConnected { get; }
 
-        protected ILogger? Logger => Parameters.Logger;
+        protected ILogger Logger => Parameters.Logger;
         protected NetworkProtocol Protocol => Parameters.Protocol;
         
         protected NetworkClientEntity(ClientParameters parameters)

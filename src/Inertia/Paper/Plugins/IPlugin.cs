@@ -11,6 +11,6 @@ namespace Inertia.Plugins
         
         public void Execute(object[] parameters);
         public void Stopping();
-        public void Error(Exception errorEx);
+        public void Error(Exception exception);
     }
 }

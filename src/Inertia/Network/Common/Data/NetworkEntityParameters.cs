@@ -4,7 +4,7 @@ namespace Inertia.Network
 {
     public abstract class NetworkEntityParameters
     {
-        public ILogger? Logger { get; set; }
+        public ILogger Logger { get; set; } = BasicLogger.Default;
         public NetworkProtocol Protocol { get; set; } = NetworkProtocolFactory.DefaultProtocol;
         public string Ip { get; set; }
         public int Port { get; set; }

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Inertia.Logging
 {
-    public sealed class SimpleLogger : ILogger, IDisposable
+    public sealed class BasicLogger : ILogger, IDisposable
     {
         public static ILogger Default { get; private set; }
 
@@ -15,16 +15,16 @@ namespace Inertia.Logging
 
         public bool IsDisposed { get; private set; }
 
-        private readonly SimpleLoggerConfiguration _configuration;
+        private readonly BasicLoggerConfiguration _configuration;
         private readonly StreamWriter? _outputFileStream;
         private readonly Stream? _outputConsoleStream;
         private readonly AsyncActionQueue? _actionQueue;
                 
-        static SimpleLogger()
+        static BasicLogger()
         {
-            Default = new SimpleLogger(new SimpleLoggerConfiguration());
+            Default = new BasicLogger(new BasicLoggerConfiguration());
         }
-        public SimpleLogger(SimpleLoggerConfiguration configuration)
+        public BasicLogger(BasicLoggerConfiguration configuration)
         {
             _configuration = configuration;
 
@@ -80,7 +80,7 @@ namespace Inertia.Logging
             Dispose(true);
         }
 
-        private void LogLine(object content, SimpleLoggerConfiguration.LogStyle logStyle)
+        private void LogLine(object content, LogStyle logStyle)
         {
             if (_configuration.ExecuteAsync) _actionQueue.Enqueue(Finalize);
             else Finalize();

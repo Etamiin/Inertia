@@ -72,7 +72,7 @@ namespace Inertia.Network
                 }
                 catch (Exception ex)
                 {
-                    SimpleLogger.Default.Error($"SSL Authentification Failed: {ex}");
+                    BasicLogger.Default.Error($"SSL Authentification Failed: {ex}");
                 }
             }
         }
