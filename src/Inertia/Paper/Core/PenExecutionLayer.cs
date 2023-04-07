@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Threading;
+using System.Threading.Tasks;
 
 namespace Inertia.Paper
 {
@@ -13,7 +13,7 @@ namespace Inertia.Paper
 
         private PenExecutionLayerType _type;
         private double _targetMsPerTick;
-        private Thread? _thread;
+        private Task? _task;
         private Clock? _clock;
 
         internal PenExecutionLayer(int tickPerSecond, PenExecutionLayerType type)
@@ -22,10 +22,7 @@ namespace Inertia.Paper
 
             if (!ReflectionProvider.IsPaperOwned)
             {
-                _thread = new Thread(ExecuteCycle);
-                _thread.IsBackground = true;
-
-                _thread.Start();
+                _task = Task.Run(ExecuteCycle);
             }
         }
 
@@ -60,7 +57,7 @@ namespace Inertia.Paper
             Dispose(true);
         }
 
-        private void ExecuteCycle()
+        private async Task ExecuteCycle()
         {
             while (!IsDisposed && _type != PenExecutionLayerType.None)
             {
@@ -78,15 +75,16 @@ namespace Inertia.Paper
                 }
                 else if (_type == PenExecutionLayerType.FixedSleep)
                 {
-                    Thread.Sleep(1);
+                    await Task.Delay(1).ConfigureAwait(false);
                 }
-
 
                 currentMsUpdate = _clock.GetElapsedMilliseconds();
 
                 _clock.Reset();
                 ComponentsUpdate?.Invoke((float)(currentMsUpdate / 1000.0d));
             }
+
+            _task = null;
         }
         private void Dispose(bool disposing)
         {

@@ -1,4 +1,6 @@
-﻿namespace Inertia.Network
+﻿using System;
+
+namespace Inertia.Network
 {
     public class ClientParameters : NetworkEntityParameters
     {
@@ -6,6 +8,11 @@
 
         public ClientParameters(string ip, int port, ActionQueue executionQueue) : base(ip, port)
         {
+            if (executionQueue == null)
+            {
+                throw new ArgumentNullException(nameof(executionQueue));
+            }
+
             ExecutionQueue = executionQueue;
         }
     }

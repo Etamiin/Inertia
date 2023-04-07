@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Inertia
 {
@@ -282,12 +283,20 @@ namespace Inertia
 
             return _writer.ToArray();
         }
+        public async Task<byte[]> ToArrayAsync()
+        {
+            return await Task.Run(ToArray).ConfigureAwait(false);
+        }
         public byte[] ToArrayAndDispose()
         {
             var data = ToArray();
             Dispose();
 
             return data;
+        }
+        public async Task<byte[]> ToArrayAndDisposeAsync()
+        {
+            return await Task.Run(ToArrayAndDispose).ConfigureAwait(false);
         }
 
         public void Dispose()

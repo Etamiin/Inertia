@@ -1,6 +1,4 @@
-﻿using Inertia.Logging;
-using System;
-using System.Linq;
+﻿using System;
 
 namespace Inertia.Network
 {
@@ -35,12 +33,9 @@ namespace Inertia.Network
             else
             {
                 cnstr = messageType.GetConstructors()[0];
-                var parameters = cnstr
-                    .GetParameters()
-                    .Select((_) => (object)null)
-                    .ToArray();
+                var parameters = cnstr.GetParameters();
 
-                return (NetworkMessage)cnstr.Invoke(parameters);
+                return (NetworkMessage)cnstr.Invoke(new object[parameters.Length]);
             }
         }
         internal static bool TryGetHandler(INetworkEntity receiver, out NetworkMessageHandler handler)
@@ -84,23 +79,7 @@ namespace Inertia.Network
 
             if (!TryGetHandler(receiver, out var handler)) return;
 
-            if (receiver is NetworkConnectionEntity connection)
-            {
-                connection.AssignedMessageQueue.Enqueue(ExecuteOutput);
-            }
-            else
-            {
-                var client = receiver as NetworkClientEntity;
-                if (client.Parameters.ExecutionQueue == null)
-                {
-                    BasicLogger.Default.Error($"Cannot process '{receiver.GetType().Name}' messages: ExecutionPool is null.");
-                    
-                    return;
-                }
-
-                client.Parameters.ExecutionQueue.Enqueue(ExecuteOutput);
-            }
-
+            receiver.ProcessInQueue(ExecuteOutput);
             void ExecuteOutput()
             {
                 foreach (var message in output.Messages)

@@ -32,7 +32,9 @@ namespace Inertia.Paper
         }
 
         private void Dispose(bool disposing)
-        { 
+        {
+            if (IsDisposed) return;
+
             if (disposing)
             {
                 State = PaperObjectState.Disposing;

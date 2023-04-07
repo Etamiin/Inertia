@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Inertia.Network
@@ -68,9 +69,10 @@ namespace Inertia.Network
             }
         }
     
-        public async Task SendAsync(NetworkMessage message)
+        public void SendAsync(NetworkMessage message)
         {
-            await Task.Run(() => {
+            ThreadPool.QueueUserWorkItem((state) =>
+            {
                 var data = _protocol.SerializeMessage(message);
                 Sending?.Invoke(data);
             });

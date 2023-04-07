@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Inertia.Network
 {
-    public abstract class NetworkServerEntity<TParameters> : INetworkEntity where TParameters : NetworkEntityParameters
+    public abstract class NetworkServerEntity<TParameters> where TParameters : NetworkEntityParameters
     {
         public TParameters Parameters => _parameters;
 
@@ -18,10 +18,10 @@ namespace Inertia.Network
             _parameters = parameters;
         }
 
-        public Task StartAsync()
+        public async Task StartAsync()
         {
-            return Task.Run(Start);
-        }        
+            await Task.Run(Start).ConfigureAwait(false);
+        }
         public void Close()
         {
             Close(NetworkDisconnectReason.Manual);

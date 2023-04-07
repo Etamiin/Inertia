@@ -90,18 +90,18 @@ namespace Inertia.Paper
             if (!IsActive) return;
             lock (_locker)
             {
-                var executableDatas = _papers
+                var writablePapers = _papers
                     .Where((obj) => obj.State == PaperObjectState.Initialized)
                     .ToArray();
 
                 var startIndex = 0;
-                ProcessPapers(executableDatas, ref startIndex);
+                ProcessPapers(writablePapers, ref startIndex);
 
-                var notInitializedDatas = _papers
+                var notInitializedPapers = _papers
                     .Where((obj) => obj.State != PaperObjectState.Initialized)
                     .ToArray();
 
-                foreach (var obj in notInitializedDatas)
+                foreach (var obj in notInitializedPapers)
                 {
                     if (obj.State == PaperObjectState.Disposing)
                     {

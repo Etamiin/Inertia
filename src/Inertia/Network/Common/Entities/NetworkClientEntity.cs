@@ -1,29 +1,31 @@
 ﻿using Inertia.Logging;
+using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Inertia.Network
 {
     public abstract class NetworkClientEntity : INetworkEntity
     {
-        internal protected readonly ClientParameters Parameters;
-
         public abstract bool IsConnected { get; }
 
-        protected ILogger Logger => Parameters.Logger;
-        protected NetworkProtocol Protocol => Parameters.Protocol;
-        
+        protected ILogger Logger => _parameters.Logger;
+        private protected NetworkProtocol Protocol => _parameters.Protocol;
+        private protected readonly ClientParameters _parameters;
+
         protected NetworkClientEntity(ClientParameters parameters)
         {
-            Parameters = parameters;
+            _parameters = parameters;
         }
 
-        public abstract void Connect();
-        public abstract bool Disconnect(NetworkDisconnectReason reason);
-        public abstract void Send(byte[] data);
-
-        public void ConnectAsync()
+        void INetworkEntity.ProcessInQueue(BasicAction action)
         {
-            Task.Run(Connect);
+            _parameters.ExecutionQueue.Enqueue(action);
+        }
+
+        public async Task ConnectAsync()
+        {
+            await Task.Run(Connect).ConfigureAwait(false);
         }
         public bool Disconnect()
         {
@@ -33,6 +35,18 @@ namespace Inertia.Network
         {
             Send(Protocol.SerializeMessage(message));
         }
+        public void SendAsync(NetworkMessage message)
+        {
+            ThreadPool.QueueUserWorkItem((state) => Send(message));
+        }
+        public void SendAsync(byte[] dataToSend)
+        {
+            ThreadPool.QueueUserWorkItem((state) => Send(dataToSend));
+        }
+
+        public abstract void Connect();
+        public abstract bool Disconnect(NetworkDisconnectReason reason);
+        public abstract void Send(byte[] data);
 
         protected virtual void Connected() { }
         protected virtual void Disconnecting(NetworkDisconnectReason reason) { }

@@ -17,7 +17,6 @@ namespace Inertia.Network
 
         public override int NetworkBufferLength => 4096;
         public override int ConnectionPerQueueInPool => 500;
-        public override int ClientMessagePerQueueCapacity => 1000;
 
         internal DefaultWebSocketNetworkProtocol()
         {

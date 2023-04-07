@@ -1,4 +1,6 @@
 ﻿using Inertia.Logging;
+using System;
+using System.Threading;
 
 namespace Inertia.Network
 {
@@ -9,7 +11,7 @@ namespace Inertia.Network
 
         protected ILogger Logger => _parameters.Logger;
 
-        internal ServerMessageQueue AssignedMessageQueue { get; private set; }
+        private protected ServerMessageQueue _messageQueue { get; private set; }
 
         private protected readonly NetworkEntityParameters _parameters;
 
@@ -17,7 +19,12 @@ namespace Inertia.Network
         {
             Id = id;
             _parameters = parameters;
-            AssignedMessageQueue = NetworkProtocolFactory.ServerAsyncPool.RegisterConnection(this);
+            _messageQueue = NetworkProtocolFactory.ServerAsyncPool.RegisterConnection(this);
+        }
+
+        void INetworkEntity.ProcessInQueue(BasicAction action)
+        {
+            _messageQueue?.Enqueue(action);
         }
 
         public T GetStateAs<T>()
@@ -30,6 +37,14 @@ namespace Inertia.Network
         public void Send(NetworkMessage message)
         {
             Send(_parameters.Protocol.SerializeMessage(message));
+        }
+        public void SendAsync(NetworkMessage message)
+        {
+            ThreadPool.QueueUserWorkItem((state) => Send(message));
+        }
+        public void SendAsync(byte[] dataToSend)
+        {
+            ThreadPool.QueueUserWorkItem((state) => Send(dataToSend));
         }
 
         public abstract void Send(byte[] dataToSend);

@@ -1,8 +1,11 @@
 ﻿using Inertia.IO;
+using Inertia.IO.Data;
+using System;
 using System.IO;
 using System.IO.Compression;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Inertia
 {
@@ -30,6 +33,10 @@ namespace Inertia
                 return sBuilder.ToString();
             }
         }
+        public static async Task<string> GetSHA256Async(byte[] data)
+        {
+            return await Task.Run(() => GetSHA256(data)).ConfigureAwait(false);
+        }
         public static string GetSHA256(FileStream stream)
         {
             using (var sha256 = SHA256.Create())
@@ -43,6 +50,10 @@ namespace Inertia
 
                 return sBuilder.ToString();
             }
+        }
+        public static async Task<string> GetSHA256Async(FileStream stream)
+        {
+            return await Task.Run(() => GetSHA256(stream)).ConfigureAwait(false);
         }
 
         public static ZipCompressionResult GzipCompress(byte[] data)
@@ -59,6 +70,10 @@ namespace Inertia
                 return new ZipCompressionResult(compressedData, compressedData.Length < data.Length);
             }
         }
+        public static async Task<ZipCompressionResult> GzipCompressAsync(byte[] data)
+        {
+            return await Task.Run(() => GzipCompress(data)).ConfigureAwait(false);
+        }
         public static ZipCompressionResult GzipDecompress(byte[] compressedData)
         {
             using (var cms = new MemoryStream(compressedData))
@@ -70,34 +85,49 @@ namespace Inertia
                         gzs.CopyTo(ms);
                     }
 
-                    return new ZipCompressionResult(ms.ToArray());
+                    return new ZipCompressionResult(ms.ToArray(), null);
                 }
             }
         }
-
-        public static byte[] AesEncrypt(byte[] data, string key)
+        public static async Task<ZipCompressionResult> GzipDecompressAsync(byte[] compressedData)
         {
-            using (var ms = new MemoryStream())
+            return await Task.Run(() => GzipDecompress(compressedData)).ConfigureAwait(false);
+        }
+
+        public static AesEncryptionResult AesEncrypt(byte[] data, string key)
+        {
+            try
             {
-                using (var pdb = new PasswordDeriveBytes(key, Encoding.ASCII.GetBytes(key)))
+                using (var ms = new MemoryStream())
                 {
-                    using (var aes = new AesManaged())
+                    using (var pdb = new PasswordDeriveBytes(key, Encoding.ASCII.GetBytes(key)))
                     {
-                        aes.Key = pdb.GetBytes(aes.KeySize / 8);
-                        aes.IV = pdb.GetBytes(aes.BlockSize / 8);
-
-                        using (var cs = new CryptoStream(ms, aes.CreateEncryptor(), CryptoStreamMode.Write))
+                        using (var aes = new AesManaged())
                         {
-                            cs.Write(data, 0, data.Length);
-                            cs.Close();
-                        }
+                            aes.Key = pdb.GetBytes(aes.KeySize / 8);
+                            aes.IV = pdb.GetBytes(aes.BlockSize / 8);
 
-                        return ms.ToArray();
+                            using (var cs = new CryptoStream(ms, aes.CreateEncryptor(), CryptoStreamMode.Write))
+                            {
+                                cs.Write(data, 0, data.Length);
+                                cs.Close();
+                            }
+
+                            return new AesEncryptionResult(true, ms.ToArray(), null);
+                        }
                     }
                 }
             }
-        }        
-        public static bool TryAesDecrypt(byte[] encryptedData, string key, out byte[] decryptedData)
+            catch (Exception ex)
+            {
+                return new AesEncryptionResult(false, null, ex);
+            }
+        }
+        public static async Task<AesEncryptionResult> AesEncryptAsync(byte[] data, string key)
+        {
+            return await Task.Run(() => AesEncrypt(data, key)).ConfigureAwait(false);
+        }
+        public static AesEncryptionResult TryAesDecrypt(byte[] encryptedData, string key)
         {
             try
             {
@@ -118,15 +148,17 @@ namespace Inertia
                         }
                     }
 
-                    decryptedData = ms.ToArray();
-                    return true;
+                    return new AesEncryptionResult(true, ms.ToArray(), null);
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                decryptedData = null;
-                return false;
+                return new AesEncryptionResult(false, null, ex);
             }
+        }
+        public static async Task<AesEncryptionResult> TryAesDecryptAsync(byte[] encryptedData, string key)
+        {
+            return await Task.Run(() => TryAesDecrypt(encryptedData, key)).ConfigureAwait(false);
         }
     }
 }

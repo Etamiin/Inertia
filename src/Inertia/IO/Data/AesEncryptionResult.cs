@@ -1,17 +1,19 @@
 ﻿using System;
 
-namespace Inertia.IO
+namespace Inertia.IO.Data
 {
-    public sealed class ZipCompressionResult : IDisposable
+    public sealed class AesEncryptionResult : IDisposable
     {
         public bool IsDisposed { get; private set; }
-        public bool? HasBetterSize { get; private set; }
-        public byte[] Data { get; private set; }
+        public bool Success { get; private set; }
+        public byte[]? Data { get; private set; }
+        public Exception? Error { get; private set; }
 
-        internal ZipCompressionResult(byte[] data, bool? hasBetterSize)
+        internal AesEncryptionResult(bool success, byte[]? data, Exception? error)
         {
+            Success = success;
             Data = data;
-            HasBetterSize = hasBetterSize;
+            Error = error;
         }
 
         public void Dispose()
@@ -26,6 +28,7 @@ namespace Inertia.IO
             if (disposing)
             {
                 Data = null;
+                Error = null;
             }
 
             IsDisposed = true;

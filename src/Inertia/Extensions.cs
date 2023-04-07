@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using Inertia;
 using Inertia.IO;
 
@@ -36,9 +37,17 @@ namespace System
         {
             return IOHelper.GzipCompress(data);
         }
+        public static async Task<ZipCompressionResult> GzipCompressAsync(this byte[] data)
+        {
+            return await IOHelper.GzipCompressAsync(data);
+        }
         public static ZipCompressionResult GzipDecompress(this byte[] compressedData)
         {
             return IOHelper.GzipDecompress(compressedData);
+        }
+        public static async Task<ZipCompressionResult> GzipDecompressAsync(this byte[] compressedData)
+        {
+            return await IOHelper.GzipDecompressAsync(compressedData);
         }
 
         public static bool GetBit(this byte value, int index)
