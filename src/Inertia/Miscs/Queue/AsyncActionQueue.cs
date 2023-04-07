@@ -12,7 +12,7 @@ namespace Inertia
             Task.Factory.StartNew(Execute, TaskCreationOptions.LongRunning);
         }
 
-        private async void Execute()
+        private async Task Execute()
         {
             while (true)
             {

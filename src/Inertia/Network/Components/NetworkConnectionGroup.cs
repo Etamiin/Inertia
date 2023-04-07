@@ -71,7 +71,7 @@ namespace Inertia.Network
     
         public void SendAsync(NetworkMessage message)
         {
-            ThreadPool.QueueUserWorkItem((state) =>
+            ThreadPool.QueueUserWorkItem((_) =>
             {
                 var data = _protocol.SerializeMessage(message);
                 Sending?.Invoke(data);

@@ -2,7 +2,7 @@
 
 namespace Inertia.Logging
 {
-    public struct LogStyle
+    public struct LogStyle : IEquatable<LogStyle>
     {
         public readonly string Title;
         public readonly ConsoleColor Color;
@@ -11,6 +11,11 @@ namespace Inertia.Logging
         {
             Title = title;
             Color = color;
+        }
+
+        public bool Equals(LogStyle other)
+        {
+            return other.Title.Equals(Title) && other.Color == Color;
         }
     }
 }

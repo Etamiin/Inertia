@@ -25,7 +25,7 @@ namespace Inertia.Network
 
             if (connection is TcpConnectionEntity tcpConnection)
             {
-                tcpConnection.Disconnecting += ConnectionDisconnected;
+                tcpConnection.Disconnecting += ConnectionDisconnecting;
             }
         }
         internal void Enqueue(BasicAction action)
@@ -56,13 +56,13 @@ namespace Inertia.Network
                 }
             }, TaskCreationOptions.LongRunning);
         }
-        private void ConnectionDisconnected(NetworkConnectionEntity entity, NetworkDisconnectReason reason)
+        private void ConnectionDisconnecting(NetworkConnectionEntity entity, NetworkDisconnectReason reason)
         {
             Interlocked.Decrement(ref _registeredConnection);
 
             if (entity is TcpConnectionEntity tcpConnection)
             {
-                tcpConnection.Disconnecting += ConnectionDisconnected;
+                tcpConnection.Disconnecting += ConnectionDisconnecting;
             }
         }
         private void Dispose(bool disposing)

@@ -99,7 +99,6 @@ namespace Inertia.Network
                 var payloadSize = applicationData.Length < PayloadMidSize ? applicationData.Length : (applicationData.Length <= ushort.MaxValue ? PayloadMidSize : PayloadFullSize);
                 byte opCode = (byte)wsOpCode;
                 opCode.SetBitRef(0, true, EndiannessType.BigEndian);
-                //opCode |= 1 << 7;
 
                 writer
                     .SetByte(opCode)

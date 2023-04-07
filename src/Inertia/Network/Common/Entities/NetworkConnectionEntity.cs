@@ -40,11 +40,11 @@ namespace Inertia.Network
         }
         public void SendAsync(NetworkMessage message)
         {
-            ThreadPool.QueueUserWorkItem((state) => Send(message));
+            ThreadPool.QueueUserWorkItem((_) => Send(message));
         }
         public void SendAsync(byte[] dataToSend)
         {
-            ThreadPool.QueueUserWorkItem((state) => Send(dataToSend));
+            ThreadPool.QueueUserWorkItem((_) => Send(dataToSend));
         }
 
         public abstract void Send(byte[] dataToSend);

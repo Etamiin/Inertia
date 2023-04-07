@@ -163,11 +163,6 @@ namespace Inertia
         }
         public BasicWriter SetDateTime(DateTime value)
         {
-            if (value == null)
-            {
-                value = DateTime.Now;
-            }
-
             return SetLong(value.Ticks);
         }
         public BasicWriter SetBytes(byte[] value)
