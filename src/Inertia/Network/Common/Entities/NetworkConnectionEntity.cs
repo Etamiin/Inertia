@@ -1,10 +1,12 @@
 ﻿using Inertia.Logging;
 using System;
+using System.Linq;
+using System.Reflection;
 using System.Threading;
 
 namespace Inertia.Network
 {
-    public abstract class NetworkConnectionEntity : INetworkEntity
+    public abstract class NetworkConnectionEntity : NetworkEntity
     {
         public uint Id { get; internal set; }
         public object? State { get; set; }
@@ -12,7 +14,6 @@ namespace Inertia.Network
         protected ILogger Logger => _parameters.Logger;
 
         private protected ServerMessageQueue _messageQueue { get; private set; }
-
         private protected readonly NetworkEntityParameters _parameters;
 
         protected NetworkConnectionEntity(uint id, NetworkEntityParameters parameters)
@@ -22,7 +23,7 @@ namespace Inertia.Network
             _messageQueue = NetworkProtocolFactory.ServerAsyncPool.RegisterConnection(this);
         }
 
-        void INetworkEntity.ProcessInQueue(BasicAction action)
+        internal override void ProcessInQueue(BasicAction action)
         {
             _messageQueue?.Enqueue(action);
         }

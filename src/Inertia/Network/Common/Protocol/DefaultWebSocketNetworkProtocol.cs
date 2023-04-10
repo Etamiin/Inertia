@@ -16,7 +16,7 @@ namespace Inertia.Network
         private const byte PayloadFullSize = 127;
 
         public override int NetworkBufferLength => 4096;
-        public override int ConnectionPerQueueInPool => 500;
+        public override int ConnectionPerQueueInPool => 750;
 
         internal DefaultWebSocketNetworkProtocol()
         {
@@ -32,7 +32,7 @@ namespace Inertia.Network
                 return writer.ToArray();
             }
         }
-        public override bool ParseMessage(INetworkEntity receiver, BasicReader reader, MessageParsingOutput output)
+        public override bool ParseMessage(NetworkEntity receiver, BasicReader reader, MessageParsingOutput output)
         {
             reader.SetPosition(0);
 

@@ -5,7 +5,7 @@ namespace Inertia.Network
     internal sealed class DefaultNetworkProtocol : NetworkProtocol
     {
         public override int NetworkBufferLength => 4096;
-        public override int ConnectionPerQueueInPool => 500;
+        public override int ConnectionPerQueueInPool => 750;
 
         internal DefaultNetworkProtocol()
         {
@@ -29,7 +29,7 @@ namespace Inertia.Network
                 return writer.ToArray();
             }
         }
-        public override bool ParseMessage(INetworkEntity receiver, BasicReader reader, MessageParsingOutput output)
+        public override bool ParseMessage(NetworkEntity receiver, BasicReader reader, MessageParsingOutput output)
         {
             reader.SetPosition(0);
 

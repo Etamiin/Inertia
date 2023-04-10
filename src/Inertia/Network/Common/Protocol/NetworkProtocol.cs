@@ -10,7 +10,7 @@
         }
 
         public abstract byte[] SerializeMessage(NetworkMessage message);
-        public abstract bool ParseMessage(INetworkEntity receiver, BasicReader reader, MessageParsingOutput output);
+        public abstract bool ParseMessage(NetworkEntity receiver, BasicReader reader, MessageParsingOutput output);
 
         protected NetworkMessage? CreateMessageById(ushort messageId)
         {

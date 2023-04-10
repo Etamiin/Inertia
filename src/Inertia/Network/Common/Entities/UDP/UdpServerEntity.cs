@@ -139,7 +139,8 @@ namespace Inertia.Network
                     OnConnectionAdded(connection);
                 }
 
-                NetworkProtocolFactory.ProcessParsing(Protocol, _connections[endPoint], _reader.Fill(data));
+                var receiver = _connections[endPoint];
+                NetworkProtocolFactory.ProcessParsing(Protocol, receiver, _reader.Fill(data));
             }
             catch (Exception ex)
             {

@@ -112,9 +112,12 @@ namespace Inertia
         {
             return _messageTypes.TryGetValue(messageId, out messageType);
         }
-        internal static bool TryGetMessageHandler(Type receiverType, out NetworkMessageHandler handler)
+        internal static bool TryGetMessageHandler(NetworkEntity receiver, out NetworkMessageHandler handler)
         {
-            return _messagesHandlers.TryGetValue(receiverType, out handler);
+            if (_messagesHandlers.TryGetValue(receiver.GetType(), out handler)) return true;
+            if (receiver.WrappedType != null) return _messagesHandlers.TryGetValue(receiver.WrappedType, out handler);
+
+            return false;
         }
 
         internal static PluginExecutionResult TryStartPlugin(string pluginFilePath, object[] executionParameters)
@@ -278,7 +281,11 @@ namespace Inertia
                     if (ps.Length == 2 && ps[0].ParameterType.IsSubclassOf(typeof(NetworkMessage)))
                     {
                         var isValidEntity = ps[1].ParameterType.IsSubclassOf(typeof(NetworkClientEntity)) || ps[1].ParameterType.IsSubclassOf(typeof(NetworkConnectionEntity));
-                        if (!isValidEntity) continue;
+                        if (!isValidEntity)
+                        {
+                            var attr = ps[1].ParameterType.GetCustomAttribute<IndirectNetworkEntityAttribute>();
+                            if (attr == null) continue;
+                        }
 
                         var msgType = ps[0].ParameterType;
                         var entityType = ps[1].ParameterType;

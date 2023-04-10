@@ -38,9 +38,9 @@ namespace Inertia.Network
                 return (NetworkMessage)cnstr.Invoke(new object[parameters.Length]);
             }
         }
-        internal static bool TryGetHandler(INetworkEntity receiver, out NetworkMessageHandler handler)
+        internal static bool TryGetHandler(NetworkEntity receiver, out NetworkMessageHandler handler)
         {
-            return ReflectionProvider.TryGetMessageHandler(receiver.GetType(), out handler);
+            return ReflectionProvider.TryGetMessageHandler(receiver, out handler);
         }
 
         public static void SetDefaultProtocol(InternalNetworkProtocolType protocolType)
@@ -66,7 +66,7 @@ namespace Inertia.Network
             }
         }
 
-        public static void ProcessParsing(NetworkProtocol protocol, INetworkEntity receiver, BasicReader reader)
+        public static void ProcessParsing(NetworkProtocol protocol, NetworkEntity receiver, BasicReader reader)
         {
             var output = new MessageParsingOutput();
 
