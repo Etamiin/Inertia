@@ -5,7 +5,7 @@ namespace Inertia.Network
     public abstract class NetworkEntityParameters
     {
         public ILogger Logger { get; set; } = BasicLogger.Default;
-        public NetworkProtocol Protocol { get; set; } = NetworkProtocolFactory.DefaultProtocol;
+        public NetworkProtocol Protocol { get; set; } = NetworkProtocolFactory.CurrentProtocol;
         public string Ip { get; set; }
         public int Port { get; set; }
         public int MessageCountLimitBeforeSpam { get; set; } = NetworkProtocolFactory.DefaultMessageCountLimitBeforeSpam;

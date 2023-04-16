@@ -3,16 +3,17 @@ using System;
 using System.Diagnostics;
 using System.Net.Security;
 using System.Net.Sockets;
+using System.Reflection.Emit;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
 namespace Inertia.Network
 {
-    public sealed class WebSocketConnectionEntity : TcpConnectionEntity
+    public sealed class WebSocketConnectionEntity : TcpConnectionEntity, INetworkConnectionWrapper
     {
         internal event BasicAction<WebSocketConnectionEntity>? ConnectionEstablished;
 
-        public WebSocketConnectionState State { get; private set; }
+        public WebSocketConnectionState ConnectionState { get; private set; }
 
         private SslStream? _sslStream;
         private X509Certificate? _serverCertificate;
@@ -20,7 +21,7 @@ namespace Inertia.Network
 
         internal WebSocketConnectionEntity(Socket socket, uint id, NetworkEntityParameters parameters, X509Certificate? serverCertificate) : base(socket, id, parameters)
         {
-            State = WebSocketConnectionState.Connecting;
+            ConnectionState = WebSocketConnectionState.Connecting;
             _wsProtocol = (DefaultWebSocketNetworkProtocol)parameters.Protocol;
             _serverCertificate = serverCertificate;
             if (_serverCertificate != null)
@@ -54,7 +55,7 @@ namespace Inertia.Network
 
             ProcessSend(Encoding.UTF8.GetBytes(httpResponse));
 
-            State = WebSocketConnectionState.Connected;
+            ConnectionState = WebSocketConnectionState.Connected;
             ConnectionEstablished?.Invoke(this);
         }
 
@@ -81,13 +82,13 @@ namespace Inertia.Network
         {
             if (_sslStream == null)
             {
-                if (State == WebSocketConnectionState.Connected)
+                if (ConnectionState == WebSocketConnectionState.Connected)
                 {
                     _socket.Send(_wsProtocol.WriteMessage(data, WebSocketOpCode.BinaryFrame));
                 }
                 else _socket.Send(data);
             }
-            else if (State == WebSocketConnectionState.Connected)
+            else if (ConnectionState == WebSocketConnectionState.Connected)
             {
                 _sslStream.Write(_wsProtocol.WriteMessage(data, WebSocketOpCode.BinaryFrame));
             }
@@ -100,7 +101,7 @@ namespace Inertia.Network
             _serverCertificate = null;
             _wsProtocol = null;
 
-            State = WebSocketConnectionState.Closed;
+            ConnectionState = WebSocketConnectionState.Closed;
         }
 
         private void OnAuthentificated(IAsyncResult iar)

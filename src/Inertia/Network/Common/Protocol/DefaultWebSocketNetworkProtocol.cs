@@ -44,7 +44,7 @@ namespace Inertia.Network
                 }
 
                 var connection = (WebSocketConnectionEntity)receiver;
-                if (connection.State == WebSocketConnectionState.Connecting)
+                if (connection.ConnectionState == WebSocketConnectionState.Connecting)
                 {
                     TryProcessHandshakeMessage(reader, connection);
                     return true;
@@ -70,6 +70,7 @@ namespace Inertia.Network
 
                             message.Deserialize(messageReader);
                             output.AddMessage(message);
+
                             if (messageReader.UnreadedLength > 0) messageReader.RemoveReadedBytes();
                         }
                     }
@@ -77,8 +78,10 @@ namespace Inertia.Network
 
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
+                BasicLogger.Default.Error("Parsing message failed: " + ex);
+
                 if (receiver is NetworkConnectionEntity connection)
                 {
                     connection.Disconnect(NetworkDisconnectReason.InvalidDataReceived);

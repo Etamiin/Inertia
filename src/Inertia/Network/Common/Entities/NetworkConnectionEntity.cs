@@ -6,7 +6,7 @@ using System.Threading;
 
 namespace Inertia.Network
 {
-    public abstract class NetworkConnectionEntity : NetworkEntity
+    public abstract class NetworkConnectionEntity : NetworkEntity, INetworkConnectionWrapper
     {
         public uint Id { get; internal set; }
         public object? State { get; set; }

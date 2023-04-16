@@ -1,4 +1,5 @@
 ﻿using Inertia.Logging;
+using System;
 
 namespace Inertia.Network
 {
