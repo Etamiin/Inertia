@@ -37,12 +37,14 @@ namespace Inertia.Network
             }
         }
 
-        private void ConnectionDisconnecting(TcpConnectionEntity connection, NetworkDisconnectReason reason)
+        private void ConnectionDisconnecting(object sender, ConnectionDisconnectingArgs e)
         {
+            var connection = e.Connection as TcpConnectionEntity;
+
             _connections.TryRemove(connection.Id, out _);
             connection.Disconnecting -= ConnectionDisconnecting;
 
-            OnConnectionDisconnecting(connection, reason);
+            OnConnectionDisconnecting(connection, e.Reason);
         }
     }
 }

@@ -4,23 +4,23 @@ namespace Inertia.Paper
 {
     public class TimedPaper : PaperObject
     {
-        public static void OnNextTick(BasicAction action)
+        public static void OnNextTick(Action action)
         {
             TimedPenSystem.CreatePaperAndActive(action);
         }
-        public static void Delayed(float delayTimeSeconds, BasicAction action)
+        public static void Delayed(float delayTimeSeconds, Action action)
         {
             TimedPenSystem.CreatePaperAndActive(action, delayTimeSeconds, false);
         }
-        public static void Delayed(TimeSpan delayTime, BasicAction action)
+        public static void Delayed(TimeSpan delayTime, Action action)
         {
             TimedPenSystem.CreatePaperAndActive(action, delayTime, false);
         }
-        public static TimedPaper DelayedLoop(float delayTimeSeconds, BasicAction action)
+        public static TimedPaper DelayedLoop(float delayTimeSeconds, Action action)
         {
             return TimedPenSystem.CreatePaperAndActive(action, delayTimeSeconds, true);
         }
-        public static TimedPaper DelayedLoop(TimeSpan delayTime, BasicAction action)
+        public static TimedPaper DelayedLoop(TimeSpan delayTime, Action action)
         {
             return TimedPenSystem.CreatePaperAndActive(action, delayTime, true);
         }
@@ -37,18 +37,18 @@ namespace Inertia.Paper
             }
         }
 
-        private readonly BasicAction? _action;
+        private readonly Action? _action;
         private readonly bool _disposeWhenExecuted;
         private readonly TimeSpan _delayTime;
         private DateTime _startAt;
 
-        internal TimedPaper(BasicAction action) : this(action, TimeSpan.Zero)
+        internal TimedPaper(Action action) : this(action, TimeSpan.Zero)
         {
         }
-        internal TimedPaper(BasicAction action, float delayTimeSeconds, bool loopExecution = false) : this(action, TimeSpan.FromSeconds(delayTimeSeconds), loopExecution)
+        internal TimedPaper(Action action, float delayTimeSeconds, bool loopExecution = false) : this(action, TimeSpan.FromSeconds(delayTimeSeconds), loopExecution)
         {
         }
-        internal TimedPaper(BasicAction action, TimeSpan delayTime, bool loopExecution = false)
+        internal TimedPaper(Action action, TimeSpan delayTime, bool loopExecution = false)
         {
             _disposeWhenExecuted = !loopExecution;
             _action = action;

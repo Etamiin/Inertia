@@ -5,21 +5,26 @@ namespace Inertia
 {
     public abstract class ActionQueue
     {
+        internal const int DefaultMaxExecutionPerTick = 30;
+
         private protected bool DisposeRequested { get; private set; }
 
         public bool IsDisposed { get; private set; }
         public int Count => _queue.Count;
 
-        private protected readonly ActionQueueParameters _parameters;
-        private ConcurrentQueue<BasicAction> _queue;
+        private int _maxExecutionPerTick;
+        private ConcurrentQueue<Action> _queue;
 
-        protected ActionQueue(ActionQueueParameters parameters)
+        protected ActionQueue() : this(DefaultMaxExecutionPerTick)
         {
-            _parameters = parameters;
-            _queue = new ConcurrentQueue<BasicAction>();
+        }
+        protected ActionQueue(int maximumExecutionPerTick)
+        {
+            _maxExecutionPerTick = maximumExecutionPerTick;
+            _queue = new ConcurrentQueue<Action>();
         }
 
-        public void Enqueue(BasicAction action)
+        public void Enqueue(Action action)
         {
             if (IsDisposed || DisposeRequested) return;
 
@@ -47,7 +52,7 @@ namespace Inertia
                 }
                 else break;
             }
-            while (i < _parameters.MaximumExecutionPerTick);
+            while (i < _maxExecutionPerTick);
         }
         protected void Clean()
         {

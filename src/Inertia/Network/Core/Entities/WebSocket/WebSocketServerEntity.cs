@@ -45,12 +45,14 @@ namespace Inertia.Network
             connection.ConnectionEstablished -= ConnectionEstablished;
             OnConnectionConnected(connection);
         }
-        private void ConnectionDisconnecting(TcpConnectionEntity connection, NetworkDisconnectReason reason)
+        private void ConnectionDisconnecting(object sender, ConnectionDisconnectingArgs e)
         {
+            var connection = e.Connection as WebSocketConnectionEntity;
+
             _connections.TryRemove(connection.Id, out _);
             connection.Disconnecting -= ConnectionDisconnecting;
 
-            OnConnectionDisconnecting((WebSocketConnectionEntity)connection, reason);
+            OnConnectionDisconnecting(connection, e.Reason);
         }
     }
 }

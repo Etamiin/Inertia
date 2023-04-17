@@ -9,7 +9,7 @@ namespace Inertia.Network
     {
         public int ConnectionCount => _connections.Count;
 
-        private event BasicAction<byte[]>? Sending;
+        private event BytesSenderAction? Sending;
 
         private readonly NetworkProtocol _protocol;
         private readonly List<NetworkConnectionEntity> _connections;

@@ -21,6 +21,6 @@ namespace Inertia.Network
             }
         }
 
-        internal abstract void ProcessInQueue(BasicAction action);
+        internal abstract void ProcessInQueue(Action action);
     }
 }

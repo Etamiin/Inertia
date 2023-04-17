@@ -5,7 +5,7 @@ namespace Inertia.Network
 {
     public class TcpConnectionEntity : NetworkConnectionEntity, IDisposable
     {
-        internal event BasicAction<TcpConnectionEntity, NetworkDisconnectReason>? Disconnecting;
+        internal event EventHandler<ConnectionDisconnectingArgs>? Disconnecting;
 
         public ConnectionStatistics Statistics { get; private set; }
         public bool IsDisposed { get; private set; }
@@ -59,7 +59,7 @@ namespace Inertia.Network
 
             if (_socket != null)
             {
-                Disconnecting?.Invoke(this, reason);
+                Disconnecting?.Invoke(this, new ConnectionDisconnectingArgs(this, reason));
                 Disconnecting = null;
 
                 if (IsConnected)

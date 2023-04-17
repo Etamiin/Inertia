@@ -2,7 +2,10 @@
 {
     public sealed class SyncActionQueue : ActionQueue
     {
-        public SyncActionQueue(ActionQueueParameters parameters) : base(parameters)
+        public SyncActionQueue() : base()
+        {
+        }
+        public SyncActionQueue(int maximumExecutionPerTick) : base(maximumExecutionPerTick)
         {
         }
 

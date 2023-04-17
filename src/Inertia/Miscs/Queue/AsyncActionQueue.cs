@@ -5,10 +5,27 @@ namespace Inertia
 {
     public sealed class AsyncActionQueue : ActionQueue
     {
+        private static TimeSpan DefaultSleepTimeOnEmptyQueue = TimeSpan.FromMilliseconds(100);
+
+        public TimeSpan? TimeBeforeDisposeOnEmptyQueue { get; private set; }
+        public TimeSpan SleepTimeOnEmptyQueue { get; private set; }
+        
         private DateTime? _emptySince;
 
-        public AsyncActionQueue(ActionQueueParameters parameters) : base(parameters)
+        public AsyncActionQueue() : this(DefaultMaxExecutionPerTick, DefaultSleepTimeOnEmptyQueue, null)
         {
+        }
+        public AsyncActionQueue(int maximumExecutionPerTick) : this(maximumExecutionPerTick, DefaultSleepTimeOnEmptyQueue, null)
+        {
+        }
+        public AsyncActionQueue(int maximumExecutionPerTick, TimeSpan sleepTimeOnEmptyQueue) : this(maximumExecutionPerTick, sleepTimeOnEmptyQueue, null)
+        {
+        }
+        public AsyncActionQueue(int maximumExecutionPerTick, TimeSpan sleepTimeOnEmptyQueue, TimeSpan? timeBeforeDisposeOnEmptyQueue) : base(maximumExecutionPerTick)
+        {
+            SleepTimeOnEmptyQueue = sleepTimeOnEmptyQueue;
+            TimeBeforeDisposeOnEmptyQueue = timeBeforeDisposeOnEmptyQueue;
+
             Task.Factory.StartNew(Execute, TaskCreationOptions.LongRunning);
         }
 
@@ -24,12 +41,12 @@ namespace Inertia
 
                 if (Count == 0)
                 {
-                    if (_parameters.TimeBeforeDisposeOnEmptyQueue.HasValue)
+                    if (TimeBeforeDisposeOnEmptyQueue.HasValue)
                     {
                         if (_emptySince.HasValue)
                         {
                             var span = DateTime.Now - _emptySince;
-                            if (span >= _parameters.TimeBeforeDisposeOnEmptyQueue.Value)
+                            if (span >= TimeBeforeDisposeOnEmptyQueue.Value)
                             {
                                 RequestDispose();
                                 continue;
@@ -41,7 +58,7 @@ namespace Inertia
                         }
                     }
 
-                    await Task.Delay(_parameters.SleepTimeOnEmptyQueue);
+                    await Task.Delay(SleepTimeOnEmptyQueue);
                 }
                 else
                 {

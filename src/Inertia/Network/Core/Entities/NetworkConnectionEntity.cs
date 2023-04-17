@@ -23,7 +23,7 @@ namespace Inertia.Network
             _messageQueue = NetworkProtocolFactory.ServerAsyncPool.RegisterConnection(this);
         }
 
-        internal override void ProcessInQueue(BasicAction action)
+        internal override void ProcessInQueue(Action action)
         {
             _messageQueue?.Enqueue(action);
         }

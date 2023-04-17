@@ -9,7 +9,7 @@ namespace Inertia
 {
     public sealed class BasicReader : IDisposable
     {
-        private static Dictionary<Type, BasicReturnAction<BasicReader, object>> _typageDefinitions = new Dictionary<Type, BasicReturnAction<BasicReader, object>>
+        private static Dictionary<Type, Func<BasicReader, object>> _typageDefinitions = new Dictionary<Type, Func<BasicReader, object>>
         {
             { typeof(bool), (reader) => reader.GetBool() },
             { typeof(string), (reader) => reader.GetString() },
@@ -29,7 +29,7 @@ namespace Inertia
             { typeof(byte[]), (reader) => reader.GetBytes() },
         };
 
-        public static void AddDeserializableType(Type type, BasicReturnAction<BasicReader, object> onDeserialize)
+        public static void AddDeserializableType(Type type, Func<BasicReader, object> onDeserialize)
         {
             if (!_typageDefinitions.ContainsKey(type))
             {
@@ -392,7 +392,7 @@ namespace Inertia
         {
             if (valueType == null) throw new ArgumentNullException(nameof(valueType));
 
-            if (_typageDefinitions.TryGetValue(valueType, out BasicReturnAction<BasicReader, object> action))
+            if (_typageDefinitions.TryGetValue(valueType, out Func<BasicReader, object> action))
             {
                 return action(this);
             }

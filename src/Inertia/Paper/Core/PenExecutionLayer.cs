@@ -7,7 +7,7 @@ namespace Inertia.Paper
     {
         private const int DefaultTickPerSecond = 60;
 
-        internal event BasicAction<float>? ComponentsUpdate;
+        internal event EventHandler<PenLayerTickingArgs>? Ticking;
 
         internal bool IsDisposed { get; private set; }
 
@@ -47,9 +47,9 @@ namespace Inertia.Paper
                 _type = type;
             }
         }
-        internal void OnComponentsUpdate(float deltaTime)
+        internal void OnTicking(float deltaTime)
         {
-            ComponentsUpdate?.Invoke(deltaTime);
+            Ticking?.Invoke(this, new PenLayerTickingArgs(deltaTime));
         }
 
         public void Dispose()
@@ -81,7 +81,7 @@ namespace Inertia.Paper
                 currentMsUpdate = _clock.GetElapsedMilliseconds();
 
                 _clock.Reset();
-                ComponentsUpdate?.Invoke((float)(currentMsUpdate / 1000.0d));
+                Ticking?.Invoke(this, new PenLayerTickingArgs((float)(currentMsUpdate / 1000.0d)));
             }
 
             _task = null;

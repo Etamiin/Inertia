@@ -19,7 +19,7 @@ namespace Inertia.Network
 
             return _bagWriter;
         }
-        public bool TryConsumeBagReader(BasicAction<BasicReader> consumeReader)
+        public bool TryConsumeBagReader(Action<BasicReader> consumeReader)
         {
             if (_bagReader != null)
             {

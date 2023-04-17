@@ -9,7 +9,7 @@ namespace Inertia
 {
     public sealed class BasicWriter : IDisposable
     {
-        private static Dictionary<Type, BasicAction<BasicWriter, object>> _typageDefinitions = new Dictionary<Type, BasicAction<BasicWriter, object>>
+        private static Dictionary<Type, Action<BasicWriter, object>> _typageDefinitions = new Dictionary<Type, Action<BasicWriter, object>>
         {
             { typeof(bool), (writer, value) => writer.SetBool((bool)value) },
             { typeof(string), (writer, value) => writer.SetString((string)value) },
@@ -29,7 +29,7 @@ namespace Inertia
             { typeof(byte[]), (writer, value) => writer.SetBytes((byte[])value) }
         };
 
-        public static void AddSerializableType(Type type, BasicAction<BasicWriter, object> onSerialize)
+        public static void AddSerializableType(Type type, Action<BasicWriter, object> onSerialize)
         {
             if (!_typageDefinitions.ContainsKey(type))
             {
@@ -233,7 +233,7 @@ namespace Inertia
                 precisedType = value.GetType();
             }
 
-            if (_typageDefinitions.TryGetValue(precisedType, out BasicAction<BasicWriter, object> action))
+            if (_typageDefinitions.TryGetValue(precisedType, out Action<BasicWriter, object> action))
             {
                 action(this, value);
             }

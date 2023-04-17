@@ -21,7 +21,7 @@ namespace Inertia.Network
             _parameters = parameters;
         }
 
-        internal override void ProcessInQueue(BasicAction action)
+        internal override void ProcessInQueue(Action action)
         {
             _parameters.ExecutionQueue.Enqueue(action);
         }

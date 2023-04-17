@@ -10,12 +10,12 @@ namespace Inertia.Network
         internal bool IsDisposed { get; private set; }
         internal int ConnectionCount => _registeredConnection;
 
-        private ConcurrentQueue<BasicAction> _queue;
+        private ConcurrentQueue<Action> _queue;
         private int _registeredConnection;
 
         internal ServerMessageQueue()
         {
-            _queue = new ConcurrentQueue<BasicAction>();
+            _queue = new ConcurrentQueue<Action>();
             StartAutoExecuteAsync();            
         }
 
@@ -28,7 +28,7 @@ namespace Inertia.Network
                 tcpConnection.Disconnecting += ConnectionDisconnecting;
             }
         }
-        internal void Enqueue(BasicAction action)
+        internal void Enqueue(Action action)
         {
             _queue.Enqueue(action);
         }
@@ -49,18 +49,18 @@ namespace Inertia.Network
                         continue;
                     }
 
-                    while (_queue.TryDequeue(out BasicAction action))
+                    while (_queue.TryDequeue(out Action action))
                     {
                         action?.Invoke();
                     }
                 }
             }, TaskCreationOptions.LongRunning);
         }
-        private void ConnectionDisconnecting(NetworkConnectionEntity entity, NetworkDisconnectReason reason)
+        private void ConnectionDisconnecting(object sender, ConnectionDisconnectingArgs e)
         {
             Interlocked.Decrement(ref _registeredConnection);
 
-            if (entity is TcpConnectionEntity tcpConnection)
+            if (e.Connection is TcpConnectionEntity tcpConnection)
             {
                 tcpConnection.Disconnecting += ConnectionDisconnecting;
             }

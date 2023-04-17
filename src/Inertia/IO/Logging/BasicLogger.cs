@@ -30,11 +30,7 @@ namespace Inertia.Logging
 
             if (configuration.ExecuteAsync)
             {
-                _actionQueue = new AsyncActionQueue(new ActionQueueParameters
-                {
-                    MaximumExecutionPerTick = 100,
-                    SleepTimeOnEmptyQueue = TimeSpan.FromMilliseconds(200)
-                });
+                _actionQueue = new AsyncActionQueue(100, TimeSpan.FromMilliseconds(200));
             }
 
             if (configuration.OutputInConsole)

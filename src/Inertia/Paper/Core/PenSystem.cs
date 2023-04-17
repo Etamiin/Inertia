@@ -60,7 +60,7 @@ namespace Inertia.Paper
 
                     if (!_processingRegistered)
                     {
-                        _executionLayer.ComponentsUpdate += ProcessPapers;
+                        _executionLayer.Ticking += ProcessPapers;
                         _processingRegistered = true;
                     }
                 }
@@ -76,16 +76,16 @@ namespace Inertia.Paper
 
                     if (_processingRegistered && !IsActive)
                     {
-                        _executionLayer.ComponentsUpdate -= ProcessPapers;
+                        _executionLayer.Ticking -= ProcessPapers;
                         _processingRegistered = false;
                     }
                 }
             }
         }
 
-        private void ProcessPapers(float deltaTime)
+        private void ProcessPapers(object sender, PenLayerTickingArgs e)
         {
-            DeltaTime = deltaTime;
+            DeltaTime = e.DeltaTime;
 
             if (!IsActive) return;
             lock (_locker)

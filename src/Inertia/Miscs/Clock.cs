@@ -5,14 +5,14 @@ namespace Inertia
 {
     public sealed class Clock
     {
-        public static double GetElapsedMilliseconds(BasicAction action)
+        public static double GetElapsedMilliseconds(Action action)
         {
             var clock = new Clock();
             action();
 
             return clock._cw.Elapsed.TotalMilliseconds;
         }   
-        public static double GetElapsedSeconds(BasicAction action)
+        public static double GetElapsedSeconds(Action action)
         {
             var clock = new Clock();
             action();

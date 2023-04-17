@@ -40,7 +40,7 @@ namespace Inertia.Paper
             var layers = _executionLayers.Values;
             foreach (var layer in layers)
             {
-                layer.OnComponentsUpdate(deltaTime);
+                layer.OnTicking(deltaTime);
             }
         }
         public static PluginExecutionResult TryStartPlugin(string pluginFilePath, params object[] executionParameters)

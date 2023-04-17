@@ -11,7 +11,7 @@ namespace Inertia.Network
 {
     public sealed class WebSocketConnectionEntity : TcpConnectionEntity, INetworkConnectionWrapper
     {
-        internal event BasicAction<WebSocketConnectionEntity>? ConnectionEstablished;
+        internal event WebSocketConnectionEstablished? ConnectionEstablished;
 
         public WebSocketConnectionState ConnectionState { get; private set; }
 
