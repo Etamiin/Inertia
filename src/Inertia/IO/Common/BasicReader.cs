@@ -173,6 +173,10 @@ namespace Inertia
             }
             else return default;
         }
+        public BitByte GetBitByte()
+        {
+            return new BitByte(GetByte());
+        }
         public sbyte GetSByte()
         {
             if (IsReadable(1))
@@ -211,10 +215,10 @@ namespace Inertia
             {
                 var bits = new[]
                 {
-                    BitConverter.ToInt32(data, 0),
-                    BitConverter.ToInt32(data, 4),
-                    BitConverter.ToInt32(data, 8),
-                    BitConverter.ToInt32(data, 12)
+                    BitConverter.ToInt32(data.Slice(0, 4)),
+                    BitConverter.ToInt32(data.Slice(4, 4)),
+                    BitConverter.ToInt32(data.Slice(8, 4)),
+                    BitConverter.ToInt32(data.Slice(12, 4))
                 };
 
                 return new decimal(bits);
@@ -273,6 +277,10 @@ namespace Inertia
         {
             return new DateTime(GetLong());
         }
+        public DateTime GetDateTime(DateTimeKind kind)
+        {
+            return DateTime.SpecifyKind(GetDateTime(), kind);
+        }
         public byte[] GetBytes()
         {
             if (TryReadSize(4, out var data))
@@ -286,7 +294,7 @@ namespace Inertia
         {
             if (TryReadSize(length, out var data))
             {
-                return data;
+                return data.ToArray();
             }
             else return new byte[0];
         }
@@ -342,23 +350,53 @@ namespace Inertia
 
             return instance;
         }
-        public Array GetArray(Type arrayType)
+        public IEnumerable GetIEnumerable(Type valueType)
         {
-            if (!arrayType.IsArray) throw new ArgumentNullException(nameof(arrayType));
+            var isList = typeof(IList).IsAssignableFrom(valueType);
+            var isArray = valueType.IsArray;
+            Type elementType = null;
 
-            var elementType = arrayType.GetElementType();
-            var length = GetInt();
-            var array = Array.CreateInstance(elementType, length);
+            if (valueType.IsGenericType)
+            {
+                var genericArgTypes = valueType.GetGenericArguments();
+                if (genericArgTypes.Length > 0)
+                {
+                    elementType = genericArgTypes[0];
+                }
+            }
+            else
+            {
+                elementType = valueType.GetElementType();
+            }
+
+            if (elementType == null)
+            {
+                throw new NotSupportedException($"Type '{valueType}' cannot be converted to IEnumerable. Only array and list types can be converted.");
+            }
+
+            var array = Array.CreateInstance(elementType, GetInt());
             for (var i = 0; i < array.Length; i++)
             {
                 array.SetValue(GetValue(elementType), i);
             }
 
+            if (!isArray && isList)
+            {
+                var concreteListType = typeof(List<>).MakeGenericType(elementType);
+                return (IEnumerable)Activator.CreateInstance(concreteListType, new object[] { array });
+            }
+
             return array;
         }
-        public T GetArray<T>()
+        public IEnumerable<T> GetIEnumerable<T>()
         {
-            return (T)(object)GetArray(typeof(T));
+            var array = new T[GetInt()];
+            for (var i = 0; i < array.Length; i++)
+            {
+                array[i] = GetValue<T>();
+            }
+
+            return array;
         }
         public IDictionary GetDictionary(Type dictionaryType)
         {
@@ -383,7 +421,6 @@ namespace Inertia
             var dict = GetDictionary(typeof(Dictionary<TKey, TValue>));
             return (Dictionary<TKey, TValue>)dict;
         }
-
         public T GetValue<T>()
         {
             return (T)GetValue(typeof(T));
@@ -406,14 +443,14 @@ namespace Inertia
                 {
                     return GetSerializableObject(valueType);
                 }
-                else if (valueType.IsArray)
-                {
-                    return GetArray(valueType);
-                }
                 else if (typeof(IDictionary).IsAssignableFrom(valueType))
                 {
                     return GetDictionary(valueType);
                 }
+                else if (typeof(IEnumerable).IsAssignableFrom(valueType))
+                {
+                    return GetIEnumerable(valueType);
+                }                
 
                 return null;
             }
@@ -432,7 +469,7 @@ namespace Inertia
 
             return UnreadedLength >= length;
         }
-        private bool TryReadSize(int length, out byte[]? data)
+        private bool TryReadSize(int length, out Span<byte> data)
         {
             this.ThrowIfDisposable(IsDisposed);
 
@@ -440,7 +477,7 @@ namespace Inertia
 
             if (length == 0)
             {
-                data = new byte[0];
+                data = new Span<byte>();
                 return true;
             }
 

@@ -6,9 +6,9 @@ namespace Inertia
 {
     public abstract class BasicCommand
     {
-        public ILogger Logger { get; internal set; } = BasicLogger.Default;
+        public ILogger Logger { get; set; } = BasicLogger.Default;
 
-        internal static void PreExecute(BasicCommand command, string[] arguments, object? state, bool containsQuotes)
+        internal static void ParseAndExecute(BasicCommand command, string[] arguments, object? state, bool containsQuotes)
         {
             if (containsQuotes)
             {

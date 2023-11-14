@@ -18,25 +18,34 @@ namespace Inertia.Logging
         private readonly BasicLoggerConfiguration _configuration;
         private readonly StreamWriter? _outputFileStream;
         private readonly Stream? _outputConsoleStream;
-        private readonly AsyncActionQueue? _actionQueue;
-                
+        private readonly AsyncTickedQueue? _asyncQueue;
+
         static BasicLogger()
         {
             Default = new BasicLogger(new BasicLoggerConfiguration());
         }
+
         public BasicLogger(BasicLoggerConfiguration configuration)
         {
             _configuration = configuration;
 
             if (configuration.ExecuteAsync)
             {
-                _actionQueue = new AsyncActionQueue(100, TimeSpan.FromMilliseconds(200));
+                _asyncQueue = new AsyncTickedQueue(100, TimeSpan.FromMilliseconds(200));
             }
 
-            if (configuration.OutputInConsole)
+            try
             {
-                Console.OutputEncoding = configuration.TextEncoding;
-                _outputConsoleStream = Console.OpenStandardOutput();
+                var consoleAvailable = !string.IsNullOrWhiteSpace(Console.Title);
+                if (consoleAvailable && configuration.OutputInConsole)
+                {
+                    Console.OutputEncoding = configuration.TextEncoding;
+                    _outputConsoleStream = Console.OpenStandardOutput();
+                }
+            }
+            catch
+            {
+                configuration.OutputInConsole = false;
             }
 
             if (!string.IsNullOrWhiteSpace(configuration.OutputFileName))
@@ -78,10 +87,10 @@ namespace Inertia.Logging
 
         private void LogLine(object content, LogStyle logStyle)
         {
-            if (_configuration.ExecuteAsync) _actionQueue.Enqueue(Finalize);
-            else Finalize();
+            if (_asyncQueue != null) _asyncQueue.Enqueue(Log);
+            else Log();
 
-            void Finalize()
+            void Log()
             {
                 var time = string.Empty;
                 if (!string.IsNullOrWhiteSpace(_configuration.TimeFormat))
@@ -89,13 +98,15 @@ namespace Inertia.Logging
                     time = DateTime.Now.ToString(_configuration.TimeFormat);
                 }
 
-                var logBytes = _configuration.TextEncoding.GetBytes($"{time}{logStyle.Title} {content}{Environment.NewLine}");
+                var logStr = string.Format(_configuration.LogFormat, time, logStyle.Title, $"{content}{Environment.NewLine}");
+                var logBytes = _configuration.TextEncoding.GetBytes(logStr);
 
                 if (_configuration.OutputInConsole)
                 {
                     Console.ForegroundColor = logStyle.Color;
                     _outputConsoleStream?.Write(logBytes);
                 }
+
                 if (_outputFileStream != null)
                 {
                     _outputFileStream.BaseStream.Write(logBytes);

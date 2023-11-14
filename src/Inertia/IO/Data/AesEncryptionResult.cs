@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Inertia.IO.Data
+namespace Inertia.IO
 {
     public sealed class AesEncryptionResult : IDisposable
     {

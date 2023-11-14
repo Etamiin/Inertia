@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 
 namespace Inertia
 {
-    public abstract class ActionQueue
+    public abstract class TickedQueue
     {
         internal const int DefaultMaxExecutionPerTick = 30;
 
@@ -15,10 +15,10 @@ namespace Inertia
         private int _maxExecutionPerTick;
         private ConcurrentQueue<Action> _queue;
 
-        protected ActionQueue() : this(DefaultMaxExecutionPerTick)
+        protected TickedQueue() : this(DefaultMaxExecutionPerTick)
         {
         }
-        protected ActionQueue(int maximumExecutionPerTick)
+        protected TickedQueue(int maximumExecutionPerTick)
         {
             _maxExecutionPerTick = maximumExecutionPerTick;
             _queue = new ConcurrentQueue<Action>();

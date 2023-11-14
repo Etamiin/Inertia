@@ -12,17 +12,22 @@ namespace Inertia.Paper
             }
         }
         
-        internal PaperObjectState State { get; set; }
+        public PaperObjectState State { get; internal set; }
 
-        public void SetActive()
+        public void Begin()
         {
-            if (IsDisposed || State == PaperObjectState.Initialized) return;
+            if (IsDisposed)
+            {
+                throw new ObjectDisposedException(GetType().Name);
+            }
 
-            var component = PaperFactory.GetScriptableSystem(GetType());
-            if (component != null)
+            if (State == PaperObjectState.Initialized) return;
+
+            var pen = PaperFactory.GetPenSystem(GetType());
+            if (pen != null)
             {
                 State = PaperObjectState.Initialized;
-                component.RegisterPaper(this);
+                pen.ArchivePaper(this);
             }
             else Dispose();
         }

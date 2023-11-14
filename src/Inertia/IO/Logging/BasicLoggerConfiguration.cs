@@ -11,10 +11,11 @@ namespace Inertia.Logging
         public Encoding TextEncoding { get; set; }
         public string? TimeFormat { get; set; }
         public bool AutoFlushInFile { get; set; } = true;
+        public string LogFormat { get; set; } = "{0}{1}{2}";
 
-        public LogStyle Debug { get; set; } = new LogStyle("[Debug]", ConsoleColor.White);
-        public LogStyle Warn { get; set; } = new LogStyle("[Warn]", ConsoleColor.Yellow);
-        public LogStyle Error { get; set; } = new LogStyle("[Error]", ConsoleColor.Red);
+        public LogStyle Debug { get; set; } = new LogStyle("[Debug] ", ConsoleColor.White);
+        public LogStyle Warn { get; set; } = new LogStyle("[Warn] ", ConsoleColor.Yellow);
+        public LogStyle Error { get; set; } = new LogStyle("[Error] ", ConsoleColor.Red);
     
         public BasicLoggerConfiguration()
         {

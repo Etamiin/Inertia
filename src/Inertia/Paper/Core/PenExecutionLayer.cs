@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Inertia.Logging;
+using System;
 using System.Threading.Tasks;
 
 namespace Inertia.Paper
@@ -73,7 +74,7 @@ namespace Inertia.Paper
                         while (_clock.ElapsedTicks < sleepTicks) ;
                     }
                 }
-                else if (_type == PenExecutionLayerType.FixedSleep)
+                else if (_type == PenExecutionLayerType.ProcessorClockBased)
                 {
                     await Task.Delay(1).ConfigureAwait(false);
                 }

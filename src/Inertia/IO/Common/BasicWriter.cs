@@ -121,6 +121,12 @@ namespace Inertia
             _writer.WriteByte(value);
             return this;
         }
+        public BasicWriter SetBitByte(BitByte value)
+        {
+            value.Serialize(this);
+            
+            return this;
+        }
         public BasicWriter SetSByte(sbyte value)
         {
             _writer.WriteByte(unchecked((byte)value));
@@ -198,15 +204,19 @@ namespace Inertia
 
             return this;
         }
-        public BasicWriter SetArray(Array array)
+        public BasicWriter SetIEnumerable(IEnumerable enumerable)
         {
-            SetInt(array.Length);
-            for (var i = 0; i < array.Length; i++)
+            var count = 0;
+            var pos = GetPosition();
+
+            SetEmpty(sizeof(int));
+            foreach (var value in enumerable)
             {
-                SetValue(array.GetValue(i));
+                SetValue(value);
+                count++;
             }
 
-            return this;
+            return SetPosition(pos).SetInt(count).SetPosition(TotalLength);
         }
         public BasicWriter SetIDictionary(IDictionary dictionary)
         {
@@ -220,10 +230,9 @@ namespace Inertia
 
             return this;
         }
-
         public BasicWriter SetValue(object value)
         {
-            return SetValue(value, null);
+            return SetValue(value, value.GetType());
         }
         public BasicWriter SetValue(object value, Type precisedType)
         {
@@ -247,13 +256,13 @@ namespace Inertia
                 {
                     SetSerializableObject((ISerializableObject)value);
                 }
-                else if (precisedType.IsArray)
-                {
-                    SetArray((Array)value);
-                }
                 else if (precisedType.GetInterface(nameof(IDictionary)) != null)
                 {
                     SetIDictionary((IDictionary)value);
+                }
+                else if (precisedType.GetInterface(nameof(IEnumerable)) != null)
+                {
+                    SetIEnumerable((IEnumerable)value);
                 }
             }
 
@@ -263,7 +272,7 @@ namespace Inertia
         {
             foreach (var obj in values)
             {
-                SetValue(obj);
+                SetValue(obj, obj.GetType());
             }
 
             return this;

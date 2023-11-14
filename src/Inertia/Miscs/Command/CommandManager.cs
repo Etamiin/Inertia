@@ -46,7 +46,7 @@ namespace Inertia
                     cmd.Logger = logger;
                 }
 
-                BasicCommand.PreExecute(cmd, arguments, state, containsQuotes);
+                BasicCommand.ParseAndExecute(cmd, arguments, state, containsQuotes);
                 return true;
             }
 

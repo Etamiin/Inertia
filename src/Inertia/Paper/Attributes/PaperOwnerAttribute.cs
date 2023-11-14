@@ -3,7 +3,7 @@
 namespace Inertia.Paper
 {
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
-    public class OverridePaperOwnerAttribute : Attribute
+    public class PaperOwnerAttribute : Attribute
     {
     }
 }

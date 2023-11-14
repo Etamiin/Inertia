@@ -3,7 +3,7 @@
     public enum PenExecutionLayerType
     {
         None,
-        FixedSleep,
+        ProcessorClockBased,
         TickBased
     }
 }

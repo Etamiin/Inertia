@@ -8,7 +8,7 @@ namespace Inertia.Paper
 {
     public abstract class PenSystem<T> : IPenSystem where T : PaperObject
     {
-        public static T CreatePaperAndActive(params object[] args)
+        public static T BeginPaper(params object[] args)
         {
             var type = typeof(T);
             var types = args.Select((obj) => obj.GetType()).ToArray();
@@ -16,11 +16,11 @@ namespace Inertia.Paper
 
             if (cnstr == null)
             {
-                throw new NotFoundConstructorException(type, types);
+                throw new ConstructorNotFoundException(type, types);
             }
 
             var instance = (T)cnstr.Invoke(args);
-            instance.SetActive();
+            instance.Begin();
 
             return instance;
         }
@@ -44,13 +44,13 @@ namespace Inertia.Paper
         {
             _locker = new object();
             _papers = new List<T>();
-            _executionLayer = PaperFactory.RegisterScriptableSystem(this);
+            _executionLayer = PaperFactory.RegisterPenSystem(this);
         }
 
         public abstract void OnProcess(T obj);
         public abstract void OnExceptionThrown(PaperInstanceThrowedException<T> paperException);
 
-        void IPenSystem.RegisterPaper(PaperObject obj)
+        void IPenSystem.ArchivePaper(PaperObject obj)
         {
             if (obj is T tData)
             {
@@ -66,7 +66,7 @@ namespace Inertia.Paper
                 }
             }
         }
-        void IPenSystem.UnregisterPaper(PaperObject obj)
+        void IPenSystem.ClearPaper(PaperObject obj)
         {
             if (obj is T tData)
             {
@@ -88,6 +88,7 @@ namespace Inertia.Paper
             DeltaTime = e.DeltaTime;
 
             if (!IsActive) return;
+
             lock (_locker)
             {
                 var writablePapers = _papers
@@ -106,7 +107,7 @@ namespace Inertia.Paper
                     if (obj.State == PaperObjectState.Disposing)
                     {
                         obj.State = PaperObjectState.Disposed;
-                        ((IPenSystem)this).UnregisterPaper(obj);
+                        ((IPenSystem)this).ClearPaper(obj);
                     }
                 }
             }

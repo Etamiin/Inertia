@@ -1,11 +1,11 @@
 ﻿namespace Inertia
 {
-    public sealed class SyncActionQueue : ActionQueue
+    public sealed class SyncTickedQueue : TickedQueue
     {
-        public SyncActionQueue() : base()
+        public SyncTickedQueue() : base()
         {
         }
-        public SyncActionQueue(int maximumExecutionPerTick) : base(maximumExecutionPerTick)
+        public SyncTickedQueue(int maximumExecutionPerTick) : base(maximumExecutionPerTick)
         {
         }
 

@@ -6,23 +6,23 @@ namespace Inertia.Paper
     {
         public static void OnNextTick(Action action)
         {
-            TimedPenSystem.CreatePaperAndActive(action);
+            TimedPenSystem.BeginPaper(action);
         }
         public static void Delayed(float delayTimeSeconds, Action action)
         {
-            TimedPenSystem.CreatePaperAndActive(action, delayTimeSeconds, false);
+            TimedPenSystem.BeginPaper(action, delayTimeSeconds, false);
         }
         public static void Delayed(TimeSpan delayTime, Action action)
         {
-            TimedPenSystem.CreatePaperAndActive(action, delayTime, false);
+            TimedPenSystem.BeginPaper(action, delayTime, false);
         }
         public static TimedPaper DelayedLoop(float delayTimeSeconds, Action action)
         {
-            return TimedPenSystem.CreatePaperAndActive(action, delayTimeSeconds, true);
+            return TimedPenSystem.BeginPaper(action, delayTimeSeconds, true);
         }
         public static TimedPaper DelayedLoop(TimeSpan delayTime, Action action)
         {
-            return TimedPenSystem.CreatePaperAndActive(action, delayTime, true);
+            return TimedPenSystem.BeginPaper(action, delayTime, true);
         }
 
         internal bool CanBeExecuted

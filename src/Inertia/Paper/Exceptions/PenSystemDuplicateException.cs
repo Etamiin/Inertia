@@ -9,7 +9,7 @@ namespace Inertia.Paper
         private readonly Type _penType;
         private readonly Type _paperType;
 
-        public PenSystemDuplicateException(Type systemType, Type dataType)
+        internal PenSystemDuplicateException(Type systemType, Type dataType)
         {
             _penType = systemType;
             _paperType = dataType;

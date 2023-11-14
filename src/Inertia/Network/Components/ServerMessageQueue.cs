@@ -45,7 +45,7 @@ namespace Inertia.Network
                 {
                     if (_queue.Count == 0)
                     {
-                        await Task.Delay(10).ConfigureAwait(false);
+                        await Task.Delay(1).ConfigureAwait(false);
                         continue;
                     }
 

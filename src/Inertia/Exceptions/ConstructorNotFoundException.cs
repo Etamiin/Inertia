@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace Inertia
 {
-    public class NotFoundConstructorException : Exception
+    public class ConstructorNotFoundException : Exception
     {
         public override string Message
         {
@@ -19,7 +19,7 @@ namespace Inertia
         private readonly Type _ownerType;
         private readonly Type[] _parametersType;
 
-        public NotFoundConstructorException(Type ownerType, Type[] parametersType)
+        internal ConstructorNotFoundException(Type ownerType, Type[] parametersType)
         {
             _ownerType = ownerType;
             _parametersType = parametersType;

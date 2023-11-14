@@ -1,6 +1,6 @@
 ﻿namespace Inertia.Paper
 {
-    internal enum PaperObjectState : byte
+    public enum PaperObjectState : byte
     {
         NoState = 0,
         Initialized = 1,

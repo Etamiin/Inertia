@@ -6,8 +6,8 @@ namespace Inertia.Paper
 {
     public static class PaperFactory
     {
-        private static ConcurrentDictionary<int, PenExecutionLayer> _executionLayers;
         private static ConcurrentDictionary<Type, IPenSystem> _componentInstances;
+        private static ConcurrentDictionary<int, PenExecutionLayer> _executionLayers;
 
         static PaperFactory()
         {
@@ -52,12 +52,12 @@ namespace Inertia.Paper
             return ReflectionProvider.TryStopPlugin(pluginIdentifier);
         }
 
-        internal static IPenSystem GetScriptableSystem(Type dataType)
+        internal static IPenSystem GetPenSystem(Type dataType)
         {
             _componentInstances.TryGetValue(dataType, out var component);
             return component;
         }
-        internal static PenExecutionLayer RegisterScriptableSystem<T>(PenSystem<T> component) where T : PaperObject
+        internal static PenExecutionLayer RegisterPenSystem<T>(PenSystem<T> component) where T : PaperObject
         {
             var dataType = typeof(T);
             if (_componentInstances.ContainsKey(dataType))
@@ -68,7 +68,7 @@ namespace Inertia.Paper
 
             if (!_executionLayers.TryGetValue(component.LayerIndex, out var executionLayer))
             {
-                ConfigureLayer(component.LayerIndex, PenExecutionLayerType.FixedSleep);
+                ConfigureLayer(component.LayerIndex, PenExecutionLayerType.ProcessorClockBased);
                 executionLayer = _executionLayers[component.LayerIndex];
             }
 

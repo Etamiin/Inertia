@@ -170,6 +170,7 @@ namespace Inertia
             var assemblies = AppDomain.CurrentDomain.GetAssemblies();
             try
             {
+                var penSystemTypes = new List<Type>();
                 foreach (var assembly in assemblies)
                 {
                     var types = assembly.GetTypes()
@@ -180,7 +181,19 @@ namespace Inertia
                         ReadTypeIOInformations(type);
                         ReadTypeInformations(type);
                         ReadTypeNetworkInformations(type);
+
+                        if (typeof(IPenSystem).IsAssignableFrom(type))
+                        {
+                            penSystemTypes.Add(type);
+                        }
                     }
+                }
+
+                //Creation of the Pen systems after reading all the types in all assemblies in case the Paper system is owned by a Type in a specific assembly
+                //So we only initialize the pen systems once when every parameters are set.
+                foreach (var penSystemType in penSystemTypes)
+                {
+                    TryCreateInstance<IPenSystem>(penSystemType, Type.EmptyTypes);
                 }
             }
             catch (Exception ex)
@@ -191,7 +204,7 @@ namespace Inertia
         private static T TryCreateInstance<T>(Type owner, Type[] parametersType, params object[] parameters)
         {
             var constructor = owner.GetConstructor(parametersType);
-            if (constructor == null) throw new NotFoundConstructorException(owner, parametersType);
+            if (constructor == null) throw new ConstructorNotFoundException(owner, parametersType);
 
             return (T)constructor.Invoke(parameters);
         }
@@ -237,14 +250,11 @@ namespace Inertia
                 }
             }
 
-            if (!IsPaperOwned && type.GetCustomAttribute<OverridePaperOwnerAttribute>() != null)
+            if (!IsPaperOwned && type.GetCustomAttribute<PaperOwnerAttribute>() != null)
             {
-                IsPaperOwned = true;
-            }
+                BasicLogger.Default.Debug("Setting paper owner.");
 
-            if (typeof(IPenSystem).IsAssignableFrom(type))
-            {
-                TryCreateInstance<IPenSystem>(type, Type.EmptyTypes);
+                IsPaperOwned = true;
             }
         }
         private static void ReadTypeNetworkInformations(Type type)

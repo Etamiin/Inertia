@@ -4,6 +4,9 @@ namespace Inertia.Logging
 {
     public struct LogStyle : IEquatable<LogStyle>
     {
+        public static LogStyle Empty => _empty;
+        private static LogStyle _empty = new LogStyle(string.Empty, ConsoleColor.Black);
+
         public readonly string Title;
         public readonly ConsoleColor Color;
 

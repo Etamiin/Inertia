@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Inertia
 {
-    public sealed class AsyncActionQueue : ActionQueue
+    public sealed class AsyncTickedQueue : TickedQueue
     {
         private static TimeSpan DefaultSleepTimeOnEmptyQueue = TimeSpan.FromMilliseconds(100);
 
@@ -12,16 +12,16 @@ namespace Inertia
         
         private DateTime? _emptySince;
 
-        public AsyncActionQueue() : this(DefaultMaxExecutionPerTick, DefaultSleepTimeOnEmptyQueue, null)
+        public AsyncTickedQueue() : this(DefaultMaxExecutionPerTick, DefaultSleepTimeOnEmptyQueue, null)
         {
         }
-        public AsyncActionQueue(int maximumExecutionPerTick) : this(maximumExecutionPerTick, DefaultSleepTimeOnEmptyQueue, null)
+        public AsyncTickedQueue(int maximumExecutionPerTick) : this(maximumExecutionPerTick, DefaultSleepTimeOnEmptyQueue, null)
         {
         }
-        public AsyncActionQueue(int maximumExecutionPerTick, TimeSpan sleepTimeOnEmptyQueue) : this(maximumExecutionPerTick, sleepTimeOnEmptyQueue, null)
+        public AsyncTickedQueue(int maximumExecutionPerTick, TimeSpan sleepTimeOnEmptyQueue) : this(maximumExecutionPerTick, sleepTimeOnEmptyQueue, null)
         {
         }
-        public AsyncActionQueue(int maximumExecutionPerTick, TimeSpan sleepTimeOnEmptyQueue, TimeSpan? timeBeforeDisposeOnEmptyQueue) : base(maximumExecutionPerTick)
+        public AsyncTickedQueue(int maximumExecutionPerTick, TimeSpan sleepTimeOnEmptyQueue, TimeSpan? timeBeforeDisposeOnEmptyQueue) : base(maximumExecutionPerTick)
         {
             SleepTimeOnEmptyQueue = sleepTimeOnEmptyQueue;
             TimeBeforeDisposeOnEmptyQueue = timeBeforeDisposeOnEmptyQueue;
