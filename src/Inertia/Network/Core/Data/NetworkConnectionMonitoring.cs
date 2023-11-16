@@ -2,14 +2,14 @@
 
 namespace Inertia.Network
 {
-    public sealed class ConnectionStatistics
+    public sealed class NetworkConnectionMonitoring
     {
         public int MessageReceivedCount { get; private set; }
         public int MessageReceivedInLastSecond { get; private set; }
 
         private DateTime? _lastSecondTimer;
         
-        internal ConnectionStatistics()
+        internal NetworkConnectionMonitoring()
         {
         }
 

@@ -5,16 +5,14 @@ namespace Inertia.Network
 {
     public abstract class NetworkServerEntity<TParameters> where TParameters : NetworkEntityParameters
     {
-        public TParameters Parameters => _parameters;
-
         protected ILogger Logger => _parameters.Logger;
         protected NetworkProtocol Protocol => _parameters.Protocol;
-        private protected readonly SafeOrderedIntProvider IdProvider;
-        private readonly TParameters _parameters;
+        private protected readonly SafeOrderedIntProvider _idProvider;
+        private protected readonly TParameters _parameters;
 
         protected NetworkServerEntity(TParameters parameters)
         {
-            IdProvider = new SafeOrderedIntProvider();
+            _idProvider = new SafeOrderedIntProvider();
             _parameters = parameters;
         }
 

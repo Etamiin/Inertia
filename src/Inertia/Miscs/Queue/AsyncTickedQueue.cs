@@ -5,7 +5,7 @@ namespace Inertia
 {
     public sealed class AsyncTickedQueue : TickedQueue
     {
-        private static TimeSpan DefaultSleepTimeOnEmptyQueue = TimeSpan.FromMilliseconds(100);
+        private static TimeSpan DefaultSleepTimeOnEmptyQueue = TimeSpan.FromMilliseconds(30);
 
         public TimeSpan? TimeBeforeDisposeOnEmptyQueue { get; private set; }
         public TimeSpan SleepTimeOnEmptyQueue { get; private set; }

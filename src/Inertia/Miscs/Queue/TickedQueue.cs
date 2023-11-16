@@ -5,7 +5,7 @@ namespace Inertia
 {
     public abstract class TickedQueue
     {
-        internal const int DefaultMaxExecutionPerTick = 30;
+        internal const int DefaultMaxExecutionPerTick = 60;
 
         private protected bool DisposeRequested { get; private set; }
 

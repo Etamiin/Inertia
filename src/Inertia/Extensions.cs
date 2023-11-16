@@ -70,11 +70,11 @@ namespace System
 
             return (value & (1 << index)) != 0;
         }
-        public static byte SetBit(this byte value, int index, bool bitValue)
+        public static byte SetBit(this byte value, int index, bool bit)
         {
-            return SetBit(value, index, bitValue, EndiannessType.Auto);
+            return SetBit(value, index, bit, EndiannessType.Auto);
         }
-        public static byte SetBit(this byte value, int index, bool bitValue, EndiannessType endianness)
+        public static byte SetBit(this byte value, int index, bool bit, EndiannessType endianness)
         {
             if (index < 0 || index >= 8) throw new ArgumentOutOfRangeException(nameof(index));
 
@@ -88,7 +88,7 @@ namespace System
                 index = 7 - index;
             }
 
-            if (bitValue)
+            if (bit)
             {
                 value = (byte)(value | (1 << index));
             }
@@ -99,13 +99,13 @@ namespace System
 
             return value;
         }
-        public static void SetBitRef(this ref byte value, int index, bool bitValue)
+        public static void SetBitRef(this ref byte value, int index, bool bit)
         {
-            value = SetBit(value, index, bitValue, EndiannessType.Auto);
+            value = SetBit(value, index, bit, EndiannessType.Auto);
         }
-        public static void SetBitRef(this ref byte value, int index, bool bitValue, EndiannessType endianness)
+        public static void SetBitRef(this ref byte value, int index, bool bit, EndiannessType endianness)
         {
-            value = SetBit(value, index, bitValue, endianness);
+            value = SetBit(value, index, bit, endianness);
         }
 
         public static void ThrowIfDisposable(this IDisposable disposable, bool isDisposed)

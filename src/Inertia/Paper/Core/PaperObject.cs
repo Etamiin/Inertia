@@ -16,10 +16,7 @@ namespace Inertia.Paper
 
         public void Begin()
         {
-            if (IsDisposed)
-            {
-                throw new ObjectDisposedException(GetType().Name);
-            }
+            this.ThrowIfDisposable(IsDisposed);
 
             if (State == PaperObjectState.Initialized) return;
 

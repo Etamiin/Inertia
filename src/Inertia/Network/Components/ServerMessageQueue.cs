@@ -62,7 +62,7 @@ namespace Inertia.Network
 
             if (e.Connection is TcpConnectionEntity tcpConnection)
             {
-                tcpConnection.Disconnecting += ConnectionDisconnecting;
+                tcpConnection.Disconnecting -= ConnectionDisconnecting;
             }
         }
         private void Dispose(bool disposing)

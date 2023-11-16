@@ -7,9 +7,9 @@ namespace Inertia.Network
     {
         internal event EventHandler<ConnectionDisconnectingArgs>? Disconnecting;
 
-        public ConnectionStatistics Statistics { get; private set; }
         public bool IsDisposed { get; private set; }
         public bool IsConnected => _socket != null && _socket.Connected;
+        public NetworkConnectionMonitoring? Monitoring { get; private set; }
 
         private protected Socket _socket { get; private set; }
         private protected BasicReader _networkDataReader { get; private set; }
@@ -17,10 +17,10 @@ namespace Inertia.Network
 
         internal TcpConnectionEntity(Socket socket, uint id, NetworkEntityParameters parameters) : base(id, parameters)
         {
-            Statistics = new ConnectionStatistics();
             _socket = socket;
             _networkDataReader = new BasicReader();
             _buffer = new byte[_parameters.Protocol.NetworkBufferLength];
+            Monitoring = new NetworkConnectionMonitoring();
         }
 
         public bool Disconnect()
@@ -95,14 +95,14 @@ namespace Inertia.Network
                 throw new SocketException((int)SocketError.SocketError);
             }
 
-            Statistics.NotifyMessageReceived();
-            if (Statistics.MessageReceivedInLastSecond >= _parameters.MessageCountLimitBeforeSpam)
+            Monitoring.NotifyMessageReceived();
+            if (Monitoring.MessageReceivedInLastSecond >= _parameters.MessageCountLimitBeforeSpam)
             {
                 Disconnect(NetworkDisconnectReason.Spam);
                 return;
             }
 
-            NetworkProtocolFactory.ProcessParsing(_parameters.Protocol, this, _networkDataReader.Fill(new ReadOnlySpan<byte>(_buffer, 0, receivedLength)));
+            NetworkProtocolManager.ProcessParsing(_parameters.Protocol, this, _networkDataReader.Fill(new ReadOnlySpan<byte>(_buffer, 0, receivedLength)));
         }
 
         private void OnReceiveData(IAsyncResult iar)

@@ -215,10 +215,10 @@ namespace Inertia
             {
                 var bits = new[]
                 {
-                    BitConverter.ToInt32(data.Slice(0, 4)),
-                    BitConverter.ToInt32(data.Slice(4, 4)),
-                    BitConverter.ToInt32(data.Slice(8, 4)),
-                    BitConverter.ToInt32(data.Slice(12, 4))
+                    BitConverter.ToInt32(data, 0),
+                    BitConverter.ToInt32(data, 4),
+                    BitConverter.ToInt32(data, 8),
+                    BitConverter.ToInt32(data, 12)
                 };
 
                 return new decimal(bits);
@@ -294,7 +294,7 @@ namespace Inertia
         {
             if (TryReadSize(length, out var data))
             {
-                return data.ToArray();
+                return data;
             }
             else return new byte[0];
         }
@@ -469,7 +469,7 @@ namespace Inertia
 
             return UnreadedLength >= length;
         }
-        private bool TryReadSize(int length, out Span<byte> data)
+        private bool TryReadSize(int length, out byte[] data)
         {
             this.ThrowIfDisposable(IsDisposed);
 
@@ -477,7 +477,7 @@ namespace Inertia
 
             if (length == 0)
             {
-                data = new Span<byte>();
+                data = new byte[0];
                 return true;
             }
 

@@ -71,9 +71,9 @@ namespace Inertia
         }
 
         internal static bool IsPaperOwned { get; private set; }
-        internal static bool IsNetworkClientUsedInAssemblies { get; private set; }
-        internal static bool IsNetworkServerUsedInAssemblies { get; private set; }
-
+        internal static bool IsNetworkClientUsed { get; private set; }
+        internal static bool IsNetworkServerUsed { get; private set; }
+        
         private readonly static Dictionary<Type, SerializablePropertyMemory[]> _properties;
         private readonly static Dictionary<string, BasicCommand> _commands;
         private readonly static Dictionary<ushort, Type> _messageTypes;
@@ -125,29 +125,32 @@ namespace Inertia
             if (!File.Exists(pluginFilePath)) return PluginExecutionResult.FileNotFound;
 
             var assembly = Assembly.LoadFrom(pluginFilePath);
-            var pluginType = assembly.GetTypes()
-                .FirstOrDefault((type) => typeof(IPlugin).IsAssignableFrom(type));
+            var pluginTypes = assembly.GetTypes()
+                .Where((type) => typeof(IPlugin).IsAssignableFrom(type));
 
-            var instance = TryCreateInstance<IPlugin>(pluginType, Type.EmptyTypes);
-            if (_pluginTraces.ContainsKey(instance.Identifier)) return PluginExecutionResult.AlreadyLoaded;
-
-            if (!instance.UsePaper)
+            foreach (var pluginType in pluginTypes)
             {
-                var options = instance.LongRun ? TaskCreationOptions.LongRunning : TaskCreationOptions.None;
-                var executionCancelSource = new CancellationTokenSource();
+                var instance = TryCreateInstance<IPlugin>(pluginType, Type.EmptyTypes);
+                if (_pluginTraces.ContainsKey(instance.Identifier)) continue;
 
-                Task.Factory.StartNew(
-                    () => RunPluginExecution(instance, executionParameters),
-                    executionCancelSource.Token,
-                    options,
-                    TaskScheduler.Default);
+                if (!instance.UsePaper)
+                {
+                    var options = instance.LongRun ? TaskCreationOptions.LongRunning : TaskCreationOptions.None;
+                    var executionCancelSource = new CancellationTokenSource();
 
-                _pluginTraces.Add(instance.Identifier, new PluginTrace(instance, executionCancelSource));
-            }
-            else
-            {
-                _pluginTraces.Add(instance.Identifier, new PluginTrace(instance));
-                TimedPaper.OnNextTick(() => RunPluginExecution(instance, executionParameters));
+                    Task.Factory.StartNew(
+                        () => RunPluginExecution(instance, executionParameters),
+                        executionCancelSource.Token,
+                        options,
+                        TaskScheduler.Default);
+
+                    _pluginTraces.Add(instance.Identifier, new PluginTrace(instance, executionCancelSource));
+                }
+                else
+                {
+                    _pluginTraces.Add(instance.Identifier, new PluginTrace(instance));
+                    TimedPaper.OnNextTick(() => RunPluginExecution(instance, executionParameters));
+                }
             }
 
             return PluginExecutionResult.Success;
@@ -228,7 +231,9 @@ namespace Inertia
                 if (type.GetCustomAttribute<IgnoreInReflectionAttribute>() != null) return;
 
                 var memoryList = new List<SerializablePropertyMemory>();
-                var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance).OrderBy((property) => property.Name);
+                var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                    .OrderBy((property) => property.Name);
+
                 foreach (var property in properties)
                 {
                     if (!property.CanWrite || property.GetCustomAttribute<IgnoreInReflectionAttribute>() != null) continue;
@@ -252,29 +257,27 @@ namespace Inertia
 
             if (!IsPaperOwned && type.GetCustomAttribute<PaperOwnerAttribute>() != null)
             {
-                BasicLogger.Default.Debug("Setting paper owner.");
-
                 IsPaperOwned = true;
             }
         }
         private static void ReadTypeNetworkInformations(Type type)
         {
-            if (!IsNetworkClientUsedInAssemblies && type.IsSubclassOf(typeof(NetworkClientEntity)))
+            if (!IsNetworkClientUsed && type.IsSubclassOf(typeof(NetworkClientEntity)))
             {
-                IsNetworkClientUsedInAssemblies = true;
+                IsNetworkClientUsed = true;
             }
 
             if (type.IsSubclassOf(typeof(TcpServerEntity)) || type.IsSubclassOf(typeof(WebSocketServerEntity)))
             {
-                if (!IsNetworkServerUsedInAssemblies)
+                if (!IsNetworkServerUsed)
                 {
-                    IsNetworkServerUsedInAssemblies = true;
+                    IsNetworkServerUsed = true;
                 }
             }      
 
             if (type.IsSubclassOf(typeof(NetworkMessage)))
             {
-                var message = NetworkProtocolFactory.CreateMessage(type);
+                var message = NetworkProtocolManager.CreateMessage(type);
                 if (!_messageTypes.ContainsKey(message.MessageId))
                 {
                     _messageTypes.Add(message.MessageId, type);

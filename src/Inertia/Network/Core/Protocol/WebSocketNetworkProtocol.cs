@@ -7,18 +7,18 @@ using System.Text;
 
 namespace Inertia.Network
 {
-    internal sealed class DefaultWebSocketNetworkProtocol : NetworkProtocol
+    internal sealed class WebSocketNetworkProtocol : NetworkProtocol
     {
         private const string HttpProtocolKey = "HTTP/1.1";
         private const string WsHandshakeKey = "Sec-WebSocket-Key:";
-        private const string WsStaticHexHashKey = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
+        private const string WsHexHashKeyConst = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
         private const byte PayloadMidSize = 126;
         private const byte PayloadFullSize = 127;
 
         public override int NetworkBufferLength => 4096;
         public override int ConnectionPerQueueInPool => 750;
 
-        internal DefaultWebSocketNetworkProtocol()
+        internal WebSocketNetworkProtocol()
         {
         }
 
@@ -38,12 +38,11 @@ namespace Inertia.Network
 
             try
             {
-                if (!(receiver is WebSocketConnectionEntity))
+                if (!(receiver is WebSocketConnectionEntity connection))
                 {
                     throw new WebSocketException($"The client is not a valid {nameof(WebSocketConnectionEntity)}.");
                 }
 
-                var connection = (WebSocketConnectionEntity)receiver;
                 if (connection.ConnectionState == WebSocketConnectionState.Connecting)
                 {
                     TryProcessHandshakeMessage(reader, connection);
@@ -80,7 +79,7 @@ namespace Inertia.Network
             }
             catch (Exception ex)
             {
-                BasicLogger.Default.Error("Parsing message failed: " + ex);
+                BasicLogger.Default.Error("Parsing network message failed: " + ex);
 
                 if (receiver is NetworkConnectionEntity connection)
                 {
@@ -151,7 +150,7 @@ namespace Inertia.Network
 
                 if (!string.IsNullOrWhiteSpace(handshakeKeyLine))
                 {
-                    var sKey = $"{handshakeKeyLine.Split(':')[1].Trim()}{WsStaticHexHashKey}";
+                    var sKey = $"{handshakeKeyLine.Split(':')[1].Trim()}{WsHexHashKeyConst}";
                     using (var sha1 = new SHA1Managed())
                     {
                         var hashData = sha1.ComputeHash(Encoding.ASCII.GetBytes(sKey));
@@ -168,11 +167,13 @@ namespace Inertia.Network
             {
                 connection.SendSpecificOpCode(applicationData, WebSocketOpCode.ConnectionClose);
                 connection.Disconnect(NetworkDisconnectReason.ConnectionLost);
+
                 return true;
             }
             else if (opCode == WebSocketOpCode.Ping)
             {
                 connection.SendSpecificOpCode(applicationData, WebSocketOpCode.Pong);
+
                 return true;
             }
 
@@ -180,7 +181,7 @@ namespace Inertia.Network
         }
         private bool TryParseMessage(BasicReader reader, out byte[] applicationData, out WebSocketOpCode opCode)
         {
-            //'Fin' not supported (always considered as true)
+            //Field 'fin' not supported (always considered as true)
             //ExtensionData not supported
 
             var fByte = reader.GetByte();
@@ -207,7 +208,7 @@ namespace Inertia.Network
                 appDataSize = (int)BitConverter.ToUInt64(bytes);
             }
 
-            if (reader.UnreadedLength < appDataSize || masked && reader.UnreadedLength < appDataSize + 4)
+            if (reader.UnreadedLength < appDataSize || masked && reader.UnreadedLength < appDataSize + 4) //+4 for masking key
             {
                 applicationData = new byte[0];
                 return false;

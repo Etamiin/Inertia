@@ -8,9 +8,9 @@ namespace Inertia.Network
     {
         protected WebSocketServerEntity(WebSocketServerParameters parameters) : base(parameters)
         {
-            if (parameters.Protocol == NetworkProtocolFactory.DefaultProtocol)
+            if (parameters.Protocol != NetworkProtocolManager.DefaultWsProtocol)
             {
-                parameters.Protocol = NetworkProtocolFactory.DefaultWsProtocol;
+                parameters.Protocol = NetworkProtocolManager.DefaultWsProtocol;
             }
         }
 
@@ -19,7 +19,7 @@ namespace Inertia.Network
             try
             {
                 var socket = ((Socket)iar.AsyncState).EndAccept(iar);
-                var connection = new WebSocketConnectionEntity(socket, (uint)IdProvider.NextValue(), Parameters, Parameters.SslCertificate);
+                var connection = new WebSocketConnectionEntity(socket, (uint)_idProvider.NextValue(), _parameters, _parameters.SslCertificate);
                 connection.ConnectionEstablished += ConnectionEstablished;
                 connection.Disconnecting += ConnectionDisconnecting;
 

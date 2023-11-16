@@ -41,7 +41,7 @@ namespace Inertia.Network
                 {
                     _reader = new BasicReader();
                     _connections.Clear();
-                    _client = new UdpClient(new IPEndPoint(string.IsNullOrWhiteSpace(Parameters.Ip) ? IPAddress.Any : IPAddress.Parse(Parameters.Ip), Parameters.Port));
+                    _client = new UdpClient(new IPEndPoint(string.IsNullOrWhiteSpace(_parameters.Ip) ? IPAddress.Any : IPAddress.Parse(_parameters.Ip), _parameters.Port));
 
                     OnStarted();
                     _client.BeginReceive(new AsyncCallback(OnReceiveData), _client);
@@ -133,14 +133,14 @@ namespace Inertia.Network
 
                 if (!_connections.ContainsKey(endPoint))
                 {
-                    var connection = new UdpConnectionEntity((uint)IdProvider.NextValue(), this, endPoint, Parameters);
+                    var connection = new UdpConnectionEntity((uint)_idProvider.NextValue(), this, endPoint, _parameters);
                     _connections.Add(endPoint, connection);
 
                     OnConnectionAdded(connection);
                 }
 
                 var receiver = _connections[endPoint];
-                NetworkProtocolFactory.ProcessParsing(Protocol, receiver, _reader.Fill(data));
+                NetworkProtocolManager.ProcessParsing(Protocol, receiver, _reader.Fill(data));
             }
             catch (Exception ex)
             {

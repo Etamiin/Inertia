@@ -15,7 +15,7 @@ namespace Inertia.Network
         private readonly List<NetworkConnectionEntity> _connections;
         private readonly object _locker;
 
-        internal NetworkConnectionGroup(NetworkProtocol protocol)
+        public NetworkConnectionGroup(NetworkProtocol protocol)
         {
             _protocol = protocol;
             _connections = new List<NetworkConnectionEntity>();

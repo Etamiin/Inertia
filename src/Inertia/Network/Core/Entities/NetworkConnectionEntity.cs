@@ -20,19 +20,12 @@ namespace Inertia.Network
         {
             Id = id;
             _parameters = parameters;
-            _messageQueue = NetworkProtocolFactory.ServerAsyncPool.RegisterConnection(this);
+            _messageQueue = NetworkProtocolManager.ServerMessagePool.RegisterConnection(this);
         }
 
         internal override void ProcessInQueue(Action action)
         {
             _messageQueue?.Enqueue(action);
-        }
-
-        public T GetStateAs<T>()
-        {
-            if (State is T tState) return tState;
-
-            return default;
         }
 
         public void Send(NetworkMessage message)

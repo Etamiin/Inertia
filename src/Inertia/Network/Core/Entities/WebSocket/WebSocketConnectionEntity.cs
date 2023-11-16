@@ -17,12 +17,12 @@ namespace Inertia.Network
 
         private SslStream? _sslStream;
         private X509Certificate? _serverCertificate;
-        private DefaultWebSocketNetworkProtocol _wsProtocol;
+        private WebSocketNetworkProtocol _wsProtocol;
 
         internal WebSocketConnectionEntity(Socket socket, uint id, NetworkEntityParameters parameters, X509Certificate? serverCertificate) : base(socket, id, parameters)
         {
             ConnectionState = WebSocketConnectionState.Connecting;
-            _wsProtocol = (DefaultWebSocketNetworkProtocol)parameters.Protocol;
+            _wsProtocol = (WebSocketNetworkProtocol)parameters.Protocol;
             _serverCertificate = serverCertificate;
             if (_serverCertificate != null)
             {
@@ -88,11 +88,14 @@ namespace Inertia.Network
                 }
                 else _socket.Send(data);
             }
-            else if (ConnectionState == WebSocketConnectionState.Connected)
+            else
             {
-                _sslStream.Write(_wsProtocol.WriteMessage(data, WebSocketOpCode.BinaryFrame));
+                if (ConnectionState == WebSocketConnectionState.Connected)
+                {
+                    _sslStream.Write(_wsProtocol.WriteMessage(data, WebSocketOpCode.BinaryFrame));
+                }
+                else _sslStream.Write(data);
             }
-            else _sslStream.Write(data);
         }
         private protected override void ProcessClean()
         {

@@ -2,21 +2,21 @@
 
 namespace Inertia.Network
 {
-    public static class NetworkProtocolFactory
+    public static class NetworkProtocolManager
     {
         internal const int DefaultBacklogSize = 1000;
         internal const int DefaultMessageCountLimitBeforeSpam = 55;
 
-        internal static ServerMessagePoolExecutor? ServerAsyncPool { get; private set; }
+        internal static ServerMessagePoolExecutor? ServerMessagePool { get; private set; }
         internal static NetworkProtocol DefaultProtocol { get; private set; }
-        internal static DefaultWebSocketNetworkProtocol DefaultWsProtocol { get; private set; }
+        internal static WebSocketNetworkProtocol DefaultWsProtocol { get; private set; }
 
         public static NetworkProtocol CurrentProtocol { get; private set; }
 
-        static NetworkProtocolFactory()
+        static NetworkProtocolManager()
         {
             DefaultProtocol = new DefaultNetworkProtocol();
-            DefaultWsProtocol = new DefaultWebSocketNetworkProtocol();
+            DefaultWsProtocol = new WebSocketNetworkProtocol();
 
             SetDefaultProtocol(InternalNetworkProtocolType.Default);
         }
@@ -38,11 +38,11 @@ namespace Inertia.Network
                 return (NetworkMessage)cnstr.Invoke(new object[parameters.Length]);
             }
         }
-        internal static bool TryGetHandler(NetworkEntity receiver, out NetworkMessageHandler handler)
+
+        public static bool TryGetHandler(NetworkEntity receiver, out NetworkMessageHandler handler)
         {
             return ReflectionProvider.TryGetMessageHandler(receiver, out handler);
         }
-
         public static void SetDefaultProtocol(InternalNetworkProtocolType protocolType)
         {
             if (protocolType == InternalNetworkProtocolType.Default) SetDefaultProtocol(DefaultProtocol);
@@ -53,19 +53,18 @@ namespace Inertia.Network
             if (CurrentProtocol == protocol) return;
 
             CurrentProtocol = protocol;
-            if (ServerAsyncPool == null)
+            if (ServerMessagePool == null)
             {
-                if (ReflectionProvider.IsNetworkServerUsedInAssemblies)
+                if (ReflectionProvider.IsNetworkServerUsed)
                 {
-                    ServerAsyncPool = new ServerMessagePoolExecutor(protocol.ConnectionPerQueueInPool);
+                    ServerMessagePool = new ServerMessagePoolExecutor(protocol.ConnectionPerQueueInPool);
                 }
             }
             else
             {
-                ServerAsyncPool.ConnectionPerQueue = protocol.ConnectionPerQueueInPool;
+                ServerMessagePool.ConnectionPerQueue = protocol.ConnectionPerQueueInPool;
             }
         }
-
         public static void ProcessParsing(NetworkProtocol protocol, NetworkEntity receiver, BasicReader reader)
         {
             var output = new MessageParsingOutput();
@@ -80,6 +79,7 @@ namespace Inertia.Network
             if (!TryGetHandler(receiver, out var handler)) return;
 
             receiver.ProcessInQueue(ExecuteOutput);
+
             void ExecuteOutput()
             {
                 foreach (var message in output.Messages)

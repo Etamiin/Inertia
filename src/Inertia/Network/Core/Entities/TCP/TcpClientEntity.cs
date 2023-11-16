@@ -103,7 +103,7 @@ namespace Inertia.Network
                     throw new SocketException((int)SocketError.SocketError);
                 }
 
-                NetworkProtocolFactory.ProcessParsing(Protocol, this, _networkDataReader.Fill(new ReadOnlySpan<byte>(_buffer, 0, received)));
+                NetworkProtocolManager.ProcessParsing(Protocol, this, _networkDataReader.Fill(new ReadOnlySpan<byte>(_buffer, 0, received)));
             }
             catch (Exception e)
             {

@@ -1,6 +1,7 @@
 ﻿using Inertia.Logging;
 using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace Inertia
 {
@@ -9,9 +10,16 @@ namespace Inertia
     /// </summary>
     public static class CommandManager
     {
+        private static IEnumerable<BasicCommand> _commands;
+
         public static IEnumerable<BasicCommand> GetCommandList()
         {
-            return ReflectionProvider.GetAllCommands();
+            if (_commands == null)
+            {
+                _commands = ReflectionProvider.GetAllCommands();
+            }
+
+            return _commands;
         }
 
         public static bool TryExecute(string commandLine)
@@ -46,7 +54,29 @@ namespace Inertia
                     cmd.Logger = logger;
                 }
 
-                BasicCommand.ParseAndExecute(cmd, arguments, state, containsQuotes);
+                if (containsQuotes)
+                {
+                    var parsedArguments = new List<string>();
+                    var argBuilder = new StringBuilder();
+
+                    foreach (var arg in arguments)
+                    {
+                        if (arg.EndsWith('"'))
+                        {
+                            argBuilder.Append($" {arg}");
+                            parsedArguments.Add(argBuilder.Replace("\"", string.Empty).ToString().Trim());
+                            argBuilder.Clear();
+                        }
+                        else if (arg.StartsWith('"')) argBuilder.Append(arg);
+                        else if (argBuilder.Length > 0) argBuilder.Append($" {arg}");
+                        else parsedArguments.Add(arg);
+                    }
+
+                    arguments = parsedArguments.ToArray();
+                }
+
+                cmd.OnExecute(new CommandArguments(arguments, state));
+
                 return true;
             }
 

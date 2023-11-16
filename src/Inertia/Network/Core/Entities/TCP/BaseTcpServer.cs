@@ -27,18 +27,6 @@ namespace Inertia.Network
             return _connections.TryGetValue(id, out connection);
         }
 
-        public NetworkConnectionGroup CreateConnectionGroup()
-        {
-            return CreateConnectionGroup(_connections.Values);
-        }
-        public NetworkConnectionGroup CreateConnectionGroup(Predicate<T> predicate)
-        {
-            var connections = _connections.Values
-                .Where((connection) => predicate(connection));
-
-            return CreateConnectionGroup(connections);
-        }
-
         public sealed override void Start()
         {
             this.ThrowIfDisposable(IsDisposed);
@@ -50,8 +38,8 @@ namespace Inertia.Network
                     _connections.Clear();
 
                     _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                    _socket.Bind(new IPEndPoint(string.IsNullOrWhiteSpace(Parameters.Ip) ? IPAddress.Any : IPAddress.Parse(Parameters.Ip), Parameters.Port));
-                    _socket.Listen(Parameters.BacklogQueueSize);
+                    _socket.Bind(new IPEndPoint(string.IsNullOrWhiteSpace(_parameters.Ip) ? IPAddress.Any : IPAddress.Parse(_parameters.Ip), _parameters.Port));
+                    _socket.Listen(_parameters.BacklogQueueSize);
 
                     OnStarted();
                     _socket.BeginAccept(OnAcceptConnection, _socket);
@@ -102,15 +90,6 @@ namespace Inertia.Network
             }
 
             IsDisposed = true;
-        }
-        private NetworkConnectionGroup CreateConnectionGroup(IEnumerable<T> connections)
-        {
-            this.ThrowIfDisposable(IsDisposed);
-
-            var group = new NetworkConnectionGroup(Protocol);
-            group.AddConnections(connections);
-
-            return group;
         }
     }
 }

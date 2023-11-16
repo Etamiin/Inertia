@@ -16,7 +16,7 @@
         {
             if (ReflectionProvider.TryGetMessageType(messageId, out var messageType))
             {
-                return NetworkProtocolFactory.CreateMessage(messageType);
+                return NetworkProtocolManager.CreateMessage(messageType);
             }
 
             return null;

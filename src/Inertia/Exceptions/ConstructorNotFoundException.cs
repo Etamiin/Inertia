@@ -19,7 +19,7 @@ namespace Inertia
         private readonly Type _ownerType;
         private readonly Type[] _parametersType;
 
-        internal ConstructorNotFoundException(Type ownerType, Type[] parametersType)
+        public ConstructorNotFoundException(Type ownerType, Type[] parametersType)
         {
             _ownerType = ownerType;
             _parametersType = parametersType;
