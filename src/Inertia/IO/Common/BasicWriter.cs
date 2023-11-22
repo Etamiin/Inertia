@@ -1,7 +1,9 @@
-﻿using System;
+﻿using Inertia.IO;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -49,23 +51,49 @@ namespace Inertia
                 return _writer.Length;
             }
         }
-        
-        private MemoryStream _writer;
+
+        private MemoryStream _baseWriter;
+        private Stream _writer;
         private readonly Encoding _encoding;
         
-        public BasicWriter() : this(Encoding.UTF8)
+        public BasicWriter() : this(BinaryTransformType.None, Encoding.UTF8)
         {
         }
-        public BasicWriter(int size) : this(size, Encoding.UTF8)
+        public BasicWriter(int size) : this(BinaryTransformType.None, size, Encoding.UTF8)
         {
         }
-        public BasicWriter(Encoding encoding) : this(256, encoding)
+        public BasicWriter(Encoding encoding) : this(BinaryTransformType.None, 256, encoding)
         {
         }
-        public BasicWriter(int size, Encoding encoding)
+        public BasicWriter(int size, Encoding encoding) : this(BinaryTransformType.None, size, encoding)
+        {
+        }
+        public BasicWriter(BinaryTransformType compression) : this(compression, Encoding.UTF8)
+        {
+        }
+        public BasicWriter(BinaryTransformType compression, int size) : this(compression, size, Encoding.UTF8)
+        {
+        }
+        public BasicWriter(BinaryTransformType compression, Encoding encoding) : this(compression, 256, encoding)
+        {
+        }
+        public BasicWriter(BinaryTransformType compression, int size, Encoding encoding)
         {
             _encoding = encoding;
-            _writer = new MemoryStream(size);
+            _baseWriter = new MemoryStream(size);
+            
+            if (compression == BinaryTransformType.Deflate)
+            {
+                _writer = new DeflateStream(_baseWriter, CompressionMode.Compress);
+            }
+            else if (compression == BinaryTransformType.GZip)
+            {
+                _writer = new GZipStream(_baseWriter, CompressionMode.Compress);
+            }
+            else
+            {
+                _writer = _baseWriter;
+            }
         }
 
         public BasicWriter SetPosition(long position)
@@ -285,7 +313,12 @@ namespace Inertia
                 throw new ObjectDisposedException(nameof(BasicWriter));
             }
 
-            return _writer.ToArray();
+            if (_baseWriter != _writer)
+            {
+                _writer.Flush();
+            }
+
+            return _baseWriter.ToArray();
         }
         public async Task<byte[]> ToArrayAsync()
         {
@@ -314,8 +347,6 @@ namespace Inertia
 
             if (disposing)
             {
-                _writer.Flush();
-                _writer.Close();
                 _writer.Dispose();
                 _writer = null;
             }

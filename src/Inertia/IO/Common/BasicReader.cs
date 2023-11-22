@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Inertia.IO;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -75,6 +76,13 @@ namespace Inertia
         {
             Fill(data);
         }
+        public BasicReader(BinaryTransformType compression, byte[] data) : this(compression, data, Encoding.UTF8)
+        {
+        }
+        public BasicReader(BinaryTransformType compression, byte[] data, Encoding encoding) : this(encoding)
+        {
+            Fill(compression, data);
+        }
 
         public BasicReader SetPosition(long position)
         {
@@ -104,11 +112,38 @@ namespace Inertia
 
         public BasicReader Fill(ReadOnlySpan<byte> data)
         {
-            return Fill(data, TotalLength);
+            return Fill(BinaryTransformType.None, data, TotalLength);
+        }
+        public BasicReader Fill(BinaryTransformType compression, ReadOnlySpan<byte> data)
+        {
+            return Fill(compression, data, TotalLength);
         }
         public BasicReader Fill(ReadOnlySpan<byte> data, long offset)
         {
+            return Fill(BinaryTransformType.None, data, offset);
+        }
+        public BasicReader Fill(BinaryTransformType compression, ReadOnlySpan<byte> data, long offset)
+        {
             this.ThrowIfDisposable(IsDisposed);
+
+            if (compression == BinaryTransformType.Deflate)
+            {
+                var transformResult = data.ToArray().DeflateDecompress();
+                if (transformResult.Success)
+                {
+                    data = transformResult.Data;
+                }
+                else throw transformResult.Error;
+            }
+            else if (compression == BinaryTransformType.GZip)
+            {
+                var transformResult = data.ToArray().GzipDecompress();
+                if (transformResult.Success)
+                {
+                    data = transformResult.Data;
+                }
+                else throw transformResult.Error;
+            }
 
             var newLength = offset + data.Length;
             if (newLength > _reader.Length)

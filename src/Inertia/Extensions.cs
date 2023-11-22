@@ -24,32 +24,6 @@ namespace System
             }
         }
 
-        public static string GetSHA256(this string text)
-        {
-            return text.GetSHA256(Encoding.UTF8);
-        }
-        public static string GetSHA256(this string text, Encoding encoding)
-        {
-            return IOHelper.GetSHA256(encoding.GetBytes(text));
-        }
-
-        public static ZipCompressionResult GzipCompress(this byte[] data)
-        {
-            return IOHelper.GzipCompress(data);
-        }
-        public static async Task<ZipCompressionResult> GzipCompressAsync(this byte[] data)
-        {
-            return await IOHelper.GzipCompressAsync(data);
-        }
-        public static ZipCompressionResult GzipDecompress(this byte[] compressedData)
-        {
-            return IOHelper.GzipDecompress(compressedData);
-        }
-        public static async Task<ZipCompressionResult> GzipDecompressAsync(this byte[] compressedData)
-        {
-            return await IOHelper.GzipDecompressAsync(compressedData);
-        }
-
         public static bool GetBit(this byte value, int index)
         {
             return GetBit(value, index, EndiannessType.Auto);
