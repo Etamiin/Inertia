@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Inertia.IO;
+using System;
 using System.Net.Sockets;
 
 namespace Inertia.Network
@@ -102,7 +103,10 @@ namespace Inertia.Network
                 return;
             }
 
-            NetworkProtocolManager.ProcessParsing(_parameters.Protocol, this, _networkDataReader.Fill(new ReadOnlySpan<byte>(_buffer, 0, receivedLength)));
+            var data = new byte[receivedLength];
+            Array.Copy(_buffer, data, receivedLength);
+
+            NetworkProtocolManager.ProcessParsing(_parameters.Protocol, this, _networkDataReader.Fill(new ReaderFilling(data)));
         }
 
         private void OnReceiveData(IAsyncResult iar)

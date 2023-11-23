@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.IO.Compression;
 using System.Text;
@@ -55,44 +56,28 @@ namespace Inertia
         private MemoryStream _baseWriter;
         private Stream _writer;
         private readonly Encoding _encoding;
-        
-        public BasicWriter() : this(BinaryTransformType.None, Encoding.UTF8)
+        private readonly string? _encryptionKey;
+
+        public BasicWriter() : this(new WriterParameters())
         {
         }
-        public BasicWriter(int size) : this(BinaryTransformType.None, size, Encoding.UTF8)
+        public BasicWriter(WriterParameters parameters)
         {
-        }
-        public BasicWriter(Encoding encoding) : this(BinaryTransformType.None, 256, encoding)
-        {
-        }
-        public BasicWriter(int size, Encoding encoding) : this(BinaryTransformType.None, size, encoding)
-        {
-        }
-        public BasicWriter(BinaryTransformType compression) : this(compression, Encoding.UTF8)
-        {
-        }
-        public BasicWriter(BinaryTransformType compression, int size) : this(compression, size, Encoding.UTF8)
-        {
-        }
-        public BasicWriter(BinaryTransformType compression, Encoding encoding) : this(compression, 256, encoding)
-        {
-        }
-        public BasicWriter(BinaryTransformType compression, int size, Encoding encoding)
-        {
-            _encoding = encoding;
-            _baseWriter = new MemoryStream(size);
-            
-            if (compression == BinaryTransformType.Deflate)
+            _encoding = parameters.Encoding;
+            _baseWriter = new MemoryStream(parameters.Size);
+            _encryptionKey = parameters.EncryptionKey;
+
+            switch (parameters.CompressionAlgorithm)
             {
-                _writer = new DeflateStream(_baseWriter, CompressionMode.Compress);
-            }
-            else if (compression == BinaryTransformType.GZip)
-            {
-                _writer = new GZipStream(_baseWriter, CompressionMode.Compress);
-            }
-            else
-            {
-                _writer = _baseWriter;
+                case CompressionAlgorithm.Deflate:
+                    _writer = new DeflateStream(_baseWriter, CompressionMode.Compress);
+                    break;
+                case CompressionAlgorithm.GZip:
+                    _writer = new GZipStream(_baseWriter, CompressionMode.Compress);
+                    break;
+                default:
+                    _writer = _baseWriter;
+                    break;
             }
         }
 
@@ -318,7 +303,21 @@ namespace Inertia
                 _writer.Flush();
             }
 
-            return _baseWriter.ToArray();
+            var binary = _baseWriter.ToArray();
+            if (!string.IsNullOrWhiteSpace(_encryptionKey))
+            {
+                using (var encryptionResult = binary.AesEncrypt(_encryptionKey))
+                {
+                    if (encryptionResult.Success)
+                    {
+                        return encryptionResult.Data;
+                    }
+
+                    throw encryptionResult.Error;
+                }
+            }
+
+            return binary;
         }
         public async Task<byte[]> ToArrayAsync()
         {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Inertia.IO;
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
@@ -140,7 +141,7 @@ namespace Inertia.Network
                 }
 
                 var receiver = _connections[endPoint];
-                NetworkProtocolManager.ProcessParsing(Protocol, receiver, _reader.Fill(data));
+                NetworkProtocolManager.ProcessParsing(Protocol, receiver, _reader.Fill(new ReaderFilling(data)));
             }
             catch (Exception ex)
             {

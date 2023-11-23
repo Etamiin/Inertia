@@ -1,4 +1,5 @@
-﻿using Inertia.Logging;
+﻿using Inertia.IO;
+using Inertia.Logging;
 using System;
 using System.Net;
 using System.Net.Sockets;
@@ -103,7 +104,10 @@ namespace Inertia.Network
                     throw new SocketException((int)SocketError.SocketError);
                 }
 
-                NetworkProtocolManager.ProcessParsing(Protocol, this, _networkDataReader.Fill(new ReadOnlySpan<byte>(_buffer, 0, received)));
+                var data = new byte[received];
+                Array.Copy(_buffer, data, received);
+
+                NetworkProtocolManager.ProcessParsing(Protocol, this, _networkDataReader.Fill(new ReaderFilling(data)));
             }
             catch (Exception e)
             {

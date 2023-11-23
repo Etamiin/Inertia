@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Inertia.IO;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -97,7 +98,7 @@ namespace Inertia.Network
                 IPEndPoint endPoint = null;
                 var data = ((UdpClient)iar.AsyncState).EndReceive(iar, ref endPoint);
 
-                NetworkProtocolManager.ProcessParsing(Protocol, this, _reader.Fill(data));
+                NetworkProtocolManager.ProcessParsing(Protocol, this, _reader.Fill(new ReaderFilling(data)));
             }
             catch (Exception e)
             {

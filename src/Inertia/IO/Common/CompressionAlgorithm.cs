@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Inertia.IO
 {
-    public enum BinaryTransformType
+    public enum CompressionAlgorithm
     {
         None = 0,
         Deflate = 1,

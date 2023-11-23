@@ -6,10 +6,10 @@ namespace Inertia.IO
     {
         public bool IsDisposed { get; private set; }
         public bool Success { get; private set; }
-        public byte[]? Data { get; private set; }
+        public byte[] Data { get; private set; }
         public Exception? Error { get; private set; }
 
-        internal BinaryTransformationResult(bool success, byte[]? data, Exception? error)
+        internal BinaryTransformationResult(bool success, byte[] data, Exception? error)
         {
             Success = success;
             Data = data;

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Inertia.IO;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -45,7 +46,7 @@ namespace Inertia.Network
             var hasBag = reader.GetBool();
             if (hasBag)
             {
-                _bagReader = new BasicReader(reader.GetBytes());
+                _bagReader = new BasicReader(new ReaderFilling(reader.GetBytes()));
             }
         }
     }

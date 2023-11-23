@@ -1,4 +1,5 @@
-﻿using Inertia.Logging;
+﻿using Inertia.IO;
+using Inertia.Logging;
 using System;
 using System.Linq;
 using System.Net.WebSockets;
@@ -56,7 +57,7 @@ namespace Inertia.Network
                     reader.RemoveReadedBytes();
                     if (ProcessOpCodeMessages(connection, opCode, ref applicationData)) break;
 
-                    using (var messageReader = new BasicReader(applicationData))
+                    using (var messageReader = new BasicReader(new ReaderFilling(applicationData)))
                     {
                         while (messageReader.UnreadedLength > 0)
                         {

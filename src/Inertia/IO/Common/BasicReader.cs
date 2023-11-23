@@ -69,19 +69,12 @@ namespace Inertia
             _encoding = encoding;
             _reader = new MemoryStream();
         }
-        public BasicReader(byte[] data) : this(data, Encoding.UTF8)
+        public BasicReader(ReaderFilling fillingObject) : this(fillingObject, Encoding.UTF8)
         {
         }
-        public BasicReader(byte[] data, Encoding encoding) : this(encoding)
+        public BasicReader(ReaderFilling fillingObject, Encoding encoding) : this(encoding)
         {
-            Fill(data);
-        }
-        public BasicReader(BinaryTransformType compression, byte[] data) : this(compression, data, Encoding.UTF8)
-        {
-        }
-        public BasicReader(BinaryTransformType compression, byte[] data, Encoding encoding) : this(encoding)
-        {
-            Fill(compression, data);
+            Fill(fillingObject);
         }
 
         public BasicReader SetPosition(long position)
@@ -110,42 +103,43 @@ namespace Inertia
             }
         }
 
-        public BasicReader Fill(ReadOnlySpan<byte> data)
+        public BasicReader Fill(ReaderFilling fillingObject)
         {
-            return Fill(BinaryTransformType.None, data, TotalLength);
+            return Fill(fillingObject, TotalLength);
         }
-        public BasicReader Fill(BinaryTransformType compression, ReadOnlySpan<byte> data)
-        {
-            return Fill(compression, data, TotalLength);
-        }
-        public BasicReader Fill(ReadOnlySpan<byte> data, long offset)
-        {
-            return Fill(BinaryTransformType.None, data, offset);
-        }
-        public BasicReader Fill(BinaryTransformType compression, ReadOnlySpan<byte> data, long offset)
+        public BasicReader Fill(ReaderFilling fillingObject, long offset)
         {
             this.ThrowIfDisposable(IsDisposed);
 
-            if (compression == BinaryTransformType.Deflate)
+            if (!string.IsNullOrWhiteSpace(fillingObject.EncryptionKey))
             {
-                var transformResult = data.ToArray().DeflateDecompress();
-                if (transformResult.Success)
+                using (var decryptResult = fillingObject.Data.AesDecrypt(fillingObject.EncryptionKey))
                 {
-                    data = transformResult.Data;
+                    if (decryptResult.Success)
+                    {
+                        fillingObject.Data = decryptResult.Data;
+                    }
+                    else throw decryptResult.Error;
                 }
-                else throw transformResult.Error;
-            }
-            else if (compression == BinaryTransformType.GZip)
-            {
-                var transformResult = data.ToArray().GzipDecompress();
-                if (transformResult.Success)
-                {
-                    data = transformResult.Data;
-                }
-                else throw transformResult.Error;
             }
 
-            var newLength = offset + data.Length;
+            if (fillingObject.CompressionAlgorithm != CompressionAlgorithm.None)
+            {
+                var transformResult =
+                    fillingObject.CompressionAlgorithm == CompressionAlgorithm.Deflate ? fillingObject.Data.DeflateDecompress() :
+                    fillingObject.Data.GzipDecompress();
+
+                using (transformResult)
+                {
+                    if (transformResult.Success)
+                    {
+                        fillingObject.Data = transformResult.Data;
+                    }
+                    else throw transformResult.Error;
+                }
+            }
+
+            var newLength = offset + fillingObject.Data.Length;
             if (newLength > _reader.Length)
             {
                 _reader.SetLength(newLength);
@@ -155,9 +149,10 @@ namespace Inertia
             var oldPosition = GetPosition();
 
             SetPosition(offset);
-            _reader.Write(data);
+            _reader.Write(fillingObject.Data);
             SetPosition(oldPosition);
 
+            fillingObject.Dispose();
             return this;
         }
 
@@ -176,7 +171,7 @@ namespace Inertia
 
             if (available.Length > 0)
             {
-                Fill(available, 0);
+                Fill(new ReaderFilling(available), 0);
                 SetPosition(0);
             }
 

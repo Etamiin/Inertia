@@ -1,15 +1,19 @@
 ﻿using Inertia.IO;
+using Inertia.Logging;
 using System;
 using System.IO;
 using System.IO.Compression;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Schema;
 
 namespace Inertia
 {
     public static class IOHelper
     {
+        private static byte[] _passSalt = new byte[] { 0x49, 0x76, 0x61, 0x6e, 0x20, 0x4d, 0x65 };
+
         public static void AppendAllBytes(string filePath, byte[] data)
         {
             using (var stream = new FileStream(filePath, FileMode.Append))
@@ -140,19 +144,21 @@ namespace Inertia
             {
                 using (var ms = new MemoryStream())
                 {
-                    using (var pdb = new PasswordDeriveBytes(key, Encoding.UTF8.GetBytes(key)))
+                    using (var pdb = new PasswordDeriveBytes(key, _passSalt))
                     {
                         using (var aes = Aes.Create())
                         {
+                            aes.Key = pdb.GetBytes(aes.KeySize / 8);
+                            aes.IV = pdb.GetBytes(aes.BlockSize / 8);
+
                             using (var cs = new CryptoStream(ms, aes.CreateEncryptor(), CryptoStreamMode.Write))
                             {
                                 cs.Write(data, 0, data.Length);
-                                cs.FlushFinalBlock();
                             }
+
+                            return new BinaryTransformationResult(true, ms.ToArray(), null);
                         }
                     }
-
-                    return new BinaryTransformationResult(true, ms.ToArray(), null);
                 }
             }
             catch (Exception ex)
@@ -160,20 +166,22 @@ namespace Inertia
                 return new BinaryTransformationResult(false, null, ex);
             }
         }
-        public static BinaryTransformationResult TryAesDecrypt(this byte[] encryptedData, string key)
+        public static BinaryTransformationResult AesDecrypt(this byte[] encryptedData, string key)
         {
             try
             {
                 using (var ms = new MemoryStream())
                 {
-                    using (var pdb = new PasswordDeriveBytes(key, Encoding.UTF8.GetBytes(key)))
+                    using (var pdb = new PasswordDeriveBytes(key, _passSalt))
                     {
                         using (var aes = Aes.Create())
                         {
+                            aes.Key = pdb.GetBytes(aes.KeySize / 8);
+                            aes.IV = pdb.GetBytes(aes.BlockSize / 8);
+
                             using (var cs = new CryptoStream(ms, aes.CreateDecryptor(), CryptoStreamMode.Write))
                             {
-                                cs.Write(encryptedData);
-                                cs.FlushFinalBlock();
+                                cs.Write(encryptedData, 0, encryptedData.Length);
                             }
                         }
                     }
