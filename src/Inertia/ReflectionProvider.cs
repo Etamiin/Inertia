@@ -196,7 +196,7 @@ namespace Inertia
                 //So we only initialize the pen systems once when every parameters are set.
                 foreach (var penSystemType in penSystemTypes)
                 {
-                    TryCreateInstance<IPenSystem>(penSystemType, Type.EmptyTypes);
+                    TryCreateInstance<IPenSystem>(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, penSystemType, Type.EmptyTypes);
                 }
             }
             catch (Exception ex)
@@ -204,10 +204,14 @@ namespace Inertia
                 throw new TypeLoadException($"{nameof(ReflectionProvider)} failed to load.", ex);
             }
         }
-        private static T TryCreateInstance<T>(Type owner, Type[] parametersType, params object[] parameters)
+        private static T TryCreateInstance<T>(Type owner, Type[] parametersTypes, params object[] parameters)
         {
-            var constructor = owner.GetConstructor(parametersType);
-            if (constructor == null) throw new ConstructorNotFoundException(owner, parametersType);
+            return TryCreateInstance<T>(BindingFlags.Instance | BindingFlags.Public, owner, parametersTypes, parameters);
+        }
+        private static T TryCreateInstance<T>(BindingFlags bindingFlags, Type owner, Type[] parametersTypes, params object[] parameters)
+        {
+            var constructor = owner.GetConstructor(bindingFlags, Type.DefaultBinder, parametersTypes, new ParameterModifier[0]);
+            if (constructor == null) throw new ConstructorNotFoundException(owner, parametersTypes);
 
             return (T)constructor.Invoke(parameters);
         }

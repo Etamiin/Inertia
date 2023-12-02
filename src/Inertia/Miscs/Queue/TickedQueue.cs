@@ -40,7 +40,7 @@ namespace Inertia
 
         protected void ProcessQueue()
         {
-            if (IsDisposed) return;
+            if (IsDisposed || Count == 0) return;
 
             var i = 0;
             do

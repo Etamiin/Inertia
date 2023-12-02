@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Inertia.Logging;
+using System;
+using System.Diagnostics;
 
 namespace Inertia.Network
 {
@@ -7,7 +9,7 @@ namespace Inertia.Network
         internal const int DefaultBacklogSize = 1000;
         internal const int DefaultMessageCountLimitBeforeSpam = 55;
 
-        internal static ServerMessagePoolExecutor? ServerMessagePool { get; private set; }
+        internal static ServerMessagePoolExecutor ServerMessagePool { get; private set; }
         internal static NetworkProtocol DefaultProtocol { get; private set; }
         internal static WebSocketNetworkProtocol DefaultWsProtocol { get; private set; }
 
@@ -57,7 +59,7 @@ namespace Inertia.Network
             {
                 if (ReflectionProvider.IsNetworkServerUsed)
                 {
-                    ServerMessagePool = new ServerMessagePoolExecutor(protocol.ConnectionPerQueueInPool);
+                    ServerMessagePool = new ServerMessagePoolExecutor(protocol.ConnectionPerQueueInPool, BasicLogger.Default);
                 }
             }
             else
@@ -68,7 +70,7 @@ namespace Inertia.Network
         public static void ProcessParsing(NetworkProtocol protocol, NetworkEntity receiver, BasicReader reader)
         {
             var output = new MessageParsingOutput();
-
+            
             if (!protocol.ParseMessage(receiver, reader, output)) return;
             if (output.Messages.Count == 0)
             {

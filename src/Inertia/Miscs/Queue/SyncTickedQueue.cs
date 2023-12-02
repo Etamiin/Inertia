@@ -11,7 +11,7 @@
 
         public void Execute()
         {
-            if (DisposeRequested) return;
+            if (DisposeRequested || Count == 0) return;
 
             ProcessQueue();
         }

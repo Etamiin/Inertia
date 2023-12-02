@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Inertia.Logging;
+using System;
 using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,12 +12,20 @@ namespace Inertia.Network
         internal int ConnectionCount => _registeredConnection;
 
         private ConcurrentQueue<Action> _queue;
+        private ILogger _logger;
         private int _registeredConnection;
 
-        internal ServerMessageQueue()
+        internal ServerMessageQueue(ILogger logger)
         {
+            if (logger == null)
+            {
+                throw new ArgumentNullException(nameof(logger));
+            }
+
             _queue = new ConcurrentQueue<Action>();
-            StartAutoExecuteAsync();            
+            _logger = logger;
+
+            StartQueueExecution();            
         }
 
         internal void RegisterConnection(NetworkConnectionEntity connection)
@@ -38,7 +47,7 @@ namespace Inertia.Network
             Dispose(true);
         }
 
-        private void StartAutoExecuteAsync()
+        private void StartQueueExecution()
         {
             Task.Factory.StartNew(async () => {
                 while (!IsDisposed)
@@ -49,9 +58,16 @@ namespace Inertia.Network
                         continue;
                     }
 
-                    while (_queue.TryDequeue(out Action action))
+                    try
                     {
-                        action?.Invoke();
+                        while (_queue.TryDequeue(out Action action))
+                        {
+                            action?.Invoke();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.Error($"Error on ServerMessageQueue: {ex}");
                     }
                 }
             }, TaskCreationOptions.LongRunning);

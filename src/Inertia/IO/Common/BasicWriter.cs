@@ -1,10 +1,13 @@
 ﻿using Inertia.IO;
+using Inertia.Logging;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.IO.Compression;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -107,7 +110,7 @@ namespace Inertia
         }
         public BasicWriter SetString(string value)
         {
-            return SetBytes(!string.IsNullOrWhiteSpace(value) ? _encoding.GetBytes(value) : new byte[0]);
+            return SetBytes(!string.IsNullOrEmpty(value) ? _encoding.GetBytes(value) : new byte[0]);
         }
         public BasicWriter SetFloat(float value)
         {
@@ -189,7 +192,10 @@ namespace Inertia
             if (value == null) throw new ArgumentNullException(nameof(value));
 
             _writer.Write(BitConverter.GetBytes(value.Length));
-            _writer.Write(value);
+            if (value.Length > 0)
+            {
+                _writer.Write(value);
+            }
 
             return this;
         }
@@ -245,15 +251,14 @@ namespace Inertia
         }
         public BasicWriter SetValue(object value)
         {
+            if (value == null) return this;
+
             return SetValue(value, value.GetType());
         }
         public BasicWriter SetValue(object value, Type precisedType)
         {
-            if (value == null) return this;
-            if (precisedType == null)
-            {
-                precisedType = value.GetType();
-            }
+            if (precisedType == null) return this;
+            if (value == null && precisedType != typeof(string)) return this;
 
             if (_typageDefinitions.TryGetValue(precisedType, out Action<BasicWriter, object> action))
             {

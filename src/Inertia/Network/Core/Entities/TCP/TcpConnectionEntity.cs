@@ -1,4 +1,5 @@
 ﻿using Inertia.IO;
+using Inertia.Logging;
 using System;
 using System.Net.Sockets;
 
@@ -10,7 +11,7 @@ namespace Inertia.Network
 
         public bool IsDisposed { get; private set; }
         public bool IsConnected => _socket != null && _socket.Connected;
-        public NetworkConnectionMonitoring? Monitoring { get; private set; }
+        public NetworkConnectionMonitoring Monitoring { get; private set; }
 
         private protected Socket _socket { get; private set; }
         private protected BasicReader _networkDataReader { get; private set; }
@@ -102,7 +103,7 @@ namespace Inertia.Network
                 Disconnect(NetworkDisconnectReason.Spam);
                 return;
             }
-
+            
             var data = new byte[receivedLength];
             Array.Copy(_buffer, data, receivedLength);
 
