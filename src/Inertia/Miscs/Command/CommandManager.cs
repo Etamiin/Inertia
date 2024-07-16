@@ -10,17 +10,7 @@ namespace Inertia
     /// </summary>
     public static class CommandManager
     {
-        private static IEnumerable<BasicCommand> _commands;
-
-        public static IEnumerable<BasicCommand> GetCommandList()
-        {
-            if (_commands == null)
-            {
-                _commands = ReflectionProvider.GetAllCommands();
-            }
-
-            return _commands;
-        }
+        public static IEnumerable<CommandLine> GetAllCommands => ReflectionProvider.GetAllCommands();
 
         public static bool TryExecute(string commandLine)
         {
@@ -47,11 +37,11 @@ namespace Inertia
         
         private static bool TryExecuteByName(string commandName, ILogger? logger, object? state, bool containsQuotes, params string[] arguments)
         {
-            if (ReflectionProvider.TryGetCommand(commandName, out BasicCommand cmd))
+            if (ReflectionProvider.TryGetCommand(commandName, out CommandLine cmd))
             {
-                if (logger != null)
+                if (logger == null)
                 {
-                    cmd.Logger = logger;
+                    logger = LoggingProvider.Logger;
                 }
 
                 if (containsQuotes)
@@ -63,11 +53,11 @@ namespace Inertia
                     {
                         if (arg.EndsWith('"'))
                         {
-                            argBuilder.Append($" {arg}");
-                            parsedArguments.Add(argBuilder.Replace("\"", string.Empty).ToString().Trim());
+                            argBuilder.Append($" {arg.Remove(arg.Length - 1, 1)}");
+                            parsedArguments.Add(argBuilder.ToString().Trim());
                             argBuilder.Clear();
                         }
-                        else if (arg.StartsWith('"')) argBuilder.Append(arg);
+                        else if (arg.StartsWith('"')) argBuilder.Append(arg.Remove(0, 1));
                         else if (argBuilder.Length > 0) argBuilder.Append($" {arg}");
                         else parsedArguments.Add(arg);
                     }
@@ -75,7 +65,7 @@ namespace Inertia
                     arguments = parsedArguments.ToArray();
                 }
 
-                cmd.OnExecute(new CommandArguments(arguments, state));
+                cmd.Execute(new CommandLineArguments(arguments), logger, state);
 
                 return true;
             }

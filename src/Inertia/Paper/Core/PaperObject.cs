@@ -8,38 +8,36 @@ namespace Inertia.Paper
         {
             get
             {
-                return State == PaperObjectState.Disposing || State == PaperObjectState.Disposed;
+                return State == PaperObjectState.Disposed;
             }
         }
-        
         public PaperObjectState State { get; internal set; }
+        public IPenSystem PenSystem { get; private set; }
 
-        public void Begin()
+        public PaperObject()
         {
-            this.ThrowIfDisposable(IsDisposed);
-
-            if (State == PaperObjectState.Initialized) return;
-
-            var pen = PaperFactory.GetPenSystem(GetType());
-            if (pen != null)
+            PenSystem = PaperFactory.GetPenSystem(GetType());
+            if (PenSystem != null)
             {
+                PenSystem.RegisterPaper(this);
                 State = PaperObjectState.Initialized;
-                pen.ArchivePaper(this);
             }
             else Dispose();
         }
+
         public void Dispose()
         {
             Dispose(true);
         }
 
-        private void Dispose(bool disposing)
+        protected virtual void Dispose(bool disposing)
         {
             if (IsDisposed) return;
 
             if (disposing)
             {
-                State = PaperObjectState.Disposing;
+                State = PaperObjectState.Disposed;
+                PenSystem = null;
             }
         }
     }

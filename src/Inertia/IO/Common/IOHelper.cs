@@ -137,7 +137,6 @@ namespace Inertia
                 return new BinaryTransformationResult(false, null, ex);
             }
         }
-
         public static BinaryTransformationResult AesEncrypt(this byte[] data, string key)
         {
             try

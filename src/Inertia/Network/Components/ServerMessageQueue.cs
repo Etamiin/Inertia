@@ -17,10 +17,7 @@ namespace Inertia.Network
 
         internal ServerMessageQueue(ILogger logger)
         {
-            if (logger == null)
-            {
-                throw new ArgumentNullException(nameof(logger));
-            }
+            if (logger == null) throw new ArgumentNullException(nameof(logger));
 
             _queue = new ConcurrentQueue<Action>();
             _logger = logger;

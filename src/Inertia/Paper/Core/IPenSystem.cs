@@ -1,11 +1,14 @@
-﻿namespace Inertia.Paper
+﻿using Inertia.Logging;
+
+namespace Inertia.Paper
 {
-    internal interface IPenSystem
+    public interface IPenSystem
     {
+        ILogger Logger { get; }
         float DeltaTime { get; }
+        int TickCount { get; }
         int LayerIndex { get; }
 
-        internal void ArchivePaper(PaperObject obj);
-        internal void ClearPaper(PaperObject obj);
+        internal void RegisterPaper(PaperObject obj);
     }
 }

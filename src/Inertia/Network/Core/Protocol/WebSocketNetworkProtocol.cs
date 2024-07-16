@@ -25,15 +25,15 @@ namespace Inertia.Network
 
         public override byte[] SerializeMessage(NetworkMessage message)
         {
-            using (var writer = new BasicWriter())
+            using (var writer = new DataWriter())
             {
-                writer.SetUShort(message.MessageId);
+                writer.Write(message.MessageId);
                 message.Serialize(writer);
 
                 return writer.ToArray();
             }
         }
-        public override bool ParseMessage(NetworkEntity receiver, BasicReader reader, MessageParsingOutput output)
+        public override bool ParseMessage(NetworkEntity receiver, DataReader reader, MessageParsingOutput output)
         {
             reader.SetPosition(0);
 
@@ -57,11 +57,11 @@ namespace Inertia.Network
                     reader.RemoveReadedBytes();
                     if (ProcessOpCodeMessages(connection, opCode, ref applicationData)) break;
 
-                    using (var messageReader = new BasicReader(new ReaderFilling(applicationData)))
+                    using (var messageReader = new DataReader(applicationData))
                     {
                         while (messageReader.UnreadedLength > 0)
                         {
-                            var msgId = messageReader.GetUShort();
+                            var msgId = messageReader.ReadUShort();
                             var message = CreateMessageById(msgId);
                             if (message == null)
                             {
@@ -80,7 +80,7 @@ namespace Inertia.Network
             }
             catch (Exception ex)
             {
-                BasicLogger.Default.Error("Parsing network message failed: " + ex);
+                LoggingProvider.Logger?.Error("Parsing network message failed: " + ex);
 
                 if (receiver is NetworkConnectionEntity connection)
                 {
@@ -97,40 +97,40 @@ namespace Inertia.Network
 
         internal byte[] WriteMessage(byte[] applicationData, WebSocketOpCode wsOpCode)
         {
-            using (var writer = new BasicWriter())
+            using (var writer = new DataWriter())
             {
                 var payloadSize = applicationData.Length < PayloadMidSize ? applicationData.Length : (applicationData.Length <= ushort.MaxValue ? PayloadMidSize : PayloadFullSize);
                 byte opCode = (byte)wsOpCode;
                 opCode.SetBitRef(0, true, EndiannessType.BigEndian);
 
                 writer
-                    .SetByte(opCode)
-                    .SetByte((byte)payloadSize);
+                    .Write(opCode)
+                    .Write((byte)payloadSize);
 
                 if (payloadSize == PayloadMidSize)
                 {
                     var bytes = BitConverter.GetBytes((ushort)applicationData.Length);
                     Array.Reverse(bytes);
 
-                    writer.SetBytesWithoutHeader(bytes);
+                    writer.WriteRaw(bytes);
                 }
                 else if (payloadSize == PayloadFullSize)
                 {
                     var bytes = BitConverter.GetBytes((uint)applicationData.Length);
                     Array.Reverse(bytes);
 
-                    writer.SetBytesWithoutHeader(bytes);
+                    writer.WriteRaw(bytes);
                 }
 
                 return writer
-                    .SetBytesWithoutHeader(applicationData)
+                    .WriteRaw(applicationData)
                     .ToArray();
             }
         }
 
-        private void TryProcessHandshakeMessage(BasicReader reader, WebSocketConnectionEntity connection)
+        private void TryProcessHandshakeMessage(DataReader reader, WebSocketConnectionEntity connection)
         {
-            var data = reader.GetBytes((int)reader.UnreadedLength);
+            var data = reader.ReadBytes((int)reader.UnreadedLength);
             var httpRequest = Encoding.UTF8.GetString(data);
             var handshakeResult = GetHanshakeKeyResult(httpRequest);
 
@@ -180,14 +180,14 @@ namespace Inertia.Network
 
             return false;
         }
-        private bool TryParseMessage(BasicReader reader, out byte[] applicationData, out WebSocketOpCode opCode)
+        private bool TryParseMessage(DataReader reader, out byte[] applicationData, out WebSocketOpCode opCode)
         {
             //Field 'fin' not supported (always considered as true)
             //ExtensionData not supported
 
-            var fByte = reader.GetByte();
+            var fByte = reader.ReadByte();
             var fin = fByte.GetBit(0, EndiannessType.BigEndian);
-            var payloadByte = reader.GetByte();
+            var payloadByte = reader.ReadByte();
             var masked = payloadByte.GetBit(0, EndiannessType.BigEndian);
 
             opCode = (WebSocketOpCode)fByte.SetBit(0, false, EndiannessType.BigEndian);
@@ -196,14 +196,14 @@ namespace Inertia.Network
             int appDataSize = payloadByte;
             if (payloadByte == PayloadMidSize)
             {
-                var bytes = reader.GetBytes(2);
+                var bytes = reader.ReadBytes(2);
                 Array.Reverse(bytes);
 
                 appDataSize = BitConverter.ToUInt16(bytes);
             }
             else if (payloadByte == PayloadFullSize)
             {
-                var bytes = reader.GetBytes(4);
+                var bytes = reader.ReadBytes(4);
                 Array.Reverse(bytes);
 
                 appDataSize = (int)BitConverter.ToUInt64(bytes);
@@ -217,8 +217,8 @@ namespace Inertia.Network
 
             if (masked)
             {
-                var maskingKey = reader.GetBytes(4);
-                applicationData = reader.GetBytes(appDataSize);
+                var maskingKey = reader.ReadBytes(4);
+                applicationData = reader.ReadBytes(appDataSize);
 
                 for (var i = 0; i < applicationData.Length; i++)
                 {
@@ -227,7 +227,7 @@ namespace Inertia.Network
             }
             else
             {
-                applicationData = reader.GetBytes(appDataSize);
+                applicationData = reader.ReadBytes(appDataSize);
             }
 
             return true;

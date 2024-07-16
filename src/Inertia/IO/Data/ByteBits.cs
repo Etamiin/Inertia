@@ -2,18 +2,18 @@
 
 namespace System
 {
-    public sealed class BitByte : ISerializableObject
+    public sealed class ByteBits
     {
         public byte Byte { get; private set; }
 
-        public BitByte()
+        public ByteBits()
         {
         }
-        public BitByte(params bool[] bits)
+        public ByteBits(params bool[] bits)
         {
             Set(bits);
         }
-        public BitByte(byte value)
+        public ByteBits(byte value)
         {
             Byte = value;
         }
@@ -54,15 +54,6 @@ namespace System
             {
                 Byte = Byte.SetBit(i, value);
             }
-        }
-
-        public void Serialize(BasicWriter writer)
-        {
-            writer.SetByte(Byte);
-        }
-        public void Deserialize(BasicReader reader)
-        {
-            Byte = reader.GetByte();
         }
     }
 }

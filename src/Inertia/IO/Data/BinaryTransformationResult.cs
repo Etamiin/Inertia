@@ -6,14 +6,22 @@ namespace Inertia.IO
     {
         public bool IsDisposed { get; private set; }
         public bool Success { get; private set; }
-        public byte[] Data { get; private set; }
+        public byte[]? Data { get; private set; }
         public Exception? Error { get; private set; }
 
-        internal BinaryTransformationResult(bool success, byte[] data, Exception? error)
+        internal BinaryTransformationResult(bool success, byte[]? data, Exception? error)
         {
             Success = success;
             Data = data;
             Error = error;
+        }
+
+        public byte[] GetDataOrThrow()
+        {
+            if (Error != null) throw Error;
+            if (Data == null) throw new ArgumentNullException(nameof(Data));
+
+            return Data;
         }
 
         public void Dispose()

@@ -12,7 +12,7 @@ namespace Inertia.Network
 
         public bool IsDisposed { get; private set; }
 
-        private BasicReader? _networkDataReader;
+        private DataReader? _networkDataReader;
         private Socket? _socket;
         private byte[] _buffer;
         
@@ -31,7 +31,7 @@ namespace Inertia.Network
                     _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                     _socket.Connect(new IPEndPoint(IPAddress.Parse(_parameters.Ip), _parameters.Port));
                     
-                    _networkDataReader = new BasicReader();
+                    _networkDataReader = new DataReader();
                     _buffer = new byte[Protocol.NetworkBufferLength];
 
                     Connected();
@@ -107,7 +107,7 @@ namespace Inertia.Network
                 var data = new byte[received];
                 Array.Copy(_buffer, data, received);
 
-                NetworkProtocolManager.ProcessParsing(Protocol, this, _networkDataReader.Fill(new ReaderFilling(data)));
+                NetworkProtocolManager.ProcessParsing(Protocol, this, _networkDataReader.Fill(data));
             }
             catch (Exception e)
             {

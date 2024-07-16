@@ -6,7 +6,7 @@ namespace Inertia.Network
 {
     public static class NetworkProtocolManager
     {
-        internal const int DefaultBacklogSize = 1000;
+        internal const int DefaultBacklogQueueSize = 1000;
         internal const int DefaultMessageCountLimitBeforeSpam = 55;
 
         internal static ServerMessagePoolExecutor ServerMessagePool { get; private set; }
@@ -59,7 +59,7 @@ namespace Inertia.Network
             {
                 if (ReflectionProvider.IsNetworkServerUsed)
                 {
-                    ServerMessagePool = new ServerMessagePoolExecutor(protocol.ConnectionPerQueueInPool, BasicLogger.Default);
+                    ServerMessagePool = new ServerMessagePoolExecutor(protocol.ConnectionPerQueueInPool, LoggingProvider.Logger);
                 }
             }
             else
@@ -67,7 +67,7 @@ namespace Inertia.Network
                 ServerMessagePool.ConnectionPerQueue = protocol.ConnectionPerQueueInPool;
             }
         }
-        public static void ProcessParsing(NetworkProtocol protocol, NetworkEntity receiver, BasicReader reader)
+        public static void ProcessParsing(NetworkProtocol protocol, NetworkEntity receiver, DataReader reader)
         {
             var output = new MessageParsingOutput();
             

@@ -14,13 +14,13 @@ namespace Inertia.Network
         public NetworkConnectionMonitoring Monitoring { get; private set; }
 
         private protected Socket _socket { get; private set; }
-        private protected BasicReader _networkDataReader { get; private set; }
+        private protected DataReader _networkDataReader { get; private set; }
         private protected byte[] _buffer { get; private set; }
 
         internal TcpConnectionEntity(Socket socket, uint id, NetworkEntityParameters parameters) : base(id, parameters)
         {
             _socket = socket;
-            _networkDataReader = new BasicReader();
+            _networkDataReader = new DataReader();
             _buffer = new byte[_parameters.Protocol.NetworkBufferLength];
             Monitoring = new NetworkConnectionMonitoring();
         }
@@ -107,7 +107,7 @@ namespace Inertia.Network
             var data = new byte[receivedLength];
             Array.Copy(_buffer, data, receivedLength);
 
-            NetworkProtocolManager.ProcessParsing(_parameters.Protocol, this, _networkDataReader.Fill(new ReaderFilling(data)));
+            NetworkProtocolManager.ProcessParsing(_parameters.Protocol, this, _networkDataReader.Fill(data));
         }
 
         private void OnReceiveData(IAsyncResult iar)

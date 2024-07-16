@@ -7,19 +7,19 @@ namespace Inertia.Network
 {
     public abstract class BaggedNetworkMessage : NetworkMessage
     {
-        private BasicWriter? _bagWriter;
-        private BasicReader? _bagReader;
+        private DataWriter? _bagWriter;
+        private DataReader? _bagReader;
 
-        public BasicWriter WriteInBag()
+        public DataWriter StartWriting()
         {
             if (_bagWriter == null)
             {
-                _bagWriter = new BasicWriter();
+                _bagWriter = new DataWriter();
             }
 
             return _bagWriter;
         }
-        public bool TryOpenBag(out BasicReader? reader)
+        public bool TryOpen(out DataReader? reader)
         {
             reader = _bagReader;
             _bagReader = null;
@@ -27,26 +27,26 @@ namespace Inertia.Network
             return reader != null;
         }
 
-        public override sealed void Serialize(BasicWriter writer)
+        public override sealed void Serialize(DataWriter writer)
         {
             base.Serialize(writer);
 
             var hasBag = _bagWriter != null;
-            writer.SetBool(hasBag);
+            writer.Write(hasBag);
 
             if (hasBag)
             {
-                writer.SetBytes(_bagWriter.ToArray());
+                writer.Write(_bagWriter.ToArray());
             }
         }
-        public override sealed void Deserialize(BasicReader reader)
+        public override sealed void Deserialize(DataReader reader)
         {
             base.Deserialize(reader);
 
-            var hasBag = reader.GetBool();
+            var hasBag = reader.ReadBool();
             if (hasBag)
             {
-                _bagReader = new BasicReader(new ReaderFilling(reader.GetBytes()));
+                _bagReader = new DataReader(reader.ReadBytes());
             }
         }
     }

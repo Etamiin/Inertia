@@ -22,7 +22,7 @@ namespace Inertia.Network
 
         private readonly Dictionary<IPEndPoint, UdpConnectionEntity> _connections;
         private UdpClient _client;
-        private BasicReader _reader;
+        private DataReader _reader;
 
         protected UdpServerEntity(NetworkEntityParameters parameters) : base(parameters)
         {
@@ -40,7 +40,7 @@ namespace Inertia.Network
             {
                 try
                 {
-                    _reader = new BasicReader();
+                    _reader = new DataReader();
                     _connections.Clear();
                     _client = new UdpClient(new IPEndPoint(string.IsNullOrWhiteSpace(_parameters.Ip) ? IPAddress.Any : IPAddress.Parse(_parameters.Ip), _parameters.Port));
 
@@ -141,7 +141,7 @@ namespace Inertia.Network
                 }
 
                 var receiver = _connections[endPoint];
-                NetworkProtocolManager.ProcessParsing(Protocol, receiver, _reader.Fill(new ReaderFilling(data)));
+                NetworkProtocolManager.ProcessParsing(Protocol, receiver, _reader.Fill(data));
             }
             catch (Exception ex)
             {

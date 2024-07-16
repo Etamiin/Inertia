@@ -1,11 +1,12 @@
-﻿using Inertia.Plugins;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 
 namespace Inertia.Paper
 {
     public static class PaperFactory
     {
+        internal static event Action<float> LayersTick;
+
         private static ConcurrentDictionary<Type, IPenSystem> _componentInstances;
         private static ConcurrentDictionary<int, PenExecutionLayer> _executionLayers;
 
@@ -35,36 +36,31 @@ namespace Inertia.Paper
         }
         public static void CallCycle(float deltaTime)
         {
-            if (!ReflectionProvider.IsPaperOwned) return;
+            if (!ReflectionProvider.IsPaperOwned) throw new InvalidOperationException($"{nameof(CallCycle)} can only be called when {nameof(PaperOwnerAttribute)} attribute is defined.");
 
-            var layers = _executionLayers.Values;
-            foreach (var layer in layers)
+            LayersTick?.Invoke(deltaTime);
+        }
+
+        internal static IPenSystem GetPenSystem(Type paperObjectType)
+        {
+            do
             {
-                layer.OnTicking(deltaTime);
-            }
-        }
-        public static PluginExecutionResult TryStartPlugin(string pluginFilePath, params object[] executionParameters)
-        {
-            return ReflectionProvider.TryStartPlugin(pluginFilePath, executionParameters);
-        }
-        public static bool TryStopPlugin(string pluginIdentifier)
-        {
-            return ReflectionProvider.TryStopPlugin(pluginIdentifier);
-        }
+                if (_componentInstances.TryGetValue(paperObjectType, out var component)) return component;
 
-        internal static IPenSystem GetPenSystem(Type dataType)
-        {
-            _componentInstances.TryGetValue(dataType, out var component);
-            return component;
+                paperObjectType = paperObjectType.BaseType;
+            }
+            while (paperObjectType.BaseType != null);
+
+            throw new InvalidCastException($"Type '{paperObjectType.Name}' is invalid, no PenSystem is attached to this type.");
         }
         internal static PenExecutionLayer RegisterPenSystem<T>(PenSystem<T> component) where T : PaperObject
         {
-            var dataType = typeof(T);
-            if (_componentInstances.ContainsKey(dataType))
+            var paperObjectType = typeof(T);
+            if (_componentInstances.ContainsKey(paperObjectType))
             {
-                throw new PenSystemDuplicateException(component.GetType(), dataType);
+                throw new PenSystemDuplicateException(component.GetType(), paperObjectType);
             }
-            else _componentInstances.TryAdd(dataType, component);
+            else _componentInstances.TryAdd(paperObjectType, component);
 
             if (!_executionLayers.TryGetValue(component.LayerIndex, out var executionLayer))
             {

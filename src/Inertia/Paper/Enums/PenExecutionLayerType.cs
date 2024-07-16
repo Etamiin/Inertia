@@ -2,8 +2,13 @@
 {
     public enum PenExecutionLayerType
     {
-        None,
+        /// <summary>
+        /// Execute callbacks based on the processor clock
+        /// </summary>
         ProcessorClockBased,
+        /// <summary>
+        /// Execute callbacks based on the Stopwatch ticks
+        /// </summary>
         TickBased
     }
 }

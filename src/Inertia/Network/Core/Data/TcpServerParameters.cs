@@ -9,7 +9,7 @@
         }
         public TcpServerParameters(string ip, int port) : base(ip, port)
         {
-            BacklogQueueSize = NetworkProtocolManager.DefaultBacklogSize;
+            BacklogQueueSize = NetworkProtocolManager.DefaultBacklogQueueSize;
         }
     }
 }

@@ -14,10 +14,10 @@ namespace Inertia.Network
 
         public override byte[] SerializeMessage(NetworkMessage message)
         {
-            using (var writer = new BasicWriter())
+            using (var writer = new DataWriter())
             {
                 writer
-                    .SetUShort(message.MessageId)
+                    .Write(message.MessageId)
                     .SetEmpty(sizeof(uint));
 
                 var cPos = writer.GetPosition();
@@ -25,12 +25,12 @@ namespace Inertia.Network
                 message.Serialize(writer);
                 writer
                     .SetPosition(cPos - sizeof(uint))
-                    .SetUInt((uint)(writer.TotalLength - cPos));
+                    .Write((uint)(writer.TotalLength - cPos));
 
                 return writer.ToArray();
             }
         }
-        public override bool ParseMessage(NetworkEntity receiver, BasicReader reader, MessageParsingOutput output)
+        public override bool ParseMessage(NetworkEntity receiver, DataReader reader, MessageParsingOutput output)
         {
             reader.SetPosition(0);
 
@@ -38,8 +38,8 @@ namespace Inertia.Network
             {
                 while (reader.UnreadedLength > 0)
                 {
-                    var msgId = reader.GetUShort();
-                    var msgSize = reader.GetUInt();
+                    var msgId = reader.ReadUShort();
+                    var msgSize = reader.ReadUInt();
 
                     if (reader.UnreadedLength < msgSize) break;
 

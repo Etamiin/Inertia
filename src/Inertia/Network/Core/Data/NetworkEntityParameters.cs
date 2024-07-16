@@ -15,7 +15,7 @@ namespace Inertia.Network
         }
         protected NetworkEntityParameters(string ip, int port)
         {
-            Logger = BasicLogger.Default;
+            Logger = LoggingProvider.Logger;
             Protocol = NetworkProtocolManager.CurrentProtocol;
             MessageCountLimitBeforeSpam = NetworkProtocolManager.DefaultMessageCountLimitBeforeSpam;
             Ip = ip.Replace("localhost", "127.0.0.1");

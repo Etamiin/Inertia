@@ -6,7 +6,7 @@ namespace Inertia.Network
 {
     public abstract class NetworkEntity
     {
-        internal protected Type? WrappedType { get; private set; }
+        internal protected Type? IndirectType { get; private set; }
 
         public NetworkEntity()
         {
@@ -17,7 +17,7 @@ namespace Inertia.Network
 
             if (indirectEntityType != null)
             {
-                WrappedType = indirectEntityType;
+                IndirectType = indirectEntityType;
             }
         }
 

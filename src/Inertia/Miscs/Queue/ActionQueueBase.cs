@@ -3,56 +3,54 @@ using System.Collections.Concurrent;
 
 namespace Inertia
 {
-    public abstract class TickedQueue
+    public abstract class ActionQueueBase : IDisposable
     {
         internal const int DefaultMaxExecutionPerTick = 60;
-
-        private protected bool DisposeRequested { get; private set; }
 
         public bool IsDisposed { get; private set; }
         public int Count => _queue.Count;
 
         private int _maxExecutionPerTick;
         private ConcurrentQueue<Action> _queue;
+        private protected bool _isDisposing;
 
-        protected TickedQueue() : this(DefaultMaxExecutionPerTick)
+        protected ActionQueueBase() : this(DefaultMaxExecutionPerTick)
         {
         }
-        protected TickedQueue(int maximumExecutionPerTick)
+        protected ActionQueueBase(int maximumExecutionPerTick)
         {
             _maxExecutionPerTick = maximumExecutionPerTick;
             _queue = new ConcurrentQueue<Action>();
+
+            if (_maxExecutionPerTick <= 0)
+            {
+                _maxExecutionPerTick = DefaultMaxExecutionPerTick;
+            }
         }
 
         public void Enqueue(Action action)
         {
-            if (IsDisposed || DisposeRequested) return;
+            if (IsDisposed || _isDisposing) return;
 
             _queue.Enqueue(action);
         }
-
-        public virtual void RequestDispose()
+        public void Dispose()
         {
-            if (IsDisposed || DisposeRequested) return;
-
-            DisposeRequested = true;
+            Dispose(true);
         }
 
         protected void ProcessQueue()
         {
             if (IsDisposed || Count == 0) return;
 
-            var i = 0;
-            do
+            for (var i = 0; i < _maxExecutionPerTick; i++)
             {
                 if (_queue.TryDequeue(out var action))
                 {
                     action?.Invoke();
-                    i++;
                 }
                 else break;
             }
-            while (i < _maxExecutionPerTick);
         }
         protected void Clean()
         {
@@ -62,10 +60,17 @@ namespace Inertia
             {
                 ProcessQueue();
             }
+        }
 
-            _queue = null;
-            IsDisposed = true;
-            DisposeRequested = false;
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!IsDisposed && disposing)
+            {
+                _isDisposing = true;
+                _queue = null;
+                IsDisposed = true;
+                _isDisposing = false;
+            }
         }
     }
 }

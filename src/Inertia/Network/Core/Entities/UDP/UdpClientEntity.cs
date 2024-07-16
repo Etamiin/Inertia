@@ -13,7 +13,7 @@ namespace Inertia.Network
         public override bool IsConnected => (_client?.Client) != null && _client.Client.Connected;
 
         private UdpClient _client;
-        private BasicReader _reader;
+        private DataReader _reader;
 
         protected UdpClientEntity(ClientParameters parameters) : base(parameters)
         {
@@ -30,7 +30,7 @@ namespace Inertia.Network
             {
                 try
                 {
-                    _reader = new BasicReader();
+                    _reader = new DataReader();
                     _client = new UdpClient();
                     _client.Connect(new IPEndPoint(IPAddress.Parse(_parameters.Ip), _parameters.Port));
 
@@ -98,7 +98,7 @@ namespace Inertia.Network
                 IPEndPoint endPoint = null;
                 var data = ((UdpClient)iar.AsyncState).EndReceive(iar, ref endPoint);
 
-                NetworkProtocolManager.ProcessParsing(Protocol, this, _reader.Fill(new ReaderFilling(data)));
+                NetworkProtocolManager.ProcessParsing(Protocol, this, _reader.Fill(data));
             }
             catch (Exception e)
             {

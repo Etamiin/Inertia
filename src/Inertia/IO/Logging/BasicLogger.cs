@@ -6,33 +6,15 @@ namespace Inertia.Logging
 {
     public sealed class BasicLogger : ILogger, IDisposable
     {
-        public static ILogger Default { get; private set; }
-
-        public static void SetDefault(ILogger logger)
-        {
-            Default = logger;
-        }
-
         public bool IsDisposed { get; private set; }
 
         private readonly BasicLoggerConfiguration _configuration;
         private readonly StreamWriter? _outputFileStream;
         private readonly Stream? _outputConsoleStream;
-        private readonly AsyncTickedQueue? _asyncQueue;
-
-        static BasicLogger()
-        {
-            Default = new BasicLogger(new BasicLoggerConfiguration());
-        }
 
         public BasicLogger(BasicLoggerConfiguration configuration)
         {
             _configuration = configuration;
-
-            if (configuration.ExecuteAsync)
-            {
-                _asyncQueue = new AsyncTickedQueue(100, TimeSpan.FromMilliseconds(200));
-            }
 
             try
             {
@@ -50,34 +32,64 @@ namespace Inertia.Logging
 
             if (!string.IsNullOrWhiteSpace(configuration.OutputFileName))
             {
-                var info = new FileInfo(configuration.OutputFileName);
-                if (!info.Directory.Exists) info.Directory.Create();
-                if (!info.Exists) info.Create().Dispose();
+                var outputFileInfo = new FileInfo(configuration.OutputFileName);
 
-                _outputFileStream = new StreamWriter(info.FullName, true, configuration.TextEncoding);
+                if (!outputFileInfo.Directory.Exists) outputFileInfo.Directory.Create();
+                if (!outputFileInfo.Exists) outputFileInfo.Create().Dispose();
+
+                _outputFileStream = new StreamWriter(outputFileInfo.FullName, true, configuration.TextEncoding);
+            }
+
+            if (configuration.HandleUnhandledException)
+            {
+                AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+            }
+
+            if (configuration.HandleUnobservedException)
+            {
+                TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
             }
         }
 
         public void Debug(object content)
         {
-            LogLine(content, _configuration.Debug);
+            LogLine(LogLevel.Debug, content);
+        }
+        public void DebugAsync(object content)
+        {
+            if (_configuration.MinimumLogLevel > LogLevel.Debug) return;
+
+            Task.Run(() => LogLine(LogLevel.Debug, content));
+        }
+        public void Info(object content)
+        {
+            LogLine(LogLevel.Info, content);
+        }
+        public void InfoAsync(object content)
+        {
+            if (_configuration.MinimumLogLevel > LogLevel.Info) return;
+
+            Task.Run(() => LogLine(LogLevel.Info, content));
         }
         public void Warn(object content)
         {
-            LogLine(content, _configuration.Warn);
+            LogLine(LogLevel.Warn, content);
+        }
+        public void WarnAsync(object content)
+        {
+            if (_configuration.MinimumLogLevel > LogLevel.Warn) return;
+
+            Task.Run(() => LogLine(LogLevel.Warn, content));
         }
         public void Error(object content)
         {
-            LogLine(content, _configuration.Error);
+            LogLine(LogLevel.Error, content);
         }
+        public void ErrorAsync(object content)
+        {
+            if (_configuration.MinimumLogLevel > LogLevel.Error) return;
 
-        public void HandleUnhandledException()
-        {
-            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
-        }
-        public void HandleUnobservedException()
-        {
-            TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
+            Task.Run(() => LogLine(LogLevel.Error, content));
         }
 
         public void Dispose()
@@ -85,50 +97,45 @@ namespace Inertia.Logging
             Dispose(true);
         }
 
-        private void LogLine(object content, LogStyle logStyle)
+        private void LogLine(LogLevel level, object content)
         {
-            if (_asyncQueue != null) _asyncQueue.Enqueue(Log);
-            else Log();
+            if (_configuration.MinimumLogLevel > level) return;
 
-            void Log()
+            var logTime = string.Empty;
+            if (!string.IsNullOrWhiteSpace(_configuration.TimeFormat))
             {
-                var time = string.Empty;
-                if (!string.IsNullOrWhiteSpace(_configuration.TimeFormat))
-                {
-                    time = DateTime.Now.ToString(_configuration.TimeFormat);
-                }
+                logTime = $"{DateTime.Now.ToString(_configuration.TimeFormat)} - ";
+            }
 
-                var logStr = string.Format(_configuration.LogFormat, time, logStyle.Title, $"{content}{Environment.NewLine}");
-                var logBytes = _configuration.TextEncoding.GetBytes(logStr);
+            var logStr = $"{logTime}{level}: {content}{Environment.NewLine}";
+            var logBytes = _configuration.TextEncoding.GetBytes(logStr);
 
-                if (_configuration.OutputInConsole)
-                {
-                    Console.ForegroundColor = logStyle.Color;
-                    _outputConsoleStream?.Write(logBytes);
-                }
+            if (_configuration.OutputInConsole)
+            {
+                _outputConsoleStream?.Write(logBytes);
+            }
 
-                if (_outputFileStream != null)
+            if (_outputFileStream != null)
+            {
+                _outputFileStream.BaseStream.Write(logBytes);
+                if (_configuration.AutoFlushInFile)
                 {
-                    _outputFileStream.BaseStream.Write(logBytes);
-                    if (_configuration.AutoFlushInFile)
-                    {
-                        _outputFileStream.BaseStream.Flush();
-                    }
+                    _outputFileStream.BaseStream.Flush();
                 }
             }
+        }
+        private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            Error(e.ExceptionObject);
         }
         private void TaskScheduler_UnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
         {
             Error(e.Exception);
             e.SetObserved();
         }
-        private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
-        {
-            Error(e.ExceptionObject);
-        }
         private void Dispose(bool disposing)
         {
-            if (IsDisposed || this == Default) return;
+            if (IsDisposed) return;
 
             if (disposing)
             {

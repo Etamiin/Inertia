@@ -71,10 +71,12 @@ namespace Inertia.Network
     
         public void SendAsync(NetworkMessage message)
         {
+            if (Sending == null) return;
+
             ThreadPool.QueueUserWorkItem((_) =>
             {
                 var data = _protocol.SerializeMessage(message);
-                Sending?.Invoke(data);
+                Sending.Invoke(data);
             });
         }
     }

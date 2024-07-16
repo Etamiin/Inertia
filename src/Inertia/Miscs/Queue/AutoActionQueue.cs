@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Inertia
 {
-    public sealed class AsyncTickedQueue : TickedQueue
+    public sealed class AutoActionQueue : ActionQueueBase
     {
         private static TimeSpan DefaultSleepTimeOnEmptyQueue = TimeSpan.FromMilliseconds(30);
 
@@ -12,16 +12,16 @@ namespace Inertia
         
         private DateTime? _emptySince;
 
-        public AsyncTickedQueue() : this(DefaultMaxExecutionPerTick, DefaultSleepTimeOnEmptyQueue, null)
+        public AutoActionQueue() : this(DefaultMaxExecutionPerTick, DefaultSleepTimeOnEmptyQueue, null)
         {
         }
-        public AsyncTickedQueue(int maximumExecutionPerTick) : this(maximumExecutionPerTick, DefaultSleepTimeOnEmptyQueue, null)
+        public AutoActionQueue(int maximumExecutionPerTick) : this(maximumExecutionPerTick, DefaultSleepTimeOnEmptyQueue, null)
         {
         }
-        public AsyncTickedQueue(int maximumExecutionPerTick, TimeSpan sleepTimeOnEmptyQueue) : this(maximumExecutionPerTick, sleepTimeOnEmptyQueue, null)
+        public AutoActionQueue(int maximumExecutionPerTick, TimeSpan sleepTimeOnEmptyQueue) : this(maximumExecutionPerTick, sleepTimeOnEmptyQueue, null)
         {
         }
-        public AsyncTickedQueue(int maximumExecutionPerTick, TimeSpan sleepTimeOnEmptyQueue, TimeSpan? timeBeforeDisposeOnEmptyQueue) : base(maximumExecutionPerTick)
+        public AutoActionQueue(int maximumExecutionPerTick, TimeSpan sleepTimeOnEmptyQueue, TimeSpan? timeBeforeDisposeOnEmptyQueue) : base(maximumExecutionPerTick)
         {
             SleepTimeOnEmptyQueue = sleepTimeOnEmptyQueue;
             TimeBeforeDisposeOnEmptyQueue = timeBeforeDisposeOnEmptyQueue;
@@ -33,7 +33,7 @@ namespace Inertia
         {
             while (true)
             {
-                if (DisposeRequested)
+                if (_isDisposing)
                 {
                     Clean();
                     break;
@@ -45,10 +45,10 @@ namespace Inertia
                     {
                         if (_emptySince.HasValue)
                         {
-                            var span = DateTime.Now - _emptySince;
+                            var span = DateTime.Now - _emptySince.Value;
                             if (span >= TimeBeforeDisposeOnEmptyQueue.Value)
                             {
-                                RequestDispose();
+                                Dispose();
                                 continue;
                             }
                         }
@@ -58,7 +58,7 @@ namespace Inertia
                         }
                     }
 
-                    await Task.Delay(SleepTimeOnEmptyQueue);
+                    await Task.Delay(SleepTimeOnEmptyQueue).ConfigureAwait(false);
                 }
                 else
                 {

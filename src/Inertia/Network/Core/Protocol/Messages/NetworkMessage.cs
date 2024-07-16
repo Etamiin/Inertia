@@ -1,16 +1,16 @@
 ﻿namespace Inertia.Network
 {
-    public abstract class NetworkMessage : IAutoSerializable, ISerializableObject
+    public abstract class NetworkMessage : ISerializable
     {
         public abstract ushort MessageId { get; }
 
-        public virtual void Serialize(BasicWriter writer)
+        public virtual void Serialize(DataWriter writer)
         {
-            writer.SetAutoSerializable(this);
+            writer.WriteAutoSerializable(this);
         }
-        public virtual void Deserialize(BasicReader reader)
+        public virtual void Deserialize(DataReader reader)
         {
-            reader.GetAutoSerializable(this);
+            reader.ReadAutoSerializable(this);
         }
     }
 }

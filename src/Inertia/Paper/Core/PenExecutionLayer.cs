@@ -1,5 +1,5 @@
-﻿using Inertia.Logging;
-using System;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Inertia.Paper
@@ -9,7 +9,6 @@ namespace Inertia.Paper
         private const int DefaultTickPerSecond = 60;
 
         internal event EventHandler<PenLayerTickingArgs>? Ticking;
-
         internal bool IsDisposed { get; private set; }
 
         private PenExecutionLayerType _type;
@@ -19,11 +18,16 @@ namespace Inertia.Paper
 
         internal PenExecutionLayer(int tickPerSecond, PenExecutionLayerType type)
         {
+            _clock = new Clock();
             Change(tickPerSecond, type);
 
             if (!ReflectionProvider.IsPaperOwned)
             {
-                _task = Task.Run(ExecuteCycle);
+                _task = Task.Run(TickLayer);
+            }
+            else
+            {
+                PaperFactory.LayersTick += DoTick;
             }
         }
 
@@ -39,18 +43,9 @@ namespace Inertia.Paper
             _targetMsPerTick = 1000.0d / tickPerSecond;
             if (!ReflectionProvider.IsPaperOwned)
             {
-                if (_clock == null)
-                {
-                    _clock = new Clock();
-                }
-                else _clock.Reset();
-
+                _clock.Reset();
                 _type = type;
             }
-        }
-        internal void OnTicking(float deltaTime)
-        {
-            Ticking?.Invoke(this, new PenLayerTickingArgs(deltaTime));
         }
 
         public void Dispose()
@@ -58,34 +53,38 @@ namespace Inertia.Paper
             Dispose(true);
         }
 
-        private async Task ExecuteCycle()
+        private async Task TickLayer()
         {
-            while (!IsDisposed && _type != PenExecutionLayerType.None)
+            while (!IsDisposed)
             {
-                var currentMsUpdate = _clock.GetElapsedMilliseconds();
-
-                if (_type == PenExecutionLayerType.TickBased)
+                var currentTickMs = _clock.GetElapsedMilliseconds();
+                if (currentTickMs < _targetMsPerTick)
                 {
-                    if (currentMsUpdate < _targetMsPerTick)
-                    {
-                        var msToSleep = _targetMsPerTick - currentMsUpdate;
-                        var sleepTicks = TimeSpan.TicksPerMillisecond * msToSleep;
+                    var msToSleep = _targetMsPerTick - currentTickMs;
 
-                        while (_clock.ElapsedTicks < sleepTicks) ;
+                    if (_type == PenExecutionLayerType.TickBased)
+                    {
+                        var waitToTicks = _clock.ElapsedTicks + (TimeSpan.TicksPerMillisecond * msToSleep);
+
+                        while (_clock.ElapsedTicks < waitToTicks) ;
+                    }
+                    else if (_type == PenExecutionLayerType.ProcessorClockBased)
+                    {
+                        await Task.Delay((int)msToSleep).ConfigureAwait(false);
                     }
                 }
-                else if (_type == PenExecutionLayerType.ProcessorClockBased)
-                {
-                    await Task.Delay(1).ConfigureAwait(false);
-                }
 
-                currentMsUpdate = _clock.GetElapsedMilliseconds();
+                var deltaTime = (float)(_clock.GetElapsedMilliseconds() / 1000.0d);
 
                 _clock.Reset();
-                Ticking?.Invoke(this, new PenLayerTickingArgs((float)(currentMsUpdate / 1000.0d)));
+                Ticking?.Invoke(this, new PenLayerTickingArgs(deltaTime));
             }
 
             _task = null;
+        }
+        private void DoTick(float deltaTime)
+        {
+            Ticking?.Invoke(this, new PenLayerTickingArgs(deltaTime));
         }
         private void Dispose(bool disposing)
         {
@@ -93,7 +92,13 @@ namespace Inertia.Paper
 
             if (disposing)
             {
-                _type = PenExecutionLayerType.None;
+                _task?.Dispose();
+                _task = null;
+
+                if (ReflectionProvider.IsPaperOwned)
+                {
+                    PaperFactory.LayersTick -= DoTick;
+                }
             }
 
             IsDisposed = true;
