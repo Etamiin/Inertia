@@ -65,7 +65,10 @@ namespace Inertia.Network
                         connection.Dispose();
                     }
                 }
-                catch { }
+                catch 
+                {
+                    // No need to catch the exception details here, if the process fails, all connections will be cleaned if the instance is reused.
+                }
             }
 
             if (IsRunning)

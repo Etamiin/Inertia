@@ -15,7 +15,7 @@ namespace Inertia.Network
         private const byte PayloadMidSize = 126;
         private const byte PayloadFullSize = 127;
 
-        internal WebSocketNetworkProtocol()
+        private protected WebSocketNetworkProtocol()
         {
         }
 
@@ -173,7 +173,7 @@ namespace Inertia.Network
             //ExtensionData not supported
 
             var fByte = reader.ReadByte();
-            var fin = fByte.GetBit(0, EndiannessType.BigEndian);
+            /*var fin*/ _ = fByte.GetBit(0, EndiannessType.BigEndian);
             var payloadByte = reader.ReadByte();
             var masked = payloadByte.GetBit(0, EndiannessType.BigEndian);
 

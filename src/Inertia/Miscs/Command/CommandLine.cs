@@ -11,10 +11,6 @@ namespace Inertia
         public ILogger Logger { get; set; }
         public object? State { get; set; }
 
-        public CommandLine()
-        {
-        }
-
         public abstract void Execute(CommandLineArguments arguments);
     }
 }

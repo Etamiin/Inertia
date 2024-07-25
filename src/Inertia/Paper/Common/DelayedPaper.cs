@@ -49,7 +49,7 @@ namespace Inertia.Paper
 
             if (delayTime == 0 && durationTime > 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(delayTime), "Delay can't be zero when duration is zero.");
+                throw new ArgumentOutOfRangeException(nameof(delayTime), "Delay can't be zero when duration is greater than zero.");
             }
 
             return new EnumeratorPaper(ProcessTime(action, delayTime, durationTime));

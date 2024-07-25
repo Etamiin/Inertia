@@ -7,7 +7,7 @@ namespace Inertia.Network
     {
         private protected readonly NetworkEntityParameters _parameters;
 
-        public NetworkEntity(NetworkEntityParameters parameters)
+        protected NetworkEntity(NetworkEntityParameters parameters)
         {
             _parameters = parameters;
         }

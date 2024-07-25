@@ -24,7 +24,7 @@ namespace System
             {
                 if (index < 0 || index > 7)
                 {
-                    throw new IndexOutOfRangeException();
+                    throw new ArgumentOutOfRangeException();
                 }
 
                 return Byte.GetBit(index);
@@ -33,7 +33,7 @@ namespace System
             {
                 if (index < 0 || index > 7)
                 {
-                    throw new IndexOutOfRangeException();
+                    throw new ArgumentOutOfRangeException();
                 }
 
                 Byte = Byte.SetBit(index, value);

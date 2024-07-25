@@ -61,7 +61,7 @@ namespace Inertia
 
         private BinaryWriter _writer;
         private MemoryStream _stream;
-        private DataWriterSettings _settings;
+        private readonly DataWriterSettings _settings;
 
         public DataWriter() : this(new DataWriterSettings())
         {
@@ -289,22 +289,18 @@ namespace Inertia
 
             var binary = _stream.ToArray();
 
-            if (_settings.CompressionAlgorithm != CompressionAlgorithm.None)
+            if (_settings.CompressionAlgorithm == CompressionAlgorithm.Deflate)
             {
-                switch (_settings.CompressionAlgorithm)
+                using (var deflateResult = binary.DeflateCompress())
                 {
-                    case CompressionAlgorithm.Deflate:
-                        using (var deflateResult = binary.DeflateCompress())
-                        {
-                            binary = deflateResult.GetDataOrThrow();
-                        }
-                        break;
-                    case CompressionAlgorithm.GZip:
-                        using (var gzipResult = binary.GzipCompress())
-                        {
-                            binary = gzipResult.GetDataOrThrow();
-                        }
-                        break;
+                    binary = deflateResult.GetDataOrThrow();
+                }
+            }
+            else if (_settings.CompressionAlgorithm == CompressionAlgorithm.GZip)
+            {
+                using (var gzipResult = binary.GzipCompress())
+                {
+                    binary = gzipResult.GetDataOrThrow();
                 }
             }
 

@@ -2,7 +2,7 @@
 {
     public sealed class ActionQueue : ActionQueueBase
     {
-        public ActionQueue() : base()
+        public ActionQueue()
         {
         }
         public ActionQueue(int maximumExecutionPerTick) : base(maximumExecutionPerTick)

@@ -8,7 +8,7 @@ namespace Inertia
     {
         private readonly ConstructorInfo _constructor;
         private readonly object[] _constructorParameters;
-        private bool _isDefaultConstructor;
+        private readonly bool _isDefaultConstructor;
 
         internal SerializableObjectCache(Type type)
         {

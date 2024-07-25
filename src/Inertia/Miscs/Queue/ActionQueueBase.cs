@@ -10,7 +10,7 @@ namespace Inertia
         public bool IsDisposed { get; private set; }
         public int Count => _queue.Count;
 
-        private int _maxExecutionPerTick;
+        private readonly int _maxExecutionPerTick;
         private ConcurrentQueue<Action> _queue;
         private protected bool _isDisposing;
 

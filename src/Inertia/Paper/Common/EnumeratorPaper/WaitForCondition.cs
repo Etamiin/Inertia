@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Inertia.Paper
 {
     public class WaitForCondition : EnumeratorPaperElement
     {
-        private Func<bool> _condition;
+        private readonly Func<bool> _condition;
 
         public WaitForCondition(Func<bool> condition)
         {
@@ -15,6 +13,7 @@ namespace Inertia.Paper
 
         public override void Update(float deltaTime, IPenSystem penSystem)
         {
+            //Nothing to process for this class
         }
 
         public override bool IsProcessed()

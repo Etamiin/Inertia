@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Inertia.Logging
 {
@@ -16,15 +14,19 @@ namespace Inertia.Logging
 
         public void Debug(object content)
         {
+            //No implementation for NullLogger
         }
         public void Info(object content)
         {
+            //No implementation for NullLogger
         }
         public void Warn(object content)
         {
+            //No implementation for NullLogger
         }
         public void Error(object content)
         {
+            //No implementation for NullLogger
         }
     }
 }

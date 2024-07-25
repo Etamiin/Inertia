@@ -13,7 +13,7 @@ namespace Inertia.Network
         internal int ConnectionCount => _registeredConnection;
 
         private ConcurrentQueue<Action> _queue;
-        private ILogger _logger;
+        private readonly ILogger _logger;
         private int _registeredConnection;
 
         internal ServerMessageQueue(ILogger logger)

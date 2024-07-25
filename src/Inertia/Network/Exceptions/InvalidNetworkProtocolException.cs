@@ -6,7 +6,7 @@ namespace Inertia.Network
     {
         public override string Message => $"Invalid {nameof(NetworkProtocol)} defined, expected protocol type: '{_expectedType.Name}'.";
 
-        private Type _expectedType;
+        private readonly Type _expectedType;
 
         public InvalidNetworkProtocolException(Type expectedType)
         {

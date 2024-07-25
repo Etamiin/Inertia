@@ -14,7 +14,7 @@ namespace Inertia.Paper
         public PaperObjectState State { get; internal set; }
         public IPenSystem PenSystem { get; private set; }
 
-        public PaperObject()
+        protected PaperObject()
         {
             PenSystem = PaperFactory.GetPenSystem(GetType());
             if (PenSystem != null)

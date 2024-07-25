@@ -2,7 +2,7 @@
 {
     public class WaitForSeconds : EnumeratorPaperElement
     {
-        private float _seconds;
+        private readonly float _seconds;
         private float _currentTime;
 
         public WaitForSeconds(float seconds)

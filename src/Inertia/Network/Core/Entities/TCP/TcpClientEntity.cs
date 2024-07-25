@@ -88,6 +88,10 @@ namespace Inertia.Network
             }
         }
 
+        public bool Ping()
+        {
+            return _socket?.Poll(1000, SelectMode.SelectError) == true;
+        }
         public void Dispose()
         {
             Dispose(true);

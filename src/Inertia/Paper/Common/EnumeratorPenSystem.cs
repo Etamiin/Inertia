@@ -1,7 +1,5 @@
 ﻿using Inertia.Logging;
 using System;
-using System.Diagnostics;
-using System.Xml.Linq;
 
 namespace Inertia.Paper
 {
@@ -9,6 +7,7 @@ namespace Inertia.Paper
     {
         protected override void Tick()
         {
+            // Nothing to process for this pen system on tick
         }
 
         protected override void Process(EnumeratorPaper paper)

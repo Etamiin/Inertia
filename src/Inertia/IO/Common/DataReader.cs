@@ -17,22 +17,22 @@ namespace Inertia
     {
         private static Dictionary<Type, Func<DataReader, Type, object>> _readingDefinitions = new Dictionary<Type, Func<DataReader, Type, object>>
         {
-            { typeof(bool), (reader, type) => reader.ReadBool() },
-            { typeof(string), (reader, type) => reader.ReadString() },
-            { typeof(float), (reader, type) => reader.ReadFloat() },
-            { typeof(decimal), (reader, type) => reader.ReadDecimal() },
-            { typeof(double), (reader, type) => reader.ReadDouble() },
-            { typeof(byte), (reader, type) => reader.ReadByte() },
-            { typeof(sbyte), (reader, type) => reader.ReadSByte() },
-            { typeof(char), (reader, type) => reader.ReadChar() },
-            { typeof(short), (reader, type) => reader.ReadShort() },
-            { typeof(ushort), (reader, type) => reader.ReadUShort() },
-            { typeof(int), (reader, type) => reader.ReadInt() },
-            { typeof(uint), (reader, type) => reader.ReadUInt() },
-            { typeof(long), (reader, type) => reader.ReadLong() },
-            { typeof(ulong), (reader, type) => reader.ReadULong() },
-            { typeof(DateTime), (reader, type) => reader.ReadDateTime() },
-            { typeof(byte[]), (reader, type) => reader.ReadBytes() },
+            { typeof(bool), (reader, _) => reader.ReadBool() },
+            { typeof(string), (reader, _) => reader.ReadString() },
+            { typeof(float), (reader, _) => reader.ReadFloat() },
+            { typeof(decimal), (reader, _) => reader.ReadDecimal() },
+            { typeof(double), (reader, _) => reader.ReadDouble() },
+            { typeof(byte), (reader, _) => reader.ReadByte() },
+            { typeof(sbyte), (reader, _) => reader.ReadSByte() },
+            { typeof(char), (reader, _) => reader.ReadChar() },
+            { typeof(short), (reader, _) => reader.ReadShort() },
+            { typeof(ushort), (reader, _) => reader.ReadUShort() },
+            { typeof(int), (reader, _) => reader.ReadInt() },
+            { typeof(uint), (reader, _) => reader.ReadUInt() },
+            { typeof(long), (reader, _) => reader.ReadLong() },
+            { typeof(ulong), (reader, _) => reader.ReadULong() },
+            { typeof(DateTime), (reader, _) => reader.ReadDateTime(DateTimeKind.Local) },
+            { typeof(byte[]), (reader, _) => reader.ReadBytes() },
             { typeof(Enum), (reader, type) => reader.ReadEnum(type) }
         };
 
@@ -66,7 +66,7 @@ namespace Inertia
 
         private BinaryReader _reader;
         private MemoryStream _stream;
-        private DataReaderSettings _settings;
+        private readonly DataReaderSettings _settings;
 
         public DataReader() : this(new DataReaderSettings())
         {
@@ -129,8 +129,7 @@ namespace Inertia
 
             if (_settings.CompressionAlgorithm != CompressionAlgorithm.None)
             {
-                var decompressionResult = _settings.CompressionAlgorithm == CompressionAlgorithm.Deflate ?
-                    data.DeflateDecompress() : data.GzipDecompress();
+                var decompressionResult = _settings.CompressionAlgorithm == CompressionAlgorithm.Deflate ? data.DeflateDecompress() : data.GzipDecompress();
 
                 using (decompressionResult)
                 {
@@ -235,7 +234,7 @@ namespace Inertia
         {
             return _reader.ReadUInt64();
         }
-        public DateTime ReadDateTime(DateTimeKind kind = DateTimeKind.Local)
+        public DateTime ReadDateTime(DateTimeKind kind)
         {
             return new DateTime(_reader.ReadInt64(), kind);
         }
@@ -397,7 +396,6 @@ namespace Inertia
 
         private object ReadIEnumerable(Type valueType)
         {
-            var isList = typeof(IList).IsAssignableFrom(valueType);
             var isArray = valueType.IsArray;
             Type elementType = null;
 

@@ -4,10 +4,6 @@
     {
         private int _startTick, _currentTick;
 
-        public WaitForEndOfTick()
-        {
-        }
-
         public override void Update(float deltaTime, IPenSystem penSystem)
         {
             if (_startTick == 0)
