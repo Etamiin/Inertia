@@ -18,6 +18,8 @@ namespace Inertia.Network
         {
             try
             {
+                if (!IsRunning) return;
+
                 var socket = ((Socket)iar.AsyncState).EndAccept(iar);
                 var connection = new WebSocketConnectionEntity(socket, (uint)_idProvider.NextValue(), _parameters, _parameters.SslCertificate);
                 

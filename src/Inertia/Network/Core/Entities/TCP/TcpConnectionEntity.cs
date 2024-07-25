@@ -1,5 +1,6 @@
 ﻿using Inertia.Logging;
 using System;
+using System.Diagnostics;
 using System.Net.Sockets;
 
 namespace Inertia.Network
@@ -32,11 +33,6 @@ namespace Inertia.Network
         public sealed override void Send(byte[] dataToSend)
         {
             this.ThrowIfDisposable(IsDisposed);
-
-            if (dataToSend?.Length == 0)
-            {
-                throw new ArgumentNullException(nameof(dataToSend));
-            }
 
             if (IsConnected)
             {
@@ -88,10 +84,7 @@ namespace Inertia.Network
         private protected void ProcessReceivedData(int receivedLength)
         {
             if (!IsConnected) return;
-            if (receivedLength == 0)
-            {
-                throw new SocketException((int)SocketError.SocketError);
-            }
+            if (receivedLength == 0) return;
 
             Monitoring.NotifyMessageReceived();
             if (Monitoring.MessageReceivedInLastSecond >= _parameters.MessageCountLimitBeforeSpam)
@@ -110,7 +103,15 @@ namespace Inertia.Network
         {
             try
             {
+                if (!IsConnected) return;
+
                 var received = ((Socket)iar.AsyncState).EndReceive(iar);
+                if (received == 0 && !IsDisposed)
+                {
+                    Disconnect(NetworkDisconnectReason.ConnectionLost);
+                    return;
+                }
+
                 ProcessReceivedData(received);
             }
             catch (Exception ex)

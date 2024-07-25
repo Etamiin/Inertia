@@ -15,11 +15,8 @@ namespace Inertia.Network
         {
             try
             {
-                //Debugger.Break();
+                if (!IsRunning) return;
 
-                if (!_socket.IsBound) return;
-
-                var sk = _socket;
                 var socket = ((Socket)iar.AsyncState).EndAccept(iar);
                 var connection = new TcpConnectionEntity(socket, (uint)_idProvider.NextValue(), _parameters);
 

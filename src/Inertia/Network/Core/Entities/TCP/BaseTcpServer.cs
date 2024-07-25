@@ -75,6 +75,8 @@ namespace Inertia.Network
             {
                 _socket?.Close();
                 _socket = null;
+
+                OnClosed(reason);
             }
         }
 

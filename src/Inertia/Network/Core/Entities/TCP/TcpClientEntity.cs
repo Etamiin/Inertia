@@ -70,11 +70,6 @@ namespace Inertia.Network
         {
             this.ThrowIfDisposable(IsDisposed);
 
-            if (dataToSend?.Length == 0)
-            {
-                throw new ArgumentNullException(nameof(dataToSend));
-            }
-
             if (IsConnected)
             {
                 try { 
@@ -101,12 +96,13 @@ namespace Inertia.Network
         {
             try
             {
-                int received = ((Socket)iar.AsyncState).EndReceive(iar);
-
                 if (!IsConnected) return;
-                if (received == 0)
+
+                int received = ((Socket)iar.AsyncState).EndReceive(iar);
+                if (received == 0 && !IsDisposed)
                 {
-                    throw new SocketException((int)SocketError.SocketError);
+                    Disconnect(NetworkDisconnectReason.ConnectionLost);
+                    return;
                 }
 
                 var data = new byte[received];
