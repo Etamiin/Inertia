@@ -1,5 +1,4 @@
-﻿using Inertia.IO;
-using Inertia.Logging;
+﻿using Inertia.Logging;
 using System;
 using System.Net;
 using System.Net.Sockets;
@@ -34,11 +33,12 @@ namespace Inertia.Network
                     _networkDataReader = new DataReader();
                     _buffer = new byte[Protocol.NetworkBufferLength];
 
-                    Connected();
+                    OnConnected();
                     _socket.BeginReceive(_buffer, 0, _buffer.Length, SocketFlags.None, OnReceiveData, _socket);
                 }
-                catch
+                catch (Exception ex)
                 {
+                    Logger.Error(ex, GetType(), nameof(Connect));
                     Disconnect(NetworkDisconnectReason.ConnectionFailed);
                 }
             }
@@ -49,7 +49,7 @@ namespace Inertia.Network
 
             if (_socket != null)
             {
-                Disconnecting(reason);
+                OnDisconnecting(reason);
 
                 if (_socket.Connected)
                 {
@@ -70,7 +70,7 @@ namespace Inertia.Network
         {
             this.ThrowIfDisposable(IsDisposed);
 
-            if (dataToSend == null || dataToSend.Length == 0)
+            if (dataToSend?.Length == 0)
             {
                 throw new ArgumentNullException(nameof(dataToSend));
             }
@@ -80,8 +80,9 @@ namespace Inertia.Network
                 try { 
                     _socket?.Send(dataToSend);
                 }
-                catch 
+                catch (Exception ex)
                 {
+                    Logger.Error(ex, GetType(), nameof(Send));
                     Disconnect(NetworkDisconnectReason.InvalidMessageSended);
                 }
             }
@@ -109,9 +110,11 @@ namespace Inertia.Network
 
                 NetworkProtocolManager.ProcessParsing(Protocol, this, _networkDataReader.Fill(data));
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                if (e is SocketException || e is ObjectDisposedException)
+                Logger.Error(ex, GetType(), nameof(OnReceiveData));
+
+                if (ex is SocketException || ex is ObjectDisposedException)
                 {
                     Disconnect(NetworkDisconnectReason.ConnectionLost);
                     return;

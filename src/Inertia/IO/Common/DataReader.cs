@@ -66,21 +66,21 @@ namespace Inertia
 
         private BinaryReader _reader;
         private MemoryStream _stream;
-        private DataReaderParameters _parameters;
+        private DataReaderSettings _settings;
 
-        public DataReader() : this(new DataReaderParameters())
+        public DataReader() : this(new DataReaderSettings())
         {
         }
-        public DataReader(DataReaderParameters parameters)
+        public DataReader(DataReaderSettings settings)
         {
-            _parameters = parameters;
+            _settings = settings;
             _stream = new MemoryStream();
-            _reader = new BinaryReader(_stream, parameters.Encoding);
+            _reader = new BinaryReader(_stream, settings.Encoding);
         }
-        public DataReader(byte[] data) : this(data, new DataReaderParameters())
+        public DataReader(byte[] data) : this(data, new DataReaderSettings())
         {
         }
-        public DataReader(byte[] data, DataReaderParameters parameters) : this(parameters)
+        public DataReader(byte[] data, DataReaderSettings settings) : this(settings)
         {
             Fill(data);
         }
@@ -119,17 +119,17 @@ namespace Inertia
         {
             this.ThrowIfDisposable(IsDisposed);
 
-            if (!string.IsNullOrWhiteSpace(_parameters.EncryptionKey))
+            if (!string.IsNullOrWhiteSpace(_settings.EncryptionKey))
             {
-                using (var decryptResult = data.AesDecrypt(_parameters.EncryptionKey))
+                using (var decryptResult = data.AesDecrypt(_settings.EncryptionKey))
                 {
                     data = decryptResult.GetDataOrThrow();
                 }
             }
 
-            if (_parameters.CompressionAlgorithm != CompressionAlgorithm.None)
+            if (_settings.CompressionAlgorithm != CompressionAlgorithm.None)
             {
-                var decompressionResult = _parameters.CompressionAlgorithm == CompressionAlgorithm.Deflate ?
+                var decompressionResult = _settings.CompressionAlgorithm == CompressionAlgorithm.Deflate ?
                     data.DeflateDecompress() : data.GzipDecompress();
 
                 using (decompressionResult)
@@ -419,19 +419,29 @@ namespace Inertia
                 throw new NotSupportedException($"Type '{valueType}' cannot be converted to IEnumerable. Only array and list types can be converted.");
             }
 
-            var array = Array.CreateInstance(elementType, ReadInt());
-            for (var i = 0; i < array.Length; i++)
+            if (isArray)
             {
-                array.SetValue(ReadValue(elementType), i);
-            }
+                var array = Array.CreateInstance(elementType, ReadInt());
+                for (var i = 0; i < array.Length; i++)
+                {
+                    array.SetValue(ReadValue(elementType), i);
+                }
 
-            if (!isArray && isList)
+                return array;
+            }
+            else
             {
                 var concreteListType = typeof(List<>).MakeGenericType(elementType);
-                return Activator.CreateInstance(concreteListType, new object[] { array });
-            }
+                var list = (IList)Activator.CreateInstance(concreteListType);
+                var count = ReadInt();
 
-            return array;
+                for (var i = 0; i < count; i++)
+                {
+                    list.Add(ReadValue(elementType));
+                }
+
+                return list;
+            }
         }
         private void Dispose(bool disposing)
         {

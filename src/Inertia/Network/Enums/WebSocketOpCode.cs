@@ -1,6 +1,6 @@
 ﻿namespace Inertia.Network
 {
-    internal enum WebSocketOpCode : byte
+    public enum WebSocketOpCode : byte
     {
         ContinuationFrame = 0,
         TextFrame = 1,

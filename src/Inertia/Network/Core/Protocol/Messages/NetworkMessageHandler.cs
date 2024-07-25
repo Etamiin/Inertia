@@ -6,28 +6,28 @@ namespace Inertia.Network
 {
     public sealed class NetworkMessageHandler
     {
-        private readonly Dictionary<Type, MethodInfo> _references;
+        private readonly Dictionary<Type, MethodInfo> _methodHandlers;
 
         internal NetworkMessageHandler()
         {
-            _references = new Dictionary<Type, MethodInfo>();
+            _methodHandlers = new Dictionary<Type, MethodInfo>();
         }
 
         internal void RegisterReference(Type messageType, MethodInfo method)
         {
-            if (!_references.ContainsKey(messageType))
+            if (!_methodHandlers.ContainsKey(messageType))
             {
-                _references.Add(messageType, method);
+                _methodHandlers.Add(messageType, method);
             }
             else
             {
-                _references[messageType] = method;
+                _methodHandlers[messageType] = method;
             }
         }
 
         public bool TryHandle(NetworkMessage message, object receiver)
         {
-            if (_references.TryGetValue(message.GetType(), out MethodInfo method))
+            if (_methodHandlers.TryGetValue(message.GetType(), out MethodInfo method))
             {
                 method.Invoke(null, new object[] { message, receiver });
                 return true;

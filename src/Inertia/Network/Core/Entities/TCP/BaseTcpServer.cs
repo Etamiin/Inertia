@@ -3,19 +3,20 @@ using System.Collections.Concurrent;
 using System.Net.Sockets;
 using System.Net;
 using System.Linq;
-using System.Collections.Generic;
+using Inertia.Logging;
 
 namespace Inertia.Network
 {
-    public abstract class BaseTcpServer<T, TParameters> : NetworkServerEntity<TParameters>, IDisposable where T : TcpConnectionEntity where TParameters : TcpServerParameters
+    public abstract class BaseTcpServer<T, TParameters> : NetworkServerEntity<TParameters>, IDisposable 
+        where T : TcpConnectionEntity 
+        where TParameters : TcpServerParameters
     {
         public bool IsDisposed { get; private set; }
-        public bool IsRunning => _socket != null && _socket.IsBound;
+        public bool IsRunning => _socket?.IsBound == true;
         public int ConnectedCount => _connections.Count;
 
         private protected Socket? _socket { get; private set; }
-
-        private protected readonly ConcurrentDictionary<uint, T> _connections;
+        private protected ConcurrentDictionary<uint, T> _connections { get; private set; }
 
         protected BaseTcpServer(TParameters parameters) : base (parameters)
         {
@@ -26,7 +27,6 @@ namespace Inertia.Network
         {
             return _connections.TryGetValue(id, out connection);
         }
-
         public sealed override void Start()
         {
             this.ThrowIfDisposable(IsDisposed);
@@ -46,7 +46,7 @@ namespace Inertia.Network
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error($"Starting server failed: {ex}");
+                    Logger.Error(ex, GetType(), nameof(Start));
                     Close(NetworkDisconnectReason.ConnectionFailed);
                 }
             }
@@ -55,13 +55,17 @@ namespace Inertia.Network
         {
             this.ThrowIfDisposable(IsDisposed);
 
-            if (_connections != null && _connections.Count > 0)
+            if (_connections?.Any() == true)
             {
-                var entities = _connections.Values.ToArray();
-                foreach (var connection in entities)
+                try
                 {
-                    connection.Dispose();
+                    var entities = _connections.Values.ToArray();
+                    foreach (var connection in entities)
+                    {
+                        connection.Dispose();
+                    }
                 }
+                catch { }
             }
 
             if (IsRunning)
@@ -76,8 +80,14 @@ namespace Inertia.Network
             Dispose(true);
         }
 
-        internal abstract void OnAcceptConnection(IAsyncResult iar);
-        protected virtual void OnConnectionConnected(T connection) { }
+        internal virtual void OnAcceptConnection(IAsyncResult iar)
+        {
+            if (IsRunning)
+            {
+                _socket?.BeginAccept(OnAcceptConnection, _socket);
+            }
+        }
+        protected virtual void OnConnectionEstablished(T connection) { }
         protected virtual void OnConnectionDisconnecting(T connection, NetworkDisconnectReason reason) { }
 
         private void Dispose(bool disposing)

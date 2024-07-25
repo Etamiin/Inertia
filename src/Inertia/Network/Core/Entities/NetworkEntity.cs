@@ -1,24 +1,36 @@
 ﻿using System;
-using System.Linq;
-using System.Reflection;
+using System.Threading.Tasks;
 
 namespace Inertia.Network
 {
     public abstract class NetworkEntity
     {
-        internal protected Type? IndirectType { get; private set; }
+        private protected readonly NetworkEntityParameters _parameters;
 
-        public NetworkEntity()
+        public NetworkEntity(NetworkEntityParameters parameters)
         {
-            var receiverType = GetType();
-            var indirectEntityType = receiverType
-                .GetInterfaces()
-                .FirstOrDefault((interfaceType) => interfaceType.GetCustomAttribute<IndirectNetworkEntityAttribute>() != null);
+            _parameters = parameters;
+        }
 
-            if (indirectEntityType != null)
-            {
-                IndirectType = indirectEntityType;
-            }
+        public abstract void Send(byte[] dataToSend);
+        public abstract bool Disconnect(NetworkDisconnectReason reason);
+
+        public virtual void Send(NetworkMessage message)
+        {
+            Send(_parameters.Protocol.SerializeMessage(message));
+        }
+        public bool Disconnect()
+        {
+            return Disconnect(NetworkDisconnectReason.Manual);
+        }
+
+        public Task SendAsync(NetworkMessage message)
+        {
+            return Task.Run(() => Send(message));
+        }
+        public Task SendAsync(byte[] dataToSend)
+        {
+            return Task.Run(() => Send(dataToSend));
         }
 
         internal abstract void ProcessInQueue(Action action);

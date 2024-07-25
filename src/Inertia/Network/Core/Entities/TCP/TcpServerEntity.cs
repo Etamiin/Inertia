@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Inertia.Logging;
+using System;
 using System.Net.Sockets;
 
 namespace Inertia.Network
@@ -21,20 +22,19 @@ namespace Inertia.Network
                 _connections.TryAdd(connection.Id, connection);
 
                 connection.BeginReceiveMessages();
-                OnConnectionConnected(connection);
+                OnConnectionEstablished(connection);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                if (e is SocketException || e is ObjectDisposedException)
+                Logger.Error(ex, GetType(), nameof(OnAcceptConnection));
+
+                if (ex is SocketException || ex is ObjectDisposedException)
                 {
                     return;
                 }
             }
 
-            if (IsRunning)
-            {
-                _socket?.BeginAccept(OnAcceptConnection, _socket);
-            }
+            base.OnAcceptConnection(iar);
         }
 
         private void ConnectionDisconnecting(object sender, ConnectionDisconnectingArgs e)

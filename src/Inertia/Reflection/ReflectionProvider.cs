@@ -6,28 +6,30 @@ using System.Data;
 using System.Linq;
 using System.Reflection;
 using Inertia.IO;
+using Inertia.Logging;
 
 namespace Inertia
 {
     internal static class ReflectionProvider
     {
         internal static bool IsPaperOwned { get; private set; }
-        internal static bool IsNetworkClientUsed { get; private set; }
-        internal static bool IsNetworkServerUsed { get; private set; }
+        internal static bool ContainsNetworkServerEntities { get; private set; }
         
         private readonly static Dictionary<Type, Dictionary<string, SerializablePropertyCache>> _propertyCaches;
         private readonly static Dictionary<Type, SerializableObjectCache> _serializableObjCaches;
-        private readonly static Dictionary<string, CommandLine> _commands;
+        private readonly static Dictionary<string, Type> _commands;
         private readonly static Dictionary<ushort, Type> _messageTypes;
         private readonly static Dictionary<Type, NetworkMessageHandler> _messagesHandlerPerEntity;
+        private readonly static Dictionary<Type, Type> _indirectNetworkEntityTypes;
 
         static ReflectionProvider()
         {
             _propertyCaches = new Dictionary<Type, Dictionary<string, SerializablePropertyCache>>();
             _serializableObjCaches = new Dictionary<Type, SerializableObjectCache>();
-            _commands = new Dictionary<string, CommandLine>();
+            _commands = new Dictionary<string, Type>();
             _messageTypes = new Dictionary<ushort, Type>();
             _messagesHandlerPerEntity = new Dictionary<Type, NetworkMessageHandler>();
+            _indirectNetworkEntityTypes = new Dictionary<Type, Type>();
 
             RegisterAll();
         }
@@ -44,27 +46,42 @@ namespace Inertia
 
             return default;
         }
-        internal static IEnumerable<CommandLine> GetAllCommands()
+        internal static IEnumerable<string> GetAllCommandNames()
         {
-            return _commands.Values.AsEnumerable();
+            return _commands.Keys.AsEnumerable();
         }
-        internal static bool TryGetCommand(string commandName, out CommandLine command)
+        internal static CommandLine CreateCommand(string commandName, ILogger logger, object? state)
         {
-            return _commands.TryGetValue(commandName, out command);
+            if (_commands.TryGetValue(commandName, out var cmdType))
+            {
+                var cmd = TryCreateInstance<CommandLine>(BindingFlags.Public | BindingFlags.Instance, cmdType, Type.EmptyTypes);
+                
+                cmd.Logger = logger;
+                cmd.State = state;
+
+                return cmd;
+            }
+
+            return null;
         }
-        internal static bool TryGetMessageType(ushort messageId, out Type messageType)
+        internal static bool TryCreateNetworkMessage(ushort messageId, out NetworkMessage message)
         {
-            return _messageTypes.TryGetValue(messageId, out messageType);
+            if (_messageTypes.TryGetValue(messageId, out var messageType))
+            {
+                message = (NetworkMessage)GetSerializableObjectCache(messageType)?.CreateInstance();
+            }
+            else
+            {
+                message = null;
+            }
+
+            return message != null;
         }
         internal static bool TryGetMessageHandler(NetworkEntity receiver, out NetworkMessageHandler handler)
         {
-            if (_messagesHandlerPerEntity.TryGetValue(receiver.GetType(), out handler) ||
-                _messagesHandlerPerEntity.TryGetValue(receiver.IndirectType, out handler))
-            {
-                return true;
-            }
-
-            return false;
+            return 
+                _messagesHandlerPerEntity.TryGetValue(receiver.GetType(), out handler) ||
+                (_indirectNetworkEntityTypes.TryGetValue(receiver.GetType(), out var indirectType) && _messagesHandlerPerEntity.TryGetValue(indirectType, out handler));
         }
 
         private static void RegisterAll()
@@ -142,10 +159,12 @@ namespace Inertia
             if (type.IsSubclassOf(typeof(CommandLine)))
             {
                 var instance = TryCreateInstance<CommandLine>(type, Type.EmptyTypes);
-                if (!_commands.ContainsKey(instance.Name))
+                if (_commands.ContainsKey(instance.Name))
                 {
-                    _commands.Add(instance.Name, instance);
+                    throw new DuplicateNameException($"Command '{instance.Name}' already registered.");
                 }
+
+                _commands[instance.Name] = type;
             }
 
             if (!IsPaperOwned && type.GetCustomAttribute<PaperOwnerAttribute>() != null)
@@ -155,25 +174,30 @@ namespace Inertia
         }
         private static void ReadTypeNetworkInformations(Type type)
         {
-            if (!IsNetworkClientUsed && type.IsSubclassOf(typeof(NetworkClientEntity)))
+            if (!ContainsNetworkServerEntities)
             {
-                IsNetworkClientUsed = true;
+                ContainsNetworkServerEntities = type.IsSubclassOf(typeof(TcpServerEntity)) || type.IsSubclassOf(typeof(WebSocketServerEntity));
             }
-
-            if (type.IsSubclassOf(typeof(TcpServerEntity)) || type.IsSubclassOf(typeof(WebSocketServerEntity)))
-            {
-                if (!IsNetworkServerUsed)
-                {
-                    IsNetworkServerUsed = true;
-                }
-            }      
-
+   
             if (type.IsSubclassOf(typeof(NetworkMessage)))
             {
-                var message = NetworkProtocolManager.CreateMessage(type);
+                if (type.IsAbstract) return;
+
+                var message = (NetworkMessage)GetSerializableObjectCache(type)?.CreateInstance();
                 if (!_messageTypes.ContainsKey(message.MessageId))
                 {
                     _messageTypes.Add(message.MessageId, type);
+                }
+            }
+            else if (type.IsSubclassOf(typeof(NetworkEntity)))
+            {
+                var indirectEntityType = type
+                    .GetInterfaces()
+                    .FirstOrDefault((interfaceType) => interfaceType.GetCustomAttribute<IndirectNetworkEntityAttribute>() != null);
+
+                if (indirectEntityType != null)
+                {
+                    _indirectNetworkEntityTypes.Add(type, indirectEntityType);
                 }
             }
             else if (typeof(IMessageHandler).IsAssignableFrom(type))
@@ -186,22 +210,23 @@ namespace Inertia
                     var ps = smethod.GetParameters();
                     if (ps.Length == 2 && ps[0].ParameterType.IsSubclassOf(typeof(NetworkMessage)))
                     {
-                        var isValidEntity = ps[1].ParameterType.IsSubclassOf(typeof(NetworkClientEntity)) || ps[1].ParameterType.IsSubclassOf(typeof(NetworkConnectionEntity));
-                        if (!isValidEntity)
-                        {
-                            var attr = ps[1].ParameterType.GetCustomAttribute<IndirectNetworkEntityAttribute>();
-                            if (attr == null) continue;
-                        }
+                        var isValidEntity = 
+                            ps[1].ParameterType.IsSubclassOf(typeof(NetworkClientEntity)) ||
+                            ps[1].ParameterType.IsSubclassOf(typeof(NetworkConnectionEntity)) ||
+                            ps[1].ParameterType.GetCustomAttribute<IndirectNetworkEntityAttribute>() != null;
+
+                        if (!isValidEntity) continue;
 
                         var msgType = ps[0].ParameterType;
                         var entityType = ps[1].ParameterType;
 
-                        if (!_messagesHandlerPerEntity.ContainsKey(entityType))
+                        if (!_messagesHandlerPerEntity.TryGetValue(entityType, out var handler))
                         {
-                            _messagesHandlerPerEntity.Add(entityType, new NetworkMessageHandler());
+                            handler = new NetworkMessageHandler();
+                            _messagesHandlerPerEntity.Add(entityType, handler);
                         }
 
-                        _messagesHandlerPerEntity[entityType].RegisterReference(msgType, smethod);
+                        handler.RegisterReference(msgType, smethod);
                     }
                 }
             }

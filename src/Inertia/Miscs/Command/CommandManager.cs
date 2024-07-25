@@ -10,7 +10,7 @@ namespace Inertia
     /// </summary>
     public static class CommandManager
     {
-        public static IEnumerable<CommandLine> GetAllCommands => ReflectionProvider.GetAllCommands();
+        public static IEnumerable<string> GetAllCommandNames => ReflectionProvider.GetAllCommandNames();
 
         public static bool TryExecute(string commandLine)
         {
@@ -37,40 +37,33 @@ namespace Inertia
         
         private static bool TryExecuteByName(string commandName, ILogger? logger, object? state, bool containsQuotes, params string[] arguments)
         {
-            if (ReflectionProvider.TryGetCommand(commandName, out CommandLine cmd))
+            var cmd = ReflectionProvider.CreateCommand(commandName, logger ?? LoggingProvider.Logger, state);
+            if (cmd == null) return false;
+
+            if (containsQuotes)
             {
-                if (logger == null)
-                {
-                    logger = LoggingProvider.Logger;
-                }
+                var parsedArguments = new List<string>();
+                var argBuilder = new StringBuilder();
 
-                if (containsQuotes)
+                foreach (var arg in arguments)
                 {
-                    var parsedArguments = new List<string>();
-                    var argBuilder = new StringBuilder();
-
-                    foreach (var arg in arguments)
+                    if (arg.EndsWith('"'))
                     {
-                        if (arg.EndsWith('"'))
-                        {
-                            argBuilder.Append($" {arg.Remove(arg.Length - 1, 1)}");
-                            parsedArguments.Add(argBuilder.ToString().Trim());
-                            argBuilder.Clear();
-                        }
-                        else if (arg.StartsWith('"')) argBuilder.Append(arg.Remove(0, 1));
-                        else if (argBuilder.Length > 0) argBuilder.Append($" {arg}");
-                        else parsedArguments.Add(arg);
+                        argBuilder.Append($" {arg.Remove(arg.Length - 1, 1)}");
+                        parsedArguments.Add(argBuilder.ToString().Trim());
+                        argBuilder.Clear();
                     }
-
-                    arguments = parsedArguments.ToArray();
+                    else if (arg.StartsWith('"')) argBuilder.Append(arg.Remove(0, 1));
+                    else if (argBuilder.Length > 0) argBuilder.Append($" {arg}");
+                    else parsedArguments.Add(arg);
                 }
 
-                cmd.Execute(new CommandLineArguments(arguments), logger, state);
-
-                return true;
+                arguments = parsedArguments.ToArray();
             }
 
-            return false;
+            cmd.Execute(new CommandLineArguments(arguments));
+
+            return true;
         }
     }
 }

@@ -4,14 +4,14 @@ using System.Text;
 
 namespace Inertia.IO
 {
-    public class DataWriterParameters
+    public class DataWriterSettings
     {
         public int Capacity { get; set; }
         public Encoding Encoding { get; set; }
         public CompressionAlgorithm CompressionAlgorithm { get; set; }
         public string? EncryptionKey { get; set; }
 
-        public DataWriterParameters()
+        public DataWriterSettings()
         {
             Capacity = 256;
             Encoding = Encoding.UTF8;

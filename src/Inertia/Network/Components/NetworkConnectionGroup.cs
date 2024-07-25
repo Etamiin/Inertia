@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Inertia.Network
@@ -61,6 +60,7 @@ namespace Inertia.Network
                     {
                         Sending -= connection.Send;
                         _connections.RemoveAt(i);
+
                         continue;
                     }
 
@@ -69,14 +69,13 @@ namespace Inertia.Network
             }
         }
     
-        public void SendAsync(NetworkMessage message)
+        public Task SendAsync(NetworkMessage message)
         {
-            if (Sending == null) return;
+            if (Sending == null) return Task.CompletedTask;
 
-            ThreadPool.QueueUserWorkItem((_) =>
+            return Task.Run(() =>
             {
-                var data = _protocol.SerializeMessage(message);
-                Sending.Invoke(data);
+                Sending?.Invoke(_protocol.SerializeMessage(message));
             });
         }
     }

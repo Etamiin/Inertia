@@ -7,6 +7,7 @@ namespace Inertia
     internal class SerializableObjectCache
     {
         private readonly ConstructorInfo _constructor;
+        private readonly object[] _constructorParameters;
         private bool _isDefaultConstructor;
 
         internal SerializableObjectCache(Type type)
@@ -17,6 +18,9 @@ namespace Inertia
             if (!_isDefaultConstructor)
             {
                 _constructor = type.GetConstructors()[0];
+                _constructorParameters = _constructor.GetParameters()
+                    .Select(p => null as object)
+                    .ToArray();
             }
         }
 
@@ -24,11 +28,7 @@ namespace Inertia
         {
             if (_isDefaultConstructor) return _constructor.Invoke(new object[0]);
 
-            var parameters = _constructor.GetParameters()
-                .Select(p => null as object)
-                .ToArray();
-
-            return _constructor.Invoke(parameters);
+            return _constructor.Invoke(_constructorParameters);
         }
     }
 }

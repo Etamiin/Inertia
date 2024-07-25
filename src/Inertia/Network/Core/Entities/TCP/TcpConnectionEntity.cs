@@ -1,5 +1,4 @@
-﻿using Inertia.IO;
-using Inertia.Logging;
+﻿using Inertia.Logging;
 using System;
 using System.Net.Sockets;
 
@@ -10,7 +9,7 @@ namespace Inertia.Network
         internal event EventHandler<ConnectionDisconnectingArgs>? Disconnecting;
 
         public bool IsDisposed { get; private set; }
-        public bool IsConnected => _socket != null && _socket.Connected;
+        public bool IsConnected => _socket?.Connected == true;
         public NetworkConnectionMonitoring Monitoring { get; private set; }
 
         private protected Socket _socket { get; private set; }
@@ -25,20 +24,16 @@ namespace Inertia.Network
             Monitoring = new NetworkConnectionMonitoring();
         }
 
-        public bool Disconnect()
+        internal protected virtual void BeginReceiveMessages()
         {
-            return Disconnect(NetworkDisconnectReason.Manual);
-        }
-        public void Dispose()
-        {
-            Dispose(true);
+            _socket.BeginReceive(_buffer, 0, _buffer.Length, SocketFlags.None, OnReceiveData, _socket);
         }
 
         public sealed override void Send(byte[] dataToSend)
         {
             this.ThrowIfDisposable(IsDisposed);
 
-            if (dataToSend == null || dataToSend.Length == 0)
+            if (dataToSend?.Length == 0)
             {
                 throw new ArgumentNullException(nameof(dataToSend));
             }
@@ -49,8 +44,9 @@ namespace Inertia.Network
                 {
                     ProcessSend(dataToSend);
                 }
-                catch
+                catch (Exception ex)
                 {
+                    Logger.Error(ex, GetType(), nameof(Send));
                     Disconnect(NetworkDisconnectReason.InvalidMessageSended);
                 }
             }
@@ -79,11 +75,11 @@ namespace Inertia.Network
             return true;
         }
 
-        internal protected virtual void BeginReceiveMessages()
+        public void Dispose()
         {
-            _socket.BeginReceive(_buffer, 0, _buffer.Length, SocketFlags.None, OnReceiveData, _socket);
+            Dispose(true);
         }
-        
+
         private protected virtual void ProcessSend(byte[] data)
         {
             _socket.Send(data);
@@ -119,6 +115,8 @@ namespace Inertia.Network
             }
             catch (Exception ex)
             {
+                Logger.Error(ex, GetType(), nameof(OnReceiveData));
+
                 if (ex is SocketException || ex is ObjectDisposedException)
                 {
                     if (!IsDisposed)

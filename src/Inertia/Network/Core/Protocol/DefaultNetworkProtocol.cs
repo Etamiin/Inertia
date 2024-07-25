@@ -6,7 +6,7 @@ namespace Inertia.Network
     internal sealed class DefaultNetworkProtocol : NetworkProtocol
     {
         public override int NetworkBufferLength => 4096;
-        public override int ConnectionPerQueueInPool => 750;
+        public override int ConnectionPerMessageQueue => 500;
 
         internal DefaultNetworkProtocol()
         {
@@ -30,7 +30,7 @@ namespace Inertia.Network
                 return writer.ToArray();
             }
         }
-        public override bool ParseMessage(NetworkEntity receiver, DataReader reader, MessageParsingOutput output)
+        public override bool TryParseMessage(NetworkEntity receiver, DataReader reader, MessageParsingOutput output)
         {
             reader.SetPosition(0);
 
@@ -60,17 +60,11 @@ namespace Inertia.Network
 
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
-                if (receiver is NetworkConnectionEntity connection)
-                {
-                    connection.Disconnect(NetworkDisconnectReason.InvalidDataReceived);
-                }
-                else if (receiver is NetworkClientEntity client)
-                {
-                    client.Disconnect(NetworkDisconnectReason.InvalidDataReceived);
-                }
+                LoggingProvider.Logger.Error(ex, GetType(), nameof(TryParseMessage));
 
+                receiver.Disconnect(NetworkDisconnectReason.InvalidDataReceived);
                 return false;
             }            
         }

@@ -1,15 +1,13 @@
 ﻿using Inertia.Logging;
 using System;
-using System.Diagnostics;
 using System.Net.Security;
 using System.Net.Sockets;
-using System.Reflection.Emit;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
 namespace Inertia.Network
 {
-    public sealed class WebSocketConnectionEntity : TcpConnectionEntity, INetworkConnectionWrapper
+    public sealed class WebSocketConnectionEntity : TcpConnectionEntity
     {
         internal event WebSocketConnectionEstablished? ConnectionEstablished;
 
@@ -21,9 +19,15 @@ namespace Inertia.Network
 
         internal WebSocketConnectionEntity(Socket socket, uint id, NetworkEntityParameters parameters, X509Certificate? serverCertificate) : base(socket, id, parameters)
         {
+            if (!(parameters.Protocol is WebSocketNetworkProtocol wsProtocol))
+            {
+                throw new InvalidNetworkProtocolException(typeof(WebSocketNetworkProtocol));
+            }
+
             ConnectionState = WebSocketConnectionState.Connecting;
-            _wsProtocol = (WebSocketNetworkProtocol)parameters.Protocol;
             _serverCertificate = serverCertificate;
+            _wsProtocol = wsProtocol;
+
             if (_serverCertificate != null)
             {
                 _sslStream = new SslStream(new NetworkStream(socket), false);
@@ -38,10 +42,11 @@ namespace Inertia.Network
             {
                 try
                 {
-                    _sslStream?.Write(_wsProtocol.WriteMessage(data, opCode));
+                    _sslStream?.Write(_wsProtocol.WriteWsMessage(data, opCode));
                 }
-                catch
+                catch (Exception ex)
                 {
+                    Logger.Error(ex, GetType(), nameof(SendSpecificOpCode));
                     Disconnect(NetworkDisconnectReason.InvalidMessageSended);
                 }
             }
@@ -58,7 +63,6 @@ namespace Inertia.Network
             ConnectionState = WebSocketConnectionState.Connected;
             ConnectionEstablished?.Invoke(this);
         }
-
         internal protected override void BeginReceiveMessages()
         {
             if (_serverCertificate == null)
@@ -69,11 +73,11 @@ namespace Inertia.Network
             {
                 try
                 {
-                    _sslStream?.BeginAuthenticateAsServer(_serverCertificate, false, false, OnAuthentificated, _sslStream);
+                    _sslStream?.BeginAuthenticateAsServer(_serverCertificate, false, false, OnAuthenticated, _sslStream);
                 }
                 catch (Exception ex)
                 {
-                    LoggingProvider.Logger?.Error($"SSL Authentification Failed: {ex}");
+                    LoggingProvider.Logger?.Error($"SSL authentication failed: {ex}");
                 }
             }
         }
@@ -84,7 +88,7 @@ namespace Inertia.Network
             {
                 if (ConnectionState == WebSocketConnectionState.Connected)
                 {
-                    _socket.Send(_wsProtocol.WriteMessage(data, WebSocketOpCode.BinaryFrame));
+                    _socket.Send(_wsProtocol.WriteWsMessage(data, WebSocketOpCode.BinaryFrame));
                 }
                 else _socket.Send(data);
             }
@@ -92,7 +96,7 @@ namespace Inertia.Network
             {
                 if (ConnectionState == WebSocketConnectionState.Connected)
                 {
-                    _sslStream.Write(_wsProtocol.WriteMessage(data, WebSocketOpCode.BinaryFrame));
+                    _sslStream.Write(_wsProtocol.WriteWsMessage(data, WebSocketOpCode.BinaryFrame));
                 }
                 else _sslStream.Write(data);
             }
@@ -107,7 +111,7 @@ namespace Inertia.Network
             ConnectionState = WebSocketConnectionState.Closed;
         }
 
-        private void OnAuthentificated(IAsyncResult iar)
+        private void OnAuthenticated(IAsyncResult iar)
         {
             var sslStream = (SslStream)iar.AsyncState;
 
@@ -130,6 +134,8 @@ namespace Inertia.Network
             }
             catch (Exception ex)
             {
+                Logger.Error(ex, GetType(), nameof(OnReceiveSslData));
+
                 if (ex is SocketException || ex is ObjectDisposedException)
                 {
                     if (!IsDisposed)

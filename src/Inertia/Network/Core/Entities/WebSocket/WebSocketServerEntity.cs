@@ -1,5 +1,5 @@
-﻿using System;
-using System.ComponentModel;
+﻿using Inertia.Logging;
+using System;
 using System.Net.Sockets;
 
 namespace Inertia.Network
@@ -8,9 +8,9 @@ namespace Inertia.Network
     {
         protected WebSocketServerEntity(WebSocketServerParameters parameters) : base(parameters)
         {
-            if (parameters.Protocol != NetworkProtocolManager.DefaultWsProtocol)
+            if (!(parameters.Protocol is WebSocketNetworkProtocol))
             {
-                parameters.Protocol = NetworkProtocolManager.DefaultWsProtocol;
+                throw new InvalidNetworkProtocolException(typeof(WebSocketNetworkProtocol));
             }
         }
 
@@ -20,6 +20,7 @@ namespace Inertia.Network
             {
                 var socket = ((Socket)iar.AsyncState).EndAccept(iar);
                 var connection = new WebSocketConnectionEntity(socket, (uint)_idProvider.NextValue(), _parameters, _parameters.SslCertificate);
+                
                 connection.ConnectionEstablished += ConnectionEstablished;
                 connection.Disconnecting += ConnectionDisconnecting;
 
@@ -28,22 +29,21 @@ namespace Inertia.Network
             }
             catch (Exception ex)
             {
+                Logger.Error(ex, GetType(), nameof(OnAcceptConnection));
+
                 if (ex is SocketException || ex is ObjectDisposedException)
                 {
                     return;
                 }
             }
 
-            if (IsRunning)
-            {
-                _socket?.BeginAccept(OnAcceptConnection, _socket);
-            }
+            base.OnAcceptConnection(iar);
         }
         
         private void ConnectionEstablished(WebSocketConnectionEntity connection)
         {
             connection.ConnectionEstablished -= ConnectionEstablished;
-            OnConnectionConnected(connection);
+            OnConnectionEstablished(connection);
         }
         private void ConnectionDisconnecting(object sender, ConnectionDisconnectingArgs e)
         {

@@ -11,19 +11,18 @@ namespace Inertia.Paper
         internal event EventHandler<PenLayerTickingArgs>? Ticking;
         internal bool IsDisposed { get; private set; }
 
-        private PenExecutionLayerType _type;
         private double _targetMsPerTick;
         private Task? _task;
         private Clock? _clock;
 
-        internal PenExecutionLayer(int tickPerSecond, PenExecutionLayerType type)
+        internal PenExecutionLayer(int tickPerSecond)
         {
             _clock = new Clock();
-            Change(tickPerSecond, type);
+            Change(tickPerSecond);
 
             if (!ReflectionProvider.IsPaperOwned)
             {
-                _task = Task.Run(TickLayer);
+                _task = Task.Factory.StartNew(TickLayer, TaskCreationOptions.LongRunning);
             }
             else
             {
@@ -31,7 +30,7 @@ namespace Inertia.Paper
             }
         }
 
-        internal void Change(int tickPerSecond, PenExecutionLayerType type)
+        internal void Change(int tickPerSecond)
         {
             if (IsDisposed) return;
 
@@ -44,7 +43,6 @@ namespace Inertia.Paper
             if (!ReflectionProvider.IsPaperOwned)
             {
                 _clock.Reset();
-                _type = type;
             }
         }
 
@@ -62,16 +60,7 @@ namespace Inertia.Paper
                 {
                     var msToSleep = _targetMsPerTick - currentTickMs;
 
-                    if (_type == PenExecutionLayerType.TickBased)
-                    {
-                        var waitToTicks = _clock.ElapsedTicks + (TimeSpan.TicksPerMillisecond * msToSleep);
-
-                        while (_clock.ElapsedTicks < waitToTicks) ;
-                    }
-                    else if (_type == PenExecutionLayerType.ProcessorClockBased)
-                    {
-                        await Task.Delay((int)msToSleep).ConfigureAwait(false);
-                    }
+                    await Task.Delay((int)msToSleep).ConfigureAwait(false);
                 }
 
                 var deltaTime = (float)(_clock.GetElapsedMilliseconds() / 1000.0d);

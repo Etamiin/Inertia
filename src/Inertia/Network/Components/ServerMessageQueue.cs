@@ -1,6 +1,7 @@
 ﻿using Inertia.Logging;
 using System;
 using System.Collections.Concurrent;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -49,7 +50,7 @@ namespace Inertia.Network
             Task.Factory.StartNew(async () => {
                 while (!IsDisposed)
                 {
-                    if (_queue.Count == 0)
+                    if (!_queue.Any())
                     {
                         await Task.Delay(1).ConfigureAwait(false);
                         continue;
@@ -64,7 +65,7 @@ namespace Inertia.Network
                     }
                     catch (Exception ex)
                     {
-                        _logger.Error($"Error on ServerMessageQueue: {ex}");
+                        _logger.Error(ex, GetType(), nameof(StartQueueExecution));
                     }
                 }
             }, TaskCreationOptions.LongRunning);

@@ -1,24 +1,23 @@
 ﻿using Inertia.Logging;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Inertia.Network
 {
-    internal class ServerMessagePoolExecutor
+    internal class ServerMessageQueuePool
     {
         internal int ConnectionPerQueue { get; set; }
 
         private readonly ILogger _logger;
-        private readonly List<ServerMessageQueue> _pool;
+        private readonly List<ServerMessageQueue> _messageQueuePool;
         private readonly object _locker;
 
-        internal ServerMessagePoolExecutor(int connectionPerQueue, ILogger logger)
+        internal ServerMessageQueuePool(int connectionPerQueue)
         {
             ConnectionPerQueue = connectionPerQueue;
 
-            _logger = logger;
-            _pool = new List<ServerMessageQueue>();
+            _logger = LoggingProvider.Logger;
+            _messageQueuePool = new List<ServerMessageQueue>();
             _locker = new object();
         }
 
@@ -34,11 +33,11 @@ namespace Inertia.Network
         {
             lock (_locker)
             {
-                var queue = _pool.FirstOrDefault((q) => q.ConnectionCount < ConnectionPerQueue);
+                var queue = _messageQueuePool.FirstOrDefault((q) => q.ConnectionCount < ConnectionPerQueue);
                 if (queue == null)
                 {
                     queue = new ServerMessageQueue(_logger);
-                    _pool.Add(queue);
+                    _messageQueuePool.Add(queue);
                 }
 
                 return queue;

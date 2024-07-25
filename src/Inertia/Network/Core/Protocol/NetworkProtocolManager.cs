@@ -1,6 +1,5 @@
-﻿using Inertia.Logging;
-using System;
-using System.Diagnostics;
+﻿using System;
+using System.Linq;
 
 namespace Inertia.Network
 {
@@ -9,76 +8,69 @@ namespace Inertia.Network
         internal const int DefaultBacklogQueueSize = 1000;
         internal const int DefaultMessageCountLimitBeforeSpam = 55;
 
-        internal static ServerMessagePoolExecutor ServerMessagePool { get; private set; }
-        internal static NetworkProtocol DefaultProtocol { get; private set; }
-        internal static WebSocketNetworkProtocol DefaultWsProtocol { get; private set; }
+        internal static ServerMessageQueuePool ServerMessagePool { get; private set; }
+        public static NetworkProtocol CurrentProtocol
+        {
+            get
+            {
+                if (_currProtocol == null)
+                {
+                    CurrentProtocol = new DefaultNetworkProtocol();
+                }
 
-        public static NetworkProtocol CurrentProtocol { get; private set; }
+                return _currProtocol;
+            }
+            set
+            {
+                if (value == null)
+                {
+                    throw new ArgumentNullException(nameof(CurrentProtocol));
+                }
+
+                if (_currProtocol == value) return;
+
+                _currProtocol = value;
+
+                if (ReflectionProvider.ContainsNetworkServerEntities)
+                {
+                    if (ServerMessagePool == null)
+                    {
+                        ServerMessagePool = new ServerMessageQueuePool(_currProtocol.ConnectionPerMessageQueue);
+                    }
+                    else
+                    {
+                        ServerMessagePool.ConnectionPerQueue = _currProtocol.ConnectionPerMessageQueue;
+                    }
+                }
+            }
+        }
+
+        private static NetworkProtocol _currProtocol;
 
         static NetworkProtocolManager()
         {
-            DefaultProtocol = new DefaultNetworkProtocol();
-            DefaultWsProtocol = new WebSocketNetworkProtocol();
-
-            SetDefaultProtocol(InternalNetworkProtocolType.Default);
-        }
-
-        internal static NetworkMessage CreateMessage(Type messageType)
-        {
-            if (messageType.IsAbstract || !messageType.IsSubclassOf(typeof(NetworkMessage))) return null;
-
-            var cnstr = messageType.GetConstructor(Type.EmptyTypes);
-            if (cnstr != null)
-            {
-                return (NetworkMessage)cnstr.Invoke(new object[0]);
-            }
-            else
-            {
-                cnstr = messageType.GetConstructors()[0];
-                var parameters = cnstr.GetParameters();
-
-                return (NetworkMessage)cnstr.Invoke(new object[parameters.Length]);
-            }
         }
 
         public static bool TryGetHandler(NetworkEntity receiver, out NetworkMessageHandler handler)
         {
             return ReflectionProvider.TryGetMessageHandler(receiver, out handler);
         }
-        public static void SetDefaultProtocol(InternalNetworkProtocolType protocolType)
-        {
-            if (protocolType == InternalNetworkProtocolType.Default) SetDefaultProtocol(DefaultProtocol);
-            else if (protocolType == InternalNetworkProtocolType.WebSocket) SetDefaultProtocol(DefaultWsProtocol);
-        }
-        public static void SetDefaultProtocol(NetworkProtocol protocol)
-        {
-            if (CurrentProtocol == protocol) return;
-
-            CurrentProtocol = protocol;
-            if (ServerMessagePool == null)
-            {
-                if (ReflectionProvider.IsNetworkServerUsed)
-                {
-                    ServerMessagePool = new ServerMessagePoolExecutor(protocol.ConnectionPerQueueInPool, LoggingProvider.Logger);
-                }
-            }
-            else
-            {
-                ServerMessagePool.ConnectionPerQueue = protocol.ConnectionPerQueueInPool;
-            }
-        }
         public static void ProcessParsing(NetworkProtocol protocol, NetworkEntity receiver, DataReader reader)
         {
             var output = new MessageParsingOutput();
             
-            if (!protocol.ParseMessage(receiver, reader, output)) return;
-            if (output.Messages.Count == 0)
+            if (!protocol.TryParseMessage(receiver, reader, output)) return;
+            if (!output.Messages.Any())
             {
                 output.Dispose();
                 return;
             }
 
-            if (!TryGetHandler(receiver, out var handler)) return;
+            if (!TryGetHandler(receiver, out var handler))
+            {
+                output.Dispose();
+                return;
+            }
 
             receiver.ProcessInQueue(ExecuteOutput);
 

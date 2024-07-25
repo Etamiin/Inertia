@@ -8,44 +8,44 @@ namespace Inertia.Logging
     {
         public bool IsDisposed { get; private set; }
 
-        private readonly BasicLoggerConfiguration _configuration;
+        private readonly BasicLoggerSettings _settings;
         private readonly StreamWriter? _outputFileStream;
         private readonly Stream? _outputConsoleStream;
 
-        public BasicLogger(BasicLoggerConfiguration configuration)
+        public BasicLogger(BasicLoggerSettings settings)
         {
-            _configuration = configuration;
+            _settings = settings;
 
             try
             {
                 var consoleAvailable = !string.IsNullOrWhiteSpace(Console.Title);
-                if (consoleAvailable && configuration.OutputInConsole)
+                if (consoleAvailable && settings.OutputInConsole)
                 {
-                    Console.OutputEncoding = configuration.TextEncoding;
+                    Console.OutputEncoding = settings.TextEncoding;
                     _outputConsoleStream = Console.OpenStandardOutput();
                 }
             }
             catch
             {
-                configuration.OutputInConsole = false;
+                settings.OutputInConsole = false;
             }
 
-            if (!string.IsNullOrWhiteSpace(configuration.OutputFileName))
+            if (!string.IsNullOrWhiteSpace(settings.OutputFileName))
             {
-                var outputFileInfo = new FileInfo(configuration.OutputFileName);
+                var outputFileInfo = new FileInfo(settings.OutputFileName);
 
                 if (!outputFileInfo.Directory.Exists) outputFileInfo.Directory.Create();
                 if (!outputFileInfo.Exists) outputFileInfo.Create().Dispose();
 
-                _outputFileStream = new StreamWriter(outputFileInfo.FullName, true, configuration.TextEncoding);
+                _outputFileStream = new StreamWriter(outputFileInfo.FullName, true, settings.TextEncoding);
             }
 
-            if (configuration.HandleUnhandledException)
+            if (settings.HandleUnhandledException)
             {
                 AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
             }
 
-            if (configuration.HandleUnobservedException)
+            if (settings.HandleUnobservedException)
             {
                 TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
             }
@@ -55,41 +55,41 @@ namespace Inertia.Logging
         {
             LogLine(LogLevel.Debug, content);
         }
-        public void DebugAsync(object content)
+        public Task DebugAsync(object content)
         {
-            if (_configuration.MinimumLogLevel > LogLevel.Debug) return;
+            if (_settings.MinimumLogLevel > LogLevel.Debug) return Task.CompletedTask;
 
-            Task.Run(() => LogLine(LogLevel.Debug, content));
+            return Task.Run(() => LogLine(LogLevel.Debug, content));
         }
         public void Info(object content)
         {
             LogLine(LogLevel.Info, content);
         }
-        public void InfoAsync(object content)
+        public Task InfoAsync(object content)
         {
-            if (_configuration.MinimumLogLevel > LogLevel.Info) return;
+            if (_settings.MinimumLogLevel > LogLevel.Info) return Task.CompletedTask;
 
-            Task.Run(() => LogLine(LogLevel.Info, content));
+            return Task.Run(() => LogLine(LogLevel.Info, content));
         }
         public void Warn(object content)
         {
             LogLine(LogLevel.Warn, content);
         }
-        public void WarnAsync(object content)
+        public Task WarnAsync(object content)
         {
-            if (_configuration.MinimumLogLevel > LogLevel.Warn) return;
+            if (_settings.MinimumLogLevel > LogLevel.Warn) return Task.CompletedTask;
 
-            Task.Run(() => LogLine(LogLevel.Warn, content));
+            return Task.Run(() => LogLine(LogLevel.Warn, content));
         }
         public void Error(object content)
         {
             LogLine(LogLevel.Error, content);
         }
-        public void ErrorAsync(object content)
+        public Task ErrorAsync(object content)
         {
-            if (_configuration.MinimumLogLevel > LogLevel.Error) return;
+            if (_settings.MinimumLogLevel > LogLevel.Error) return Task.CompletedTask;
 
-            Task.Run(() => LogLine(LogLevel.Error, content));
+            return Task.Run(() => LogLine(LogLevel.Error, content));
         }
 
         public void Dispose()
@@ -99,18 +99,18 @@ namespace Inertia.Logging
 
         private void LogLine(LogLevel level, object content)
         {
-            if (_configuration.MinimumLogLevel > level) return;
+            if (IsDisposed || _settings.MinimumLogLevel > level) return;
 
             var logTime = string.Empty;
-            if (!string.IsNullOrWhiteSpace(_configuration.TimeFormat))
+            if (!string.IsNullOrWhiteSpace(_settings.TimeFormat))
             {
-                logTime = $"{DateTime.Now.ToString(_configuration.TimeFormat)} - ";
+                logTime = $"{DateTime.Now.ToString(_settings.TimeFormat)} - ";
             }
 
             var logStr = $"{logTime}{level}: {content}{Environment.NewLine}";
-            var logBytes = _configuration.TextEncoding.GetBytes(logStr);
+            var logBytes = _settings.TextEncoding.GetBytes(logStr);
 
-            if (_configuration.OutputInConsole)
+            if (_settings.OutputInConsole)
             {
                 _outputConsoleStream?.Write(logBytes);
             }
@@ -118,7 +118,7 @@ namespace Inertia.Logging
             if (_outputFileStream != null)
             {
                 _outputFileStream.BaseStream.Write(logBytes);
-                if (_configuration.AutoFlushInFile)
+                if (_settings.AutoFlushInFile)
                 {
                     _outputFileStream.BaseStream.Flush();
                 }

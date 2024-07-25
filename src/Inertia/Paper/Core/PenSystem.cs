@@ -8,13 +8,14 @@ namespace Inertia.Paper
     {
         public ILogger Logger => LoggingProvider.Logger;
         public virtual int LayerIndex { get; }
+        public virtual bool RunWhenEmpty { get; }
         public float DeltaTime { get; private set; }
         public int TickCount { get; private set; }
         public bool IsActive
         {
             get
             {
-                return _papers.Count > 0;
+                return _papers.Count > 0 || RunWhenEmpty;
             }
         }
 
@@ -59,11 +60,11 @@ namespace Inertia.Paper
 
             lock (_locker)
             {
+                Tick();
+
                 var writablePapers = _papers
                     .Where((obj) => obj.State == PaperObjectState.Initialized)
                     .ToArray();
-
-                Tick();
 
                 foreach (var obj in writablePapers)
                 {

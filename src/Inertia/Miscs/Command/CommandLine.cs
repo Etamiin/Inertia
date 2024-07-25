@@ -8,6 +8,13 @@ namespace Inertia
     {
         public abstract string Name { get; }
 
-        public abstract void Execute(CommandLineArguments arguments, ILogger logger, object? state);
+        public ILogger Logger { get; set; }
+        public object? State { get; set; }
+
+        public CommandLine()
+        {
+        }
+
+        public abstract void Execute(CommandLineArguments arguments);
     }
 }

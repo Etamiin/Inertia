@@ -34,7 +34,7 @@ namespace Inertia.Network
                     _client = new UdpClient();
                     _client.Connect(new IPEndPoint(IPAddress.Parse(_parameters.Ip), _parameters.Port));
 
-                    Connected();
+                    OnConnected();
                     _client.BeginReceive(new AsyncCallback(OnReceiveData), _client);
                 }
                 catch
@@ -58,7 +58,7 @@ namespace Inertia.Network
                 return true;
             }
 
-            Disconnecting(reason);
+            OnDisconnecting(reason);
 
             return false;
         }

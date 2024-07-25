@@ -1,5 +1,8 @@
-﻿namespace Inertia.Network
+﻿using Inertia.IO;
+
+namespace Inertia.Network
 {
+    [AutoSerializable]
     public abstract class NetworkMessage : ISerializable
     {
         public abstract ushort MessageId { get; }

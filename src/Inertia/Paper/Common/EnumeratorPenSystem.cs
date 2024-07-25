@@ -36,8 +36,8 @@ namespace Inertia.Paper
             }
             catch (Exception ex)
             {
+                Logger.Error(ex, GetType(), nameof(Process));
                 paper.Dispose();
-                Logger.Error(ex);
             }
         }
     }

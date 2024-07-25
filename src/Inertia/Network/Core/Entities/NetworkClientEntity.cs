@@ -1,8 +1,5 @@
 ﻿using Inertia.Logging;
 using System;
-using System.Linq;
-using System.Reflection;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Inertia.Network
@@ -14,44 +11,26 @@ namespace Inertia.Network
         protected ILogger Logger => _parameters.Logger;
 
         protected NetworkProtocol Protocol => _parameters.Protocol;
-        private protected readonly ClientParameters _parameters;
+        private protected readonly ClientParameters _clientParameters;
 
-        protected NetworkClientEntity(ClientParameters parameters)
+        protected NetworkClientEntity(ClientParameters parameters) : base(parameters)
         {
-            _parameters = parameters;
+            _clientParameters = parameters;
         }
 
-        internal override void ProcessInQueue(Action action)
+        internal sealed override void ProcessInQueue(Action action)
         {
-            _parameters.ExecutionQueue.Enqueue(action);
+            _clientParameters.ExecutionQueue.Enqueue(action);
         }
+
+        public abstract void Connect();
 
         public async Task ConnectAsync()
         {
             await Task.Run(Connect).ConfigureAwait(false);
         }
-        public bool Disconnect()
-        {
-            return Disconnect(NetworkDisconnectReason.Manual);
-        }
-        public void Send(NetworkMessage message)
-        {
-            Send(Protocol.SerializeMessage(message));
-        }
-        public void SendAsync(NetworkMessage message)
-        {
-            ThreadPool.QueueUserWorkItem((_) => Send(message));
-        }
-        public void SendAsync(byte[] dataToSend)
-        {
-            ThreadPool.QueueUserWorkItem((_) => Send(dataToSend));
-        }
 
-        public abstract void Connect();
-        public abstract bool Disconnect(NetworkDisconnectReason reason);
-        public abstract void Send(byte[] data);
-
-        protected virtual void Connected() { }
-        protected virtual void Disconnecting(NetworkDisconnectReason reason) { }
+        protected virtual void OnConnected() { }
+        protected virtual void OnDisconnecting(NetworkDisconnectReason reason) { }
     }
 }

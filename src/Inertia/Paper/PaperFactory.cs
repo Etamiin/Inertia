@@ -18,20 +18,20 @@ namespace Inertia.Paper
             ReflectionProvider.Invalidate();
         }
 
-        public static void ConfigureLayer(int layerIndex, PenExecutionLayerType type)
+        public static void ConfigureLayer(int layerIndex)
         {
-            ConfigureLayer(layerIndex, -1, type);
+            ConfigureLayer(layerIndex, -1);
         }
-        public static void ConfigureLayer(int layerIndex, int tickPerSecond, PenExecutionLayerType type)
+        public static void ConfigureLayer(int layerIndex, int tickPerSecond)
         {
             if (!_executionLayers.TryGetValue(layerIndex, out var layer))
             {
-                layer = new PenExecutionLayer(tickPerSecond, type);
+                layer = new PenExecutionLayer(tickPerSecond);
                 _executionLayers.TryAdd(layerIndex, layer);
             }
             else
             {
-                layer.Change(tickPerSecond, type);
+                layer.Change(tickPerSecond);
             }
         }
         public static void CallCycle(float deltaTime)
@@ -64,7 +64,7 @@ namespace Inertia.Paper
 
             if (!_executionLayers.TryGetValue(component.LayerIndex, out var executionLayer))
             {
-                ConfigureLayer(component.LayerIndex, PenExecutionLayerType.ProcessorClockBased);
+                ConfigureLayer(component.LayerIndex);
                 executionLayer = _executionLayers[component.LayerIndex];
             }
 

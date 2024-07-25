@@ -1,5 +1,4 @@
-﻿using Inertia.IO;
-using Inertia.Logging;
+﻿using Inertia.Logging;
 using System;
 using System.Linq;
 using System.Net.WebSockets;
@@ -8,16 +7,13 @@ using System.Text;
 
 namespace Inertia.Network
 {
-    internal sealed class WebSocketNetworkProtocol : NetworkProtocol
+    public abstract class WebSocketNetworkProtocol : NetworkProtocol
     {
         private const string HttpProtocolKey = "HTTP/1.1";
         private const string WsHandshakeKey = "Sec-WebSocket-Key:";
         private const string WsHexHashKeyConst = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
         private const byte PayloadMidSize = 126;
         private const byte PayloadFullSize = 127;
-
-        public override int NetworkBufferLength => 4096;
-        public override int ConnectionPerQueueInPool => 750;
 
         internal WebSocketNetworkProtocol()
         {
@@ -33,7 +29,7 @@ namespace Inertia.Network
                 return writer.ToArray();
             }
         }
-        public override bool ParseMessage(NetworkEntity receiver, DataReader reader, MessageParsingOutput output)
+        public override bool TryParseMessage(NetworkEntity receiver, DataReader reader, MessageParsingOutput output)
         {
             reader.SetPosition(0);
 
@@ -80,22 +76,13 @@ namespace Inertia.Network
             }
             catch (Exception ex)
             {
-                LoggingProvider.Logger?.Error("Parsing network message failed: " + ex);
+                LoggingProvider.Logger.Error(ex, GetType(), nameof(TryParseMessage));
 
-                if (receiver is NetworkConnectionEntity connection)
-                {
-                    connection.Disconnect(NetworkDisconnectReason.InvalidDataReceived);
-                }
-                else if (receiver is NetworkClientEntity client)
-                {
-                    client.Disconnect(NetworkDisconnectReason.InvalidDataReceived);
-                }
-
+                receiver.Disconnect(NetworkDisconnectReason.InvalidDataReceived);
                 return false;
             }
         }
-
-        internal byte[] WriteMessage(byte[] applicationData, WebSocketOpCode wsOpCode)
+        public byte[] WriteWsMessage(byte[] applicationData, WebSocketOpCode wsOpCode)
         {
             using (var writer = new DataWriter())
             {

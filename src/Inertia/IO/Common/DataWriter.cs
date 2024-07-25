@@ -61,16 +61,16 @@ namespace Inertia
 
         private BinaryWriter _writer;
         private MemoryStream _stream;
-        private DataWriterParameters _parameters;
+        private DataWriterSettings _settings;
 
-        public DataWriter() : this(new DataWriterParameters())
+        public DataWriter() : this(new DataWriterSettings())
         {
         }
-        public DataWriter(DataWriterParameters parameters)
+        public DataWriter(DataWriterSettings settings)
         {
-            _parameters = parameters;
-            _stream = new MemoryStream(parameters.Capacity);
-            _writer = new BinaryWriter(_stream, parameters.Encoding);
+            _settings = settings;
+            _stream = new MemoryStream(settings.Capacity);
+            _writer = new BinaryWriter(_stream, settings.Encoding);
         }
 
         public DataWriter SetPosition(long position)
@@ -289,9 +289,9 @@ namespace Inertia
 
             var binary = _stream.ToArray();
 
-            if (_parameters.CompressionAlgorithm != CompressionAlgorithm.None)
+            if (_settings.CompressionAlgorithm != CompressionAlgorithm.None)
             {
-                switch (_parameters.CompressionAlgorithm)
+                switch (_settings.CompressionAlgorithm)
                 {
                     case CompressionAlgorithm.Deflate:
                         using (var deflateResult = binary.DeflateCompress())
@@ -308,9 +308,9 @@ namespace Inertia
                 }
             }
 
-            if (!string.IsNullOrWhiteSpace(_parameters.EncryptionKey))
+            if (!string.IsNullOrWhiteSpace(_settings.EncryptionKey))
             {
-                using (var encryptionResult = binary.AesEncrypt(_parameters.EncryptionKey))
+                using (var encryptionResult = binary.AesEncrypt(_settings.EncryptionKey))
                 {
                     binary = encryptionResult.GetDataOrThrow();
                 }
