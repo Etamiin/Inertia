@@ -8,7 +8,7 @@
         ConnectionTimeout = 4,
         InvalidMessageSended = 5,
         InvalidDataReceived = 6,
-        SslAuthentificationFailed = 7,
+        SslAuthenticationFailed = 7,
         Spam = 8
     }
 }

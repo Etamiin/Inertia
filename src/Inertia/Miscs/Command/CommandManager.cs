@@ -24,7 +24,7 @@ namespace Inertia
         {
             return TryExecute(commandLine, null, state);
         }
-        public static bool TryExecute(string commandLine, ILogger? logger, object? state)
+        public static bool TryExecute(string commandLine, ILogger logger, object? state)
         {
             if (string.IsNullOrWhiteSpace(commandLine)) return false;
 
@@ -35,7 +35,7 @@ namespace Inertia
             return TryExecuteByName(values[0], logger, state, commandLine.Contains('"'), args);
         }
         
-        private static bool TryExecuteByName(string commandName, ILogger? logger, object? state, bool containsQuotes, params string[] arguments)
+        private static bool TryExecuteByName(string commandName, ILogger logger, object? state, bool containsQuotes, params string[] arguments)
         {
             var cmd = ReflectionProvider.CreateCommand(commandName, logger ?? LoggingProvider.Logger, state);
             if (cmd == null) return false;

@@ -31,7 +31,7 @@ namespace Inertia.Network
                     _socket.Connect(new IPEndPoint(IPAddress.Parse(_parameters.Ip), _parameters.Port));
                     
                     _networkDataReader = new DataReader();
-                    _buffer = new byte[Protocol.NetworkBufferLength];
+                    _buffer = new byte[NetworkProtocolManager.CurrentProtocol.NetworkBufferLength];
 
                     OnConnected();
                     _socket.BeginReceive(_buffer, 0, _buffer.Length, SocketFlags.None, OnReceiveData, _socket);
@@ -108,7 +108,7 @@ namespace Inertia.Network
                 var data = new byte[received];
                 Array.Copy(_buffer, data, received);
 
-                NetworkProtocolManager.ProcessParsing(Protocol, this, _networkDataReader.Fill(data));
+                NetworkProtocolManager.ProcessParsing(this, _networkDataReader.Fill(data));
             }
             catch (Exception ex)
             {

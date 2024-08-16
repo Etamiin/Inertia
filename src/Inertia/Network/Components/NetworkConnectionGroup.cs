@@ -10,13 +10,11 @@ namespace Inertia.Network
 
         private event BytesSenderAction? Sending;
 
-        private readonly NetworkProtocol _protocol;
         private readonly List<NetworkConnectionEntity> _connections;
         private readonly object _locker;
 
-        public NetworkConnectionGroup(NetworkProtocol protocol)
+        public NetworkConnectionGroup()
         {
-            _protocol = protocol;
             _connections = new List<NetworkConnectionEntity>();
             _locker = new object();
         }
@@ -75,7 +73,7 @@ namespace Inertia.Network
 
             return Task.Run(() =>
             {
-                Sending?.Invoke(_protocol.SerializeMessage(message));
+                Sending?.Invoke(NetworkProtocolManager.CurrentProtocol.SerializeMessage(message));
             });
         }
     }

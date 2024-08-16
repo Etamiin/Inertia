@@ -15,6 +15,8 @@ namespace Inertia.Network
         public bool IsRunning => _socket?.IsBound == true;
         public int ConnectedCount => _connections.Count;
 
+        private bool _closed;
+
         private protected Socket? _socket { get; private set; }
         private protected ConcurrentDictionary<uint, T> _connections { get; private set; }
 
@@ -40,6 +42,7 @@ namespace Inertia.Network
                     _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                     _socket.Bind(new IPEndPoint(string.IsNullOrWhiteSpace(_parameters.Ip) ? IPAddress.Any : IPAddress.Parse(_parameters.Ip), _parameters.Port));
                     _socket.Listen(_parameters.BacklogQueueSize);
+                    _closed = false;
 
                     OnStarted();
                     _socket.BeginAccept(OnAcceptConnection, _socket);
@@ -75,8 +78,12 @@ namespace Inertia.Network
             {
                 _socket?.Close();
                 _socket = null;
+            }
 
-                OnClosed(reason);
+            if (!_closed)
+            {
+                _closed = true;
+                OnClosed(reason);                
             }
         }
 

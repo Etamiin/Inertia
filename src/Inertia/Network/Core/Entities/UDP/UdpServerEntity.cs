@@ -91,7 +91,7 @@ namespace Inertia.Network
             //    throw new ObjectDisposedException(nameof(UdpConnectionEntity));
             //}
 
-            SendTo(connection.EndPoint, Protocol.SerializeMessage(message));
+            SendTo(connection.EndPoint, NetworkProtocolManager.CurrentProtocol.SerializeMessage(message));
         }
 
         public virtual void OnConnectionAdded(UdpConnectionEntity connection) { }
@@ -141,7 +141,7 @@ namespace Inertia.Network
                 }
 
                 var receiver = _connections[endPoint];
-                NetworkProtocolManager.ProcessParsing(Protocol, receiver, _reader.Fill(data));
+                NetworkProtocolManager.ProcessParsing(receiver, _reader.Fill(data));
             }
             catch (Exception ex)
             {

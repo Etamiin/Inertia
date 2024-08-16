@@ -51,11 +51,11 @@ namespace Inertia.Network
         {
             return ReflectionProvider.TryGetMessageHandler(receiver, out handler);
         }
-        public static void ProcessParsing(NetworkProtocol protocol, NetworkEntity receiver, DataReader reader)
+        public static void ProcessParsing(NetworkEntity receiver, DataReader reader)
         {
             var output = new MessageParsingOutput();
             
-            if (!protocol.TryParseMessage(receiver, reader, output)) return;
+            if (!CurrentProtocol.TryParseMessage(receiver, reader, output)) return;
             if (!output.Messages.Any())
             {
                 output.Dispose();

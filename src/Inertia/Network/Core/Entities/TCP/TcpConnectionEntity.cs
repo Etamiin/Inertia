@@ -21,7 +21,7 @@ namespace Inertia.Network
         {
             _socket = socket;
             _networkDataReader = new DataReader();
-            _buffer = new byte[_parameters.Protocol.NetworkBufferLength];
+            _buffer = new byte[NetworkProtocolManager.CurrentProtocol.NetworkBufferLength];
             Monitoring = new NetworkConnectionMonitoring();
         }
 
@@ -96,7 +96,7 @@ namespace Inertia.Network
             var data = new byte[receivedLength];
             Array.Copy(_buffer, data, receivedLength);
 
-            NetworkProtocolManager.ProcessParsing(_parameters.Protocol, this, _networkDataReader.Fill(data));
+            NetworkProtocolManager.ProcessParsing(this, _networkDataReader.Fill(data));
         }
 
         private void OnReceiveData(IAsyncResult iar)

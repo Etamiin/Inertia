@@ -19,7 +19,7 @@ namespace Inertia.Network
 
         internal WebSocketConnectionEntity(Socket socket, uint id, NetworkEntityParameters parameters, X509Certificate? serverCertificate) : base(socket, id, parameters)
         {
-            if (!(parameters.Protocol is WebSocketNetworkProtocol wsProtocol))
+            if (!(NetworkProtocolManager.CurrentProtocol is WebSocketNetworkProtocol wsProtocol))
             {
                 throw new InvalidNetworkProtocolException(typeof(WebSocketNetworkProtocol));
             }
@@ -77,7 +77,7 @@ namespace Inertia.Network
                 }
                 catch (Exception ex)
                 {
-                    LoggingProvider.Logger?.Error($"SSL authentication failed: {ex}");
+                    LoggingProvider.Logger.Error($"SSL authentication failed: {ex}");
                 }
             }
         }
@@ -122,7 +122,7 @@ namespace Inertia.Network
             }
             else
             {
-                Disconnect(NetworkDisconnectReason.SslAuthentificationFailed);
+                Disconnect(NetworkDisconnectReason.SslAuthenticationFailed);
             }
         }
         private void OnReceiveSslData(IAsyncResult iar)

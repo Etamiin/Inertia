@@ -10,7 +10,6 @@ namespace Inertia.Network
 
         protected ILogger Logger => _parameters.Logger;
 
-        protected NetworkProtocol Protocol => _parameters.Protocol;
         private protected readonly ClientParameters _clientParameters;
 
         protected NetworkClientEntity(ClientParameters parameters) : base(parameters)

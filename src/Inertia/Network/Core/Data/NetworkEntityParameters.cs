@@ -5,7 +5,6 @@ namespace Inertia.Network
     public abstract class NetworkEntityParameters
     {
         public ILogger Logger { get; set; }
-        public NetworkProtocol Protocol { get; set; }
         public string Ip { get; set; }
         public int Port { get; set; }
         public int MessageCountLimitBeforeSpam { get; set; }
@@ -16,7 +15,6 @@ namespace Inertia.Network
         protected NetworkEntityParameters(string ip, int port)
         {
             Logger = LoggingProvider.Logger;
-            Protocol = NetworkProtocolManager.CurrentProtocol;
             MessageCountLimitBeforeSpam = NetworkProtocolManager.DefaultMessageCountLimitBeforeSpam;
             Ip = ip.Replace("localhost", "127.0.0.1");
             Port = port;

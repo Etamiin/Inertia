@@ -8,7 +8,7 @@ namespace Inertia.Network
     {
         protected WebSocketServerEntity(WebSocketServerParameters parameters) : base(parameters)
         {
-            if (!(parameters.Protocol is WebSocketNetworkProtocol))
+            if (!(NetworkProtocolManager.CurrentProtocol is WebSocketNetworkProtocol))
             {
                 throw new InvalidNetworkProtocolException(typeof(WebSocketNetworkProtocol));
             }

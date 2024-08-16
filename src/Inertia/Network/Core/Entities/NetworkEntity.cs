@@ -17,7 +17,7 @@ namespace Inertia.Network
 
         public virtual void Send(NetworkMessage message)
         {
-            Send(_parameters.Protocol.SerializeMessage(message));
+            Send(NetworkProtocolManager.CurrentProtocol.SerializeMessage(message));
         }
         public bool Disconnect()
         {

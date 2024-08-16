@@ -46,11 +46,14 @@ namespace Inertia.Network
                     return true;
                 }
 
+                long lastFullyReadedPos = 0;
+
                 while (reader.UnreadedLength > 0)
                 {
                     if (!TryParseMessage(reader, out var applicationData, out var opCode)) break;
 
-                    reader.RemoveReadedBytes();
+                    lastFullyReadedPos = reader.GetPosition();
+
                     if (ProcessOpCodeMessages(connection, opCode, ref applicationData)) break;
 
                     using (var messageReader = new DataReader(applicationData))
@@ -70,6 +73,13 @@ namespace Inertia.Network
                             if (messageReader.UnreadedLength > 0) messageReader.RemoveReadedBytes();
                         }
                     }
+                }
+
+                if (lastFullyReadedPos != 0)
+                {
+                    reader
+                        .SetPosition(lastFullyReadedPos)
+                        .RemoveReadedBytes();
                 }
 
                 return true;

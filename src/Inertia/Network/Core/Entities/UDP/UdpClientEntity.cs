@@ -98,7 +98,7 @@ namespace Inertia.Network
                 IPEndPoint endPoint = null;
                 var data = ((UdpClient)iar.AsyncState).EndReceive(iar, ref endPoint);
 
-                NetworkProtocolManager.ProcessParsing(Protocol, this, _reader.Fill(data));
+                NetworkProtocolManager.ProcessParsing(this, _reader.Fill(data));
             }
             catch (Exception e)
             {

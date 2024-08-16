@@ -36,6 +36,8 @@ namespace Inertia.Network
 
             try
             {
+                long lastFullyReadedPos = 0;
+
                 while (reader.UnreadedLength > 0)
                 {
                     var msgId = reader.ReadUShort();
@@ -55,7 +57,15 @@ namespace Inertia.Network
 
                     message.Deserialize(reader);
                     output.AddMessage(message);
-                    reader.RemoveReadedBytes();
+
+                    lastFullyReadedPos = reader.GetPosition();
+                }
+
+                if (lastFullyReadedPos != 0)
+                {
+                    reader
+                        .SetPosition(lastFullyReadedPos)
+                        .RemoveReadedBytes();
                 }
 
                 return true;
