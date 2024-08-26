@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace Inertia
 {
-    public sealed class DataWriter : IDisposable
+    public sealed class DataWriter : BinaryWriter, IDisposable
     {
         private static Dictionary<Type, Action<DataWriter, object>> _writingDefinitions = new Dictionary<Type, Action<DataWriter, object>>
         {
@@ -35,159 +35,189 @@ namespace Inertia
             { typeof(ulong), (writer, value) => writer.Write((ulong)value) },
             { typeof(DateTime), (writer, value) => writer.Write((DateTime)value) },
             { typeof(byte[]), (writer, value) => writer.Write((byte[])value) },
-            { typeof(Enum), (writer, value) => writer.Write((Enum)value) }
+            { typeof(Enum), (writer, value) => writer.Write((Enum)value) },
+            { typeof(ByteBits), (writer, value) => writer.Write((ByteBits)value) }
         };
 
         public static void AddSerializableType(Type type, Action<DataWriter, object> onSerialize)
         {
-            if (!_writingDefinitions.ContainsKey(type))
-            {
-                _writingDefinitions.Add(type, onSerialize);
-            }
-            else
-            {
-                _writingDefinitions[type] = onSerialize;
-            }
+            _writingDefinitions[type] = onSerialize;
         }
 
         public bool IsDisposed { get; private set; }
+        public CompressionAlgorithm CompressionAlgorithm { get; private set; }
+        public string? EncryptionKey { get; private set; }
         public long TotalLength
         {
             get
             {
-                return _stream.Length;
+                return BaseStream.Length;
             }
         }
 
-        private BinaryWriter _writer;
-        private MemoryStream _stream;
-        private readonly DataWriterSettings _settings;
-
-        public DataWriter() : this(new DataWriterSettings())
+        public DataWriter() : this(Encoding.UTF8, 0)
         {
         }
-        public DataWriter(DataWriterSettings settings)
+        public DataWriter(string encryptionKey, CompressionAlgorithm compressionAlgorithm) : this(Encoding.UTF8, 0, encryptionKey, compressionAlgorithm)
         {
-            _settings = settings;
-            _stream = new MemoryStream(settings.Capacity);
-            _writer = new BinaryWriter(_stream, settings.Encoding);
+        }
+        public DataWriter(int capacity) : this(Encoding.UTF8, capacity)
+        {
+        }
+        public DataWriter(int capacity, string encryptionKey, CompressionAlgorithm compressionAlgorithm) : this(Encoding.UTF8, capacity, encryptionKey, compressionAlgorithm)
+        {
+        }
+        public DataWriter(Encoding encoding) : this(encoding, 0)
+        {
+        }
+        public DataWriter(Encoding encoding, string encryptionKey, CompressionAlgorithm compressionAlgorithm) : this(encoding, 0, encryptionKey, compressionAlgorithm)
+        {
+        }
+        public DataWriter(Encoding encoding, int capacity) : base(new MemoryStream(capacity), encoding)
+        {
+        }
+        public DataWriter(Encoding encoding, int capacity, string encryptionKey, CompressionAlgorithm compressionAlgorithm) : this(encoding, capacity)
+        {
+            EncryptionKey = encryptionKey;
+            CompressionAlgorithm = compressionAlgorithm;
         }
 
         public DataWriter SetPosition(long position)
         {
             this.ThrowIfDisposable(IsDisposed);
 
-            _stream.Position = Math.Min(position, TotalLength);
+            BaseStream.Position = Math.Min(position, TotalLength);
             return this;
         }
         public long GetPosition()
         {
             this.ThrowIfDisposable(IsDisposed);
 
-            return _stream.Position;
+            return BaseStream.Position;
         }
 
         public DataWriter SetEmpty(int size)
         {
             if (size <= 0) throw new ArgumentNullException(nameof(size));
 
-            _writer.Write(new byte[size]);
+            base.Write(new byte[size]);
             return this;
         }
-        public DataWriter Write(bool value)
+        public DataWriter Write(ByteBits value)
         {
-            _writer.Write(value);
+            Write(value.Byte);
+
             return this;
         }
-        public DataWriter Write(string value)
+        public new DataWriter Write(bool value)
         {
-            _writer.Write(value);
+            base.Write(value);
             return this;
         }
-        public DataWriter Write(float value)
+        public new DataWriter Write(string value)
         {
-            _writer.Write(value);
+            if (value == null)
+            {
+                value = string.Empty;
+            }
+
+            base.Write(value);
             return this;
         }
-        public DataWriter Write(decimal value)
+        public new DataWriter Write(float value)
         {
-            _writer.Write(value);
+            base.Write(value);
             return this;
         }
-        public DataWriter Write(double value)
+        public new DataWriter Write(decimal value)
         {
-            _writer.Write(value);
+            base.Write(value);
             return this;
         }
-        public DataWriter Write(byte value)
+        public new DataWriter Write(double value)
         {
-            _writer.Write(value);
+            base.Write(value);
             return this;
         }
-        public DataWriter Write(sbyte value)
+        public new DataWriter Write(byte value)
         {
-            _writer.Write(value);
+            base.Write(value);
             return this;
         }
-        public DataWriter Write(char value)
+        public new DataWriter Write(sbyte value)
         {
-            _writer.Write(value);
+            base.Write(value);
             return this;
         }
-        public DataWriter Write(short value)
+        public new DataWriter Write(char value)
         {
-            _writer.Write(value);
+            base.Write(value);
             return this;
         }
-        public DataWriter Write(ushort value)
+        public new DataWriter Write(short value)
         {
-            _writer.Write(value);
+            base.Write(value);
             return this;
         }
-        public DataWriter Write(int value)
+        public new DataWriter Write(ushort value)
         {
-            _writer.Write(value);
+            base.Write(value);
             return this;
         }
-        public DataWriter Write(uint value)
+        public new DataWriter Write(int value)
         {
-            _writer.Write(value);
+            base.Write(value);
             return this;
         }
-        public DataWriter Write(long value)
+        public new DataWriter Write(uint value)
         {
-            _writer.Write(value);
+            base.Write(value);
             return this;
         }
-        public DataWriter Write(ulong value)
+        public new DataWriter Write(long value)
         {
-            _writer.Write(value);
+            base.Write(value);
+            return this;
+        }
+        public new DataWriter Write(ulong value)
+        {
+            base.Write(value);
             return this;
         }
         public DataWriter Write(DateTime value)
         {
-            _writer.Write(value.Ticks);
+            base.Write(value.Ticks);
             return this;
         }
-        public DataWriter Write(byte[] value)
+        public DataWriter WriteBlock(byte[] value)
         {
-            if (value == null) throw new ArgumentNullException(nameof(value));
-            
-            _writer.Write(value.Length);
-            if (value.Length > 0)
+            var length = value?.Length ?? 0;
+
+            base.Write(length);
+            if (length > 0)
             {
-                _writer.Write(value);
+                base.Write(value);
             }
 
             return this;
         }
         public DataWriter Write(ISerializable value)
         {
+            if (value == null)
+            {
+                throw new ArgumentNullException(nameof(value));
+            }
+
             value.Serialize(this);
             return this;
         }
         public DataWriter Write(IEnumerable value)
         {
+            if (value == null)
+            {
+                throw new ArgumentNullException(nameof(value));
+            }
+
             var count = 0;
             var sizePos = GetPosition();
 
@@ -204,6 +234,11 @@ namespace Inertia
         }
         public DataWriter Write(IDictionary value)
         {
+            if (value == null)
+            {
+                throw new ArgumentNullException(nameof(value));
+            }
+
             Write(value.Count);
 
             foreach (DictionaryEntry entry in value)
@@ -228,8 +263,7 @@ namespace Inertia
         public DataWriter Write(object value, Type type)
         {
             if (type == null) return this;
-            if (value == null && type != typeof(string)) return this;
-
+            
             var writerMethodFound = _writingDefinitions.TryGetValue(type, out Action<DataWriter, object> action);
             if (!writerMethodFound && type.IsEnum)
             {
@@ -252,6 +286,8 @@ namespace Inertia
         }
         public DataWriter Write(params object[] values)
         {
+            if (values == null) return this;
+
             foreach (var obj in values)
             {
                 Write(obj, obj.GetType());
@@ -259,22 +295,36 @@ namespace Inertia
 
             return this;
         }
-        public DataWriter WriteRaw(byte[] data)
+        public new DataWriter Write(byte[] data)
         {
-            _writer.Write(data);
+            if (data == null)
+            {
+                data = new byte[0];
+            }
+
+            base.Write(data);
             return this;
         }
         public DataWriter WriteAutoSerializable(object value)
         {
+            if (value == null) return this;
             if (ReflectionProvider.TryGetSerializableProperties(value.GetType(), out var propertiesDict))
             {
                 if (propertiesDict.Count > byte.MaxValue) throw new InvalidDataException($"AutoSerializable object can't have more than {byte.MaxValue} properties.");
 
-                Write((byte)propertiesDict.Count);
+                byte writedCount = 0;
+                var currPos = GetPosition();
+
+                Write((byte)0);
                 foreach (var pair in propertiesDict)
                 {
-                    pair.Value.WriteTo(value, this);
+                    if (pair.Value.WriteTo(value, this))
+                    {
+                        writedCount++;
+                    }
                 }
+
+                SetPosition(currPos).Write(writedCount);
             }
 
             return this;
@@ -282,21 +332,21 @@ namespace Inertia
         
         public byte[] ToArray()
         {
-            if (IsDisposed || _stream == null)
+            if (IsDisposed)
             {
                 throw new ObjectDisposedException(nameof(DataWriter));
             }
 
-            var binary = _stream.ToArray();
+            var binary = (BaseStream as MemoryStream).ToArray();
 
-            if (_settings.CompressionAlgorithm == CompressionAlgorithm.Deflate)
+            if (CompressionAlgorithm == CompressionAlgorithm.Deflate)
             {
                 using (var deflateResult = binary.DeflateCompress())
                 {
                     binary = deflateResult.GetDataOrThrow();
                 }
             }
-            else if (_settings.CompressionAlgorithm == CompressionAlgorithm.GZip)
+            else if (CompressionAlgorithm == CompressionAlgorithm.GZip)
             {
                 using (var gzipResult = binary.GzipCompress())
                 {
@@ -304,9 +354,9 @@ namespace Inertia
                 }
             }
 
-            if (!string.IsNullOrWhiteSpace(_settings.EncryptionKey))
+            if (!string.IsNullOrWhiteSpace(EncryptionKey))
             {
-                using (var encryptionResult = binary.AesEncrypt(_settings.EncryptionKey))
+                using (var encryptionResult = binary.AesEncrypt(EncryptionKey))
                 {
                     binary = encryptionResult.GetDataOrThrow();
                 }
@@ -330,21 +380,11 @@ namespace Inertia
             return await Task.Run(ToArrayAndDispose).ConfigureAwait(false);
         }
 
-        public void Dispose()
-        {
-            Dispose(true);
-        }
-
-        private void Dispose(bool disposing)
+        protected override void Dispose(bool disposing)
         {
             if (IsDisposed) return;
 
-            if (disposing)
-            {
-                _writer.Dispose();
-                _writer = null;
-                _stream = null;
-            }
+            base.Dispose(disposing);
 
             IsDisposed = true;
         }

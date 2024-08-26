@@ -1,6 +1,4 @@
 ﻿using Inertia.Logging;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Inertia
 {
@@ -11,6 +9,6 @@ namespace Inertia
         public ILogger Logger { get; set; }
         public object? State { get; set; }
 
-        public abstract void Execute(CommandLineArguments arguments);
+        public abstract void Execute(string[] args);
     }
 }

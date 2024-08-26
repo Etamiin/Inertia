@@ -60,7 +60,7 @@ namespace Inertia.Network
                     {
                         while (messageReader.UnreadedLength > 0)
                         {
-                            var msgId = messageReader.ReadUShort();
+                            var msgId = messageReader.ReadUInt16();
                             var message = CreateMessageById(msgId);
                             if (message == null)
                             {
@@ -109,18 +109,18 @@ namespace Inertia.Network
                     var bytes = BitConverter.GetBytes((ushort)applicationData.Length);
                     Array.Reverse(bytes);
 
-                    writer.WriteRaw(bytes);
+                    writer.Write(bytes);
                 }
                 else if (payloadSize == PayloadFullSize)
                 {
                     var bytes = BitConverter.GetBytes((uint)applicationData.Length);
                     Array.Reverse(bytes);
 
-                    writer.WriteRaw(bytes);
+                    writer.Write(bytes);
                 }
 
                 return writer
-                    .WriteRaw(applicationData)
+                    .Write(applicationData)
                     .ToArray();
             }
         }

@@ -4,9 +4,10 @@ using System.Threading.Tasks;
 
 namespace Inertia.Network
 {
-    public abstract class NetworkClientEntity : NetworkEntity
+    public abstract class NetworkClientEntity : NetworkEntity, INetworkClientEntity
     {
         public abstract bool IsConnected { get; }
+        public object? State { get; set; }
 
         protected ILogger Logger => _parameters.Logger;
 
@@ -23,7 +24,6 @@ namespace Inertia.Network
         }
 
         public abstract void Connect();
-
         public async Task ConnectAsync()
         {
             await Task.Run(Connect).ConfigureAwait(false);

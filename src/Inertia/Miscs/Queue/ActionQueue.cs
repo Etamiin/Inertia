@@ -1,27 +1,21 @@
-﻿namespace Inertia
+﻿using System;
+
+namespace Inertia
 {
     public sealed class ActionQueue : ActionQueueBase
     {
         public ActionQueue()
         {
         }
-        public ActionQueue(int maximumExecutionPerTick) : base(maximumExecutionPerTick)
+        public ActionQueue(int maximumDequeuePerExecution) : base(maximumDequeuePerExecution)
         {
         }
 
         public void Execute()
         {
-            if (_isDisposing || Count == 0) return;
+            this.ThrowIfDisposable(IsDisposed);
 
             ProcessQueue();
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (!IsDisposed && disposing)
-            {
-                Clean();
-            }
         }
     }
 }

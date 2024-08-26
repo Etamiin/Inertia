@@ -12,16 +12,16 @@ namespace Inertia
         
         private DateTime? _emptySince;
 
-        public AutoActionQueue() : this(DefaultMaxExecutionPerTick, DefaultSleepTimeOnEmptyQueue, null)
+        public AutoActionQueue() : this(DefaultMaxDequeuePerExecution, DefaultSleepTimeOnEmptyQueue, null)
         {
         }
-        public AutoActionQueue(int maximumExecutionPerTick) : this(maximumExecutionPerTick, DefaultSleepTimeOnEmptyQueue, null)
+        public AutoActionQueue(int maximumDequeuePerExecution) : this(maximumDequeuePerExecution, DefaultSleepTimeOnEmptyQueue, null)
         {
         }
-        public AutoActionQueue(int maximumExecutionPerTick, TimeSpan sleepTimeOnEmptyQueue) : this(maximumExecutionPerTick, sleepTimeOnEmptyQueue, null)
+        public AutoActionQueue(int maximumDequeuePerExecution, TimeSpan sleepTimeOnEmptyQueue) : this(maximumDequeuePerExecution, sleepTimeOnEmptyQueue, null)
         {
         }
-        public AutoActionQueue(int maximumExecutionPerTick, TimeSpan sleepTimeOnEmptyQueue, TimeSpan? timeBeforeDisposeOnEmptyQueue) : base(maximumExecutionPerTick)
+        public AutoActionQueue(int maximumDequeuePerExecution, TimeSpan sleepTimeOnEmptyQueue, TimeSpan? timeBeforeDisposeOnEmptyQueue) : base(maximumDequeuePerExecution)
         {
             SleepTimeOnEmptyQueue = sleepTimeOnEmptyQueue;
             TimeBeforeDisposeOnEmptyQueue = timeBeforeDisposeOnEmptyQueue;
@@ -31,14 +31,8 @@ namespace Inertia
 
         private async Task Execute()
         {
-            while (true)
+            while (!IsDisposed)
             {
-                if (_isDisposing)
-                {
-                    Clean();
-                    break;
-                }
-
                 if (Count == 0)
                 {
                     if (TimeBeforeDisposeOnEmptyQueue.HasValue)

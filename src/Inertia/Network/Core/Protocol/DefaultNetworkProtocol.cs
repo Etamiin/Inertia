@@ -1,5 +1,6 @@
 ﻿using Inertia.Logging;
 using System;
+using System.Diagnostics;
 
 namespace Inertia.Network
 {
@@ -40,8 +41,8 @@ namespace Inertia.Network
 
                 while (reader.UnreadedLength > 0)
                 {
-                    var msgId = reader.ReadUShort();
-                    var msgSize = reader.ReadUInt();
+                    var msgId = reader.ReadUInt16();
+                    var msgSize = reader.ReadUInt32();
 
                     if (reader.UnreadedLength < msgSize) break;
 

@@ -3,7 +3,7 @@ using System;
 
 namespace Inertia.Network
 {
-    public abstract class NetworkConnectionEntity : NetworkEntity
+    public abstract class NetworkConnectionEntity : NetworkEntity, INetworkConnectionEntity
     {
         public uint Id { get; internal set; }
         public object? State { get; set; }

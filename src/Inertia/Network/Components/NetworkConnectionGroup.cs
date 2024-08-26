@@ -8,7 +8,7 @@ namespace Inertia.Network
     {
         public int ConnectionCount => _connections.Count;
 
-        private event BytesSenderAction? Sending;
+        private event BytesSenderAction? SendingData;
 
         private readonly List<NetworkConnectionEntity> _connections;
         private readonly object _locker;
@@ -23,7 +23,7 @@ namespace Inertia.Network
         {
             lock (_locker)
             {
-                Sending += connection.Send;
+                SendingData += connection.Send;
                 _connections.Add(connection);
             }
         }
@@ -33,7 +33,7 @@ namespace Inertia.Network
             {
                 foreach (var connection in connections)
                 {
-                    Sending += connection.Send;
+                    SendingData += connection.Send;
                     _connections.Add(connection);
                 }
             }
@@ -42,7 +42,7 @@ namespace Inertia.Network
         {
             lock (_locker)
             {
-                Sending -= connection.Send;
+                SendingData -= connection.Send;
                 _connections.Remove(connection);
             }
         }
@@ -56,7 +56,7 @@ namespace Inertia.Network
                     var connection = _connections[i];
                     if (predicate(connection))
                     {
-                        Sending -= connection.Send;
+                        SendingData -= connection.Send;
                         _connections.RemoveAt(i);
 
                         continue;
@@ -67,13 +67,19 @@ namespace Inertia.Network
             }
         }
     
+        public Task SendAsync(byte[] data)
+        {
+            if (SendingData == null) return Task.CompletedTask;
+
+            return Task.Run(() => SendingData?.Invoke(data));
+        }
         public Task SendAsync(NetworkMessage message)
         {
-            if (Sending == null) return Task.CompletedTask;
+            if (SendingData == null) return Task.CompletedTask;
 
             return Task.Run(() =>
             {
-                Sending?.Invoke(NetworkProtocolManager.CurrentProtocol.SerializeMessage(message));
+                SendingData?.Invoke(NetworkProtocolManager.CurrentProtocol.SerializeMessage(message));
             });
         }
     }

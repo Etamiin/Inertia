@@ -112,9 +112,7 @@ namespace Inertia.Network
             }
             catch (Exception ex)
             {
-                Logger.Error(ex, GetType(), nameof(OnReceiveData));
-
-                if (ex is SocketException || ex is ObjectDisposedException)
+                if (ex is SocketException se || ex is ObjectDisposedException)
                 {
                     Disconnect(NetworkDisconnectReason.ConnectionLost);
                     return;

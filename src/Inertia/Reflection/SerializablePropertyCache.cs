@@ -11,11 +11,20 @@ namespace Inertia
             _property = info;
         }
 
-        public void WriteTo(object serializableObject, DataWriter writer)
+        public bool WriteTo(object serializableObject, DataWriter writer)
         {
-            writer
-                .Write(_property.Name)
-                .Write(_property.GetValue(serializableObject), _property.PropertyType);
+            var value = _property.GetValue(serializableObject);
+
+            if (value != null)
+            {
+                writer
+                    .Write(_property.Name)
+                    .Write(value, _property.PropertyType);
+
+                return true;
+            }
+
+            return false;
         }
         public void ReadFrom(object serializableObject, DataReader reader)
         {

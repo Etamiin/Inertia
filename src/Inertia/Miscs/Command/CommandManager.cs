@@ -61,7 +61,7 @@ namespace Inertia
                 arguments = parsedArguments.ToArray();
             }
 
-            cmd.Execute(new CommandLineArguments(arguments));
+            cmd.Execute(arguments);
 
             return true;
         }

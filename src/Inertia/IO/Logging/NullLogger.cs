@@ -14,19 +14,19 @@ namespace Inertia.Logging
 
         public void Debug(object content)
         {
-            //No implementation for NullLogger
+            //No implementation
         }
         public void Info(object content)
         {
-            //No implementation for NullLogger
+            //No implementation
         }
         public void Warn(object content)
         {
-            //No implementation for NullLogger
+            //No implementation
         }
         public void Error(object content)
         {
-            //No implementation for NullLogger
+            //No implementation
         }
     }
 }

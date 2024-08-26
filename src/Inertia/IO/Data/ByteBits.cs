@@ -1,9 +1,21 @@
-﻿using Inertia;
-
-namespace System
+﻿namespace System
 {
     public sealed class ByteBits
     {
+        public static bool operator ==(ByteBits b1, ByteBits b2)
+        {
+            if ((object)null == b1) return (object)null == b2;
+
+            return b1.Byte == b2.Byte;
+        }
+
+        public static bool operator !=(ByteBits b1, ByteBits b2)
+        {
+            if ((object)null == b1) return (object)null != b2;
+
+            return b1.Byte != b2.Byte;
+        }
+
         public byte Byte { get; private set; }
 
         public ByteBits()

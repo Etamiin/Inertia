@@ -1,8 +1,15 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 
 namespace Inertia.Logging
 {
+    public enum LogLevel : byte
+    {
+        Debug = 0,
+        Info = 1,
+        Warn = 2,
+        Error = 3
+    }
+
     public sealed class BasicLoggerSettings
     {
         public string? OutputFileName { get; private set; }

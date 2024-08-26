@@ -5,32 +5,31 @@ namespace Inertia
 {
     public abstract class ActionQueueBase : IDisposable
     {
-        internal const int DefaultMaxExecutionPerTick = 60;
+        internal const int DefaultMaxDequeuePerExecution = 60;
 
         public bool IsDisposed { get; private set; }
         public int Count => _queue.Count;
 
-        private readonly int _maxExecutionPerTick;
+        private readonly int _maxExecutionPerExecution;
         private ConcurrentQueue<Action> _queue;
-        private protected bool _isDisposing;
 
-        protected ActionQueueBase() : this(DefaultMaxExecutionPerTick)
+        protected ActionQueueBase() : this(DefaultMaxDequeuePerExecution)
         {
         }
-        protected ActionQueueBase(int maximumExecutionPerTick)
+        protected ActionQueueBase(int maximumDequeuePerExecution)
         {
-            _maxExecutionPerTick = maximumExecutionPerTick;
+            _maxExecutionPerExecution = maximumDequeuePerExecution;
             _queue = new ConcurrentQueue<Action>();
 
-            if (_maxExecutionPerTick <= 0)
+            if (_maxExecutionPerExecution <= 0)
             {
-                _maxExecutionPerTick = DefaultMaxExecutionPerTick;
+                _maxExecutionPerExecution = DefaultMaxDequeuePerExecution;
             }
         }
 
         public void Enqueue(Action action)
         {
-            if (IsDisposed || _isDisposing) return;
+            this.ThrowIfDisposable(IsDisposed);
 
             _queue.Enqueue(action);
         }
@@ -43,33 +42,32 @@ namespace Inertia
         {
             if (IsDisposed || Count == 0) return;
 
-            for (var i = 0; i < _maxExecutionPerTick; i++)
-            {
-                if (_queue.TryDequeue(out var action))
-                {
-                    action?.Invoke();
-                }
-                else break;
-            }
-        }
-        protected void Clean()
-        {
-            if (IsDisposed) return;
-
-            while (Count > 0)
-            {
-                ProcessQueue();
-            }
+            DoProcessQueue();
         }
 
         protected virtual void Dispose(bool disposing)
         {
             if (!IsDisposed && disposing)
             {
-                _isDisposing = true;
                 _queue = null;
                 IsDisposed = true;
-                _isDisposing = false;
+
+                while (Count > 0)
+                {
+                    DoProcessQueue();
+                }
+            }
+        }
+
+        private void DoProcessQueue()
+        {
+            for (var i = 0; i < _maxExecutionPerExecution; i++)
+            {
+                if (_queue.TryDequeue(out var action))
+                {
+                    action?.Invoke();
+                }
+                else break;
             }
         }
     }

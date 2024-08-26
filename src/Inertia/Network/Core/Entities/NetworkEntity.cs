@@ -14,7 +14,7 @@ namespace Inertia.Network
 
         public abstract void Send(byte[] dataToSend);
         public abstract bool Disconnect(NetworkDisconnectReason reason);
-
+        
         public virtual void Send(NetworkMessage message)
         {
             Send(NetworkProtocolManager.CurrentProtocol.SerializeMessage(message));

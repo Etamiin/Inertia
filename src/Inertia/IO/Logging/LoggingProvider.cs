@@ -19,6 +19,6 @@
             }
         }
 
-        private static ILogger _logger;
+        private static ILogger _logger = new BasicLogger(new BasicLoggerSettings());
     }
 }

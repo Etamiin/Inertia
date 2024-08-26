@@ -47,6 +47,13 @@ namespace Inertia.Network
 
         private static NetworkProtocol _currProtocol;
 
+        static NetworkProtocolManager()
+        {
+            ReflectionProvider.Invalidate();
+
+            CurrentProtocol = new DefaultNetworkProtocol();
+        }
+
         public static bool TryGetHandler(NetworkEntity receiver, out NetworkMessageHandler handler)
         {
             return ReflectionProvider.TryGetMessageHandler(receiver, out handler);

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Data;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 
@@ -9,6 +11,7 @@ namespace Inertia
         private readonly ConstructorInfo _constructor;
         private readonly object[] _constructorParameters;
         private readonly bool _isDefaultConstructor;
+        private readonly Type _type;
 
         internal SerializableObjectCache(Type type)
         {

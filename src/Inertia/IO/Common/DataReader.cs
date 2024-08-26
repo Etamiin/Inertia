@@ -13,74 +13,77 @@ using System.Text;
 
 namespace Inertia
 {
-    public sealed class DataReader : IDisposable
+    public sealed class DataReader : BinaryReader, IDisposable
     {
         private static Dictionary<Type, Func<DataReader, Type, object>> _readingDefinitions = new Dictionary<Type, Func<DataReader, Type, object>>
         {
-            { typeof(bool), (reader, _) => reader.ReadBool() },
+            { typeof(bool), (reader, _) => reader.ReadBoolean() },
             { typeof(string), (reader, _) => reader.ReadString() },
-            { typeof(float), (reader, _) => reader.ReadFloat() },
+            { typeof(float), (reader, _) => reader.ReadSingle() },
             { typeof(decimal), (reader, _) => reader.ReadDecimal() },
             { typeof(double), (reader, _) => reader.ReadDouble() },
             { typeof(byte), (reader, _) => reader.ReadByte() },
             { typeof(sbyte), (reader, _) => reader.ReadSByte() },
             { typeof(char), (reader, _) => reader.ReadChar() },
-            { typeof(short), (reader, _) => reader.ReadShort() },
-            { typeof(ushort), (reader, _) => reader.ReadUShort() },
-            { typeof(int), (reader, _) => reader.ReadInt() },
-            { typeof(uint), (reader, _) => reader.ReadUInt() },
-            { typeof(long), (reader, _) => reader.ReadLong() },
-            { typeof(ulong), (reader, _) => reader.ReadULong() },
+            { typeof(short), (reader, _) => reader.ReadInt16() },
+            { typeof(ushort), (reader, _) => reader.ReadUInt16() },
+            { typeof(int), (reader, _) => reader.ReadInt32() },
+            { typeof(uint), (reader, _) => reader.ReadUInt32() },
+            { typeof(long), (reader, _) => reader.ReadInt64() },
+            { typeof(ulong), (reader, _) => reader.ReadUInt64() },
             { typeof(DateTime), (reader, _) => reader.ReadDateTime(DateTimeKind.Local) },
             { typeof(byte[]), (reader, _) => reader.ReadBytes() },
-            { typeof(Enum), (reader, type) => reader.ReadEnum(type) }
+            { typeof(Enum), (reader, type) => reader.ReadEnum(type) },
+            { typeof(ByteBits), (reader, _) => reader.ReadByteBits() }
         };
 
         public static void AddDeserializableType(Type type, Func<DataReader, Type, object> onDeserialize)
         {
-            if (!_readingDefinitions.ContainsKey(type))
-            {
-                _readingDefinitions.Add(type, onDeserialize);
-            }
-            else
-            {
-                _readingDefinitions[type] = onDeserialize;
-            }
+            _readingDefinitions[type] = onDeserialize;
         }
 
         public bool IsDisposed { get; private set; }
+        public string? EncryptionKey { get; private set; }
+        public CompressionAlgorithm CompressionAlgorithm { get; private set; }
         public long TotalLength
         {
             get
             {
-                return _stream != null ? _stream.Length : 0;
+                return BaseStream.Length;
             }
         }
         public long UnreadedLength
         {
             get
             {
-                return _stream != null ? (_stream.Length - _stream.Position) : 0;
+                return BaseStream.Length - BaseStream.Position;
             }
         }
 
-        private BinaryReader _reader;
-        private MemoryStream _stream;
-        private readonly DataReaderSettings _settings;
-
-        public DataReader() : this(new DataReaderSettings())
+        public DataReader() : this(Encoding.UTF8)
         {
         }
-        public DataReader(DataReaderSettings settings)
-        {
-            _settings = settings;
-            _stream = new MemoryStream();
-            _reader = new BinaryReader(_stream, settings.Encoding);
-        }
-        public DataReader(byte[] data) : this(data, new DataReaderSettings())
+        public DataReader(string encryptionKey, CompressionAlgorithm compressionAlgorithm) : this(Encoding.UTF8, encryptionKey, compressionAlgorithm)
         {
         }
-        public DataReader(byte[] data, DataReaderSettings settings) : this(settings)
+        public DataReader(Encoding encoding) : base(new MemoryStream(), encoding)
+        {
+        }
+        public DataReader(Encoding encoding, string encryptionKey, CompressionAlgorithm compressionAlgorithm) : this(encoding)
+        {
+            EncryptionKey = encryptionKey;
+            CompressionAlgorithm = compressionAlgorithm;
+        }
+        public DataReader(byte[] data) : this(data, string.Empty, CompressionAlgorithm.None)
+        {
+        }
+        public DataReader(byte[] data, string encryptionKey, CompressionAlgorithm compressionAlgorithm) : this(data, Encoding.UTF8, encryptionKey, compressionAlgorithm)
+        {
+        }
+        public DataReader(byte[] data, Encoding encoding) : this(data, encoding, null, CompressionAlgorithm.None)
+        {
+        }
+        public DataReader(byte[] data, Encoding encoding, string encryptionKey, CompressionAlgorithm compressionAlgorithm) : this(encoding, encryptionKey, compressionAlgorithm)
         {
             Fill(data);
         }
@@ -91,24 +94,21 @@ namespace Inertia
             
             if (position < 0) return this;
 
-            _stream.Position = Math.Min(position, TotalLength);
+            BaseStream.Position = Math.Min(position, TotalLength);
             return this;
         }
         public long GetPosition()
         {
             this.ThrowIfDisposable(IsDisposed);
 
-            if (_stream == null) return 0;
-
-            return _stream.Position;
+            return BaseStream.Position;
         }
         public void Clear()
         {
-            if (!IsDisposed && _stream != null)
-            {
-                _stream.Dispose();
-                _stream = new MemoryStream();
-            }
+            this.ThrowIfDisposable(IsDisposed);
+
+            BaseStream.SetLength(0);
+            (BaseStream as MemoryStream).Capacity = 0;
         }
 
         public DataReader Fill(byte[] data)
@@ -119,17 +119,17 @@ namespace Inertia
         {
             this.ThrowIfDisposable(IsDisposed);
 
-            if (!string.IsNullOrWhiteSpace(_settings.EncryptionKey))
+            if (!string.IsNullOrWhiteSpace(EncryptionKey))
             {
-                using (var decryptResult = data.AesDecrypt(_settings.EncryptionKey))
+                using (var decryptResult = data.AesDecrypt(EncryptionKey))
                 {
                     data = decryptResult.GetDataOrThrow();
                 }
             }
 
-            if (_settings.CompressionAlgorithm != CompressionAlgorithm.None)
+            if (CompressionAlgorithm != CompressionAlgorithm.None)
             {
-                var decompressionResult = _settings.CompressionAlgorithm == CompressionAlgorithm.Deflate ? data.DeflateDecompress() : data.GzipDecompress();
+                var decompressionResult = CompressionAlgorithm == CompressionAlgorithm.Deflate ? data.DeflateDecompress() : data.GzipDecompress();
 
                 using (decompressionResult)
                 {
@@ -138,16 +138,16 @@ namespace Inertia
             }
 
             var newLength = offset + data.Length;
-            if (newLength > _stream.Length)
+            if (newLength > BaseStream.Length)
             {
-                _stream.SetLength(newLength);
-                _stream.Capacity = (int)newLength;
+                BaseStream.SetLength(newLength);
+                (BaseStream as MemoryStream).Capacity = (int)newLength;
             }            
 
             var oldPosition = GetPosition();
 
             SetPosition(offset);
-            _stream.Write(data);
+            BaseStream.Write(data);
             SetPosition(oldPosition);
 
             return this;
@@ -162,8 +162,8 @@ namespace Inertia
 
             var available = ReadBytes((int)UnreadedLength);
 
-            _stream.SetLength(available.Length);
-            _stream.Capacity = available.Length;
+            BaseStream.SetLength(available.Length);
+            (BaseStream as MemoryStream).Capacity = available.Length;
 
             if (available.Length > 0)
             {
@@ -174,78 +174,17 @@ namespace Inertia
             return this;
         }
 
-        public bool ReadBool()
-        {
-            return _reader.ReadBoolean();
-        }
-        public string ReadString()
-        {
-            return _reader.ReadString();
-        }
-        public byte ReadByte()
-        {
-            return _reader.ReadByte();
-        }
         public ByteBits ReadByteBits()
         {
-            return new ByteBits(_reader.ReadByte());
-        }
-        public sbyte ReadSByte()
-        {
-            return _reader.ReadSByte();
-        }
-        public char ReadChar()
-        {
-            return _reader.ReadChar();
-        }
-        public float ReadFloat()
-        {
-            return _reader.ReadSingle();
-        }
-        public double ReadDouble()
-        {
-            return _reader.ReadDouble();
-        }
-        public decimal ReadDecimal()
-        {
-            return _reader.ReadDecimal();
-        }
-        public short ReadShort()
-        {
-            return _reader.ReadInt16();
-        }
-        public ushort ReadUShort()
-        {
-            return _reader.ReadUInt16();
-        }
-        public int ReadInt()
-        {
-            return _reader.ReadInt32();
-        }
-        public uint ReadUInt()
-        {
-            return _reader.ReadUInt32();
-        }
-        public long ReadLong()
-        {
-            return _reader.ReadInt64();
-        }
-        public ulong ReadULong()
-        {
-            return _reader.ReadUInt64();
+            return new ByteBits(ReadByte());
         }
         public DateTime ReadDateTime(DateTimeKind kind)
         {
-            return new DateTime(_reader.ReadInt64(), kind);
+            return new DateTime(ReadInt64(), kind);
         }
         public byte[] ReadBytes()
         {
-            var length = _reader.ReadInt32();
-            return _reader.ReadBytes(length);
-        }
-        public byte[] ReadBytes(int count)
-        {
-            return _reader.ReadBytes(count);
+            return ReadBytes(ReadInt32());
         }
         public T ReadSerializable<T>() where T : ISerializable
         {
@@ -273,7 +212,7 @@ namespace Inertia
         }
         public T[] ReadArray<T>()
         {
-            var array = new T[_reader.ReadInt32()];
+            var array = new T[ReadInt32()];
             for (var i = 0; i < array.Length; i++)
             {
                 array[i] = ReadValue<T>();
@@ -285,7 +224,7 @@ namespace Inertia
         {
             if (!dictionaryType.IsGenericType || !typeof(IDictionary).IsAssignableFrom(dictionaryType)) throw new ArgumentNullException(nameof(dictionaryType));
 
-            var count = ReadInt();
+            var count = ReadInt32();
             var arguments = dictionaryType.GetGenericArguments();
             var dict = (IDictionary)Activator.CreateInstance(dictionaryType);
 
@@ -323,10 +262,10 @@ namespace Inertia
         {
             if (ReflectionProvider.TryGetSerializableProperties(instance.GetType(), out var propertiesDict))
             {
-                var propertiesCount = _reader.ReadByte();
+                var propertiesCount = ReadByte();
                 for (var i = 0; i < propertiesCount; i++)
                 {
-                    var key = _reader.ReadString();
+                    var key = ReadString();
                     if (propertiesDict.TryGetValue(key, out var propertyMem))
                     {
                         propertyMem.ReadFrom(instance, this);
@@ -389,11 +328,6 @@ namespace Inertia
             }
         }
 
-        public void Dispose()
-        {
-            Dispose(true);
-        }
-
         private object ReadIEnumerable(Type valueType)
         {
             var isArray = valueType.IsArray;
@@ -419,7 +353,7 @@ namespace Inertia
 
             if (isArray)
             {
-                var array = Array.CreateInstance(elementType, ReadInt());
+                var array = Array.CreateInstance(elementType, ReadInt32());
                 for (var i = 0; i < array.Length; i++)
                 {
                     array.SetValue(ReadValue(elementType), i);
@@ -431,7 +365,7 @@ namespace Inertia
             {
                 var concreteListType = typeof(List<>).MakeGenericType(elementType);
                 var list = (IList)Activator.CreateInstance(concreteListType);
-                var count = ReadInt();
+                var count = ReadInt32();
 
                 for (var i = 0; i < count; i++)
                 {
@@ -441,16 +375,11 @@ namespace Inertia
                 return list;
             }
         }
-        private void Dispose(bool disposing)
+        protected override void Dispose(bool disposing)
         {
             if (IsDisposed) return;
 
-            if (disposing)
-            {
-                _reader.Dispose();
-                _reader = null;
-                _stream = null;
-            }
+            base.Dispose(disposing);
 
             IsDisposed = true;
         }

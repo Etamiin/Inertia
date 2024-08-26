@@ -7,6 +7,7 @@ using System.Linq;
 using System.Reflection;
 using Inertia.IO;
 using Inertia.Logging;
+using System.Diagnostics;
 
 namespace Inertia
 {
