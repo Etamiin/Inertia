@@ -5,6 +5,18 @@ VisualStudioVersion = 17.0.31912.275
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Inertia", "Inertia\Inertia.csproj", "{5E695135-01F0-4344-A5C8-E0714AD85FE1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inertia.Tests", "..\tests\Inertia.Tests\Inertia.Tests.csproj", "{DC633EB0-2EB6-4995-AD02-ED262049F6A3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inertia.ServiceProvider", "Inertia.ServiceProvider\Inertia.ServiceProvider.csproj", "{56B99C93-A2CB-4392-9197-C7854AB37156}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{CE59F2A7-E54C-49EF-97FA-C13F0799823F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{2FA1B936-0182-4685-8E19-98BE466F243D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inertia.Loops", "Inertia.Loops\Inertia.Loops.csproj", "{EB8157BF-33F3-4E51-9E45-6BD267065BD9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inertia.Network", "Inertia.Network\Inertia.Network.csproj", "{3AAEF15A-B588-48A3-A2B5-B01316BB6260}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,9 +27,32 @@ Global
 		{5E695135-01F0-4344-A5C8-E0714AD85FE1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5E695135-01F0-4344-A5C8-E0714AD85FE1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5E695135-01F0-4344-A5C8-E0714AD85FE1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC633EB0-2EB6-4995-AD02-ED262049F6A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC633EB0-2EB6-4995-AD02-ED262049F6A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC633EB0-2EB6-4995-AD02-ED262049F6A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC633EB0-2EB6-4995-AD02-ED262049F6A3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{56B99C93-A2CB-4392-9197-C7854AB37156}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{56B99C93-A2CB-4392-9197-C7854AB37156}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{56B99C93-A2CB-4392-9197-C7854AB37156}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{56B99C93-A2CB-4392-9197-C7854AB37156}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EB8157BF-33F3-4E51-9E45-6BD267065BD9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EB8157BF-33F3-4E51-9E45-6BD267065BD9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EB8157BF-33F3-4E51-9E45-6BD267065BD9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EB8157BF-33F3-4E51-9E45-6BD267065BD9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3AAEF15A-B588-48A3-A2B5-B01316BB6260}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3AAEF15A-B588-48A3-A2B5-B01316BB6260}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3AAEF15A-B588-48A3-A2B5-B01316BB6260}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3AAEF15A-B588-48A3-A2B5-B01316BB6260}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{5E695135-01F0-4344-A5C8-E0714AD85FE1} = {2FA1B936-0182-4685-8E19-98BE466F243D}
+		{DC633EB0-2EB6-4995-AD02-ED262049F6A3} = {CE59F2A7-E54C-49EF-97FA-C13F0799823F}
+		{56B99C93-A2CB-4392-9197-C7854AB37156} = {2FA1B936-0182-4685-8E19-98BE466F243D}
+		{EB8157BF-33F3-4E51-9E45-6BD267065BD9} = {2FA1B936-0182-4685-8E19-98BE466F243D}
+		{3AAEF15A-B588-48A3-A2B5-B01316BB6260} = {2FA1B936-0182-4685-8E19-98BE466F243D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A870FAC4-EEF9-43D7-A155-67F25FD80CCC}
