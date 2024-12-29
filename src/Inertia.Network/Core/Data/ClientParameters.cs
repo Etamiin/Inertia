@@ -4,13 +4,13 @@ namespace Inertia.Network
 {
     public class ClientParameters : NetworkEntityParameters
     {
-        public ActionQueueBase ExecutionQueue { get; private set; }
+        public SafeActionQueue ExecutionQueue { get; private set; }
 
         public ClientParameters(string ip, int port) : base(ip, port)
         {
-            ExecutionQueue = new AutoActionQueue();
+            ExecutionQueue = new SafeActionQueueRunner();
         }
-        public ClientParameters(string ip, int port, ActionQueueBase executionQueue) : base(ip, port)
+        public ClientParameters(string ip, int port, SafeActionQueue executionQueue) : base(ip, port)
         {
             if (executionQueue is null)
             {

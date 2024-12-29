@@ -26,15 +26,13 @@ namespace Inertia.Network
 
         private void Dispose(bool disposing)
         {
-            if (IsDisposed) return;
-
-            if (disposing)
+            if (!IsDisposed && disposing)
             {
                 Messages.Clear();
                 Messages = null;
-            }
 
-            IsDisposed = true;
+                IsDisposed = true;
+            }
         }
     }
 }

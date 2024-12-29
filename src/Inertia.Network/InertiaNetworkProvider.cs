@@ -8,7 +8,7 @@ namespace Inertia.Network
 {
     internal static class InertiaNetworkProvider
     {
-        internal sealed class NetworkTypeInterceptor : ReflectionLoadInterceptor
+        internal sealed class NetworkTypeInterceptor : TypeLoaderInterceptor
         {
             internal NetworkTypeInterceptor()
             {

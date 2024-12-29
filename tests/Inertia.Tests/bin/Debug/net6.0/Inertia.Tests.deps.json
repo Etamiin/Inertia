@@ -9,8 +9,6 @@
       "Inertia.Tests/1.0.0": {
         "dependencies": {
           "Inertia": "1.0.0",
-          "Inertia.Loops": "1.0.0",
-          "Inertia.ServiceProvider": "1.0.0",
           "Microsoft.NET.Test.Sdk": "17.12.0",
           "coverlet.collector": "6.0.2",
           "xunit": "2.9.2",
@@ -350,28 +348,6 @@
             "fileVersion": "1.0.0.0"
           }
         }
-      },
-      "Inertia.Loops/1.0.0": {
-        "dependencies": {
-          "Inertia": "1.0.0"
-        },
-        "runtime": {
-          "Inertia.Loops.dll": {
-            "assemblyVersion": "1.0.0",
-            "fileVersion": "1.0.0.0"
-          }
-        }
-      },
-      "Inertia.ServiceProvider/1.0.0": {
-        "dependencies": {
-          "Inertia": "1.0.0"
-        },
-        "runtime": {
-          "Inertia.ServiceProvider.dll": {
-            "assemblyVersion": "1.0.0",
-            "fileVersion": "1.0.0.0"
-          }
-        }
       }
     }
   },
@@ -487,16 +463,6 @@
       "hashPath": "xunit.runner.visualstudio.2.8.2.nupkg.sha512"
     },
     "Inertia/1.0.0": {
-      "type": "project",
-      "serviceable": false,
-      "sha512": ""
-    },
-    "Inertia.Loops/1.0.0": {
-      "type": "project",
-      "serviceable": false,
-      "sha512": ""
-    },
-    "Inertia.ServiceProvider/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

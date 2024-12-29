@@ -135,14 +135,12 @@ namespace Inertia.Network
         }
         private void Dispose(bool disposing)
         {
-            if (IsDisposed) return;
-
-            if (disposing)
+            if (!IsDisposed && disposing)
             {
                 Disconnect();
-            }
 
-            IsDisposed = true;
+                IsDisposed = true;
+            }
         }
     }
 }

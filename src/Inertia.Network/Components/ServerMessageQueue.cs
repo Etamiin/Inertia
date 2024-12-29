@@ -81,9 +81,7 @@ namespace Inertia.Network
         }
         private void Dispose(bool disposing)
         {
-            if (IsDisposed) return;
-
-            if (disposing)
+            if (!IsDisposed && disposing)
             {
                 _queue.Clear();
                 _queue = null;

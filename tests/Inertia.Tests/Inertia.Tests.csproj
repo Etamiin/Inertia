@@ -22,8 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Inertia.Loops\Inertia.Loops.csproj" />
-    <ProjectReference Include="..\..\src\Inertia.ServiceProvider\Inertia.ServiceProvider.csproj" />
     <ProjectReference Include="..\..\src\Inertia\Inertia.csproj" />
   </ItemGroup>
 
