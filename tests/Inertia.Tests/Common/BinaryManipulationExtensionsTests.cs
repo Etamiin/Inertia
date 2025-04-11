@@ -8,5 +8,6 @@ namespace Inertia.Tests.Common
 {
     internal class BinaryManipulationExtensionsTests
     {
+        //TODO
     }
 }

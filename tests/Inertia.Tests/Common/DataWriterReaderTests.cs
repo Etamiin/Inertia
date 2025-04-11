@@ -6,6 +6,7 @@ namespace Inertia.Tests
     public class DataWriterReaderTests
     {
         private const string EncryptionKeyTest = "{ga.kmwlU3^YQDv";
+        private static byte[] Salt = new byte[] { 5, 7, 9, 11, 13, 15, 17 };
 
         [Theory]
         [InlineData(null, CompressionAlgorithm.None)]
@@ -16,7 +17,7 @@ namespace Inertia.Tests
         [InlineData(EncryptionKeyTest, CompressionAlgorithm.Deflate)]
         public void ReadWrite_AllTypes(string encryptionKey, CompressionAlgorithm compressionAlgorithm)
         {
-            CompareWriterReaderDataValues(encryptionKey, compressionAlgorithm);
+            CompareWriterReaderDataValues(new BinaryTransformationProcessor(encryptionKey, Salt, compressionAlgorithm));
         }
 
         [Theory]
@@ -25,26 +26,27 @@ namespace Inertia.Tests
         [InlineData(EncryptionKeyTest, CompressionAlgorithm.Deflate)]
         public void Reader_Fill(string encryptionKey, CompressionAlgorithm compressionAlgorithm)
         {
+            var binaryProcessor = new BinaryTransformationProcessor(encryptionKey, Salt, compressionAlgorithm);
             var values = new DataWriterReaderTypesValues();
-            var writerData = GetWriterData(values, encryptionKey, compressionAlgorithm);
+            var writerData = GetWriterData(values, binaryProcessor);
 
-            using (var reader = new DataReader(writerData, encryptionKey, compressionAlgorithm))
+            using (var reader = new DataReader(writerData, binaryProcessor))
             {
                 CompareWriterReaderDataValues(reader);
 
                 reader.RemoveReadedBytes();
-                reader.Fill(writerData, encryptionKey, compressionAlgorithm);
+                reader.Fill(writerData, binaryProcessor);
 
                 CompareWriterReaderDataValues(reader);
             }
         }
 
-        private void CompareWriterReaderDataValues(string encryptionKey, CompressionAlgorithm compressionAlgorithm)
+        private void CompareWriterReaderDataValues(BinaryTransformationProcessor binaryProcessor)
         {
             var values = new DataWriterReaderTypesValues();
-            var writerData = GetWriterData(values, encryptionKey, compressionAlgorithm);
-            
-            using (var reader = new DataReader(writerData, encryptionKey, compressionAlgorithm))
+            var writerData = GetWriterData(values, binaryProcessor);
+
+            using (var reader = new DataReader(writerData, binaryProcessor))
             {
                 CompareWriterReaderDataValues(reader);
             }
@@ -70,44 +72,47 @@ namespace Inertia.Tests
             Assert.Equal(reader.ReadULong(), values.ULong);
             Assert.Equal(reader.ReadDateTime(), values.DateTime);
             Assert.Equal(reader.ReadBytes(values.Bytes.Length), values.Bytes);
-            Assert.Equal(reader.ReadBytes(), values.Bytes);
-            Assert.Equal(reader.ReadSerializable(typeof(SimpleISerializableObject)), values.ISerializable);
+            Assert.Equal(reader.ReadBytesWithHeader(), values.Bytes);
+            Assert.Equal(reader.ReadSerializable<SimpleISerializableObject>(), values.ISerializable);
             Assert.Equal(reader.ReadIEnumerable<List<byte>>(), values.IEnumerable);
             Assert.Equal(reader.ReadDictionary(values.IDictionary.GetType()), values.IDictionary);
             Assert.Equal(reader.ReadEnum<DataEnum>(), values.Enum);
             Assert.Equal(reader.ReadValue(values.Object.GetType()), values.Object);
-            Assert.Equal(reader.ReadAutoSerializable(values.AutoSerializable.GetType()), values.AutoSerializable);
+            Assert.Equal(reader.ReadValue(values.AutoSerializable.GetType()), values.AutoSerializable);
         }
 
-        private byte[] GetWriterData(DataWriterReaderTypesValues values, string encryptionKey, CompressionAlgorithm compressionAlgorithm)
+        private byte[] GetWriterData(DataWriterReaderTypesValues values, BinaryTransformationProcessor binaryProcessor)
         {
-            var writer = new DataWriter()
-                .Write(values.Bool)
-                .Write(values.String)
-                .Write(values.Byte)
-                .Write(values.SByte)
-                .Write(values.Char)
-                .Write(values.ByteBits)
-                .Write(values.Short)
-                .Write(values.UShort)
-                .Write(values.Float)
-                .Write(values.Double)
-                .Write(values.Decimal)
-                .Write(values.Int)
-                .Write(values.UInt)
-                .Write(values.Long)
-                .Write(values.ULong)
-                .Write(values.DateTime)
-                .Write(values.Bytes)
-                .WriteWithHeader(values.Bytes)
-                .Write(values.ISerializable)
-                .Write(values.IEnumerable)
-                .Write(values.IDictionary)
-                .Write(values.Enum)
-                .Write(values.Object)
-                .Write(values.AutoSerializable);
+            using (var writer = new DataWriter())
+            {
+                writer
+                    .Write(values.Bool)
+                    .Write(values.String)
+                    .Write(values.Byte)
+                    .Write(values.SByte)
+                    .Write(values.Char)
+                    .Write(values.ByteBits)
+                    .Write(values.Short)
+                    .Write(values.UShort)
+                    .Write(values.Float)
+                    .Write(values.Double)
+                    .Write(values.Decimal)
+                    .Write(values.Int)
+                    .Write(values.UInt)
+                    .Write(values.Long)
+                    .Write(values.ULong)
+                    .Write(values.DateTime)
+                    .Write(values.Bytes)
+                    .WriteWithHeader(values.Bytes)
+                    .Write(values.ISerializable)
+                    .Write(values.IEnumerable)
+                    .Write(values.IDictionary)
+                    .Write(values.Enum)
+                    .Write(values.Object)
+                    .Write(values.AutoSerializable);
 
-            return writer.ToArrayAndDispose(encryptionKey, compressionAlgorithm);
+                return writer.ToArray(binaryProcessor);
+            }
         }
     }
 }

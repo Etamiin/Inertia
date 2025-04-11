@@ -2,11 +2,12 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <Nullable>enable</Nullable>
+	  <Nullable>annotations</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Inertia\Inertia.csproj" />
+    <ProjectReference Include="..\Inertia.Common\Inertia.Common.csproj" />
+    <ProjectReference Include="..\Inertia.IO\Inertia.IO.csproj" />
   </ItemGroup>
 
 </Project>

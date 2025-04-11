@@ -1,8 +1,5 @@
-﻿using Inertia.IO;
-
-namespace Inertia.Tests.Data
+﻿namespace Inertia.Tests.Data
 {
-    [AutoSerializable]
     public class ComplexAutoSerializableObject
     {
         public SimpleAutoSerializableObject? Simple { get; set; }

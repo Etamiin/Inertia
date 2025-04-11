@@ -11,10 +11,7 @@
             Username = "Inertia";
 
             var password = "password";
-            using (var encryptionResult = password.AesEncrypt("_key"))
-            {
-                EncryptedPassword = encryptionResult.GetDataOrThrow();
-            }
+            EncryptedPassword = password.AesEncrypt("_key", new byte[] { 5, 7, 9, 11, 13, 15 });
         }
         public void Serialize(DataWriter writer)
         {
@@ -27,7 +24,7 @@
         public void Deserialize(byte version, DataReader reader)
         {
             Username = reader.ReadString();
-            EncryptedPassword = reader.ReadBytes();
+            EncryptedPassword = reader.ReadBytesWithHeader();
 
             var isOk = reader.ReadString() == "OK";
             if (!isOk)
