@@ -24,7 +24,7 @@ namespace Inertia.Network
                 if (!IsRunning) return;
 
                 var socket = ((Socket)iar.AsyncState).EndAccept(iar);
-                var connection = new WebSocketConnectionEntity(socket, (uint)_clientIdProvider.NextValue(), _sslCertificate);
+                var connection = new WebSocketConnectionEntity(socket, (uint)ConnectionIdProvider.GetNextId(), _sslCertificate);
                 
                 connection.ConnectionEstablished += ConnectionEstablished;
                 connection.Disconnecting += ConnectionDisconnecting;

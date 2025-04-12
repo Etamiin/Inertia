@@ -7,10 +7,7 @@ namespace Inertia.Network
     {
         protected NetworkEntity(NetworkProtocol networkProtocol)
         {
-            if (networkProtocol == null)
-            {
-                throw new ArgumentNullException(nameof(networkProtocol));
-            }
+            Check.ThrowsIfNull(networkProtocol, nameof(networkProtocol));
 
             NetworkProtocol = networkProtocol;
         }

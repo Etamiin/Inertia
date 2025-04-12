@@ -45,14 +45,15 @@ namespace Inertia.IO
             _binaryReader = new BinaryReader(new MemoryStream(), encoding);
             _lock = new object();
         }
-        public DataReader(byte[] data) : this(data, Encoding.UTF8, null)
+        public DataReader(byte[] data) : this(data, Encoding.UTF8)
         {
         }
         public DataReader(byte[] data, BinaryTransformationProcessor binaryProcessor) : this(data, Encoding.UTF8, binaryProcessor)
         {
         }
-        public DataReader(byte[] data, Encoding encoding) : this(data, encoding, null)
+        public DataReader(byte[] data, Encoding encoding) : this(encoding)
         {
+            Fill(data);
         }
         public DataReader(byte[] data, Encoding encoding, BinaryTransformationProcessor binaryProcessor) : this(encoding)
         {
@@ -130,18 +131,17 @@ namespace Inertia.IO
         {
             Check.ThrowsIfDisposable(this, IsDisposed);
 
-            var available = ReadBytes((int)UnreadedLength);
+            var buffer = (_binaryReader.BaseStream as MemoryStream).GetBuffer();
+            var availableBytes = (int)UnreadedLength;
+            var position = (int)Position;
 
-            RefreshStreamLength(available.Length);
-
-            if (available.Length > 0)
+            if (availableBytes > 0 && position > 0)
             {
-                Position = 0;
-
-                _binaryReader.BaseStream.Write(available, 0, available.Length);
-
+                Buffer.BlockCopy(buffer, position, buffer, 0, availableBytes);
                 Position = 0;
             }
+
+            RefreshStreamLength(availableBytes);
 
             return this;
         }
@@ -239,22 +239,16 @@ namespace Inertia.IO
         {
             Check.ThrowsIfNull(valueType, nameof(valueType));
 
-            if (_definitions.TryGetValue(valueType, out var action))
-            {
-                return action(this, valueType);
-            }
-            else
-            {
-                if (typeof(ISerializable).IsAssignableFrom(valueType)) return ReadSerializable(valueType);
-                if (typeof(IDictionary).IsAssignableFrom(valueType)) return ReadDictionary(valueType);
-                if (typeof(IEnumerable).IsAssignableFrom(valueType)) return ReadIEnumerable(valueType);           
-                if (valueType.IsEnum) return ReadEnum(valueType);
+            if (_definitions.TryGetValue(valueType, out var action)) return action(this, valueType);
+            if (typeof(ISerializable).IsAssignableFrom(valueType)) return ReadSerializable(valueType);
+            if (typeof(IDictionary).IsAssignableFrom(valueType)) return ReadDictionary(valueType);
+            if (typeof(IEnumerable).IsAssignableFrom(valueType)) return ReadIEnumerable(valueType);
+            if (valueType.IsEnum) return ReadEnum(valueType);
 
-                var nullableType = Nullable.GetUnderlyingType(valueType);
-                if (nullableType != null) return ReadValue(nullableType);
+            var nullableType = Nullable.GetUnderlyingType(valueType);
+            if (nullableType != null) return ReadValue(nullableType);
 
-                if (valueType.IsClass && !valueType.IsAbstract) return ReadSerializedObject(valueType);
-            }
+            if (valueType.IsClass && !valueType.IsAbstract) return ReadSerializedObject(valueType);
 
             throw new NotSupportedException($"Type '{valueType}' cannot be deserialized, consider using custom serialization definition.");
         }

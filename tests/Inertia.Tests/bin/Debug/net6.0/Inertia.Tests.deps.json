@@ -8,8 +8,8 @@
     ".NETCoreApp,Version=v6.0": {
       "Inertia.Tests/1.0.0": {
         "dependencies": {
+          "Inertia.Common": "1.0.0",
           "Inertia.IO": "1.0.0",
-          "Inertia.Network": "1.0.0",
           "Microsoft.NET.Test.Sdk": "17.12.0",
           "coverlet.collector": "6.0.2",
           "xunit": "2.9.2",
@@ -342,20 +342,20 @@
         }
       },
       "xunit.runner.visualstudio/2.8.2": {},
-      "Inertia.IO/1.0.0": {
+      "Inertia.Common/1.0.0": {
         "runtime": {
-          "Inertia.IO.dll": {
+          "Inertia.Common.dll": {
             "assemblyVersion": "1.0.0",
             "fileVersion": "1.0.0.0"
           }
         }
       },
-      "Inertia.Network/1.0.0": {
+      "Inertia.IO/1.0.0": {
         "dependencies": {
-          "Inertia.IO": "1.0.0"
+          "Inertia.Common": "1.0.0"
         },
         "runtime": {
-          "Inertia.Network.dll": {
+          "Inertia.IO.dll": {
             "assemblyVersion": "1.0.0",
             "fileVersion": "1.0.0.0"
           }
@@ -474,12 +474,12 @@
       "path": "xunit.runner.visualstudio/2.8.2",
       "hashPath": "xunit.runner.visualstudio.2.8.2.nupkg.sha512"
     },
-    "Inertia.IO/1.0.0": {
+    "Inertia.Common/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
     },
-    "Inertia.Network/1.0.0": {
+    "Inertia.IO/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

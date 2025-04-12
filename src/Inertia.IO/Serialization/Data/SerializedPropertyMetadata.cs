@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace Inertia.IO
 {
-    internal class SerializedPropertyMetadata
+    internal sealed class SerializedPropertyMetadata
     {
         private Func<object, object> _getValue;
         private Action<object, object> _setValue;
@@ -32,7 +32,7 @@ namespace Inertia.IO
             var instanceParameter = Expression.Parameter(typeof(object), "instance");
             var instanceCast = Expression.Convert(instanceParameter, property.DeclaringType);
             var propertyAccess = Expression.Property(instanceCast, property);
-            var convertResult = Expression.Convert(propertyAccess, property.PropertyType);
+            var convertResult = Expression.Convert(propertyAccess, typeof(object));
             var valueParameter = Expression.Parameter(typeof(object), "value");
             var valueCast = Expression.Convert(valueParameter, property.PropertyType);
             var assign = Expression.Assign(propertyAccess, valueCast);

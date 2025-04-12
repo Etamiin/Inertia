@@ -22,6 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Inertia.Common\Inertia.Common.csproj" />
     <ProjectReference Include="..\..\src\Inertia.IO\Inertia.IO.csproj" />
   </ItemGroup>
 

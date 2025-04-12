@@ -4,14 +4,10 @@ namespace Inertia.Network
 {
     public abstract class ServerEntity
     {
-        private protected readonly SafeOrderedIntProvider _clientIdProvider;
-
         protected ServerEntity(string ip, int port)
         {
             Ip = ip;
             Port = port;
-
-            _clientIdProvider = new SafeOrderedIntProvider();
         }
 
         protected string Ip { get; }

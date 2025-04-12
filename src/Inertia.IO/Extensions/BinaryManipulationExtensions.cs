@@ -4,8 +4,9 @@ using System.IO.Compression;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+using System;
 
-namespace System
+namespace Inertia.IO
 {
     public static class BinaryManipulationExtensions
     {
@@ -20,27 +21,21 @@ namespace System
 
         public static byte[] Compress(this byte[] data, CompressionAlgorithm algorithm)
         {
-            switch (algorithm)
+            return algorithm switch
             {
-                case CompressionAlgorithm.GZip:
-                    return GzipCompress(data);
-                case CompressionAlgorithm.Deflate:
-                    return DeflateCompress(data);
-                default:
-                    throw new InvalidEnumArgumentException(nameof(algorithm), (int)algorithm, algorithm.GetType());
-            }
+                CompressionAlgorithm.GZip => GzipCompress(data),
+                CompressionAlgorithm.Deflate => DeflateCompress(data),
+                _ => throw new InvalidEnumArgumentException(nameof(algorithm), (int)algorithm, algorithm.GetType())
+            };
         }
         public static byte[] Decompress(this byte[] compressedData, CompressionAlgorithm algorithm)
         {
-            switch (algorithm)
+            return algorithm switch
             {
-                case CompressionAlgorithm.GZip:
-                    return GzipDecompress(compressedData);
-                case CompressionAlgorithm.Deflate:
-                    return DeflateDecompress(compressedData);
-                default:
-                    throw new InvalidEnumArgumentException(nameof(algorithm), (int)algorithm, algorithm.GetType());
-            }
+                CompressionAlgorithm.GZip => GzipDecompress(compressedData),
+                CompressionAlgorithm.Deflate => DeflateDecompress(compressedData),
+                _ => throw new InvalidEnumArgumentException(nameof(algorithm), (int)algorithm, algorithm.GetType())
+            };
         }
 
         public static byte[] AesEncrypt(this byte[] data, string key, byte[] salt)
@@ -66,7 +61,10 @@ namespace System
         }
         public static bool GetBit(this byte value, int index, EndiannessType endianness)
         {
-            if (index < 0 || index > 7) throw new ArgumentOutOfRangeException(nameof(index));
+            if (index < 0 || index > 7)
+            {
+                throw new ArgumentOutOfRangeException(nameof(index));
+            }
 
             if (endianness == EndiannessType.BigEndian)
             {
@@ -81,7 +79,10 @@ namespace System
         }
         public static byte SetBit(this byte value, int index, bool state, EndiannessType endianness)
         {
-            if (index < 0 || index > 7) throw new ArgumentOutOfRangeException(nameof(index));
+            if (index < 0 || index > 7)
+            {
+                throw new ArgumentOutOfRangeException(nameof(index));
+            }
 
             if (endianness == EndiannessType.BigEndian)
             {
@@ -125,74 +126,62 @@ namespace System
         }
         private static byte[] WithAesEncryption(byte[] data, string key, byte[] salt, Func<Aes, ICryptoTransform> createCryptoTransform)
         {
-            using (var ms = new MemoryStream())
+            using var ms = new MemoryStream();
+            using var pdb = new Rfc2898DeriveBytes(key, salt);
+            using (var aes = Aes.Create())
             {
-                using (var pdb = new Rfc2898DeriveBytes(key, salt))
+                aes.Key = pdb.GetBytes(aes.KeySize / 8);
+                aes.IV = pdb.GetBytes(aes.BlockSize / 8);
+
+                using (var cs = new CryptoStream(ms, createCryptoTransform(aes), CryptoStreamMode.Write))
                 {
-                    using (var aes = Aes.Create())
-                    {
-                        aes.Key = pdb.GetBytes(aes.KeySize / 8);
-                        aes.IV = pdb.GetBytes(aes.BlockSize / 8);
-
-                        using (var cs = new CryptoStream(ms, createCryptoTransform(aes), CryptoStreamMode.Write))
-                        {
-                            cs.Write(data, 0, data.Length);
-                        }
-                    }
+                    cs.Write(data, 0, data.Length);
                 }
-
-                return ms.ToArray();
             }
+
+            return ms.ToArray();
         }
         private static byte[] GzipCompress(byte[] data)
         {
-            using (var ms = new MemoryStream())
+            using var ms = new MemoryStream();
+            using (var gzip = new GZipStream(ms, CompressionMode.Compress))
             {
-                using (var gzip = new GZipStream(ms, CompressionMode.Compress))
-                {
-                    gzip.Write(data, 0, data.Length);
-                }
-
-                return ms.ToArray();
+                gzip.Write(data, 0, data.Length);
             }
+
+            return ms.ToArray();
         }
         private static byte[] GzipDecompress(byte[] compressedData)
         {
-            using (var ms = new MemoryStream())
-            using (var gzms = new MemoryStream(compressedData))
+            using var ms = new MemoryStream();
+            using var gzms = new MemoryStream(compressedData);
+            using (var gzs = new GZipStream(gzms, CompressionMode.Decompress))
             {
-                using (var gzs = new GZipStream(gzms, CompressionMode.Decompress))
-                {
-                    gzs.CopyTo(ms);
-                }
-
-                return ms.ToArray();
+                gzs.CopyTo(ms);
             }
+
+            return ms.ToArray();
         }
         private static byte[] DeflateCompress(byte[] data)
         {
-            using (var ms = new MemoryStream())
+            using var ms = new MemoryStream();
+            using (var deflate = new DeflateStream(ms, CompressionMode.Compress))
             {
-                using (var deflate = new DeflateStream(ms, CompressionMode.Compress))
-                {
-                    deflate.Write(data, 0, data.Length);
-                }
-
-                return ms.ToArray();
+                deflate.Write(data, 0, data.Length);
             }
+
+            return ms.ToArray();
         }
         private static byte[] DeflateDecompress(byte[] compressedData)
         {
-            using (var ms = new MemoryStream())
-            using (var dsms = new MemoryStream(compressedData))
+            using var ms = new MemoryStream();
+            using var dsms = new MemoryStream(compressedData);
+            using (var deflate = new DeflateStream(dsms, CompressionMode.Decompress))
             {
-                using (var deflate = new DeflateStream(dsms, CompressionMode.Decompress))
-                {
-                    deflate.CopyTo(ms);
-                }
-
-                return ms.ToArray();
+                deflate.CopyTo(ms);
             }
+
+            return ms.ToArray();
         }
     }
 }

@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
 
 namespace Inertia.Network
 {
     internal static class NetworkServerManager
     {
         private static readonly ServerProcessingQueue[] _processingQueues;
+        private static int _roundRobinIndex = -1;
 
         static NetworkServerManager()
         {
@@ -19,7 +21,15 @@ namespace Inertia.Network
 
         internal static ServerProcessingQueue GetBestProcessingQueue()
         {
-            return _processingQueues.OrderBy((queue) => queue.ConnectionCount).First();
+            var selectedIndex = Interlocked.Increment(ref _roundRobinIndex) % _processingQueues.Length;
+
+            return _processingQueues[selectedIndex];
+        }
+        internal static (int index, int count)[] GetQueueCharges()
+        {
+            return _processingQueues
+                .Select((q, i) => (i, q.ConnectionCount))
+                .ToArray();
         }
     }
 }

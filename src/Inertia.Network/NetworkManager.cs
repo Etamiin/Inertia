@@ -38,7 +38,7 @@ namespace Inertia.Network
         }
         public static void ParseAndHandle(NetworkEntity receiver, DataReader reader)
         {
-            if (receiver == null || reader == null) return;
+            if (receiver is null || reader is null) return;
 
             var output = new MessageParsingOutput();
 
@@ -65,66 +65,84 @@ namespace Inertia.Network
 
                 foreach (var type in types)
                 {
-                    if (type.IsSubclassOf(typeof(NetworkMessage)))
-                    {
-                        var message = type.InvokeConstructor<NetworkMessage>();
-                        _messageTypes[message.MessageId] = type;
-                    }
-                    else if (type.IsSubclassOf(typeof(NetworkEntity)))
-                    {
-                        var indirectEntityType = type
-                            .GetInterfaces()
-                            .FirstOrDefault((interfaceType) => interfaceType.GetCustomAttribute<IndirectNetworkEntityAttribute>() != null);
-
-                        if (indirectEntityType != null)
-                        {
-                            _indirectEntityTypes.Add(type, indirectEntityType);
-                        }
-                    }
-                    else
-                    {
-                        if (type.GetCustomAttribute<MessageHandlerAttribute>() == null) continue;
-
-                        var methods = type.GetMethods(BindingFlags.Public | BindingFlags.Instance);
-
-                        foreach (var method in methods)
-                        {
-                            var handlerArgs = method.GetParameters();
-                            if (handlerArgs.Length != 2) continue;
-
-                            var messageType = handlerArgs[0].ParameterType;
-                            if (!messageType.IsSubclassOf(typeof(NetworkMessage))) continue;
-
-                            var entityType = handlerArgs[1].ParameterType;
-                            var isValidEntityType =
-                                entityType.IsSubclassOf(typeof(ClientEntity)) ||
-                                entityType.IsSubclassOf(typeof(ConnectionEntity)) ||
-                                entityType.GetCustomAttribute<IndirectNetworkEntityAttribute>() != null;
-
-                            if (!isValidEntityType) continue;
-
-                            if (!_handlerInvokerPerEntity.TryGetValue(entityType, out var handlerInvoker))
-                            {
-                                handlerInvoker = new NetworkMessageHandlerInvoker();
-                                _handlerInvokerPerEntity.Add(entityType, handlerInvoker);
-                            }
-
-                            var messageParam = Expression.Parameter(typeof(NetworkMessage), "message");
-                            var entityParam = Expression.Parameter(typeof(NetworkEntity), "entity");
-                            var callExpr = Expression.Call(
-                                Expression.New(type),
-                                method,
-                                Expression.Convert(messageParam, messageType),
-                                Expression.Convert(entityParam, entityType));
-
-                            var callback = Expression.Lambda<Action<NetworkMessage, NetworkEntity>>(callExpr, messageParam, entityParam).Compile();
-
-                            handlerInvoker.Register(messageType, callback);
-                        }
-                    }
+                    RegisterMessageType(type);
+                    RegisterIndirectEntityType(type);
+                    RegisterMessageHandlers(type);
                 }
             }
 
+            LinkIndirectHandlers();
+        }
+        private static void RegisterMessageType(Type type)
+        {
+            if (type.IsSubclassOf(typeof(NetworkMessage)))
+            {
+                var message = type.InvokeConstructor<NetworkMessage>();
+                if (_messageTypes.ContainsKey(message.MessageId))
+                {
+                    throw new InvalidOperationException($"Message ID '{message.MessageId}' is already registered.");
+                }
+
+                _messageTypes[message.MessageId] = type;
+            }
+        }
+        private static void RegisterIndirectEntityType(Type type)
+        {
+            if (type.IsSubclassOf(typeof(NetworkEntity)))
+            {
+                var indirectEntityType = type
+                    .GetInterfaces()
+                    .FirstOrDefault((interfaceType) => interfaceType.GetCustomAttribute<IndirectNetworkEntityAttribute>() != null);
+
+                if (indirectEntityType != null)
+                {
+                    _indirectEntityTypes.Add(type, indirectEntityType);
+                }
+            }
+        }
+        private static void RegisterMessageHandlers(Type type)
+        {
+            if (type.GetCustomAttribute<MessageHandlerAttribute>() is null) return;
+
+            var methods = type.GetMethods(BindingFlags.Public | BindingFlags.Instance);
+
+            foreach (var method in methods)
+            {
+                var handlerArgs = method.GetParameters();
+                if (handlerArgs.Length != 2) continue;
+
+                var messageType = handlerArgs[0].ParameterType;
+                if (!messageType.IsSubclassOf(typeof(NetworkMessage))) continue;
+
+                var entityType = handlerArgs[1].ParameterType;
+                var isValidEntityType =
+                    entityType.IsSubclassOf(typeof(ClientEntity)) ||
+                    entityType.IsSubclassOf(typeof(TcpConnectionEntity)) ||
+                    entityType.GetCustomAttribute<IndirectNetworkEntityAttribute>() != null;
+
+                if (!isValidEntityType) continue;
+
+                if (!_handlerInvokerPerEntity.TryGetValue(entityType, out var handlerInvoker))
+                {
+                    handlerInvoker = new NetworkMessageHandlerInvoker();
+                    _handlerInvokerPerEntity.Add(entityType, handlerInvoker);
+                }
+
+                var messageParam = Expression.Parameter(typeof(NetworkMessage), "message");
+                var entityParam = Expression.Parameter(typeof(NetworkEntity), "entity");
+                var callExpr = Expression.Call(
+                    Expression.New(type),
+                    method,
+                    Expression.Convert(messageParam, messageType),
+                    Expression.Convert(entityParam, entityType));
+
+                var callback = Expression.Lambda<Action<NetworkMessage, NetworkEntity>>(callExpr, messageParam, entityParam).Compile();
+
+                handlerInvoker.Register(messageType, callback);
+            }
+        }
+        private static void LinkIndirectHandlers()
+        {
             foreach (var kvp in _indirectEntityTypes)
             {
                 var directEntityType = kvp.Key;

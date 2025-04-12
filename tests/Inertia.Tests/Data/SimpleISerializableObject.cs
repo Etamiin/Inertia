@@ -1,4 +1,6 @@
-﻿namespace Inertia.Tests.Data
+﻿using Inertia.IO;
+
+namespace Inertia.Tests.Data
 {
     public class SimpleISerializableObject : ISerializable
     {

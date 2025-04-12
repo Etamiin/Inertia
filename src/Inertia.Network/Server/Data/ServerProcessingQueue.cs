@@ -1,42 +1,35 @@
-﻿using System;
+﻿using Inertia.Logging;
+using System;
 using System.Collections.Concurrent;
+using System.Diagnostics.SymbolStore;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Inertia.Network
 {
-    public sealed class ServerProcessingQueue
+    internal sealed class ServerProcessingQueue
     {
-        private readonly BlockingCollection<Action> _queue = new BlockingCollection<Action>();
-        private CancellationTokenSource? _cts;
+        private readonly BlockingCollection<Action> _queue;
 
         private int _registeredConnectionCount;
-        private bool _isRunning;
+        private int _isStarted;
 
         internal ServerProcessingQueue()
         {
             _queue = new BlockingCollection<Action>();           
         }
 
-        internal int ConnectionCount => _registeredConnectionCount;
+        public int ConnectionCount => _registeredConnectionCount;
 
-        internal void Stop()
-        {
-            _isRunning = false;
-            _cts?.Cancel();
-        }
-        internal void RegisterConnection(ConnectionEntity connection)
+        internal void RegisterConnection(TcpConnectionEntity connection)
         {
             Interlocked.Increment(ref _registeredConnectionCount);
 
-            if (connection is TcpConnectionEntity tcpConnection)
-            {
-                tcpConnection.Disconnecting += ConnectionDisconnecting;
-            }
+            connection.Disconnecting += ConnectionDisconnecting;
         }
         internal void Enqueue(Action action)
         {
-            if (!_isRunning)
+            if (Interlocked.CompareExchange(ref _isStarted, 1, 0) == 0)
             {
                 StartQueueExecution();
             }
@@ -46,35 +39,25 @@ namespace Inertia.Network
 
         private void StartQueueExecution()
         {
-            _isRunning = true;
-            _cts = new CancellationTokenSource();
-
             Task.Factory.StartNew(() => {
-                try
+                foreach (var action in _queue.GetConsumingEnumerable())
                 {
-                    foreach (var action in _queue.GetConsumingEnumerable(_cts.Token))
+                    try
                     {
                         action?.Invoke();
                     }
+                    catch (Exception ex)
+                    {
+                        LoggingProvider.LogHandler.Log(LogLevel.Error, $"An error occurred when executing an action in the server processing queue", ex);
+                    }
                 }
-                catch (OperationCanceledException oce)
-                {
-                    //
-                }
-                catch (Exception ex)
-                {
-                    //
-                }
-            }, _cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+            }, TaskCreationOptions.LongRunning);
         }
         private void ConnectionDisconnecting(object sender, ConnectionDisconnectingArgs e)
         {
             Interlocked.Decrement(ref _registeredConnectionCount);
 
-            if (e.Connection is TcpConnectionEntity tcpConnection)
-            {
-                tcpConnection.Disconnecting -= ConnectionDisconnecting;
-            }
+            e.Connection.Disconnecting -= ConnectionDisconnecting;
         }
     }
 }

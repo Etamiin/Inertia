@@ -5,7 +5,7 @@ using System.Net;
 
 namespace Inertia.Network
 {
-    public abstract class TcpServerBase<TConnection> : ServerEntity, IDisposable where TConnection : TcpConnectionEntityBase
+    public abstract class TcpServerBase<TConnection> : ServerEntity, IDisposable where TConnection : TcpConnectionEntity
     {
         private protected Socket? _socket { get; private set; }
         private protected ConcurrentDictionary<uint, TConnection> _connections { get; private set; }
@@ -17,17 +17,20 @@ namespace Inertia.Network
         }
 
         public bool IsDisposed { get; private set; }
-        public bool IsRunning => _socket?.IsBound == true;
+        public bool IsRunning => _isStarted && _socket?.IsBound == true;
         public int ConnectedCount => _connections.Count;
 
-        public bool TryGetConnection(uint id, out TConnection connection)
+        internal virtual void OnAcceptConnection(IAsyncResult iar)
         {
-            return _connections.TryGetValue(id, out connection);
+            if (IsRunning)
+            {
+                _socket?.BeginAccept(OnAcceptConnection, _socket);
+            }
         }
 
         public sealed override void Start()
         {
-            this.ThrowIfDisposable(IsDisposed);
+            Check.ThrowsIfDisposable(this, IsDisposed);
 
             if (IsRunning)
             {
@@ -48,7 +51,7 @@ namespace Inertia.Network
         }
         public sealed override void Stop(NetworkStopReason reason)
         {
-            this.ThrowIfDisposable(IsDisposed);
+            Check.ThrowsIfDisposable(this, IsDisposed);
 
             if (!_isStarted)
             {
@@ -63,7 +66,7 @@ namespace Inertia.Network
                 }
                 catch
                 {
-                    //
+                    // no-op
                 }
             }
 
@@ -77,18 +80,15 @@ namespace Inertia.Network
             OnStopped(reason);
         }
 
+        public bool TryGetConnection(uint id, out TConnection connection)
+        {
+            return _connections.TryGetValue(id, out connection);
+        }
         public void Dispose()
         {
             Dispose(true);
         }
 
-        internal virtual void OnAcceptConnection(IAsyncResult iar)
-        {
-            if (IsRunning)
-            {
-                _socket?.BeginAccept(OnAcceptConnection, _socket);
-            }
-        }
         protected virtual void OnConnectionEstablished(TConnection connection) { }
         protected virtual void OnConnectionDisconnecting(TConnection connection, NetworkStopReason reason) { }
 

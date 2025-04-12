@@ -40,11 +40,7 @@ namespace Inertia.Network
         public sealed override void Disconnect(NetworkStopReason reason)
         {
             Check.ThrowsIfDisposable(this, IsDisposed);
-
-            if (_socket == null)
-            {
-                throw new InvalidOperationException("Client is not connected.");
-            }
+            Check.ThrowsIfNull(_socket, nameof(Socket));
 
             OnDisconnecting(reason);
 

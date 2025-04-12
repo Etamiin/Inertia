@@ -6,7 +6,7 @@ namespace System
 {
     public static class Extensions
     {
-        private readonly static Random Randomizer = new Random();
+        private static readonly Random Randomizer = new Random();
 
         public static T InvokeConstructor<T>(this Type type)
         {
@@ -22,8 +22,11 @@ namespace System
         }
         public static object InvokeConstructor(this Type type, BindingFlags bindingFlags)
         {
-            var constructor = type.GetConstructor(bindingFlags, Type.DefaultBinder, Type.EmptyTypes, new ParameterModifier[0]);
-            if (constructor is null) throw new ConstructorNotFoundException(type, Type.EmptyTypes);
+            var constructor = type.GetConstructor(bindingFlags, Type.DefaultBinder, Type.EmptyTypes, Array.Empty<ParameterModifier>());
+            if (constructor is null)
+            {
+                throw new ConstructorNotFoundException(type, Type.EmptyTypes);
+            }
 
             return constructor.Invoke(new object[0]);
         }
@@ -42,7 +45,10 @@ namespace System
         public static object InvokeConstructor(this Type type, BindingFlags bindingFlags, Type[] parametersTypes, params object[] parameters)
         {
             var constructor = type.GetConstructor(bindingFlags, Type.DefaultBinder, parametersTypes, new ParameterModifier[0]);
-            if (constructor is null) throw new ConstructorNotFoundException(type, parametersTypes);
+            if (constructor is null)
+            {
+                throw new ConstructorNotFoundException(type, parametersTypes);
+            }
 
             return constructor.Invoke(parameters);
         }

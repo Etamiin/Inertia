@@ -87,10 +87,24 @@ namespace Inertia.IO
                 onLockProcess.Invoke(this);
             }
         }
+        public virtual DataWriter Clear()
+        {
+            Check.ThrowsIfDisposable(this, IsDisposed);
+
+            var stream = _binaryWriter.BaseStream as MemoryStream;
+
+            stream.SetLength(0);
+            stream.Position = 0;
+
+            return this;
+        }
 
         public virtual DataWriter SetEmpty(int size)
         {
-            if (size <= 0) throw new ArgumentOutOfRangeException(nameof(size));
+            if (size <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(size));
+            }
 
             _binaryWriter.Write(new byte[size]);
             return this;
@@ -324,7 +338,10 @@ namespace Inertia.IO
         {
             var metadata = SerializationManager.GetSerializableObjectMetadata(value.GetType());
 
-            if (metadata.Properties.Count > byte.MaxValue) throw new InvalidDataException($"AutoSerializable object can't have more than {byte.MaxValue} properties.");
+            if (metadata.Properties.Count > byte.MaxValue)
+            {
+                throw new InvalidDataException($"AutoSerializable object can't have more than {byte.MaxValue} properties.");
+            }
 
             byte writedCount = 0;
             var propertiesCountPosition = Position;

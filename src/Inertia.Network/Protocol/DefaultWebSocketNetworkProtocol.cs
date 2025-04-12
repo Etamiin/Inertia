@@ -7,6 +7,6 @@
         }
 
         public override int NetworkBufferLength => 4096;
-        public override int MaxReceivedMessagePerSecondPerClient => 60;
+        public override int MaxReceivedMessagePerSecondPerClient => 90;
     }
 }

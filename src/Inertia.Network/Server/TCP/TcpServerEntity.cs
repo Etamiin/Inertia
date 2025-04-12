@@ -17,7 +17,7 @@ namespace Inertia.Network
                 if (!IsRunning) return;
 
                 var socket = ((Socket)iar.AsyncState).EndAccept(iar);
-                var connection = new TcpConnectionEntity(socket, (uint)_clientIdProvider.NextValue());
+                var connection = new TcpConnectionEntity(socket, (uint)ConnectionIdProvider.GetNextId());
 
                 connection.Disconnecting += ConnectionDisconnecting;
 
@@ -38,11 +38,11 @@ namespace Inertia.Network
 
         private void ConnectionDisconnecting(object sender, ConnectionDisconnectingArgs e)
         {
-            if (e.Connection is TcpConnectionEntity connection && _connections.TryRemove(connection.Id, out _))
+            if ( _connections.TryRemove(e.Connection.Id, out _))
             {
-                connection.Disconnecting -= ConnectionDisconnecting;
+                e.Connection.Disconnecting -= ConnectionDisconnecting;
 
-                OnConnectionDisconnecting(connection, e.Reason);
+                OnConnectionDisconnecting(e.Connection, e.Reason);
             }
         }
     }

@@ -6,82 +6,81 @@ namespace Inertia.Network
 {
     public class ConnectionGroup
     {
-        private event BytesSenderAction? SendingData;
+        private BytesSenderAction? _sendingData;
 
         private readonly NetworkProtocol _networkProtocol;
-        private readonly List<ConnectionEntity> _connections;
+        private readonly HashSet<TcpConnectionEntity> _connections;
         private readonly object _locker;
 
         public ConnectionGroup(NetworkProtocol networkProtocol)
         {
             _networkProtocol = networkProtocol;
-            _connections = new List<ConnectionEntity>();
+            _connections = new HashSet<TcpConnectionEntity>();
             _locker = new object();
         }
         
         public int ConnectionCount => _connections.Count;
 
-        public void AddConnection(ConnectionEntity connection)
+        public void AddConnection(TcpConnectionEntity connection)
         {
             lock (_locker)
             {
-                SendingData += connection.Send;
+                _sendingData += connection.Send;
                 _connections.Add(connection);
             }
         }
-        public void AddConnections(IEnumerable<ConnectionEntity> connections)
+        public void AddConnections(IEnumerable<TcpConnectionEntity> connections)
         {
             lock (_locker)
             {
                 foreach (var connection in connections)
                 {
-                    SendingData += connection.Send;
+                    _sendingData += connection.Send;
                     _connections.Add(connection);
                 }
             }
         }
-        public void RemoveConnection(ConnectionEntity connection)
+        public void RemoveConnection(TcpConnectionEntity connection)
         {
             lock (_locker)
             {
-                SendingData -= connection.Send;
+                _sendingData -= connection.Send;
                 _connections.Remove(connection);
             }
         }
-        public void RemoveConnections(Predicate<ConnectionEntity> predicate)
+        public void RemoveConnections(Predicate<TcpConnectionEntity> predicate)
         {
             lock (_locker)
             {
-                var i = 0;
-                while (i < _connections.Count)
-                {
-                    var connection = _connections[i];
-                    if (predicate(connection))
-                    {
-                        SendingData -= connection.Send;
-                        _connections.RemoveAt(i);
-
-                        continue;
-                    }
-
-                    i++;
-                }
+                _connections.RemoveWhere(predicate);
             }
         }
-    
+        public void Clear()
+        {
+            lock (_locker)
+            {
+                foreach (var conn in _connections)
+                {
+                    _sendingData -= conn.Send;
+                }
+
+                _connections.Clear();
+            }
+        }
+
         public Task SendAsync(byte[] data)
         {
-            if (SendingData is null) return Task.CompletedTask;
+            if (_sendingData is null) return Task.CompletedTask;
 
-            return Task.Run(() => SendingData?.Invoke(data));
+            return Task.Run(() => _sendingData?.Invoke(data));
         }
         public Task SendAsync(NetworkMessage message)
         {
-            if (SendingData is null) return Task.CompletedTask;
+            if (_sendingData is null) return Task.CompletedTask;
 
             return Task.Run(() =>
             {
-                SendingData?.Invoke(_networkProtocol.SerializeMessage(message));
+                _sendingData?.Invoke(_networkProtocol.SerializeMessage(message));
             });
         }
     }

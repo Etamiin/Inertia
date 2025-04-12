@@ -4,17 +4,12 @@ using System.Reflection;
 
 namespace Inertia.IO
 {
-    internal class SerializedObjectMetadata
+    internal sealed class SerializedObjectMetadata
     {
         internal SerializedObjectMetadata(Type type)
         {
             Properties = new Dictionary<string, SerializedPropertyMetadata>();
-            Options = type.GetCustomAttribute<ObjectSerializationOptionsAttribute>();
-
-            if (Options is null)
-            {
-                Options = new ObjectSerializationOptionsAttribute(false);
-            }
+            Options = type.GetCustomAttribute<ObjectSerializationOptionsAttribute>() ?? new ObjectSerializationOptionsAttribute(false);
         }
 
         internal Dictionary<string, SerializedPropertyMetadata> Properties { get; }

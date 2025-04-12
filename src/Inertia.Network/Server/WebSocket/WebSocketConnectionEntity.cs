@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Inertia.Network
 {
-    public sealed class WebSocketConnectionEntity : TcpConnectionEntityBase
+    public sealed class WebSocketConnectionEntity : TcpConnectionEntity
     {
         internal event WebSocketConnectionEstablished? ConnectionEstablished;
 
@@ -17,7 +17,7 @@ namespace Inertia.Network
 
         internal WebSocketConnectionEntity(Socket socket, uint id, X509Certificate? serverCertificate) : base(socket, id, NetworkManager.WsProtocol)
         {
-            _webSocketProtocol = (WebSocketNetworkProtocol)NetworkProtocol;
+            _webSocketProtocol = NetworkProtocol as WebSocketNetworkProtocol;
             _serverCertificate = serverCertificate;
 
             if (_serverCertificate != null)
@@ -48,29 +48,9 @@ namespace Inertia.Network
                 }
             }
         }
-        private protected override void DoSend(byte[] data)
-        {
-            if (_sslStream is null)
-            {
-                if (ConnectionState == WebSocketConnectionState.Connected)
-                {
-                    _socket.Send(_webSocketProtocol.WriteWebSocketMessage(data, WebSocketOpCode.BinaryFrame));
-                }
-                else _socket.Send(data);
-            }
-            else
-            {
-                if (ConnectionState == WebSocketConnectionState.Connected)
-                {
-                    _sslStream.Write(_webSocketProtocol.WriteWebSocketMessage(data, WebSocketOpCode.BinaryFrame));
-                }
-                else _sslStream.Write(data);
-            }
-        }
-
         internal void SendSpecificOpCode(byte[] data, WebSocketOpCode opCode)
         {
-            this.ThrowIfDisposable(IsDisposed);
+            Check.ThrowsIfDisposable(this, IsDisposed);
 
             if (IsConnected)
             {
@@ -93,10 +73,39 @@ namespace Inertia.Network
                 $"Connection: Upgrade\r\n" +
                 $"Sec-WebSocket-Accept: {handshakeKey}\r\n\r\n";
 
-            DoSend(Encoding.UTF8.GetBytes(httpResponse));
+            Send(Encoding.UTF8.GetBytes(httpResponse));
 
             ConnectionState = WebSocketConnectionState.Connected;
             ConnectionEstablished?.Invoke(this);
+        }
+
+        public override void Send(byte[] data)
+        {
+            try
+            {
+                if (_sslStream is null)
+                {
+                    if (ConnectionState == WebSocketConnectionState.Connected)
+                    {
+                        _socket.Send(_webSocketProtocol.WriteWebSocketMessage(data, WebSocketOpCode.BinaryFrame));
+                    }
+                    else _socket.Send(data);
+                }
+                else
+                {
+                    if (ConnectionState == WebSocketConnectionState.Connected)
+                    {
+                        _sslStream.Write(_webSocketProtocol.WriteWebSocketMessage(data, WebSocketOpCode.BinaryFrame));
+                    }
+                    else _sslStream.Write(data);
+                }
+            }
+            catch (Exception ex)
+            {
+                LoggingProvider.LogHandler.Log(LogLevel.Error, $"An error occurred when sending message.", ex);
+
+                Disconnect(NetworkStopReason.InvalidMessageSent);
+            }
         }
 
         protected override void Dispose(bool disposing)

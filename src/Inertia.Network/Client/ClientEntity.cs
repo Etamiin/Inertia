@@ -9,10 +9,7 @@ namespace Inertia.Network
 
         protected ClientEntity(string ip, int port, NetworkProtocol networkProtocol, ClientProcessingQueue processingQueue) : base(networkProtocol)
         {
-            if (processingQueue == null)
-            {
-                throw new ArgumentNullException(nameof(processingQueue));
-            }
+            Check.ThrowsIfNull(processingQueue, nameof(processingQueue));
 
             Ip = ip;
             Port = port;

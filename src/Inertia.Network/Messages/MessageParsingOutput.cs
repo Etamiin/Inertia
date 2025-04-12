@@ -16,7 +16,7 @@ namespace Inertia.Network
         
         public void AddMessage(NetworkMessage message)
         {
-            this.ThrowIfDisposable(IsDisposed);
+            Check.ThrowsIfDisposable(this, IsDisposed);
 
             Messages.Add(message);
         }

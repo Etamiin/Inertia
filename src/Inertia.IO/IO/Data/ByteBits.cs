@@ -1,4 +1,6 @@
-﻿namespace System
+﻿using System;
+
+namespace Inertia.IO
 {
     public struct ByteBits
     {
@@ -30,7 +32,10 @@
 
         public void Set(params bool[] bits)
         {
-            if (bits.Length > 8) throw new IndexOutOfRangeException($"Bits array size cannot be greater than 8.");
+            if (bits.Length > 8)
+            {
+                throw new IndexOutOfRangeException($"Bits array size cannot be greater than 8.");
+            }
 
             for (var i = 0; i < bits.Length; i++)
             {
@@ -43,6 +48,17 @@
             {
                 _byte.SetBitByRef(i, state);
             }
+        }
+        public bool[] GetBits()
+        {
+            var bits = new bool[8];
+
+            for (int i = 0; i < 8; i++)
+            {
+                bits[i] = this[i];
+            }
+
+            return bits;
         }
     }
 }
