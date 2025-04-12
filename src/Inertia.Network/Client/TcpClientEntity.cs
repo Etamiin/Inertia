@@ -95,7 +95,7 @@ namespace Inertia.Network
 
                 _networkDataReader.Lock((reader) =>
                 {
-                    _networkDataReader.Fill(_buffer!, receivedLength);
+                    reader.Fill(_buffer!, receivedLength);
                 });
 
                 _processingQueue.Enqueue(() => _networkDataReader.Lock((reader) =>
@@ -107,7 +107,7 @@ namespace Inertia.Network
             {
                 LoggingProvider.LogHandler.Log(LogLevel.Error, "An error occurred when receiving network data", ex);
 
-                if (ex is SocketException se || ex is ObjectDisposedException)
+                if (ex is SocketException || ex is ObjectDisposedException)
                 {
                     Disconnect(NetworkStopReason.ConnectionLost);
                     return;

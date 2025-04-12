@@ -11,7 +11,7 @@ namespace Inertia.Network
     {
         internal event WebSocketConnectionEstablished? ConnectionEstablished;
 
-        private WebSocketNetworkProtocol _webSocketProtocol;
+        private readonly WebSocketNetworkProtocol _webSocketProtocol;
         private SslStream? _sslStream;
         private X509Certificate? _serverCertificate;
 

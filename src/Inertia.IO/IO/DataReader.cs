@@ -34,8 +34,8 @@ namespace Inertia.IO
             _definitions[typeof(T)] = onDeserialize;
         }
 
-        private BinaryReader _binaryReader;
-        private object _lock;
+        private readonly BinaryReader _binaryReader;
+        private readonly object _lock;
 
         public DataReader() : this(Encoding.UTF8)
         {
@@ -87,11 +87,11 @@ namespace Inertia.IO
             }
         }
 
-        public virtual DataReader Fill(byte[] data)
+        public DataReader Fill(byte[] data)
         {
             return Fill(data, data.Length);
         }
-        public virtual DataReader Fill(byte[] data, BinaryTransformationProcessor binaryProcessor)
+        public DataReader Fill(byte[] data, BinaryTransformationProcessor binaryProcessor)
         {
             Check.ThrowsIfNull(binaryProcessor, nameof(binaryProcessor));
 
@@ -99,7 +99,7 @@ namespace Inertia.IO
 
             return Fill(data, data.Length);
         }
-        public virtual DataReader Fill(byte[] buffer, int length)
+        public DataReader Fill(byte[] buffer, int length)
         {
             Check.ThrowsIfDisposable(this, IsDisposed);
 

@@ -106,13 +106,13 @@ namespace Inertia.Network
                 {
                     var length = (ushort)data.Length;
 
-                    writer.Write(new byte[] { (byte)(length >> 8), (byte)(length & 0xFF) });
+                    writer.Write(new[] { (byte)(length >> 8), (byte)(length & 0xFF) });
                 }
                 else if (payloadSize == PayloadFullSize)
                 {
                     var length = (uint)data.Length;
 
-                    writer.Write(new byte[] {
+                    writer.Write(new[] {
                         (byte)(length >> 24),
                         (byte)((length >> 16) & 0xFF),
                         (byte)((length >> 8) & 0xFF),

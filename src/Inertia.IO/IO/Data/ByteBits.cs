@@ -2,7 +2,7 @@
 
 namespace Inertia.IO
 {
-    public struct ByteBits
+    public struct ByteBits : IEquatable<ByteBits>
     {
         public static implicit operator byte(ByteBits byteBits) => byteBits._byte;
         public static implicit operator ByteBits(byte b) => new ByteBits(b);
@@ -34,7 +34,7 @@ namespace Inertia.IO
         {
             if (bits.Length > 8)
             {
-                throw new IndexOutOfRangeException($"Bits array size cannot be greater than 8.");
+                throw new ArgumentOutOfRangeException(nameof(bits));
             }
 
             for (var i = 0; i < bits.Length; i++)
@@ -59,6 +59,11 @@ namespace Inertia.IO
             }
 
             return bits;
+        }
+
+        public bool Equals(ByteBits other)
+        {
+            return _byte == other._byte;
         }
     }
 }

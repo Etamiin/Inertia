@@ -32,5 +32,15 @@
 
             return false;
         }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(
+                Simple,
+                Ints,
+                Strings,
+                NullList
+            );
+        }
     }
 }

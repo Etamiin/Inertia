@@ -51,8 +51,8 @@ namespace Inertia.Tests.Data
             DateTime = new DateTime(2024, 11, 22, 10, 30, 0);
             Bytes = Encoding.UTF8.GetBytes("Hello, World!");
             ISerializable = new SimpleISerializableObject();
-            IEnumerable = new List<byte>() { 12, 13, 14, 15 };
-            IDictionary = new Dictionary<string, byte>() { { "Key1", 16 }, { "Key2", 17 } };
+            IEnumerable = new List<byte> { 12, 13, 14, 15 };
+            IDictionary = new Dictionary<string, byte>{ { "Key1", 16 }, { "Key2", 17 } };
             Enum = DataEnum.Second;
             Object = new SimpleAutoSerializableObject();
             AutoSerializable = new ComplexAutoSerializableObject();

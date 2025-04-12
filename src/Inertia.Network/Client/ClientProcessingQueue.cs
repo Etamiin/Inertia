@@ -6,7 +6,7 @@ namespace Inertia.Network
 {
     public class ClientProcessingQueue
     {
-        private ConcurrentQueue<Action> _queue;
+        private readonly ConcurrentQueue<Action> _queue;
 
         public ClientProcessingQueue()
         {

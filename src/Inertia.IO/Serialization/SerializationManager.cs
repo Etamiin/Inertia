@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 
 namespace Inertia.IO
 {
@@ -52,21 +53,21 @@ namespace Inertia.IO
 
         private static string ReducePropertyName(string name, Dictionary<string, SerializedPropertyMetadata> properties)
         {
-            var reducedName = name.Substring(0, 1);
+            var nameBuilder = new StringBuilder(name.Substring(0, 1));
 
             for (var i = 1; i < name.Length; i++)
             {
                 if (!properties.ContainsKey(name)) break;
 
-                reducedName += name[i];
+                nameBuilder.Append(name[i]);
 
                 if (i == name.Length - 1)
                 {
-                    throw new InvalidOperationException($"Cannot reduce property name '{name}', conflict at '{reducedName}'.");
+                    throw new InvalidOperationException($"Cannot reduce property name '{name}', conflict at '{nameBuilder}'.");
                 }
             }
 
-            return reducedName;
+            return nameBuilder.ToString();
         }
     }
 }
